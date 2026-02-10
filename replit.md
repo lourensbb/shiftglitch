@@ -21,7 +21,7 @@ Preferred communication style: Simple, everyday language.
 - **Express.js v5:** A minimal static file server (`server.js`) that serves the frontend files. It runs on port 5000.
 - **Caching:** All responses have cache-control headers set to prevent caching (`no-cache, no-store, must-revalidate`), which is useful during development.
 - **SPA routing:** The catch-all route `/{*splat}` ensures all paths serve `index.html`, enabling client-side routing.
-- **No API endpoints:** There are currently no backend API routes. All data logic is handled on the frontend, either locally or through Firebase.
+- **API proxy:** `/api/gemini` POST endpoint proxies requests to the Gemini API, keeping the API key server-side only (stored in `GEMINI_API_KEY` env var).
 
 ### Data Storage
 - **Firebase Firestore (optional):** The app is designed to optionally connect to Firebase for cloud persistence. It uses Firestore for document-based storage (`getDoc`, `setDoc`) and Firebase Auth for user identity.
@@ -63,9 +63,15 @@ Preferred communication style: Simple, everyday language.
 - **Firebase/Firestore** — Cloud database for persisting user data (optional, requires `__firebase_config` global)
 - **Firebase Authentication** — User identity management (optional)
 - **Google Fonts** — Inter and Lora typefaces
-- **Gemini API** — AI-powered mission plan generation (requires API key in `apiKey` variable)
+- **Gemini API** — AI-powered mission plan generation (API key stored server-side in `GEMINI_API_KEY` env var, proxied via `/api/gemini`)
 
 ## Recent Changes
+
+### Feb 10, 2026 — Flashcard System & Security Fixes
+1. **Flashcard system:** Full deck/card CRUD with localStorage persistence. "Decks" nav link added. Deck list view, deck detail view (card list with Leitner box status), and study mode with card flipping.
+2. **Leitner spaced repetition:** 5-box system (New/Learning/Review/Familiar/Mastered) with intervals of 1/3/7/14/30 days. "Again" re-queues incorrect cards to end of current session for retry.
+3. **XSS protection:** All user-generated content (deck titles, card front/back) is HTML-escaped via `esc()` utility before rendering.
+4. **Gemini API security:** Moved API key to server-side environment variable (`GEMINI_API_KEY`). Frontend calls `/api/gemini` proxy endpoint instead of exposing key in client code.
 
 ### Feb 10, 2026 — Bug Fix Session
 1. **Firebase crash fix:** Wrapped Firebase initialization in try-catch so the app gracefully falls back to local-only mode when `__firebase_config` is not available, instead of crashing.
