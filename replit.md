@@ -67,6 +67,12 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### Feb 10, 2026 — The Blurting Method
+1. **Blurting Method feature:** New "Blurt" section added to navigation. An active recall study tool where students read notes, hide them, write everything they remember, then compare to fill in gaps.
+2. **Four-phase flow:** List (manage sessions) → Read (enter source notes) → Blurt (recall from memory in dark mode UI) → Compare (side-by-side source vs recall, with orange-highlighted gap-filling textarea).
+3. **Session persistence:** All blurt sessions saved to localStorage with title, source, recall, gaps, review count, and timestamps. Sessions can be reviewed, re-blurted, or deleted.
+4. **XSS protection:** All user input in blurt sessions is escaped via `esc()` before rendering.
+
 ### Feb 10, 2026 — Flashcard System & Security Fixes
 1. **Flashcard system:** Full deck/card CRUD with localStorage persistence. "Decks" nav link added. Deck list view, deck detail view (card list with Leitner box status), and study mode with card flipping.
 2. **Leitner spaced repetition:** 5-box system (New/Learning/Review/Familiar/Mastered) with intervals of 1/3/7/14/30 days. "Again" re-queues incorrect cards to end of current session for retry.
