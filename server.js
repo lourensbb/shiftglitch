@@ -2,9 +2,34 @@ const express = require('express');
 const path = require('path');
 const app = express();
 
+app.use(express.json());
+
 app.use((req, res, next) => {
   res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
   next();
+});
+
+app.post('/api/gemini', async (req, res) => {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    return res.status(500).json({ error: 'Gemini API key not configured on the server.' });
+  }
+  const { model, contents, systemInstruction } = req.body;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contents, systemInstruction })
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      return res.status(response.status).json({ error: data.error?.message || 'Gemini API error' });
+    }
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to contact Gemini API.' });
+  }
 });
 
 app.use(express.static(path.join(__dirname)));

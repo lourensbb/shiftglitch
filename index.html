@@ -162,27 +162,24 @@
     </div>
 
     <script>
-        const apiKey = ""; 
-        const AI_MODEL = "gemini-2.5-flash-preview-09-2025";
-        const TTS_MODEL = "gemini-2.5-flash-preview-tts";
+        const AI_MODEL = "gemini-2.5-flash-preview-05-20";
 
         const aiService = {
             async callGemini(userQuery, systemPrompt = "") {
-                if (!apiKey) return "API key not configured. Please set your Gemini API key to enable AI features.";
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/${AI_MODEL}:generateContent?key=${apiKey}`;
                 const payload = {
+                    model: AI_MODEL,
                     contents: [{ parts: [{ text: userQuery }] }],
                     systemInstruction: { parts: [{ text: systemPrompt }] }
                 };
                 let delay = 1000;
-                for (let i = 0; i < 5; i++) {
+                for (let i = 0; i < 3; i++) {
                     try {
-                        const response = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
-                        if (!response.ok) throw new Error("API Connection Error");
+                        const response = await fetch('/api/gemini', { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
                         const result = await response.json();
+                        if (!response.ok) return result.error || "API Connection Error";
                         return result.candidates?.[0]?.content?.parts?.[0]?.text || "No response generated.";
                     } catch (error) {
-                        if (i === 4) return "Failed to contact the AI Mission Core.";
+                        if (i === 2) return "Failed to contact the AI Mission Core.";
                         await new Promise(res => setTimeout(res, delay));
                         delay *= 2;
                     }
