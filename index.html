@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synapse - Interactive Learning OS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const app_fb = initializeApp(firebaseConfig);
+        const auth = getAuth(app_fb);
+        const db = getFirestore(app_fb);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+        window.fb = { 
+            auth, db, appId, doc, getDoc, setDoc, 
+            signInAnonymously, signInWithCustomToken, onAuthStateChanged 
+        };
+    </script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Lora', 'serif'],
+                    },
+                }
+            }
+        }
+    </script>
+
+    <style>
+        :root { --bg-color: #FDFCF8; --text-color: #2D2A26; }
+
+        .dark {
+            background-color: #1c1917;
+            color: #e7e5e4;
+            --bg-color: #1c1917;
+            --text-color: #e7e5e4;
+        }
+
+        .dark .bg-white { background-color: #292524 !important; } 
+        .dark .text-stone-900 { color: #f5f5f4 !important; }
+        .dark h1, .dark h2, .dark h3, .dark h4 { color: #f5f5f4 !important; }
+        .dark .bg-stone-50 { background-color: #1c1917 !important; }
+        .dark .border-stone-100, .dark .border-stone-200, .dark .border-stone-800 { border-color: #44403c !important; }
+        .dark .text-stone-500, .dark .text-stone-600 { color: #a8a29e !important; }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-color); 
+            color: var(--text-color); 
+            transition: background-color 0.3s ease, color 0.3s ease; 
+            line-height: 1.6;
+        }
+
+        h1, h2, h3, h4 { 
+            font-family: 'Lora', serif;
+            letter-spacing: -0.02em;
+        }
+        
+        .cornell-notes {
+            min-height: 400px;
+            background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+            background-size: 24px 24px;
+            padding: 2.5rem;
+            line-height: 2;
+            outline: none;
+            border-radius: 1.5rem;
+            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05);
+            font-family: 'Inter', sans-serif;
+            font-size: 1.1rem;
+        }
+        .dark .cornell-notes {
+            background-image: radial-gradient(#3f3a36 1px, transparent 1px);
+            background-color: #292524;
+        }
+
+        .chart-container { position: relative; width: 100%; max-width: 600px; margin: 0 auto; height: 300px; }
+        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); }
+        .animate-fade-in { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .ai-loader {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #ea580c;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        input[type="checkbox"] { accent-color: #ea580c; width: 1.1rem; height: 1.1rem; cursor: pointer; }
+
+        .timer-circle { transition: stroke-dashoffset 1s linear; }
+    </style>
+</head>
+<body class="antialiased selection:bg-orange-100 dark:selection:bg-orange-900 selection:text-orange-900 dark:selection:text-orange-100 font-sans">
+
+    <nav class="sticky top-0 z-50 bg-[#FDFCF8]/90 dark:bg-[#1c1917]/90 backdrop-blur-md border-b border-stone-200 dark:border-stone-800 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-3 cursor-pointer" onclick="app.navTo('dashboard')">
+                        <div class="w-8 h-8 bg-stone-800 dark:bg-orange-600 rounded-full flex items-center justify-center text-[#FDFCF8] font-serif font-bold text-lg">S</div>
+                        <span class="font-serif text-xl font-bold tracking-tight text-stone-900 dark:text-stone-50">Synapse</span>
+                    </div>
+                    <button id="theme-toggle" class="text-2xl hover:scale-110 transition-transform focus:outline-none">🌙</button>
+                </div>
+                
+                <div class="hidden md:flex items-center gap-8" id="desktop-nav">
+                    <button onclick="app.navTo('dashboard')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-sm font-semibold tracking-wide transition-colors uppercase">Mission</button>
+                    <button onclick="app.navTo('explore')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-sm font-semibold tracking-wide transition-colors uppercase">Vault</button>
+                    <button onclick="app.navTo('spaced')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-sm font-semibold tracking-wide transition-colors uppercase">Spaced</button>
+                    <button onclick="app.showAbout()" class="text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-sm font-semibold tracking-wide transition-colors uppercase">About</button>
+                </div>
+
+                <div class="md:hidden flex items-center">
+                    <button onclick="app.toggleMobileMenu()" class="text-stone-600 dark:text-stone-400 p-2 text-2xl">
+                        <span id="menu-icon">☰</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-[#FDFCF8] dark:bg-[#1c1917] border-b border-stone-200 dark:border-stone-800 px-4 pt-2 pb-6 space-y-1">
+            <button onclick="app.navTo('dashboard')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Mission</button>
+            <button onclick="app.navTo('explore')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Vault</button>
+            <button onclick="app.navTo('spaced')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Spaced</button>
+        </div>
+    </nav>
+
+    <main id="app-container" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pb-24"></main>
+
+    <div id="modal-overlay" class="fixed inset-0 bg-stone-900/60 backdrop-blur-sm hidden z-[60] opacity-0 transition-opacity duration-300 flex items-center justify-center p-4">
+        <div id="modal-content" class="bg-white dark:bg-[#292524] w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-[2rem] shadow-2xl transform scale-95 transition-transform duration-300 border border-stone-100 dark:border-stone-700"></div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification-box" class="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-stone-900 text-white px-6 py-4 rounded-2xl shadow-2xl z-[100] hidden flex items-center gap-4">
+        <span id="notification-msg" class="font-medium">Session Complete!</span>
+        <button onclick="app.hideNotification()" class="bg-white/20 hover:bg-white/30 px-3 py-1 rounded-lg text-xs font-bold uppercase">Close</button>
+    </div>
+
+    <script>
+        const apiKey = ""; 
+        const AI_MODEL = "gemini-2.5-flash-preview-09-2025";
+        const TTS_MODEL = "gemini-2.5-flash-preview-tts";
+
+        const aiService = {
+            async callGemini(userQuery, systemPrompt = "") {
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/${AI_MODEL}:generateContent?key=${apiKey}`;
+                const payload = {
+                    contents: [{ parts: [{ text: userQuery }] }],
+                    systemInstruction: { parts: [{ text: systemPrompt }] }
+                };
+                let delay = 1000;
+                for (let i = 0; i < 5; i++) {
+                    try {
+                        const response = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+                        if (!response.ok) throw new Error("API Connection Error");
+                        const result = await response.json();
+                        return result.candidates?.[0]?.content?.parts?.[0]?.text || "No response generated.";
+                    } catch (error) {
+                        if (i === 4) return "Failed to contact the AI Mission Core.";
+                        await new Promise(res => setTimeout(res, delay));
+                        delay *= 2;
+                    }
+                }
+            }
+        };
+
+        const learningData = [
+            { 
+                id: 1, 
+                title: "Active Recall", 
+                category: "Memorization", 
+                efficiency: 95, 
+                effort: 85, 
+                summary: "Testing before review.", 
+                description: "The practice of retrieving information from memory without cues. This strengthens neural pathways significantly more than passive reading.", 
+                example: "Instead of re-reading a chapter on Anatomy, close the book and draw the circulatory system from memory, then check for errors.",
+                steps: ["Scan material", "Hide source", "Recall and record"] 
+            },
+            { 
+                id: 2, 
+                title: "Spaced Repetition", 
+                category: "Retention", 
+                efficiency: 92, 
+                effort: 40, 
+                summary: "Interval optimization.", 
+                description: "Reviewing information at increasing intervals to exploit the psychological spacing effect.", 
+                example: "Learning Spanish: Review new words after 1 day, then 3 days, then 1 week, then 1 month to lock them into long-term memory.",
+                steps: ["1 Day Review", "3 Day Review", "1 Week Review"] 
+            },
+            { 
+                id: 3, 
+                title: "Feynman Technique", 
+                category: "Understanding", 
+                efficiency: 88, 
+                effort: 90, 
+                summary: "Simplify to teach.", 
+                description: "Teaching a concept in simple terms to identify gaps in your knowledge architecture.", 
+                example: "Explain 'Quantum Entanglement' to a 10-year-old using two spinning coins. If you struggle to simplify it, you don't understand it yet.",
+                steps: ["Pick topic", "Teach child", "Spot logic gaps"] 
+            },
+            { 
+                id: 4, 
+                title: "Interleaving", 
+                category: "Application", 
+                efficiency: 85, 
+                effort: 75, 
+                summary: "Subject shuffling.", 
+                description: "Mixing different subjects or problem types in a single session to improve skill discrimination.", 
+                example: "In a tennis session, alternate between serves, backhands, and volleys every 5 minutes rather than practicing only serves for an hour.",
+                steps: ["Pick 3 topics", "Rotate 25 mins", "Compare logic"] 
+            },
+            {
+                id: 5,
+                title: "The Leitner System",
+                category: "Retention",
+                efficiency: 94,
+                effort: 65,
+                summary: "Box-based flashcards.",
+                description: "A structured method of using flashcards where correctly answered cards move to boxes reviewed less frequently, while incorrect cards return to the 'every day' box for aggressive repetition.",
+                example: "Use 3 shoeboxes. Box 1: Daily. Box 2: Tue/Thu. Box 3: Fri. Miss a card in Box 3? It goes back to Box 1 immediately.",
+                steps: ["Setup 3 Boxes", "Test Box 1", "Correct? Move to 2", "Wrong? Reset to 1"]
+            }
+        ];
+
+        const state = { 
+            view: 'dashboard', 
+            search: '', 
+            aiOutput: '', 
+            isAiLoading: false, 
+            user: null, 
+            breakdown: '',
+            progress: {},
+            timerSeconds: 25 * 60,
+            timerInitialSeconds: 25 * 60,
+            timerIsRunning: false,
+            timerMode: 'work',
+            timerInterval: null
+        };
+
+        const app = {
+            charts: { scatter: null, doughnut: null },
+
+            init: async () => {
+                const toggle = document.getElementById('theme-toggle');
+                toggle.addEventListener('click', () => {
+                    document.body.classList.toggle('dark');
+                    toggle.textContent = document.body.classList.contains('dark') ? '☀️' : '🌙';
+                    if (state.view === 'dashboard') app.renderCharts();
+                });
+
+                const initAuth = async () => {
+                    if (!window.fb || !window.fb.auth) return;
+                    try {
+                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                            await window.fb.signInWithCustomToken(window.fb.auth, __initial_auth_token);
+                        } else {
+                            await window.fb.signInAnonymously(window.fb.auth);
+                        }
+                    } catch (err) { console.error("Auth Error", err); }
+                };
+                
+                await initAuth();
+                if (window.fb && window.fb.onAuthStateChanged) {
+                    window.fb.onAuthStateChanged(window.fb.auth, async (user) => {
+                        state.user = user;
+                        if (user && state.view === 'dashboard') await app.loadUserData();
+                    });
+                }
+
+                app.navTo('dashboard');
+                window.addEventListener('resize', app.handleResize);
+            },
+
+            handleResize: () => { if (state.view === 'dashboard') app.renderCharts(); },
+
+            toggleMobileMenu: () => {
+                const menu = document.getElementById('mobile-menu');
+                if (menu) menu.classList.toggle('hidden');
+            },
+
+            navTo: (tabId) => {
+                state.view = tabId;
+                window.scrollTo(0, 0);
+
+                const menu = document.getElementById('mobile-menu');
+                if (menu) menu.classList.add('hidden');
+
+                document.querySelectorAll('.nav-btn').forEach(btn => {
+                    btn.classList.remove('text-orange-600', 'font-bold');
+                    const label = tabId === 'dashboard' ? 'Mission' : (tabId === 'spaced' ? 'Spaced' : 'Vault');
+                    if (btn.textContent.trim().toUpperCase() === label.toUpperCase()) btn.classList.add('text-orange-600', 'font-bold');
+                });
+
+                app.render();
+            },
+
+            startTimer: () => {
+                if (state.timerIsRunning) return;
+                state.timerIsRunning = true;
+                state.timerInterval = setInterval(() => {
+                    state.timerSeconds--;
+                    app.updateTimerUI();
+                    if (state.timerSeconds <= 0) {
+                        app.pauseTimer();
+                        app.showNotification(state.timerMode === 'work' ? "Focus complete!" : "Break over!");
+                    }
+                }, 1000);
+                app.updateTimerUI();
+            },
+
+            pauseTimer: () => {
+                state.timerIsRunning = false;
+                clearInterval(state.timerInterval);
+                app.updateTimerUI();
+            },
+
+            resetTimer: () => {
+                app.pauseTimer();
+                state.timerSeconds = state.timerInitialSeconds;
+                app.updateTimerUI();
+            },
+
+            switchTimerMode: (mode) => {
+                app.pauseTimer();
+                state.timerMode = mode;
+                state.timerInitialSeconds = mode === 'work' ? 25 * 60 : 5 * 60;
+                state.timerSeconds = state.timerInitialSeconds;
+                app.updateTimerUI();
+            },
+
+            updateTimerUI: () => {
+                const display = document.getElementById('timer-display');
+                const btn = document.getElementById('timer-toggle-btn');
+                const progress = document.getElementById('timer-progress');
+                if (!display || !btn || !progress) return;
+
+                const m = Math.floor(state.timerSeconds / 60);
+                const s = state.timerSeconds % 60;
+                display.textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                btn.textContent = state.timerIsRunning ? 'Pause' : 'Start';
+                
+                const circumference = 2 * Math.PI * 45;
+                const offset = circumference - (state.timerSeconds / state.timerInitialSeconds) * circumference;
+                progress.style.strokeDasharray = `${circumference} ${circumference}`;
+                progress.style.strokeDashoffset = offset;
+            },
+
+            showNotification: (msg) => {
+                const box = document.getElementById('notification-box');
+                const text = document.getElementById('notification-msg');
+                if (text) text.textContent = msg;
+                if (box) box.classList.remove('hidden');
+            },
+
+            hideNotification: () => {
+                const box = document.getElementById('notification-box');
+                if (box) box.classList.add('hidden');
+            },
+
+            async saveUserData() {
+                const notesArea = document.getElementById('notes-editable');
+                if (notesArea) {
+                    localStorage.setItem('cornellNotes', notesArea.innerHTML);
+                }
+
+                if (!state.user || !window.fb) return;
+                const progressItems = document.querySelectorAll('#progress-list input[type="checkbox"]');
+                const progressState = {};
+                progressItems.forEach(item => { progressState[item.id] = item.checked; });
+                const statusIndicator = document.getElementById('save-status');
+                if (statusIndicator) statusIndicator.textContent = "Saving...";
+                try {
+                    const dataRef = window.fb.doc(window.fb.db, 'artifacts', window.fb.appId, 'users', state.user.uid, 'settings', 'user_data');
+                    await window.fb.setDoc(dataRef, { 
+                        notes: notesArea ? notesArea.innerHTML : "", 
+                        progress: progressState,
+                        updatedAt: Date.now() 
+                    });
+                    if (statusIndicator) statusIndicator.textContent = "Synced";
+                    state.progress = progressState;
+                } catch (e) { if (statusIndicator) statusIndicator.textContent = "Sync Error"; }
+            },
+
+            async loadUserData() {
+                const localNotes = localStorage.getItem('cornellNotes');
+                const notesArea = document.getElementById('notes-editable');
+                if (notesArea && localNotes) notesArea.innerHTML = localNotes;
+
+                if (!state.user || !window.fb) return;
+                try {
+                    const dataRef = window.fb.doc(window.fb.db, 'artifacts', window.fb.appId, 'users', state.user.uid, 'settings', 'user_data');
+                    const snap = await window.fb.getDoc(dataRef);
+                    if (snap.exists()) {
+                        const data = snap.data();
+                        if (notesArea && data.notes) notesArea.innerHTML = data.notes;
+                        if (data.progress) {
+                            state.progress = data.progress;
+                            Object.keys(data.progress).forEach(id => {
+                                const el = document.getElementById(id);
+                                if (el) el.checked = data.progress[id];
+                            });
+                        }
+                    }
+                } catch (e) { console.error("Load failed", e); }
+            },
+
+            async generateMissionPlan() {
+                const subject = document.getElementById('subjectInput').value;
+                if (!subject) return;
+                state.isAiLoading = true; app.render();
+                const res = await aiService.callGemini(`Draft a 3-stage mission for learning "${subject}" using techniques: ${learningData.map(t=>t.title).join(',')}.`, "Expert coach.");
+                state.aiOutput = res; state.isAiLoading = false; app.render();
+            },
+
+            openModal: (id) => {
+                const t = learningData.find(x => x.id === id);
+                const modal = document.getElementById('modal-overlay');
+                document.getElementById('modal-content').innerHTML = `
+                    <div class="p-8 relative">
+                        <button onclick="app.closeModal()" class="absolute top-6 right-6 text-stone-400 hover:text-stone-900 dark:hover:text-white transition-colors text-2xl">✕</button>
+                        
+                        <div class="mb-8">
+                            <span class="text-orange-600 font-bold uppercase tracking-widest text-xs">${t.category} Protocol</span>
+                            <h2 class="text-5xl font-serif font-bold text-stone-900 dark:text-stone-50 mt-2">${t.title}</h2>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                            <div class="space-y-6">
+                                <div>
+                                    <h3 class="text-sm font-bold uppercase text-stone-400 tracking-widest mb-2">The Mechanism</h3>
+                                    <p class="text-stone-600 dark:text-stone-400 leading-relaxed font-medium">${t.description}</p>
+                                </div>
+                                <div class="bg-stone-50 dark:bg-stone-900/50 p-6 rounded-3xl border border-stone-100 dark:border-stone-800">
+                                    <h3 class="text-sm font-bold uppercase text-stone-500 tracking-widest mb-3 flex items-center gap-2">
+                                        💡 Field Application
+                                    </h3>
+                                    <p class="text-stone-700 dark:text-stone-300 italic leading-relaxed">
+                                        "${t.example}"
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="bg-stone-50 dark:bg-stone-900/50 p-8 rounded-[2rem] border border-stone-100 dark:border-stone-800">
+                                <h3 class="text-sm font-bold uppercase text-stone-500 tracking-widest mb-6">Execution Sequence</h3>
+                                <ul class="space-y-4">
+                                    ${t.steps.map((s,i) => `
+                                        <li class="flex items-center gap-4">
+                                            <span class="flex-shrink-0 w-8 h-8 rounded-full bg-orange-600 text-white flex items-center justify-center text-sm font-bold">${i+1}</span> 
+                                            <span class="font-semibold text-stone-700 dark:text-stone-200">${s}</span>
+                                        </li>
+                                    `).join('')}
+                                </ul>
+                                <div class="mt-10 pt-6 border-t border-stone-200 dark:border-stone-800">
+                                    <p class="text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-2">Retention Metric</p>
+                                    <div class="w-full bg-stone-200 dark:bg-stone-800 h-2 rounded-full overflow-hidden">
+                                        <div class="bg-orange-600 h-full" style="width: ${t.efficiency}%"></div>
+                                    </div>
+                                    <div class="flex justify-between mt-1 text-[10px] font-bold text-stone-500">
+                                        <span>Efficiency Rating</span>
+                                        <span>${t.efficiency}%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                modal.classList.remove('hidden');
+                setTimeout(() => modal.classList.remove('opacity-0'), 10);
+            },
+
+            closeModal: () => {
+                document.getElementById('modal-overlay').classList.add('opacity-0');
+                setTimeout(() => document.getElementById('modal-overlay').classList.add('hidden'), 300);
+            },
+
+            render: () => {
+                const container = document.getElementById('app-container');
+                if (state.view === 'dashboard') {
+                    container.innerHTML = app.getHomeHTML();
+                    app.renderCharts();
+                    app.loadUserData();
+                    app.updateTimerUI();
+                } else if (state.view === 'explore') {
+                    container.innerHTML = app.getExploreHTML();
+                    app.renderVault();
+                } else if (state.view === 'spaced') {
+                    container.innerHTML = app.getSpacedHTML();
+                }
+            },
+
+            getHomeHTML: () => `
+                <div class="animate-fade-in space-y-12">
+                    <section class="text-center">
+                        <h1 class="text-5xl md:text-7xl font-serif font-bold mb-4">The Mission.</h1>
+                        <p class="text-stone-500 dark:text-stone-400 max-w-xl mx-auto italic font-medium">Strategic intelligence synthesis powered by Gemini API.</p>
+                    </section>
+                    <section class="bg-stone-900 dark:bg-stone-800 rounded-[2.5rem] p-10 text-white shadow-2xl relative overflow-hidden">
+                        <div class="relative z-10 flex flex-col gap-6">
+                            <h2 class="text-3xl font-serif font-semibold text-white">✨ Mission Architect</h2>
+                            <div class="flex flex-col sm:flex-row gap-3">
+                                <input id="subjectInput" type="text" placeholder="Objective..." class="flex-grow bg-white/10 px-6 py-4 rounded-2xl border border-white/20 text-white font-sans focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all">
+                                <button onclick="app.generateMissionPlan()" class="bg-orange-600 px-8 py-4 rounded-2xl font-bold tracking-wide hover:bg-orange-500 transition-all">
+                                    ${state.isAiLoading ? '<span class="ai-loader"></span>' : 'Synthesize ✨'}
+                                </button>
+                            </div>
+                            <div class="bg-white/5 p-6 rounded-2xl border border-white/10 text-stone-300 leading-relaxed whitespace-pre-line font-sans text-sm md:text-base">
+                                ${state.aiOutput || 'Awaiting mission input...'}
+                            </div>
+                        </div>
+                    </section>
+                    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                        <div class="lg:col-span-1 space-y-8">
+                            <div class="bg-white dark:bg-[#292524] p-6 rounded-[2rem] border border-stone-100 dark:border-stone-800 shadow-sm flex flex-col items-center">
+                                <div class="relative w-40 h-40 mb-6">
+                                    <svg class="w-full h-full transform -rotate-90">
+                                        <circle cx="80" cy="80" r="45" stroke-width="6" stroke="currentColor" fill="transparent" class="text-stone-100 dark:text-stone-800" />
+                                        <circle id="timer-progress" cx="80" cy="80" r="45" stroke-width="6" stroke="currentColor" fill="transparent" class="timer-circle ${state.timerMode === 'work' ? 'text-orange-600' : 'text-stone-400'}" />
+                                    </svg>
+                                    <div id="timer-display" class="absolute inset-0 flex items-center justify-center text-3xl font-bold font-sans">25:00</div>
+                                </div>
+                                <div class="flex gap-2 w-full"><button id="timer-toggle-btn" onclick="state.timerIsRunning ? app.pauseTimer() : app.startTimer()" class="flex-grow bg-stone-900 dark:bg-stone-50 text-white dark:text-stone-900 py-3 rounded-2xl font-bold uppercase tracking-widest text-xs">Start</button></div>
+                            </div>
+                            <div class="bg-white dark:bg-[#292524] p-8 rounded-[2rem] border border-stone-100 dark:border-stone-800 shadow-sm">
+                                <h3 class="text-xl font-serif font-bold mb-6 text-stone-900 dark:text-stone-50">Status</h3>
+                                <ul id="progress-list" class="space-y-4">
+                                    ${[1,2,3,4,5].map(i => `<li class="flex items-center gap-3"><input type="checkbox" id="m${i}" onchange="app.saveUserData()"><label for="m${i}" class="text-sm font-semibold text-stone-600 dark:text-stone-300">Module 0${i}</label></li>`).join('')}
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="lg:col-span-3 bg-white dark:bg-[#292524] rounded-[2.5rem] p-10 border border-stone-100 dark:border-stone-800 shadow-sm flex flex-col">
+                            <div class="flex justify-between items-center mb-6">
+                                <div class="flex flex-col">
+                                    <h3 class="text-2xl font-serif font-bold text-stone-900 dark:text-stone-50">Mission Notes</h3>
+                                    <span id="save-status" class="text-[10px] uppercase font-bold tracking-widest text-stone-400">Synced</span>
+                                </div>
+                                <button onclick="app.saveUserData()" class="bg-orange-600 hover:bg-orange-500 text-white px-6 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-all">Save Notes</button>
+                            </div>
+                            <div class="cornell-notes dark:text-stone-100 flex-grow" contenteditable="true" id="notes-editable" onblur="app.saveUserData()">
+                                Start your Cornell Note synthesis here...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `,
+
+            getExploreHTML: () => `
+                <div class="animate-fade-in text-center">
+                    <h1 class="text-6xl font-serif font-bold mb-12">The Vault</h1>
+                    <div id="vault-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6"></div>
+                </div>
+            `,
+
+            renderVault: () => {
+                const grid = document.getElementById('vault-grid');
+                if (!grid) return;
+                grid.innerHTML = learningData.map(t => `
+                    <div onclick="app.openModal(${t.id})" class="card-hover bg-white dark:bg-[#292524] p-8 rounded-3xl border border-stone-100 dark:border-stone-800 cursor-pointer text-left flex flex-col group">
+                        <span class="text-[10px] font-bold text-orange-600 uppercase tracking-widest mb-2">${t.category}</span>
+                        <h3 class="text-2xl font-serif font-bold mb-3 text-stone-900 dark:text-stone-50">${t.title}</h3>
+                        <p class="text-sm text-stone-500 dark:text-stone-400 flex-grow leading-relaxed">${t.summary}</p>
+                        <div class="mt-6 text-[10px] font-bold text-stone-400 uppercase tracking-widest group-hover:text-orange-600 transition-colors">Open Protocol ↗</div>
+                    </div>
+                `).join('');
+            },
+
+            getSpacedHTML: () => `
+                <section class="animate-fade-in max-w-4xl mx-auto space-y-12">
+                    <div class="border-b border-stone-200 dark:border-stone-800 pb-10 text-center">
+                        <span class="text-orange-600 font-bold tracking-wider text-xs uppercase mb-3 block">Module 04 Protocol</span>
+                        <h2 class="text-6xl font-serif font-bold mb-4 text-stone-900 dark:text-stone-50">Spaced Repetition</h2>
+                        <p class="text-xl text-stone-600 dark:text-stone-400 italic leading-relaxed font-medium">
+                            Combatting the forgetting curve through algorithmic review.
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-16 py-8">
+                        <div class="space-y-8">
+                            <h3 class="text-2xl font-serif font-bold text-stone-900 dark:text-stone-50">Mechanism</h3>
+                            <div class="text-stone-700 dark:text-stone-300 space-y-5 font-sans text-lg leading-relaxed">
+                                <p>Instead of cramming, Spaced Repetition forces the brain to rebuild neural pathways exactly as they start to decay.</p>
+                                <ul class="space-y-6">
+                                    <li class="flex gap-4"><span class="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-orange-600 mt-3"></span> <div><strong>Interval Logic:</strong> Review at 1, 3, 7, and 30 days.</div></li>
+                                    <li class="flex gap-4"><span class="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-orange-600 mt-3"></span> <div><strong>Efficiency:</strong> Spend 80% less time on things you already know well.</div></li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="space-y-10">
+                            <div class="bg-stone-100 dark:bg-stone-800 p-8 rounded-[2.5rem] border border-stone-200 dark:border-stone-700 relative overflow-hidden">
+                                <div class="absolute -right-4 -top-4 text-6xl opacity-10 font-serif">"</div>
+                                <h3 class="text-xs font-bold uppercase tracking-widest text-stone-500 mb-4">NotebookLM Insight</h3>
+                                <p class="text-stone-600 dark:text-stone-400 italic font-medium leading-relaxed text-lg">
+                                    "Algorithm-based tools like Anki or RemNote automate this scheduling, showing you cards only when you are statistically likely to forget them."
+                                </p>
+                            </div>
+                            
+                            <div class="p-10 border-2 border-dashed border-stone-200 dark:border-stone-800 rounded-[2.5rem] text-center">
+                                <p class="text-sm font-bold text-stone-500 mb-8 uppercase tracking-widest">Protocol Stored</p>
+                                <button onclick="app.navTo('dashboard')" class="bg-stone-900 dark:bg-stone-50 text-white dark:text-stone-900 px-10 py-4 rounded-2xl font-bold uppercase tracking-tighter text-sm transition-transform active:scale-95 shadow-lg">Return to Mission</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            `,
+
+            renderCharts: () => {
+                const s = Chart.getChart("efficiencyChart"); if (s) s.destroy();
+                const d = Chart.getChart("distributionChart"); if (d) d.destroy();
+            },
+
+            showAbout: () => alert("Synapse OS v3.9 - Mission Notes Workspace Enabled.")
+        };
+
+        document.addEventListener('DOMContentLoaded', app.init);
+    </script>
+</body>
+</html>
