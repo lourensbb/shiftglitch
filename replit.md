@@ -99,6 +99,13 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### Feb 11, 2026 — Mission Simplification for Teens
+1. **Mission Guide:** Added "How to Use Synapse" 3-step instruction box (Pick a topic → Use the tools → Level up your rank) with numbered emoji cards.
+2. **To-Do List:** Replaced Quest Log with interactive emoji to-do list (⬜/✅ toggle, add/remove tasks). Persisted to `synapse_todos` localStorage key via `todoStore`. Included in export/import.
+3. **AI prompt simplified:** Study Plan Generator now produces max 150-word, 3-step plans in simple language for teenagers. Button changed from "Synthesize" to "Go!".
+4. **Dashboard text clarified:** Title changed to "Your Mission", subtitle to "Your study home base. Everything starts here." Section renamed to "Study Plan Generator" with teen-friendly placeholder examples.
+5. **Study quotes:** 20 motivational study quotes displayed randomly on dashboard load.
+
 ### Feb 11, 2026 — Study Streak Tracker
 1. **Streak calculation:** `rankEngine.getStreak()` calculates consecutive active days from `activeDateLog` array.
 2. **Dashboard card:** Study Streak card in sidebar shows current streak count, emoji indicator (🔥/🟠/🟡/⚪), motivational message, and 7-day visual calendar with filled/empty dots.
