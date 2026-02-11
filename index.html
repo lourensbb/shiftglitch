@@ -133,6 +133,24 @@
             return d.innerHTML;
         }
 
+        function mdToHtml(str) {
+            if (!str) return '';
+            let h = esc(str);
+            h = h.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
+            h = h.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+            h = h.replace(/\*(.+?)\*/g, '<em>$1</em>');
+            h = h.replace(/^### (.+)$/gm, '<h4 class="text-lg font-serif font-bold text-white mt-4 mb-1">$1</h4>');
+            h = h.replace(/^## (.+)$/gm, '<h3 class="text-xl font-serif font-bold text-white mt-5 mb-2">$1</h3>');
+            h = h.replace(/^# (.+)$/gm, '<h2 class="text-2xl font-serif font-bold text-white mt-6 mb-2">$1</h2>');
+            h = h.replace(/^\s*[-•]\s+(.+)$/gm, '<li class="ml-4 mb-1">$1</li>');
+            h = h.replace(/(<li[^>]*>.*<\/li>\n?)+/g, '<ul class="list-disc pl-4 my-2">$&</ul>');
+            h = h.replace(/^\d+\.\s+(.+)$/gm, '<li class="ml-4 mb-1">$1</li>');
+            h = h.replace(/\n{2,}/g, '</p><p class="mb-3">');
+            h = '<p class="mb-3">' + h + '</p>';
+            h = h.replace(/<p class="mb-3"><\/p>/g, '');
+            return h;
+        }
+
         const AI_MODEL = "gemini-2.0-flash";
 
         const aiService = {
@@ -763,8 +781,8 @@
                                     ${state.isAiLoading ? '<span class="ai-loader"></span>' : 'Synthesize'}
                                 </button>
                             </div>
-                            <div class="bg-white/5 p-6 rounded-2xl border border-white/10 text-stone-300 leading-relaxed whitespace-pre-line font-sans text-sm md:text-base">
-                                ${state.aiOutput ? esc(state.aiOutput) : 'Awaiting mission input...'}
+                            <div class="bg-white/5 p-6 rounded-2xl border border-white/10 text-stone-300 leading-relaxed font-sans text-sm md:text-base">
+                                ${state.aiOutput ? mdToHtml(state.aiOutput) : 'Awaiting mission input...'}
                             </div>
                         </div>
                     </section>
