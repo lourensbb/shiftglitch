@@ -12,25 +12,18 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, collection, addDoc, updateDoc, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        try {
-            const fbCfg = typeof window.__firebase_config !== 'undefined' ? window.__firebase_config : (typeof __firebase_config !== 'undefined' ? __firebase_config : null);
-            if (!fbCfg) throw new Error('Firebase config not available');
-            const firebaseConfig = JSON.parse(fbCfg);
-            const app_fb = initializeApp(firebaseConfig);
-            const auth = getAuth(app_fb);
-            const db = getFirestore(app_fb);
-            const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const app_fb = initializeApp(firebaseConfig);
+        const auth = getAuth(app_fb);
+        const db = getFirestore(app_fb);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
-            window.fb = { 
-                auth, db, appId, doc, getDoc, setDoc, 
-                signInAnonymously, signInWithCustomToken, onAuthStateChanged 
-            };
-        } catch (e) {
-            console.warn('Firebase not configured, running in local-only mode.', e.message);
-            window.fb = null;
-        }
+        window.fb = { 
+            auth, db, appId, doc, getDoc, setDoc, collection, addDoc, updateDoc, getDocs, deleteDoc,
+            signInAnonymously, signInWithCustomToken, onAuthStateChanged 
+        };
     </script>
 
     <script>
@@ -42,6 +35,9 @@
                         sans: ['Inter', 'sans-serif'],
                         serif: ['Lora', 'serif'],
                     },
+                    colors: {
+                        stone: { 850: '#1f1c1a' }
+                    }
                 }
             }
         }
@@ -76,6 +72,14 @@
             font-family: 'Lora', serif;
             letter-spacing: -0.02em;
         }
+
+        /* 3D Flip Card Mechanics */
+        .perspective-1000 { perspective: 1000px; }
+        .transform-style-3d { transform-style: preserve-3d; }
+        .backface-hidden { backface-visibility: hidden; }
+        .rotate-y-180 { transform: rotateY(180deg); }
+        .card-inner { transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+        .flipped { transform: rotateY(180deg); }
 
         .cornell-notes {
             min-height: 400px;
@@ -132,8 +136,6 @@
                     <button onclick="app.navTo('dashboard')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-sm font-semibold tracking-wide transition-colors uppercase">Mission</button>
                     <button onclick="app.navTo('explore')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-sm font-semibold tracking-wide transition-colors uppercase">Vault</button>
                     <button onclick="app.navTo('spaced')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-sm font-semibold tracking-wide transition-colors uppercase">Spaced</button>
-                    <button onclick="app.navTo('flashcards')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-sm font-semibold tracking-wide transition-colors uppercase">Decks</button>
-                    <button onclick="app.navTo('blurt')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-sm font-semibold tracking-wide transition-colors uppercase">Blurt</button>
                     <button onclick="app.showAbout()" class="text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-sm font-semibold tracking-wide transition-colors uppercase">About</button>
                 </div>
 
@@ -149,15 +151,13 @@
             <button onclick="app.navTo('dashboard')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Mission</button>
             <button onclick="app.navTo('explore')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Vault</button>
             <button onclick="app.navTo('spaced')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Spaced</button>
-            <button onclick="app.navTo('flashcards')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Decks</button>
-            <button onclick="app.navTo('blurt')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Blurt</button>
         </div>
     </nav>
 
     <main id="app-container" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pb-24"></main>
 
-    <div id="modal-overlay" class="fixed inset-0 bg-stone-900/60 backdrop-blur-sm hidden z-[60] opacity-0 transition-opacity duration-300 flex items-center justify-center p-4">
-        <div id="modal-content" class="bg-white dark:bg-[#292524] w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-[2rem] shadow-2xl transform scale-95 transition-transform duration-300 border border-stone-100 dark:border-stone-700"></div>
+    <div id="modal-overlay" class="fixed inset-0 bg-stone-900/80 backdrop-blur-md hidden z-[60] opacity-0 transition-opacity duration-300 flex items-center justify-center p-4">
+        <div id="modal-content" class="bg-white dark:bg-[#1c1917] w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-[2.5rem] shadow-2xl transform scale-95 transition-transform duration-300 border border-stone-200 dark:border-stone-800"></div>
     </div>
 
     <!-- Notification -->
@@ -167,24 +167,26 @@
     </div>
 
     <script>
-        const AI_MODEL = "gemini-2.5-flash-preview-05-20";
+        const apiKey = ""; 
+        const AI_MODEL = "gemini-2.5-flash-preview-09-2025";
+        const TTS_MODEL = "gemini-2.5-flash-preview-tts";
 
         const aiService = {
             async callGemini(userQuery, systemPrompt = "") {
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/${AI_MODEL}:generateContent?key=${apiKey}`;
                 const payload = {
-                    model: AI_MODEL,
                     contents: [{ parts: [{ text: userQuery }] }],
                     systemInstruction: { parts: [{ text: systemPrompt }] }
                 };
                 let delay = 1000;
-                for (let i = 0; i < 3; i++) {
+                for (let i = 0; i < 5; i++) {
                     try {
-                        const response = await fetch('/api/gemini', { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+                        const response = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+                        if (!response.ok) throw new Error("API Connection Error");
                         const result = await response.json();
-                        if (!response.ok) return result.error || "API Connection Error";
                         return result.candidates?.[0]?.content?.parts?.[0]?.text || "No response generated.";
                     } catch (error) {
-                        if (i === 2) return "Failed to contact the AI Mission Core.";
+                        if (i === 4) return "Failed to contact the AI Mission Core.";
                         await new Promise(res => setTimeout(res, delay));
                         delay *= 2;
                     }
@@ -194,58 +196,25 @@
 
         const learningData = [
             { 
-                id: 1, 
-                title: "Active Recall", 
-                category: "Memorization", 
-                efficiency: 95, 
-                effort: 85, 
-                summary: "Testing before review.", 
-                description: "The practice of retrieving information from memory without cues. This strengthens neural pathways significantly more than passive reading.", 
-                example: "Instead of re-reading a chapter on Anatomy, close the book and draw the circulatory system from memory, then check for errors.",
-                steps: ["Scan material", "Hide source", "Recall and record"] 
+                id: 1, title: "Active Recall", category: "Memorization", efficiency: 95, effort: 85, summary: "Testing before review.", 
+                description: "The practice of retrieving information from memory without cues.", example: "Close the book and draw the system from memory.", steps: ["Scan material", "Hide source", "Recall and record"] 
             },
             { 
-                id: 2, 
-                title: "Spaced Repetition", 
-                category: "Retention", 
-                efficiency: 92, 
-                effort: 40, 
-                summary: "Interval optimization.", 
-                description: "Reviewing information at increasing intervals to exploit the psychological spacing effect.", 
-                example: "Learning Spanish: Review new words after 1 day, then 3 days, then 1 week, then 1 month to lock them into long-term memory.",
-                steps: ["1 Day Review", "3 Day Review", "1 Week Review"] 
+                id: 2, title: "Spaced Repetition", category: "Retention", efficiency: 92, effort: 40, summary: "Interval optimization.", 
+                description: "Reviewing information at increasing intervals to exploit the spacing effect.", example: "Review after 1 day, then 3 days, then 1 week.", steps: ["1 Day Review", "3 Day Review", "1 Week Review"] 
             },
             { 
-                id: 3, 
-                title: "Feynman Technique", 
-                category: "Understanding", 
-                efficiency: 88, 
-                effort: 90, 
-                summary: "Simplify to teach.", 
-                description: "Teaching a concept in simple terms to identify gaps in your knowledge architecture.", 
-                example: "Explain 'Quantum Entanglement' to a 10-year-old using two spinning coins. If you struggle to simplify it, you don't understand it yet.",
-                steps: ["Pick topic", "Teach child", "Spot logic gaps"] 
+                id: 3, title: "Feynman Technique", category: "Understanding", efficiency: 88, effort: 90, summary: "Simplify to teach.", 
+                description: "Teaching a concept in simple terms to identify gaps.", example: "Explain 'Quantum Entanglement' to a 10-year-old.", steps: ["Pick topic", "Teach child", "Spot logic gaps"] 
             },
             { 
-                id: 4, 
-                title: "Interleaving", 
-                category: "Application", 
-                efficiency: 85, 
-                effort: 75, 
-                summary: "Subject shuffling.", 
-                description: "Mixing different subjects or problem types in a single session to improve skill discrimination.", 
-                example: "In a tennis session, alternate between serves, backhands, and volleys every 5 minutes rather than practicing only serves for an hour.",
-                steps: ["Pick 3 topics", "Rotate 25 mins", "Compare logic"] 
+                id: 4, title: "Interleaving", category: "Application", efficiency: 85, effort: 75, summary: "Subject shuffling.", 
+                description: "Mixing different subjects or problem types in a single session.", example: "Alternate between tennis serves and volleys.", steps: ["Pick 3 topics", "Rotate 25 mins", "Compare logic"] 
             },
             {
-                id: 5,
-                title: "The Leitner System",
-                category: "Retention",
-                efficiency: 94,
-                effort: 65,
-                summary: "Box-based flashcards.",
-                description: "A structured method of using flashcards where correctly answered cards move to boxes reviewed less frequently, while incorrect cards return to the 'every day' box for aggressive repetition.",
-                example: "Use 3 shoeboxes. Box 1: Daily. Box 2: Tue/Thu. Box 3: Fri. Miss a card in Box 3? It goes back to Box 1 immediately.",
+                id: 5, title: "The Leitner System", category: "Retention", efficiency: 94, effort: 65, summary: "Box-based flashcards.",
+                description: "A structured method of using flashcards where correctly answered cards move to boxes reviewed less frequently, while incorrect cards return to Box 1.",
+                example: "Box 1: Daily. Box 2: Tue/Thu. Box 3: Fri. Miss a card in Box 3? It goes back to Box 1 immediately.",
                 steps: ["Setup 3 Boxes", "Test Box 1", "Correct? Move to 2", "Wrong? Reset to 1"]
             }
         ];
@@ -263,157 +232,15 @@
             timerIsRunning: false,
             timerMode: 'work',
             timerInterval: null,
-            timerTaskLabel: '',
-            pomodoroLog: [],
-            governorBlocked: false,
-            fcDecks: [],
-            fcCards: [],
-            fcCurrentDeck: null,
-            fcStudyQueue: [],
-            fcStudyIndex: 0,
-            fcFlipped: false,
-            fcView: 'decks',
-            blurtSessions: [],
-            blurtPhase: 'list',
-            blurtCurrentId: null
-        };
-
-        const esc = (s) => {
-            const d = document.createElement('div');
-            d.textContent = s;
-            return d.innerHTML;
-        };
-
-        const fcStore = {
-            load() {
-                try {
-                    const d = localStorage.getItem('synapse_decks');
-                    const c = localStorage.getItem('synapse_cards');
-                    state.fcDecks = d ? JSON.parse(d) : [];
-                    state.fcCards = c ? JSON.parse(c) : [];
-                } catch(e) { state.fcDecks = []; state.fcCards = []; }
-            },
-            save() {
-                localStorage.setItem('synapse_decks', JSON.stringify(state.fcDecks));
-                localStorage.setItem('synapse_cards', JSON.stringify(state.fcCards));
-            },
-            uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); },
-            addDeck(title) {
-                state.fcDecks.push({ id: this.uid(), title, createdAt: Date.now() });
-                this.save();
-            },
-            deleteDeck(id) {
-                state.fcDecks = state.fcDecks.filter(d => d.id !== id);
-                state.fcCards = state.fcCards.filter(c => c.deckId !== id);
-                this.save();
-            },
-            addCard(deckId, front, back) {
-                state.fcCards.push({ id: this.uid(), deckId, front, back, box: 1, lastReviewed: 0, dueAt: Date.now() });
-                this.save();
-            },
-            updateCard(id, front, back) {
-                const card = state.fcCards.find(c => c.id === id);
-                if (card) { card.front = front; card.back = back; this.save(); }
-            },
-            deleteCard(id) {
-                state.fcCards = state.fcCards.filter(c => c.id !== id);
-                this.save();
-            },
-            reviewCard(id, correct) {
-                const card = state.fcCards.find(c => c.id === id);
-                if (!card) return;
-                const intervals = { 1: 1, 2: 3, 3: 7, 4: 14, 5: 30 };
-                if (correct) {
-                    card.box = Math.min(card.box + 1, 5);
-                } else {
-                    card.box = 1;
-                }
-                card.lastReviewed = Date.now();
-                card.dueAt = Date.now() + (intervals[card.box] || 1) * 86400000;
-                this.save();
-            },
-            getDueCards(deckId) {
-                const now = Date.now();
-                return state.fcCards.filter(c => c.deckId === deckId && c.dueAt <= now);
-            },
-            getCardsByDeck(deckId) {
-                return state.fcCards.filter(c => c.deckId === deckId);
-            }
-        };
-
-        const pomodoroStore = {
-            load() {
-                try {
-                    const d = localStorage.getItem('synapse_pomodoro_log');
-                    state.pomodoroLog = d ? JSON.parse(d) : [];
-                } catch(e) { state.pomodoroLog = []; }
-            },
-            save() {
-                localStorage.setItem('synapse_pomodoro_log', JSON.stringify(state.pomodoroLog));
-            },
-            normalize(label) {
-                return label.trim().replace(/\s+/g, ' ').toLowerCase();
-            },
-            log(taskLabel) {
-                state.pomodoroLog.push({ task: this.normalize(taskLabel), completedAt: Date.now() });
-                this.save();
-            },
-            consecutiveCount(taskLabel) {
-                const key = this.normalize(taskLabel);
-                let count = 0;
-                for (let i = state.pomodoroLog.length - 1; i >= 0; i--) {
-                    if (state.pomodoroLog[i].task === key) count++;
-                    else break;
-                }
-                return count;
-            },
-            clearStreak() {
-                state.pomodoroLog.push({ task: '__breakdown__', completedAt: Date.now() });
-                this.save();
-            }
-        };
-
-        const blurtStore = {
-            load() {
-                try {
-                    const d = localStorage.getItem('synapse_blurts');
-                    state.blurtSessions = d ? JSON.parse(d) : [];
-                } catch(e) { state.blurtSessions = []; }
-            },
-            save() {
-                localStorage.setItem('synapse_blurts', JSON.stringify(state.blurtSessions));
-            },
-            uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); },
-            create(title, source) {
-                const session = {
-                    id: this.uid(), title, source, recall: '', gaps: '',
-                    createdAt: Date.now(), lastReviewedAt: null, reviewCount: 0
-                };
-                state.blurtSessions.unshift(session);
-                this.save();
-                return session.id;
-            },
-            get(id) { return state.blurtSessions.find(s => s.id === id); },
-            update(id, data) {
-                const s = this.get(id);
-                if (!s) return;
-                Object.assign(s, data);
-                this.save();
-            },
-            remove(id) {
-                state.blurtSessions = state.blurtSessions.filter(s => s.id !== id);
-                this.save();
-            }
+            flashcards: [], 
+            currentCardIndex: 0,
+            isFlipped: false
         };
 
         const app = {
             charts: { scatter: null, doughnut: null },
 
             init: async () => {
-                fcStore.load();
-                blurtStore.load();
-                pomodoroStore.load();
-
                 const toggle = document.getElementById('theme-toggle');
                 toggle.addEventListener('click', () => {
                     document.body.classList.toggle('dark');
@@ -436,7 +263,10 @@
                 if (window.fb && window.fb.onAuthStateChanged) {
                     window.fb.onAuthStateChanged(window.fb.auth, async (user) => {
                         state.user = user;
-                        if (user && state.view === 'dashboard') await app.loadUserData();
+                        if (user) {
+                            await app.loadUserData();
+                            await app.loadFlashcards();
+                        }
                     });
                 }
 
@@ -453,8 +283,6 @@
 
             navTo: (tabId) => {
                 state.view = tabId;
-                if (tabId === 'flashcards') { state.fcView = 'decks'; state.fcCurrentDeck = null; state.fcStudyQueue = []; state.fcFlipped = false; }
-                if (tabId === 'blurt') { state.blurtPhase = 'list'; state.blurtCurrentId = null; }
                 window.scrollTo(0, 0);
 
                 const menu = document.getElementById('mobile-menu');
@@ -462,45 +290,113 @@
 
                 document.querySelectorAll('.nav-btn').forEach(btn => {
                     btn.classList.remove('text-orange-600', 'font-bold');
-                    const labels = { dashboard: 'Mission', explore: 'Vault', spaced: 'Spaced', flashcards: 'Decks', blurt: 'Blurt' };
-                    if (btn.textContent.trim().toUpperCase() === (labels[tabId] || '').toUpperCase()) btn.classList.add('text-orange-600', 'font-bold');
+                    const label = tabId === 'dashboard' ? 'Mission' : (tabId === 'spaced' ? 'Spaced' : 'Vault');
+                    if (btn.textContent.trim().toUpperCase() === label.toUpperCase()) btn.classList.add('text-orange-600', 'font-bold');
                 });
 
                 app.render();
             },
 
+            async loadFlashcards() {
+                if (!state.user || !window.fb) return;
+                try {
+                    const q = window.fb.collection(window.fb.db, 'artifacts', window.fb.appId, 'users', state.user.uid, 'flashcards');
+                    const snapshot = await window.fb.getDocs(q);
+                    state.flashcards = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                } catch (e) { console.error("Error loading cards", e); }
+            },
+
+            async addFlashcard() {
+                const front = document.getElementById('card-front-input').value;
+                const back = document.getElementById('card-back-input').value;
+                if (!front || !back || !state.user) return;
+
+                const newCard = { front, back, box: 1, createdAt: Date.now() };
+                try {
+                    const ref = await window.fb.addDoc(window.fb.collection(window.fb.db, 'artifacts', window.fb.appId, 'users', state.user.uid, 'flashcards'), newCard);
+                    state.flashcards.push({ id: ref.id, ...newCard });
+                    document.getElementById('card-front-input').value = '';
+                    document.getElementById('card-back-input').value = '';
+                    app.renderFlashcardDeck(); 
+                } catch (e) { console.error("Add failed", e); }
+            },
+
+            flipCard: () => {
+                state.isFlipped = !state.isFlipped;
+                const cardInner = document.getElementById('flashcard-inner');
+                if (cardInner) {
+                    cardInner.style.transform = state.isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)';
+                }
+            },
+
+            async rateCard(success) {
+                const card = state.flashcards[state.currentCardIndex];
+                if (!card) return;
+                if (success) {
+                    card.box = Math.min(card.box + 1, 5);
+                } else {
+                    card.box = 1;
+                }
+                state.isFlipped = false;
+                const cardInner = document.getElementById('flashcard-inner');
+                if (cardInner) cardInner.style.transform = 'rotateY(0deg)';
+                state.currentCardIndex = (state.currentCardIndex + 1) % state.flashcards.length;
+                try {
+                    const cardRef = window.fb.doc(window.fb.db, 'artifacts', window.fb.appId, 'users', state.user.uid, 'flashcards', card.id);
+                    await window.fb.updateDoc(cardRef, { box: card.box });
+                } catch (e) { console.error("Update failed", e); }
+                setTimeout(() => { app.renderFlashcardDeck(); }, 300);
+            },
+
+            renderFlashcardDeck: () => {
+                const container = document.getElementById('flashcard-container');
+                const stats = document.getElementById('box-stats');
+                if (stats) {
+                    const boxes = [0,0,0,0,0];
+                    state.flashcards.forEach(c => boxes[(c.box || 1) - 1]++);
+                    stats.innerHTML = boxes.map((count, i) => `
+                        <div class="flex flex-col items-center">
+                            <span class="text-[10px] font-bold uppercase text-stone-400">Box ${i+1}</span>
+                            <span class="font-serif font-bold text-xl ${count > 0 ? 'text-orange-600' : 'text-stone-300'}">${count}</span>
+                        </div>
+                    `).join('');
+                }
+                if (!container) return;
+                if (state.flashcards.length === 0) {
+                    container.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-stone-400"><p class="mb-4">No cards in your deck.</p><p class="text-sm">Add one below to start.</p></div>`;
+                    return;
+                }
+                const card = state.flashcards[state.currentCardIndex];
+                container.innerHTML = `
+                    <div class="group w-full h-80 perspective-1000 cursor-pointer" onclick="app.flipCard()">
+                        <div id="flashcard-inner" class="relative w-full h-full text-center transition-all duration-500 transform-style-3d shadow-xl rounded-2xl">
+                            <div class="absolute inset-0 w-full h-full bg-stone-50 dark:bg-[#1f1c1a] border border-stone-200 dark:border-stone-800 rounded-2xl backface-hidden flex flex-col items-center justify-center p-8">
+                                <span class="absolute top-4 left-6 text-xs font-bold text-stone-400 uppercase tracking-widest">Box ${card.box || 1} • Front</span>
+                                <h3 class="text-2xl font-serif font-bold text-stone-900 dark:text-stone-100">${card.front}</h3>
+                                <p class="absolute bottom-6 text-xs text-stone-400 uppercase tracking-widest">Click to Flip</p>
+                            </div>
+                            <div class="absolute inset-0 w-full h-full bg-stone-900 dark:bg-stone-800 text-white rounded-2xl backface-hidden rotate-y-180 flex flex-col items-center justify-center p-8">
+                                <span class="absolute top-4 left-6 text-xs font-bold text-stone-500 uppercase tracking-widest">Back</span>
+                                <p class="text-xl font-medium leading-relaxed">${card.back}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex gap-4 mt-8 w-full max-w-md mx-auto">
+                        <button onclick="event.stopPropagation(); app.rateCard(false)" class="flex-1 bg-stone-200 dark:bg-stone-800 hover:bg-red-100 dark:hover:bg-red-900/30 hover:text-red-700 text-stone-600 dark:text-stone-400 py-3 rounded-xl font-bold text-sm transition-colors">Incorrect (Reset)</button>
+                        <button onclick="event.stopPropagation(); app.rateCard(true)" class="flex-1 bg-orange-600 hover:bg-orange-500 text-white py-3 rounded-xl font-bold text-sm transition-colors">Correct (Next Box)</button>
+                    </div>
+                `;
+            },
+
             startTimer: () => {
                 if (state.timerIsRunning) return;
-                if (state.timerMode === 'work') {
-                    const labelEl = document.getElementById('timer-task-label');
-                    const label = labelEl?.value.trim() || '';
-                    if (!label) {
-                        app.showNotification('Name your task before starting.');
-                        if (labelEl) labelEl.focus();
-                        return;
-                    }
-                    state.timerTaskLabel = label;
-                    const streak = pomodoroStore.consecutiveCount(label);
-                    if (streak >= 4) {
-                        state.governorBlocked = true;
-                        app.render();
-                        return;
-                    }
-                }
-                state.governorBlocked = false;
                 state.timerIsRunning = true;
                 state.timerInterval = setInterval(() => {
                     state.timerSeconds--;
                     app.updateTimerUI();
                     if (state.timerSeconds <= 0) {
                         app.pauseTimer();
-                        if (state.timerMode === 'work') {
-                            pomodoroStore.log(state.timerTaskLabel);
-                            const newStreak = pomodoroStore.consecutiveCount(state.timerTaskLabel);
-                            app.showNotification(`Focus complete! (${newStreak}/4 on this task)`);
-                        } else {
-                            app.showNotification("Break over!");
-                        }
+                        app.showNotification(state.timerMode === 'work' ? "Focus complete!" : "Break over!");
                     }
                 }, 1000);
                 app.updateTimerUI();
@@ -515,8 +411,7 @@
             resetTimer: () => {
                 app.pauseTimer();
                 state.timerSeconds = state.timerInitialSeconds;
-                state.governorBlocked = false;
-                app.render();
+                app.updateTimerUI();
             },
 
             switchTimerMode: (mode) => {
@@ -524,8 +419,7 @@
                 state.timerMode = mode;
                 state.timerInitialSeconds = mode === 'work' ? 25 * 60 : 5 * 60;
                 state.timerSeconds = state.timerInitialSeconds;
-                state.governorBlocked = false;
-                app.render();
+                app.updateTimerUI();
             },
 
             updateTimerUI: () => {
@@ -533,12 +427,10 @@
                 const btn = document.getElementById('timer-toggle-btn');
                 const progress = document.getElementById('timer-progress');
                 if (!display || !btn || !progress) return;
-
                 const m = Math.floor(state.timerSeconds / 60);
                 const s = state.timerSeconds % 60;
                 display.textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
                 btn.textContent = state.timerIsRunning ? 'Pause' : 'Start';
-
                 const circumference = 2 * Math.PI * 45;
                 const offset = circumference - (state.timerSeconds / state.timerInitialSeconds) * circumference;
                 progress.style.strokeDasharray = `${circumference} ${circumference}`;
@@ -562,7 +454,6 @@
                 if (notesArea) {
                     localStorage.setItem('cornellNotes', notesArea.innerHTML);
                 }
-
                 if (!state.user || !window.fb) return;
                 const progressItems = document.querySelectorAll('#progress-list input[type="checkbox"]');
                 const progressState = {};
@@ -576,7 +467,7 @@
                         progress: progressState,
                         updatedAt: Date.now() 
                     });
-                    if (statusIndicator) statusIndicator.textContent = "Synced";
+                    if (statusIndicator) statusIndicator.textContent = "Locked In";
                     state.progress = progressState;
                 } catch (e) { if (statusIndicator) statusIndicator.textContent = "Sync Error"; }
             },
@@ -585,7 +476,6 @@
                 const localNotes = localStorage.getItem('cornellNotes');
                 const notesArea = document.getElementById('notes-editable');
                 if (notesArea && localNotes) notesArea.innerHTML = localNotes;
-
                 if (!state.user || !window.fb) return;
                 try {
                     const dataRef = window.fb.doc(window.fb.db, 'artifacts', window.fb.appId, 'users', state.user.uid, 'settings', 'user_data');
@@ -615,55 +505,51 @@
             openModal: (id) => {
                 const t = learningData.find(x => x.id === id);
                 const modal = document.getElementById('modal-overlay');
-                document.getElementById('modal-content').innerHTML = `
-                    <div class="p-8 relative">
-                        <button onclick="app.closeModal()" class="absolute top-6 right-6 text-stone-400 hover:text-stone-900 dark:hover:text-white transition-colors text-2xl">✕</button>
 
-                        <div class="mb-8">
-                            <span class="text-orange-600 font-bold uppercase tracking-widest text-xs">${t.category} Protocol</span>
-                            <h2 class="text-5xl font-serif font-bold text-stone-900 dark:text-stone-50 mt-2">${t.title}</h2>
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-                            <div class="space-y-6">
-                                <div>
-                                    <h3 class="text-sm font-bold uppercase text-stone-400 tracking-widest mb-2">The Mechanism</h3>
-                                    <p class="text-stone-600 dark:text-stone-400 leading-relaxed font-medium">${t.description}</p>
-                                </div>
-                                <div class="bg-stone-50 dark:bg-stone-900/50 p-6 rounded-3xl border border-stone-100 dark:border-stone-800">
-                                    <h3 class="text-sm font-bold uppercase text-stone-500 tracking-widest mb-3 flex items-center gap-2">
-                                        💡 Field Application
-                                    </h3>
-                                    <p class="text-stone-700 dark:text-stone-300 italic leading-relaxed">
-                                        "${t.example}"
-                                    </p>
-                                </div>
+                if (id === 5) {
+                     document.getElementById('modal-content').innerHTML = `
+                        <div class="p-8 relative h-full flex flex-col">
+                            <button onclick="app.closeModal()" class="absolute top-6 right-6 text-stone-400 hover:text-stone-900 dark:hover:text-white transition-colors text-2xl z-50">✕</button>
+                            <div class="mb-6 flex justify-between items-end border-b border-stone-200 dark:border-stone-800 pb-6">
+                                <div><span class="text-orange-600 font-bold uppercase tracking-widest text-xs">Engine Active</span><h2 class="text-4xl font-serif font-bold text-stone-900 dark:text-stone-50 mt-1">The Leitner Deck</h2></div>
+                                <div id="box-stats" class="flex gap-6"></div>
                             </div>
-
-                            <div class="bg-stone-50 dark:bg-stone-900/50 p-8 rounded-[2rem] border border-stone-100 dark:border-stone-800">
-                                <h3 class="text-sm font-bold uppercase text-stone-500 tracking-widest mb-6">Execution Sequence</h3>
-                                <ul class="space-y-4">
-                                    ${t.steps.map((s,i) => `
-                                        <li class="flex items-center gap-4">
-                                            <span class="flex-shrink-0 w-8 h-8 rounded-full bg-orange-600 text-white flex items-center justify-center text-sm font-bold">${i+1}</span> 
-                                            <span class="font-semibold text-stone-700 dark:text-stone-200">${s}</span>
-                                        </li>
-                                    `).join('')}
-                                </ul>
-                                <div class="mt-10 pt-6 border-t border-stone-200 dark:border-stone-800">
-                                    <p class="text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-2">Retention Metric</p>
-                                    <div class="w-full bg-stone-200 dark:bg-stone-800 h-2 rounded-full overflow-hidden">
-                                        <div class="bg-orange-600 h-full" style="width: ${t.efficiency}%"></div>
+                            <div class="flex-grow grid grid-cols-1 lg:grid-cols-3 gap-8">
+                                <div class="lg:col-span-2 flex flex-col items-center justify-center bg-stone-100 dark:bg-stone-900/30 rounded-3xl p-8" id="flashcard-container"><p class="text-stone-500">Loading Deck...</p></div>
+                                <div class="bg-stone-50 dark:bg-stone-900/50 p-6 rounded-3xl border border-stone-100 dark:border-stone-800 h-fit">
+                                    <h3 class="text-xs font-bold uppercase text-stone-500 tracking-widest mb-4">Add to Deck</h3>
+                                    <div class="space-y-4">
+                                        <textarea id="card-front-input" placeholder="Front (Question)" class="w-full bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"></textarea>
+                                        <textarea id="card-back-input" placeholder="Back (Answer)" class="w-full bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"></textarea>
+                                        <button onclick="app.addFlashcard()" class="w-full bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 font-bold py-3 rounded-xl text-sm hover:opacity-90 transition-opacity">Add Card</button>
                                     </div>
-                                    <div class="flex justify-between mt-1 text-[10px] font-bold text-stone-500">
-                                        <span>Efficiency Rating</span>
-                                        <span>${t.efficiency}%</span>
-                                    </div>
+                                    <div class="mt-6 pt-6 border-t border-stone-200 dark:border-stone-700"><p class="text-xs text-stone-400 italic">"Correct answers move forward. Incorrect answers reset to Box 1."</p></div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                `;
+                    `;
+                    app.renderFlashcardDeck(); 
+                } else {
+                    document.getElementById('modal-content').innerHTML = `
+                        <div class="p-8 relative">
+                            <button onclick="app.closeModal()" class="absolute top-6 right-6 text-stone-400 hover:text-stone-900 dark:hover:text-white transition-colors text-2xl">✕</button>
+                            <div class="mb-8"><span class="text-orange-600 font-bold uppercase tracking-widest text-xs">${t.category} Protocol</span><h2 class="text-5xl font-serif font-bold text-stone-900 dark:text-stone-50 mt-2">${t.title}</h2></div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                <div class="space-y-6">
+                                    <div><h3 class="text-sm font-bold uppercase text-stone-400 tracking-widest mb-2">The Mechanism</h3><p class="text-stone-600 dark:text-stone-400 leading-relaxed font-medium">${t.description}</p></div>
+                                    <div class="bg-stone-50 dark:bg-stone-900/50 p-6 rounded-3xl border border-stone-100 dark:border-stone-800">
+                                        <h3 class="text-sm font-bold uppercase text-stone-500 tracking-widest mb-3 flex items-center gap-2">💡 Field Application</h3>
+                                        <p class="text-stone-700 dark:text-stone-300 italic leading-relaxed">"${t.example}"</p>
+                                    </div>
+                                </div>
+                                <div class="bg-stone-50 dark:bg-stone-900/50 p-8 rounded-[2rem] border border-stone-100 dark:border-stone-800">
+                                    <h3 class="text-sm font-bold uppercase text-stone-500 tracking-widest mb-6">Execution Sequence</h3>
+                                    <ul class="space-y-4">${t.steps.map((s,i) => `<li class="flex items-center gap-4"><span class="flex-shrink-0 w-8 h-8 rounded-full bg-orange-600 text-white flex items-center justify-center text-sm font-bold">${i+1}</span> <span class="font-semibold text-stone-700 dark:text-stone-200">${s}</span></li>`).join('')}</ul>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
                 modal.classList.remove('hidden');
                 setTimeout(() => modal.classList.remove('opacity-0'), 10);
             },
@@ -676,13 +562,7 @@
             render: () => {
                 const container = document.getElementById('app-container');
                 if (state.view === 'dashboard') {
-                    const notesArea = document.getElementById('notes-editable');
-                    const savedNotes = notesArea ? notesArea.innerHTML : null;
                     container.innerHTML = app.getHomeHTML();
-                    if (savedNotes && savedNotes !== 'Start your Cornell Note synthesis here...') {
-                        const newNotesArea = document.getElementById('notes-editable');
-                        if (newNotesArea) newNotesArea.innerHTML = savedNotes;
-                    }
                     app.renderCharts();
                     app.loadUserData();
                     app.updateTimerUI();
@@ -691,107 +571,63 @@
                     app.renderVault();
                 } else if (state.view === 'spaced') {
                     container.innerHTML = app.getSpacedHTML();
-                } else if (state.view === 'flashcards') {
-                    if (state.fcView === 'study') {
-                        container.innerHTML = app.getStudyHTML();
-                    } else if (state.fcView === 'deck' && state.fcCurrentDeck) {
-                        container.innerHTML = app.getDeckDetailHTML();
-                    } else {
-                        container.innerHTML = app.getDecksHTML();
-                    }
-                } else if (state.view === 'blurt') {
-                    container.innerHTML = app.getBlurtHTML();
                 }
             },
 
             getHomeHTML: () => `
                 <div class="animate-fade-in space-y-12">
                     <section class="text-center">
-                        <h1 class="text-5xl md:text-7xl font-serif font-bold mb-4">The Mission.</h1>
-                        <p class="text-stone-500 dark:text-stone-400 max-w-xl mx-auto italic font-medium">Strategic intelligence synthesis powered by Gemini API.</p>
+                        <h1 class="text-5xl md:text-7xl font-serif font-bold mb-4">The Game Plan.</h1>
+                        <p class="text-stone-500 dark:text-stone-400 max-w-xl mx-auto italic font-medium">Your personal AI cheat code for mastering anything.</p>
                     </section>
                     <section class="bg-stone-900 dark:bg-stone-800 rounded-[2.5rem] p-10 text-white shadow-2xl relative overflow-hidden">
                         <div class="relative z-10 flex flex-col gap-6">
-                            <h2 class="text-3xl font-serif font-semibold text-white">✨ Mission Architect</h2>
+                            <h2 class="text-3xl font-serif font-semibold text-white">✨ The Master Plan</h2>
                             <div class="flex flex-col sm:flex-row gap-3">
-                                <input id="subjectInput" type="text" placeholder="Objective..." class="flex-grow bg-white/10 px-6 py-4 rounded-2xl border border-white/20 text-white font-sans focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all">
+                                <input id="subjectInput" type="text" placeholder="What are we crushing today? (e.g. Calculus)" class="flex-grow bg-white/10 px-6 py-4 rounded-2xl border border-white/20 text-white font-sans focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all">
                                 <button onclick="app.generateMissionPlan()" class="bg-orange-600 px-8 py-4 rounded-2xl font-bold tracking-wide hover:bg-orange-500 transition-all">
-                                    ${state.isAiLoading ? '<span class="ai-loader"></span>' : 'Synthesize ✨'}
+                                    ${state.isAiLoading ? '<span class="ai-loader"></span>' : 'Let\'s Cook ✨'}
                                 </button>
                             </div>
                             <div class="bg-white/5 p-6 rounded-2xl border border-white/10 text-stone-300 leading-relaxed whitespace-pre-line font-sans text-sm md:text-base">
-                                ${state.aiOutput || 'Awaiting mission input...'}
+                                ${state.aiOutput || 'Tell me what to study, and I\'ll handle the rest.'}
                             </div>
                         </div>
                     </section>
                     <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
                         <div class="lg:col-span-1 space-y-8">
                             <div class="bg-white dark:bg-[#292524] p-6 rounded-[2rem] border border-stone-100 dark:border-stone-800 shadow-sm flex flex-col items-center">
-                                ${state.governorBlocked ? `
-                                <div class="w-full mb-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl p-4 text-center">
-                                    <p class="text-xs font-bold uppercase tracking-widest text-red-600 dark:text-red-400 mb-1">Governor: Blocked</p>
-                                    <p class="text-sm text-red-700 dark:text-red-300">4 pomodoros on "${esc(state.timerTaskLabel)}" — break it down or switch tasks.</p>
-                                    <div class="flex gap-2 mt-3">
-                                        <button onclick="app.governorBreakdown()" class="flex-1 bg-orange-600 text-white py-2 rounded-xl text-xs font-bold uppercase tracking-widest">I've Broken It Down</button>
-                                        <button onclick="app.governorSwitch()" class="flex-1 bg-stone-200 dark:bg-stone-700 text-stone-700 dark:text-stone-200 py-2 rounded-xl text-xs font-bold uppercase tracking-widest">Switch Task</button>
-                                    </div>
-                                </div>
-                                ` : ''}
-                                <div class="relative w-40 h-40 mb-4">
+                                <div class="relative w-40 h-40 mb-6">
                                     <svg class="w-full h-full transform -rotate-90">
                                         <circle cx="80" cy="80" r="45" stroke-width="6" stroke="currentColor" fill="transparent" class="text-stone-100 dark:text-stone-800" />
                                         <circle id="timer-progress" cx="80" cy="80" r="45" stroke-width="6" stroke="currentColor" fill="transparent" class="timer-circle ${state.timerMode === 'work' ? 'text-orange-600' : 'text-stone-400'}" />
                                     </svg>
                                     <div id="timer-display" class="absolute inset-0 flex items-center justify-center text-3xl font-bold font-sans">25:00</div>
                                 </div>
-                                ${state.timerMode === 'work' ? `
-                                <input id="timer-task-label" type="text" value="${esc(state.timerTaskLabel)}" placeholder="What are you working on?" class="w-full bg-stone-50 dark:bg-stone-800 px-4 py-2.5 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 mb-3 ${state.timerIsRunning ? 'opacity-50 pointer-events-none' : ''}" ${state.timerIsRunning ? 'disabled' : ''}>
-                                ` : ''}
-                                ${state.timerTaskLabel && state.timerMode === 'work' ? `
-                                <div class="w-full flex items-center gap-2 mb-3">
-                                    <div class="flex gap-1">
-                                        ${[1,2,3,4].map(i => `<div class="w-2.5 h-2.5 rounded-full ${pomodoroStore.consecutiveCount(state.timerTaskLabel) >= i ? 'bg-orange-600' : 'bg-stone-200 dark:bg-stone-700'}"></div>`).join('')}
-                                    </div>
-                                    <span class="text-[10px] font-bold uppercase tracking-widest text-stone-400">${pomodoroStore.consecutiveCount(state.timerTaskLabel)}/4</span>
-                                </div>
-                                ` : ''}
-                                <div class="flex gap-2 mb-3 w-full">
-                                    <button onclick="app.switchTimerMode('work')" class="flex-1 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-all ${state.timerMode === 'work' ? 'bg-orange-600 text-white' : 'bg-stone-100 dark:bg-stone-800 text-stone-500'}">Focus</button>
-                                    <button onclick="app.switchTimerMode('break')" class="flex-1 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-all ${state.timerMode === 'break' ? 'bg-stone-600 text-white' : 'bg-stone-100 dark:bg-stone-800 text-stone-500'}">Break</button>
-                                </div>
-                                <div class="flex gap-2 w-full">
-                                    <button id="timer-toggle-btn" onclick="state.timerIsRunning ? app.pauseTimer() : app.startTimer()" class="flex-grow bg-stone-900 dark:bg-stone-50 text-white dark:text-stone-900 py-3 rounded-2xl font-bold uppercase tracking-widest text-xs">Start</button>
-                                    <button onclick="app.resetTimer()" class="bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 px-4 py-3 rounded-2xl font-bold uppercase tracking-widest text-xs hover:bg-stone-200 dark:hover:bg-stone-700 transition-all">Reset</button>
-                                </div>
+                                <div class="flex gap-2 w-full"><button id="timer-toggle-btn" onclick="state.timerIsRunning ? app.pauseTimer() : app.startTimer()" class="flex-grow bg-stone-900 dark:bg-stone-50 text-white dark:text-stone-900 py-3 rounded-2xl font-bold uppercase tracking-widest text-xs">Start</button></div>
                             </div>
                             <div class="bg-white dark:bg-[#292524] p-8 rounded-[2rem] border border-stone-100 dark:border-stone-800 shadow-sm">
-                                <h3 class="text-xl font-serif font-bold mb-6 text-stone-900 dark:text-stone-50">Status</h3>
+                                <h3 class="text-xl font-serif font-bold mb-6 text-stone-900 dark:text-stone-50">Quest Log</h3>
                                 <ul id="progress-list" class="space-y-4">
-                                    ${[1,2,3,4,5].map(i => `<li class="flex items-center gap-3"><input type="checkbox" id="m${i}" onchange="app.saveUserData()"><label for="m${i}" class="text-sm font-semibold text-stone-600 dark:text-stone-300">Module 0${i}</label></li>`).join('')}
+                                    <li class="flex items-center gap-3"><input type="checkbox" id="m1" onchange="app.saveUserData()"><label for="m1" class="text-sm font-semibold text-stone-600 dark:text-stone-300">Lvl 1: Recall</label></li>
+                                    <li class="flex items-center gap-3"><input type="checkbox" id="m2" onchange="app.saveUserData()"><label for="m2" class="text-sm font-semibold text-stone-600 dark:text-stone-300">Lvl 2: Space It</label></li>
+                                    <li class="flex items-center gap-3"><input type="checkbox" id="m3" onchange="app.saveUserData()"><label for="m3" class="text-sm font-semibold text-stone-600 dark:text-stone-300">Lvl 3: Teach It</label></li>
+                                    <li class="flex items-center gap-3"><input type="checkbox" id="m4" onchange="app.saveUserData()"><label for="m4" class="text-sm font-semibold text-stone-600 dark:text-stone-300">Lvl 4: Mix It</label></li>
+                                    <li class="flex items-center gap-3"><input type="checkbox" id="m5" onchange="app.saveUserData()"><label for="m5" class="text-sm font-semibold text-stone-600 dark:text-stone-300">Lvl 5: The Box</label></li>
                                 </ul>
                             </div>
                         </div>
                         <div class="lg:col-span-3 bg-white dark:bg-[#292524] rounded-[2.5rem] p-10 border border-stone-100 dark:border-stone-800 shadow-sm flex flex-col">
                             <div class="flex justify-between items-center mb-6">
                                 <div class="flex flex-col">
-                                    <h3 class="text-2xl font-serif font-bold text-stone-900 dark:text-stone-50">Mission Notes</h3>
-                                    <span id="save-status" class="text-[10px] uppercase font-bold tracking-widest text-stone-400">Synced</span>
+                                    <h3 class="text-2xl font-serif font-bold text-stone-900 dark:text-stone-50">Brain Dump</h3>
+                                    <span id="save-status" class="text-[10px] uppercase font-bold tracking-widest text-stone-400">Locked In</span>
                                 </div>
-                                <button onclick="app.saveUserData()" class="bg-orange-600 hover:bg-orange-500 text-white px-6 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-all">Save Notes</button>
+                                <button onclick="app.saveUserData()" class="bg-orange-600 hover:bg-orange-500 text-white px-6 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-all">Save This</button>
                             </div>
                             <div class="cornell-notes dark:text-stone-100 flex-grow" contenteditable="true" id="notes-editable" onblur="app.saveUserData()">
-                                Start your Cornell Note synthesis here...
+                                Dump your big brain thoughts here...
                             </div>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div class="bg-white dark:bg-[#292524] p-8 rounded-[2rem] border border-stone-100 dark:border-stone-800 shadow-sm">
-                            <h3 class="text-lg font-serif font-bold mb-4 text-stone-900 dark:text-stone-50">Effort vs Efficiency</h3>
-                            <div class="chart-container"><canvas id="efficiencyChart"></canvas></div>
-                        </div>
-                        <div class="bg-white dark:bg-[#292524] p-8 rounded-[2rem] border border-stone-100 dark:border-stone-800 shadow-sm">
-                            <h3 class="text-lg font-serif font-bold mb-4 text-stone-900 dark:text-stone-50">Category Distribution</h3>
-                            <div class="chart-container"><canvas id="distributionChart"></canvas></div>
                         </div>
                     </div>
                 </div>
@@ -858,503 +694,11 @@
             `,
 
             renderCharts: () => {
-                const scatterCanvas = document.getElementById('efficiencyChart');
-                const doughnutCanvas = document.getElementById('distributionChart');
-                if (!scatterCanvas || !doughnutCanvas) return;
-
-                const existingScatter = Chart.getChart("efficiencyChart"); if (existingScatter) existingScatter.destroy();
-                const existingDoughnut = Chart.getChart("distributionChart"); if (existingDoughnut) existingDoughnut.destroy();
-
-                const isDark = document.body.classList.contains('dark');
-                const gridColor = isDark ? '#44403c' : '#e7e5e4';
-                const textColor = isDark ? '#a8a29e' : '#78716c';
-
-                new Chart(scatterCanvas, {
-                    type: 'scatter',
-                    data: {
-                        datasets: [{
-                            label: 'Techniques',
-                            data: learningData.map(t => ({ x: t.effort, y: t.efficiency })),
-                            backgroundColor: '#ea580c',
-                            pointRadius: 8,
-                            pointHoverRadius: 12
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                                callbacks: {
-                                    label: (ctx) => {
-                                        const t = learningData[ctx.dataIndex];
-                                        return `${t.title}: ${t.efficiency}% efficiency, ${t.effort}% effort`;
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            x: { title: { display: true, text: 'Effort', color: textColor }, grid: { color: gridColor }, ticks: { color: textColor }, min: 0, max: 100 },
-                            y: { title: { display: true, text: 'Efficiency', color: textColor }, grid: { color: gridColor }, ticks: { color: textColor }, min: 0, max: 100 }
-                        }
-                    }
-                });
-
-                const categories = [...new Set(learningData.map(t => t.category))];
-                const categoryCounts = categories.map(c => learningData.filter(t => t.category === c).length);
-                new Chart(doughnutCanvas, {
-                    type: 'doughnut',
-                    data: {
-                        labels: categories,
-                        datasets: [{
-                            data: categoryCounts,
-                            backgroundColor: ['#ea580c', '#78716c', '#292524', '#d6d3d1', '#fdba74']
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { position: 'bottom', labels: { color: textColor, padding: 16, font: { size: 11, weight: 'bold' } } }
-                        }
-                    }
-                });
+                const s = Chart.getChart("efficiencyChart"); if (s) s.destroy();
+                const d = Chart.getChart("distributionChart"); if (d) d.destroy();
             },
 
-            getDecksHTML: () => {
-                const decks = state.fcDecks;
-                return `
-                <div class="animate-fade-in space-y-10">
-                    <div class="text-center">
-                        <h1 class="text-5xl md:text-7xl font-serif font-bold mb-4">Decks</h1>
-                        <p class="text-stone-500 dark:text-stone-400 max-w-xl mx-auto italic font-medium">Flashcard decks with Leitner spaced repetition.</p>
-                    </div>
-                    <div class="bg-white dark:bg-[#292524] p-8 rounded-[2rem] border border-stone-100 dark:border-stone-800 shadow-sm">
-                        <h3 class="text-lg font-serif font-bold mb-4 text-stone-900 dark:text-stone-50">Create New Deck</h3>
-                        <div class="flex gap-3">
-                            <input id="new-deck-title" type="text" placeholder="Deck name..." class="flex-grow bg-stone-50 dark:bg-stone-800 px-5 py-3 rounded-2xl border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-orange-500">
-                            <button onclick="app.fcCreateDeck()" class="bg-orange-600 hover:bg-orange-500 text-white px-6 py-3 rounded-2xl font-bold uppercase tracking-widest text-xs transition-all">Add Deck</button>
-                        </div>
-                    </div>
-                    ${decks.length === 0 ? `
-                        <div class="text-center py-16">
-                            <p class="text-stone-400 dark:text-stone-500 text-lg italic">No decks yet. Create your first deck above.</p>
-                        </div>
-                    ` : `
-                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                            ${decks.map(d => {
-                                const total = fcStore.getCardsByDeck(d.id).length;
-                                const due = fcStore.getDueCards(d.id).length;
-                                return `
-                                <div class="card-hover bg-white dark:bg-[#292524] p-8 rounded-3xl border border-stone-100 dark:border-stone-800 flex flex-col group">
-                                    <h3 class="text-2xl font-serif font-bold mb-2 text-stone-900 dark:text-stone-50">${esc(d.title)}</h3>
-                                    <p class="text-sm text-stone-500 dark:text-stone-400 mb-1">${total} card${total !== 1 ? 's' : ''}</p>
-                                    <p class="text-xs font-bold uppercase tracking-widest ${due > 0 ? 'text-orange-600' : 'text-stone-400'} mb-6">${due} due for review</p>
-                                    <div class="mt-auto flex gap-2">
-                                        <button onclick="app.fcOpenDeck('${d.id}')" class="flex-grow bg-stone-900 dark:bg-stone-50 text-white dark:text-stone-900 py-3 rounded-2xl font-bold uppercase tracking-widest text-xs">Open</button>
-                                        ${due > 0 ? `<button onclick="app.fcStartStudy('${d.id}')" class="bg-orange-600 hover:bg-orange-500 text-white px-4 py-3 rounded-2xl font-bold uppercase tracking-widest text-xs transition-all">Study</button>` : ''}
-                                        <button onclick="app.fcDeleteDeck('${d.id}')" class="bg-stone-100 dark:bg-stone-800 text-stone-500 px-4 py-3 rounded-2xl text-xs font-bold hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-900/30 dark:hover:text-red-400 transition-all">Del</button>
-                                    </div>
-                                </div>`;
-                            }).join('')}
-                        </div>
-                    `}
-                </div>`;
-            },
-
-            getDeckDetailHTML: () => {
-                const deck = state.fcDecks.find(d => d.id === state.fcCurrentDeck);
-                if (!deck) return '';
-                const cards = fcStore.getCardsByDeck(deck.id);
-                const boxLabels = { 1: 'New', 2: 'Learning', 3: 'Review', 4: 'Familiar', 5: 'Mastered' };
-                const boxColors = { 1: 'bg-orange-600', 2: 'bg-amber-500', 3: 'bg-yellow-500', 4: 'bg-emerald-500', 5: 'bg-green-600' };
-                return `
-                <div class="animate-fade-in space-y-10">
-                    <div class="flex items-center gap-4">
-                        <button onclick="app.fcBackToDecks()" class="text-stone-400 hover:text-stone-900 dark:hover:text-white text-2xl transition-colors">←</button>
-                        <div>
-                            <h1 class="text-4xl md:text-5xl font-serif font-bold text-stone-900 dark:text-stone-50">${esc(deck.title)}</h1>
-                            <p class="text-stone-500 dark:text-stone-400 text-sm mt-1">${cards.length} card${cards.length !== 1 ? 's' : ''} in this deck</p>
-                        </div>
-                    </div>
-                    <div class="bg-white dark:bg-[#292524] p-8 rounded-[2rem] border border-stone-100 dark:border-stone-800 shadow-sm">
-                        <h3 class="text-lg font-serif font-bold mb-4 text-stone-900 dark:text-stone-50">Add Card</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
-                            <input id="new-card-front" type="text" placeholder="Front (question)..." class="bg-stone-50 dark:bg-stone-800 px-5 py-3 rounded-2xl border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-orange-500">
-                            <input id="new-card-back" type="text" placeholder="Back (answer)..." class="bg-stone-50 dark:bg-stone-800 px-5 py-3 rounded-2xl border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-orange-500">
-                        </div>
-                        <button onclick="app.fcAddCard()" class="bg-orange-600 hover:bg-orange-500 text-white px-6 py-3 rounded-2xl font-bold uppercase tracking-widest text-xs transition-all">Add Card</button>
-                    </div>
-                    ${cards.length === 0 ? `
-                        <div class="text-center py-12">
-                            <p class="text-stone-400 dark:text-stone-500 text-lg italic">No cards yet. Add your first card above.</p>
-                        </div>
-                    ` : `
-                        <div class="space-y-3">
-                            ${cards.map(c => `
-                                <div class="bg-white dark:bg-[#292524] p-6 rounded-2xl border border-stone-100 dark:border-stone-800 flex flex-col md:flex-row md:items-center gap-4">
-                                    <div class="flex-grow">
-                                        <p class="font-semibold text-stone-900 dark:text-stone-50">${esc(c.front)}</p>
-                                        <p class="text-sm text-stone-500 dark:text-stone-400 mt-1">${esc(c.back)}</p>
-                                    </div>
-                                    <div class="flex items-center gap-3 flex-shrink-0">
-                                        <span class="text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full text-white ${boxColors[c.box]}">${boxLabels[c.box]}</span>
-                                        <button onclick="app.fcEditCard('${c.id}')" class="text-stone-400 hover:text-orange-600 text-sm font-bold transition-colors">Edit</button>
-                                        <button onclick="app.fcDeleteCard('${c.id}')" class="text-stone-400 hover:text-red-600 text-sm font-bold transition-colors">Del</button>
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                        <div class="text-center pt-4">
-                            <button onclick="app.fcStartStudy('${deck.id}')" class="bg-stone-900 dark:bg-stone-50 text-white dark:text-stone-900 px-10 py-4 rounded-2xl font-bold uppercase tracking-widest text-sm transition-transform active:scale-95 shadow-lg">Study All Due Cards</button>
-                        </div>
-                    `}
-                </div>`;
-            },
-
-            getStudyHTML: () => {
-                if (state.fcStudyQueue.length === 0) {
-                    return `
-                    <div class="animate-fade-in text-center py-20 space-y-6">
-                        <h1 class="text-5xl font-serif font-bold text-stone-900 dark:text-stone-50">All Clear!</h1>
-                        <p class="text-stone-500 dark:text-stone-400 text-lg italic max-w-md mx-auto">No cards are due for review right now. Great work!</p>
-                        <button onclick="app.fcBackToDecks()" class="bg-stone-900 dark:bg-stone-50 text-white dark:text-stone-900 px-10 py-4 rounded-2xl font-bold uppercase tracking-widest text-sm transition-transform active:scale-95 shadow-lg">Back to Decks</button>
-                    </div>`;
-                }
-                const card = state.fcStudyQueue[state.fcStudyIndex];
-                const progress = state.fcStudyIndex + 1;
-                const total = state.fcStudyQueue.length;
-                return `
-                <div class="animate-fade-in max-w-2xl mx-auto space-y-8">
-                    <div class="flex items-center justify-between">
-                        <button onclick="app.fcBackToDecks()" class="text-stone-400 hover:text-stone-900 dark:hover:text-white text-2xl transition-colors">←</button>
-                        <span class="text-sm font-bold text-stone-400 uppercase tracking-widest">${progress} / ${total}</span>
-                    </div>
-                    <div class="w-full bg-stone-200 dark:bg-stone-800 h-1.5 rounded-full overflow-hidden">
-                        <div class="bg-orange-600 h-full transition-all duration-300" style="width: ${(progress / total) * 100}%"></div>
-                    </div>
-                    <div onclick="state.fcFlipped = !state.fcFlipped; app.render();" class="cursor-pointer bg-white dark:bg-[#292524] rounded-[2.5rem] border border-stone-100 dark:border-stone-800 shadow-lg p-12 md:p-16 min-h-[320px] flex flex-col items-center justify-center text-center transition-all hover:shadow-xl">
-                        ${state.fcFlipped ? `
-                            <span class="text-[10px] font-bold text-orange-600 uppercase tracking-widest mb-4">Answer</span>
-                            <p class="text-2xl md:text-3xl font-serif font-bold text-stone-900 dark:text-stone-50 leading-relaxed">${esc(card.back)}</p>
-                        ` : `
-                            <span class="text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-4">Question</span>
-                            <p class="text-2xl md:text-3xl font-serif font-bold text-stone-900 dark:text-stone-50 leading-relaxed">${esc(card.front)}</p>
-                            <p class="text-sm text-stone-400 mt-8 italic">Tap to reveal answer</p>
-                        `}
-                    </div>
-                    ${state.fcFlipped ? `
-                        <div class="flex gap-3 justify-center">
-                            <button onclick="app.fcAnswer(false)" class="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 px-8 py-4 rounded-2xl font-bold uppercase tracking-widest text-xs hover:bg-red-200 dark:hover:bg-red-900/50 transition-all">Again</button>
-                            <button onclick="app.fcAnswer(true)" class="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 px-8 py-4 rounded-2xl font-bold uppercase tracking-widest text-xs hover:bg-emerald-200 dark:hover:bg-emerald-900/50 transition-all">Got It</button>
-                        </div>
-                    ` : ''}
-                </div>`;
-            },
-
-            fcCreateDeck: () => {
-                const input = document.getElementById('new-deck-title');
-                const title = input?.value.trim();
-                if (!title) return;
-                fcStore.addDeck(title);
-                app.render();
-            },
-
-            fcDeleteDeck: (id) => {
-                if (!confirm('Delete this deck and all its cards?')) return;
-                fcStore.deleteDeck(id);
-                app.render();
-            },
-
-            fcOpenDeck: (id) => {
-                state.fcCurrentDeck = id;
-                state.fcView = 'deck';
-                app.render();
-            },
-
-            fcBackToDecks: () => {
-                state.fcCurrentDeck = null;
-                state.fcView = 'decks';
-                state.fcStudyQueue = [];
-                state.fcStudyIndex = 0;
-                state.fcFlipped = false;
-                app.render();
-            },
-
-            fcAddCard: () => {
-                const front = document.getElementById('new-card-front')?.value.trim();
-                const back = document.getElementById('new-card-back')?.value.trim();
-                if (!front || !back) return;
-                fcStore.addCard(state.fcCurrentDeck, front, back);
-                app.render();
-            },
-
-            fcEditCard: (id) => {
-                const card = state.fcCards.find(c => c.id === id);
-                if (!card) return;
-                const front = prompt('Edit front:', card.front);
-                if (front === null) return;
-                const back = prompt('Edit back:', card.back);
-                if (back === null) return;
-                fcStore.updateCard(id, front.trim() || card.front, back.trim() || card.back);
-                app.render();
-            },
-
-            fcDeleteCard: (id) => {
-                fcStore.deleteCard(id);
-                app.render();
-            },
-
-            fcStartStudy: (deckId) => {
-                let queue = fcStore.getDueCards(deckId);
-                if (queue.length === 0) {
-                    queue = fcStore.getCardsByDeck(deckId);
-                }
-                state.fcStudyQueue = queue.sort(() => Math.random() - 0.5);
-                state.fcStudyIndex = 0;
-                state.fcFlipped = false;
-                state.fcView = 'study';
-                state.fcCurrentDeck = deckId;
-                app.render();
-            },
-
-            fcAnswer: (correct) => {
-                const card = state.fcStudyQueue[state.fcStudyIndex];
-                fcStore.reviewCard(card.id, correct);
-                state.fcFlipped = false;
-                if (!correct) {
-                    state.fcStudyQueue.push(card);
-                }
-                if (state.fcStudyIndex < state.fcStudyQueue.length - 1) {
-                    state.fcStudyIndex++;
-                    app.render();
-                } else {
-                    state.fcStudyQueue = [];
-                    state.fcStudyIndex = 0;
-                    state.fcView = 'decks';
-                    app.showNotification('Study session complete!');
-                    app.render();
-                }
-            },
-
-            getBlurtHTML: () => {
-                if (state.blurtPhase === 'read') {
-                    const session = blurtStore.get(state.blurtCurrentId);
-                    return `
-                    <div class="animate-fade-in max-w-4xl mx-auto space-y-8">
-                        <div class="flex items-center gap-4">
-                            <button onclick="app.blurtBack()" class="text-stone-400 hover:text-stone-900 dark:hover:text-white text-2xl transition-colors">←</button>
-                            <div>
-                                <h1 class="text-4xl md:text-5xl font-serif font-bold text-stone-900 dark:text-stone-50">Read & Absorb</h1>
-                                <p class="text-stone-500 dark:text-stone-400 text-sm mt-1">Step 1: Read your notes carefully, then hide them.</p>
-                            </div>
-                        </div>
-                        <div class="bg-white dark:bg-[#292524] p-8 rounded-[2rem] border border-stone-100 dark:border-stone-800 shadow-sm">
-                            <label class="text-xs font-bold uppercase tracking-widest text-stone-500 mb-3 block">Source Notes</label>
-                            <textarea id="blurt-source" class="w-full min-h-[300px] bg-stone-50 dark:bg-stone-800 px-6 py-4 rounded-2xl border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100 font-sans text-base leading-relaxed focus:outline-none focus:ring-2 focus:ring-orange-500 resize-y" placeholder="Paste or type your study notes here...">${session ? esc(session.source) : ''}</textarea>
-                        </div>
-                        <div class="text-center">
-                            <button onclick="app.blurtHideAndBlurt()" class="bg-stone-900 dark:bg-stone-50 text-white dark:text-stone-900 px-10 py-4 rounded-2xl font-bold uppercase tracking-widest text-sm transition-transform active:scale-95 shadow-lg">Hide & Blurt</button>
-                        </div>
-                    </div>`;
-                }
-
-                if (state.blurtPhase === 'blurt') {
-                    return `
-                    <div class="animate-fade-in max-w-4xl mx-auto space-y-8">
-                        <div class="flex items-center gap-4">
-                            <button onclick="app.blurtBack()" class="text-stone-400 hover:text-stone-900 dark:hover:text-white text-2xl transition-colors">←</button>
-                            <div>
-                                <h1 class="text-4xl md:text-5xl font-serif font-bold text-stone-900 dark:text-stone-50">Blurt!</h1>
-                                <p class="text-stone-500 dark:text-stone-400 text-sm mt-1">Step 2: Write everything you remember. Don't peek!</p>
-                            </div>
-                        </div>
-                        <div class="bg-stone-900 dark:bg-stone-800 rounded-[2.5rem] p-10 shadow-2xl">
-                            <div class="flex items-center gap-3 mb-6">
-                                <div class="w-3 h-3 rounded-full bg-orange-600 animate-pulse"></div>
-                                <span class="text-xs font-bold uppercase tracking-widest text-stone-400">Active Recall Mode</span>
-                            </div>
-                            <textarea id="blurt-recall" class="w-full min-h-[350px] bg-white/5 px-6 py-4 rounded-2xl border border-white/10 text-white font-sans text-base leading-relaxed focus:outline-none focus:ring-2 focus:ring-orange-500 resize-y placeholder-stone-500" placeholder="Write everything you can remember..."></textarea>
-                        </div>
-                        <div class="text-center">
-                            <button onclick="app.blurtCompare()" class="bg-orange-600 hover:bg-orange-500 text-white px-10 py-4 rounded-2xl font-bold uppercase tracking-widest text-sm transition-all active:scale-95 shadow-lg">Compare with Source</button>
-                        </div>
-                    </div>`;
-                }
-
-                if (state.blurtPhase === 'compare') {
-                    const session = blurtStore.get(state.blurtCurrentId);
-                    if (!session) return '';
-                    return `
-                    <div class="animate-fade-in max-w-6xl mx-auto space-y-8">
-                        <div class="flex items-center gap-4">
-                            <button onclick="app.blurtBack()" class="text-stone-400 hover:text-stone-900 dark:hover:text-white text-2xl transition-colors">←</button>
-                            <div>
-                                <h1 class="text-4xl md:text-5xl font-serif font-bold text-stone-900 dark:text-stone-50">Compare & Fill Gaps</h1>
-                                <p class="text-stone-500 dark:text-stone-400 text-sm mt-1">Step 3: Compare your recall with the source. Note what you missed.</p>
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <div class="bg-white dark:bg-[#292524] p-8 rounded-[2rem] border border-stone-100 dark:border-stone-800 shadow-sm">
-                                <div class="flex items-center gap-2 mb-4">
-                                    <div class="w-3 h-3 rounded-full bg-stone-400"></div>
-                                    <label class="text-xs font-bold uppercase tracking-widest text-stone-500">Source Notes</label>
-                                </div>
-                                <div class="bg-stone-50 dark:bg-stone-800 px-6 py-4 rounded-2xl border border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-300 font-sans text-base leading-relaxed whitespace-pre-wrap min-h-[250px]">${esc(session.source)}</div>
-                            </div>
-                            <div class="bg-white dark:bg-[#292524] p-8 rounded-[2rem] border border-stone-100 dark:border-stone-800 shadow-sm">
-                                <div class="flex items-center gap-2 mb-4">
-                                    <div class="w-3 h-3 rounded-full bg-emerald-500"></div>
-                                    <label class="text-xs font-bold uppercase tracking-widest text-stone-500">Your Recall</label>
-                                </div>
-                                <div class="bg-emerald-50 dark:bg-emerald-900/20 px-6 py-4 rounded-2xl border border-emerald-200 dark:border-emerald-800 text-stone-700 dark:text-stone-300 font-sans text-base leading-relaxed whitespace-pre-wrap min-h-[250px]">${esc(session.recall)}</div>
-                            </div>
-                        </div>
-                        <div class="bg-white dark:bg-[#292524] p-8 rounded-[2rem] border-2 border-dashed border-orange-300 dark:border-orange-700 shadow-sm">
-                            <div class="flex items-center gap-2 mb-4">
-                                <div class="w-3 h-3 rounded-full bg-orange-600"></div>
-                                <label class="text-xs font-bold uppercase tracking-widest text-orange-600">Gaps &amp; Missing Details — Priority for Next Session</label>
-                            </div>
-                            <textarea id="blurt-gaps" class="w-full min-h-[150px] bg-orange-50 dark:bg-orange-900/20 px-6 py-4 rounded-2xl border border-orange-200 dark:border-orange-800 text-orange-900 dark:text-orange-200 font-sans text-base leading-relaxed focus:outline-none focus:ring-2 focus:ring-orange-500 resize-y placeholder-orange-400 dark:placeholder-orange-600" placeholder="Write everything you missed or got wrong here. These become your priority next time...">${esc(session.gaps)}</textarea>
-                        </div>
-                        <div class="flex gap-3 justify-center">
-                            <button onclick="app.blurtSave()" class="bg-stone-900 dark:bg-stone-50 text-white dark:text-stone-900 px-10 py-4 rounded-2xl font-bold uppercase tracking-widest text-sm transition-transform active:scale-95 shadow-lg">Save Session</button>
-                            <button onclick="app.blurtRestart()" class="bg-orange-600 hover:bg-orange-500 text-white px-10 py-4 rounded-2xl font-bold uppercase tracking-widest text-sm transition-all active:scale-95 shadow-lg">Blurt Again</button>
-                        </div>
-                    </div>`;
-                }
-
-                const sessions = state.blurtSessions;
-                return `
-                <div class="animate-fade-in space-y-10">
-                    <div class="text-center">
-                        <h1 class="text-5xl md:text-7xl font-serif font-bold mb-4">The Blurting Method</h1>
-                        <p class="text-stone-500 dark:text-stone-400 max-w-xl mx-auto italic font-medium">Read. Hide. Blurt. Compare. Fill gaps. Repeat.</p>
-                    </div>
-                    <div class="bg-white dark:bg-[#292524] p-8 rounded-[2rem] border border-stone-100 dark:border-stone-800 shadow-sm">
-                        <h3 class="text-lg font-serif font-bold mb-4 text-stone-900 dark:text-stone-50">New Blurt Session</h3>
-                        <div class="flex gap-3">
-                            <input id="new-blurt-title" type="text" placeholder="Topic name (e.g. Chapter 5 — Cell Biology)..." class="flex-grow bg-stone-50 dark:bg-stone-800 px-5 py-3 rounded-2xl border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-2 focus:ring-orange-500">
-                            <button onclick="app.blurtCreate()" class="bg-orange-600 hover:bg-orange-500 text-white px-6 py-3 rounded-2xl font-bold uppercase tracking-widest text-xs transition-all">Start</button>
-                        </div>
-                    </div>
-                    ${sessions.length === 0 ? `
-                        <div class="text-center py-16">
-                            <p class="text-stone-400 dark:text-stone-500 text-lg italic">No blurt sessions yet. Start one above!</p>
-                        </div>
-                    ` : `
-                        <div class="space-y-4">
-                            ${sessions.map(s => {
-                                const date = new Date(s.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-                                const hasGaps = s.gaps && s.gaps.trim().length > 0;
-                                return `
-                                <div class="card-hover bg-white dark:bg-[#292524] p-6 rounded-2xl border border-stone-100 dark:border-stone-800 flex flex-col md:flex-row md:items-center gap-4">
-                                    <div class="flex-grow">
-                                        <h3 class="text-xl font-serif font-bold text-stone-900 dark:text-stone-50">${esc(s.title)}</h3>
-                                        <div class="flex flex-wrap items-center gap-3 mt-2">
-                                            <span class="text-xs text-stone-400">${date}</span>
-                                            <span class="text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full ${s.reviewCount > 0 ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' : 'bg-stone-100 dark:bg-stone-800 text-stone-500'}">${s.reviewCount} review${s.reviewCount !== 1 ? 's' : ''}</span>
-                                            ${hasGaps ? '<span class="text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400">Has Gaps</span>' : ''}
-                                        </div>
-                                    </div>
-                                    <div class="flex items-center gap-2 flex-shrink-0">
-                                        <button onclick="app.blurtOpen('${s.id}')" class="bg-stone-900 dark:bg-stone-50 text-white dark:text-stone-900 px-5 py-3 rounded-2xl font-bold uppercase tracking-widest text-xs">Review</button>
-                                        <button onclick="app.blurtQuickBlurt('${s.id}')" class="bg-orange-600 hover:bg-orange-500 text-white px-5 py-3 rounded-2xl font-bold uppercase tracking-widest text-xs transition-all">Blurt</button>
-                                        <button onclick="app.blurtDelete('${s.id}')" class="bg-stone-100 dark:bg-stone-800 text-stone-500 px-4 py-3 rounded-2xl text-xs font-bold hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-900/30 dark:hover:text-red-400 transition-all">Del</button>
-                                    </div>
-                                </div>`;
-                            }).join('')}
-                        </div>
-                    `}
-                </div>`;
-            },
-
-            blurtCreate: () => {
-                const input = document.getElementById('new-blurt-title');
-                const title = input?.value.trim();
-                if (!title) return;
-                const id = blurtStore.create(title, '');
-                state.blurtCurrentId = id;
-                state.blurtPhase = 'read';
-                app.render();
-            },
-
-            blurtOpen: (id) => {
-                state.blurtCurrentId = id;
-                state.blurtPhase = 'read';
-                app.render();
-            },
-
-            blurtQuickBlurt: (id) => {
-                state.blurtCurrentId = id;
-                state.blurtPhase = 'blurt';
-                app.render();
-            },
-
-            blurtBack: () => {
-                state.blurtPhase = 'list';
-                state.blurtCurrentId = null;
-                app.render();
-            },
-
-            blurtHideAndBlurt: () => {
-                const source = document.getElementById('blurt-source')?.value.trim();
-                if (!source) { app.showNotification('Please enter your source notes first.'); return; }
-                blurtStore.update(state.blurtCurrentId, { source });
-                state.blurtPhase = 'blurt';
-                app.render();
-            },
-
-            blurtCompare: () => {
-                const recall = document.getElementById('blurt-recall')?.value.trim();
-                if (!recall) { app.showNotification('Write what you remember before comparing.'); return; }
-                const session = blurtStore.get(state.blurtCurrentId);
-                blurtStore.update(state.blurtCurrentId, {
-                    recall,
-                    lastReviewedAt: Date.now(),
-                    reviewCount: (session.reviewCount || 0) + 1
-                });
-                state.blurtPhase = 'compare';
-                app.render();
-            },
-
-            blurtSave: () => {
-                const gaps = document.getElementById('blurt-gaps')?.value || '';
-                blurtStore.update(state.blurtCurrentId, { gaps });
-                state.blurtPhase = 'list';
-                state.blurtCurrentId = null;
-                app.showNotification('Blurt session saved!');
-                app.render();
-            },
-
-            blurtRestart: () => {
-                const gaps = document.getElementById('blurt-gaps')?.value || '';
-                blurtStore.update(state.blurtCurrentId, { gaps });
-                state.blurtPhase = 'blurt';
-                app.render();
-            },
-
-            blurtDelete: (id) => {
-                if (!confirm('Delete this blurt session?')) return;
-                blurtStore.remove(id);
-                app.render();
-            },
-
-            governorBreakdown: () => {
-                pomodoroStore.clearStreak();
-                state.governorBlocked = false;
-                app.showNotification('Streak reset. You can continue with this task.');
-                app.render();
-            },
-
-            governorSwitch: () => {
-                state.governorBlocked = false;
-                state.timerTaskLabel = '';
-                app.render();
-            },
-
-            showAbout: () => alert("Synapse OS v3.9 - Mission Notes Workspace Enabled.")
+            showAbout: () => alert("Synapse OS v4.1 - Level Up Your Game")
         };
 
         document.addEventListener('DOMContentLoaded', app.init);
