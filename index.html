@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
-    
+
     <!-- Firebase SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -76,7 +76,7 @@
             font-family: 'Lora', serif;
             letter-spacing: -0.02em;
         }
-        
+
         .cornell-notes {
             min-height: 400px;
             background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
@@ -98,7 +98,7 @@
         .card-hover:hover { transform: translateY(-4px); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); }
         .animate-fade-in { animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
+
         .ai-loader {
             border: 2px solid #f3f3f3;
             border-top: 2px solid #ea580c;
@@ -127,7 +127,7 @@
                     </div>
                     <button id="theme-toggle" class="text-2xl hover:scale-110 transition-transform focus:outline-none">🌙</button>
                 </div>
-                
+
                 <div class="hidden md:flex items-center gap-8" id="desktop-nav">
                     <button onclick="app.navTo('dashboard')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-sm font-semibold tracking-wide transition-colors uppercase">Mission</button>
                     <button onclick="app.navTo('explore')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-sm font-semibold tracking-wide transition-colors uppercase">Vault</button>
@@ -395,7 +395,7 @@
                         }
                     } catch (err) { console.error("Auth Error", err); }
                 };
-                
+
                 await initAuth();
                 if (window.fb && window.fb.onAuthStateChanged) {
                     window.fb.onAuthStateChanged(window.fb.auth, async (user) => {
@@ -477,7 +477,7 @@
                 const s = state.timerSeconds % 60;
                 display.textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
                 btn.textContent = state.timerIsRunning ? 'Pause' : 'Start';
-                
+
                 const circumference = 2 * Math.PI * 45;
                 const offset = circumference - (state.timerSeconds / state.timerInitialSeconds) * circumference;
                 progress.style.strokeDasharray = `${circumference} ${circumference}`;
@@ -557,7 +557,7 @@
                 document.getElementById('modal-content').innerHTML = `
                     <div class="p-8 relative">
                         <button onclick="app.closeModal()" class="absolute top-6 right-6 text-stone-400 hover:text-stone-900 dark:hover:text-white transition-colors text-2xl">✕</button>
-                        
+
                         <div class="mb-8">
                             <span class="text-orange-600 font-bold uppercase tracking-widest text-xs">${t.category} Protocol</span>
                             <h2 class="text-5xl font-serif font-bold text-stone-900 dark:text-stone-50 mt-2">${t.title}</h2>
@@ -765,7 +765,7 @@
                                     "Algorithm-based tools like Anki or RemNote automate this scheduling, showing you cards only when you are statistically likely to forget them."
                                 </p>
                             </div>
-                            
+
                             <div class="p-10 border-2 border-dashed border-stone-200 dark:border-stone-800 rounded-[2.5rem] text-center">
                                 <p class="text-sm font-bold text-stone-500 mb-8 uppercase tracking-widest">Protocol Stored</p>
                                 <button onclick="app.navTo('dashboard')" class="bg-stone-900 dark:bg-stone-50 text-white dark:text-stone-900 px-10 py-4 rounded-2xl font-bold uppercase tracking-tighter text-sm transition-transform active:scale-95 shadow-lg">Return to Mission</button>
