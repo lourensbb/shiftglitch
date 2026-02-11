@@ -87,6 +87,7 @@
                     <button onclick="app.navTo('decks')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-xs font-semibold tracking-wide transition-colors uppercase">Decks</button>
                     <button onclick="app.navTo('quiz')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-xs font-semibold tracking-wide transition-colors uppercase">Quiz</button>
                     <button onclick="app.navTo('blurt')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-xs font-semibold tracking-wide transition-colors uppercase">Blurt</button>
+                    <button onclick="app.navTo('matrix')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-xs font-semibold tracking-wide transition-colors uppercase">Matrix</button>
                     <button onclick="app.navTo('rank')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-xs font-semibold tracking-wide transition-colors uppercase">Rank</button>
                     <button onclick="app.navTo('stats')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-xs font-semibold tracking-wide transition-colors uppercase">Stats</button>
                     <span id="nav-rank" class="text-xs font-bold text-orange-600 ml-2 bg-orange-50 dark:bg-orange-900/30 px-3 py-1 rounded-lg uppercase tracking-widest cursor-pointer" onclick="app.navTo('rank')">Space Cadet</span>
@@ -102,6 +103,7 @@
             <button onclick="app.navTo('decks')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Decks</button>
             <button onclick="app.navTo('quiz')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Quiz</button>
             <button onclick="app.navTo('blurt')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Blurt</button>
+            <button onclick="app.navTo('matrix')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Matrix</button>
             <button onclick="app.navTo('rank')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Rank</button>
             <button onclick="app.navTo('stats')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Stats</button>
         </div>
@@ -149,7 +151,8 @@
             { id: 2, title: "Spaced Repetition", category: "Retention", efficiency: 92, effort: 40, summary: "Interval optimization.", description: "Reviewing information at increasing intervals to exploit the spacing effect.", example: "Review after 1 day, then 3 days, then 1 week.", steps: ["1 Day Review", "3 Day Review", "1 Week Review"] },
             { id: 3, title: "Feynman Technique", category: "Understanding", efficiency: 88, effort: 90, summary: "Simplify to teach.", description: "Teaching a concept in simple terms to identify gaps.", example: "Explain 'Quantum Entanglement' to a 10-year-old.", steps: ["Pick topic", "Teach child", "Spot logic gaps"] },
             { id: 4, title: "Interleaving", category: "Application", efficiency: 85, effort: 75, summary: "Subject shuffling.", description: "Mixing different subjects or problem types in a single session.", example: "Alternate between tennis serves and volleys.", steps: ["Pick 3 topics", "Rotate 25 mins", "Compare logic"] },
-            { id: 5, title: "The Leitner System", category: "Retention", efficiency: 94, effort: 65, summary: "Box-based flashcards.", description: "A structured method using flashcards where correct cards move to less-frequent boxes, incorrect cards return to Box 1.", example: "Box 1: Daily. Box 2: Every 3 days. Box 3: Weekly.", steps: ["Setup 5 Boxes", "Test Box 1", "Correct? Advance", "Wrong? Reset to 1"] }
+            { id: 5, title: "The Leitner System", category: "Retention", efficiency: 94, effort: 65, summary: "Box-based flashcards.", description: "A structured method using flashcards where correct cards move to less-frequent boxes, incorrect cards return to Box 1.", example: "Box 1: Daily. Box 2: Every 3 days. Box 3: Weekly.", steps: ["Setup 5 Boxes", "Test Box 1", "Correct? Advance", "Wrong? Reset to 1"] },
+            { id: 6, title: "Eisenhower Matrix", category: "Prioritisation", efficiency: 90, effort: 30, summary: "Priority sorting.", description: "A decision-making framework that sorts tasks into four quadrants based on urgency and importance, training you to spend more time on what matters.", example: "Test tomorrow = Q1 (Do). Flashcards for next week = Q2 (Plan). Group chat = Q3 (Minimise). Scrolling = Q4 (Limit).", steps: ["Brain dump all tasks", "Sort by urgency + importance", "Act on Q1, plan Q2", "Minimise Q3, limit Q4"] }
         ];
 
         const deckStore = {
@@ -217,6 +220,51 @@
             update(id, data) { const s = state.blurtSessions.find(x => x.id === id); if (s) { Object.assign(s, data, { updatedAt: Date.now() }); this.save(); } },
             remove(id) { state.blurtSessions = state.blurtSessions.filter(s => s.id !== id); this.save(); },
             get(id) { return state.blurtSessions.find(s => s.id === id); }
+        };
+
+        const eisenhowerStore = {
+            load() {
+                try {
+                    const d = JSON.parse(localStorage.getItem('synapse_eisenhower') || '{}');
+                    state.eisenhowerTasks = d.tasks || [];
+                    state.eisenhowerReflections = d.reflections || [];
+                } catch(e) { state.eisenhowerTasks = []; state.eisenhowerReflections = []; }
+            },
+            save() {
+                localStorage.setItem('synapse_eisenhower', JSON.stringify({
+                    tasks: state.eisenhowerTasks,
+                    reflections: state.eisenhowerReflections,
+                }));
+            },
+            addTask(text) {
+                const t = { id: Date.now().toString(), text, quadrant: 0, createdAt: Date.now() };
+                state.eisenhowerTasks.push(t);
+                this.save();
+                return t;
+            },
+            moveTask(id, quadrant) {
+                const t = state.eisenhowerTasks.find(x => x.id === id);
+                if (t) { t.quadrant = quadrant; this.save(); }
+            },
+            removeTask(id) {
+                state.eisenhowerTasks = state.eisenhowerTasks.filter(t => t.id !== id);
+                this.save();
+            },
+            completeTask(id) {
+                const t = state.eisenhowerTasks.find(x => x.id === id);
+                if (t) { t.completed = true; t.completedAt = Date.now(); this.save(); }
+            },
+            getByQuadrant(q) { return state.eisenhowerTasks.filter(t => t.quadrant === q && !t.completed); },
+            getUnsorted() { return state.eisenhowerTasks.filter(t => t.quadrant === 0 && !t.completed); },
+            getCompleted() { return state.eisenhowerTasks.filter(t => t.completed); },
+            addReflection(text) {
+                state.eisenhowerReflections.push({ text, createdAt: Date.now() });
+                this.save();
+            },
+            clearCompleted() {
+                state.eisenhowerTasks = state.eisenhowerTasks.filter(t => !t.completed);
+                this.save();
+            },
         };
 
         const RANKS = ['Space Cadet', 'Second Officer', 'Flight Commander'];
@@ -329,6 +377,7 @@
             timerTaskLabel: '', governorBlocked: false, pomodoroLog: [],
             fcDecks: [], fcCards: [], fcCurrentDeck: null, fcStudyQueue: [], fcStudyIndex: 0, fcFlipped: false,
             blurtSessions: [], blurtCurrentId: null, blurtPhase: 'list',
+            eisenhowerTasks: [], eisenhowerReflections: [],
             rank: 'Space Cadet', rankEvidence: { blurtsCompleted: 0, governorBreakdowns: 0, cardsAdvanced: 0, activeDays: 0, pomodorosCompleted: 0, lastActiveDate: '' },
             quizCategory: '', quizDifficulty: 'medium', quizQuestions: [], quizIndex: 0, quizScore: 0,
             quizStreak: 0, quizAnswered: false, quizSelectedAnswer: null, quizTimer: 15, quizTimerInterval: null,
@@ -346,7 +395,7 @@
                     if (state.view === 'dashboard') app.renderCharts();
                 });
 
-                deckStore.load(); cardStore.load(); pomodoroStore.load(); blurtStore.load();
+                deckStore.load(); cardStore.load(); pomodoroStore.load(); blurtStore.load(); eisenhowerStore.load();
                 rankEngine.load(); rankEngine.trackActiveDay(); rankEngine.updateNavRank();
 
                 if (window.fb && window.fb.auth) {
@@ -375,7 +424,7 @@
                 if (menu) menu.classList.add('hidden');
                 document.querySelectorAll('.nav-btn').forEach(btn => {
                     btn.classList.remove('text-orange-600', 'font-bold');
-                    const map = { dashboard: 'Mission', explore: 'Vault', decks: 'Decks', quiz: 'Quiz', blurt: 'Blurt', rank: 'Rank', stats: 'Stats' };
+                    const map = { dashboard: 'Mission', explore: 'Vault', decks: 'Decks', quiz: 'Quiz', blurt: 'Blurt', matrix: 'Matrix', rank: 'Rank', stats: 'Stats' };
                     if (btn.textContent.trim().toUpperCase() === (map[tabId] || '').toUpperCase()) btn.classList.add('text-orange-600', 'font-bold');
                 });
                 app.render();
@@ -594,11 +643,44 @@
             blurtDelete: (id) => { if (!confirm('Delete this blurt session?')) return; blurtStore.remove(id); app.render(); },
             blurtReBlurt: (id) => { state.blurtCurrentId = id; state.blurtPhase = 'blurt'; app.render(); },
 
+            matrixAddTask: () => {
+                const el = document.getElementById('matrix-task-input');
+                if (!el || !el.value.trim()) return;
+                eisenhowerStore.addTask(el.value.trim());
+                el.value = '';
+                app.render();
+            },
+            matrixMove: (id, quadrant) => {
+                eisenhowerStore.moveTask(id, quadrant);
+                app.render();
+            },
+            matrixComplete: (id) => {
+                eisenhowerStore.completeTask(id);
+                app.render();
+            },
+            matrixDelete: (id) => {
+                eisenhowerStore.removeTask(id);
+                app.render();
+            },
+            matrixClearCompleted: () => {
+                eisenhowerStore.clearCompleted();
+                app.render();
+            },
+            matrixSaveReflection: () => {
+                const el = document.getElementById('matrix-reflection');
+                if (!el || !el.value.trim()) return;
+                eisenhowerStore.addReflection(el.value.trim());
+                el.value = '';
+                app.showNotification('Reflection saved.');
+                app.render();
+            },
+
             exportData: () => {
                 const data = {
                     decks: state.fcDecks, cards: state.fcCards, blurtSessions: state.blurtSessions,
                     pomodoroLog: state.pomodoroLog, notes: localStorage.getItem('cornellNotes') || '',
                     rank: { rank: state.rank, rankEvidence: state.rankEvidence },
+                    eisenhower: { tasks: state.eisenhowerTasks, reflections: state.eisenhowerReflections },
                     exportedAt: new Date().toISOString()
                 };
                 const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -619,6 +701,7 @@
                         if (data.pomodoroLog) { state.pomodoroLog = data.pomodoroLog; pomodoroStore.save(); }
                         if (data.notes) localStorage.setItem('cornellNotes', data.notes);
                         if (data.rank) { state.rank = data.rank.rank || 'Space Cadet'; state.rankEvidence = data.rank.rankEvidence || state.rankEvidence; rankEngine.save(); }
+                        if (data.eisenhower) { state.eisenhowerTasks = data.eisenhower.tasks || []; state.eisenhowerReflections = data.eisenhower.reflections || []; eisenhowerStore.save(); }
                         app.showNotification('Data imported successfully!');
                         app.render();
                     } catch (err) { app.showNotification('Import failed. Invalid file.'); }
@@ -647,6 +730,8 @@
                     container.innerHTML = app.getBlurtHTML();
                 } else if (state.view === 'quiz') {
                     container.innerHTML = app.getQuizHTML();
+                } else if (state.view === 'matrix') {
+                    container.innerHTML = app.getMatrixHTML();
                 } else if (state.view === 'rank') {
                     container.innerHTML = app.getRankHTML();
                 } else if (state.view === 'stats') {
@@ -1119,6 +1204,110 @@
             },
             quizReset: () => { clearInterval(state.quizTimerInterval); state.quizPhase = 'setup'; state.quizQuestions = []; app.render(); },
             decodeHTML: (html) => { const d = document.createElement('div'); d.innerHTML = html; return d.textContent; },
+
+            getMatrixHTML: () => {
+                const unsorted = eisenhowerStore.getUnsorted();
+                const q1 = eisenhowerStore.getByQuadrant(1);
+                const q2 = eisenhowerStore.getByQuadrant(2);
+                const q3 = eisenhowerStore.getByQuadrant(3);
+                const q4 = eisenhowerStore.getByQuadrant(4);
+                const completed = eisenhowerStore.getCompleted();
+
+                const taskCard = (t, showMove = true) => {
+                    const moveButtons = showMove ? `<div class="flex gap-1 mt-2">
+                        ${t.quadrant !== 1 ? '<button onclick="app.matrixMove(\''+t.id+'\', 1)" class="text-[9px] font-bold uppercase tracking-widest bg-red-100 dark:bg-red-900/30 text-red-600 px-2 py-0.5 rounded">Q1</button>' : ''}
+                        ${t.quadrant !== 2 ? '<button onclick="app.matrixMove(\''+t.id+'\', 2)" class="text-[9px] font-bold uppercase tracking-widest bg-amber-100 dark:bg-amber-900/30 text-amber-600 px-2 py-0.5 rounded">Q2</button>' : ''}
+                        ${t.quadrant !== 3 ? '<button onclick="app.matrixMove(\''+t.id+'\', 3)" class="text-[9px] font-bold uppercase tracking-widest bg-blue-100 dark:bg-blue-900/30 text-blue-600 px-2 py-0.5 rounded">Q3</button>' : ''}
+                        ${t.quadrant !== 4 ? '<button onclick="app.matrixMove(\''+t.id+'\', 4)" class="text-[9px] font-bold uppercase tracking-widest bg-stone-200 dark:bg-stone-700 text-stone-500 px-2 py-0.5 rounded">Q4</button>' : ''}
+                    </div>` : '';
+                    return `<div class="bg-white dark:bg-[#292524] p-3 rounded-xl border border-stone-100 dark:border-stone-800 flex flex-col gap-1">
+                        <div class="flex items-start justify-between gap-2">
+                            <span class="text-sm font-medium flex-grow">${esc(t.text)}</span>
+                            <div class="flex gap-1 flex-shrink-0">
+                                <button onclick="app.matrixComplete('${t.id}')" class="text-green-500 hover:text-green-600 text-xs" title="Complete">&#x2713;</button>
+                                <button onclick="app.matrixDelete('${t.id}')" class="text-stone-400 hover:text-red-500 text-xs">&times;</button>
+                            </div>
+                        </div>
+                        ${moveButtons}
+                    </div>`;
+                };
+
+                const quadrantBlock = (num, title, subtitle, colorBg, colorBorder, colorText, items) => `
+                    <div class="rounded-[1.5rem] p-5 border ${colorBorder} ${colorBg} flex flex-col">
+                        <div class="mb-3">
+                            <h3 class="text-sm font-bold uppercase tracking-widest ${colorText}">${title}</h3>
+                            <p class="text-[10px] text-stone-500 dark:text-stone-400 mt-0.5">${subtitle}</p>
+                        </div>
+                        <div class="space-y-2 flex-grow">${items.length === 0 ? '<p class="text-xs text-stone-400 italic">No tasks here</p>' : items.map(t => taskCard(t)).join('')}</div>
+                    </div>`;
+
+                return `<div class="animate-fade-in max-w-5xl mx-auto space-y-8">
+                    <div class="text-center mb-4">
+                        <h1 class="text-5xl font-serif font-bold mb-3">Eisenhower Matrix</h1>
+                        <p class="text-stone-500 dark:text-stone-400 italic max-w-xl mx-auto">Stop being busy. Start being smart. Sort tasks by what actually matters.</p>
+                    </div>
+
+                    <div class="bg-white dark:bg-[#292524] rounded-[2rem] p-8 border border-stone-100 dark:border-stone-800 shadow-sm">
+                        <h3 class="text-sm font-bold uppercase text-stone-500 tracking-widest mb-3">Brain Dump</h3>
+                        <p class="text-xs text-stone-400 mb-4">Write everything on your mind. Don't organise yet — just dump.</p>
+                        <div class="flex gap-3">
+                            <input id="matrix-task-input" type="text" placeholder="What's on your mind?" class="flex-grow bg-stone-50 dark:bg-stone-800 px-4 py-3 rounded-xl border border-stone-200 dark:border-stone-700 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" onkeydown="if(event.key==='Enter')app.matrixAddTask()">
+                            <button onclick="app.matrixAddTask()" class="bg-orange-600 hover:bg-orange-500 text-white px-6 py-3 rounded-xl font-bold text-sm uppercase tracking-widest">Add</button>
+                        </div>
+                        ${unsorted.length > 0 ? `
+                            <div class="mt-4 space-y-2">
+                                <h4 class="text-xs font-bold uppercase text-stone-400 tracking-widest">Unsorted (${unsorted.length})</h4>
+                                ${unsorted.map(t => `<div class="bg-stone-50 dark:bg-stone-800 p-3 rounded-xl flex items-center gap-3">
+                                    <span class="text-sm font-medium flex-grow">${esc(t.text)}</span>
+                                    <div class="flex gap-1">
+                                        <button onclick="app.matrixMove('${t.id}', 1)" class="text-[9px] font-bold uppercase tracking-widest bg-red-100 dark:bg-red-900/30 text-red-600 px-2 py-1 rounded-lg">Q1</button>
+                                        <button onclick="app.matrixMove('${t.id}', 2)" class="text-[9px] font-bold uppercase tracking-widest bg-amber-100 dark:bg-amber-900/30 text-amber-600 px-2 py-1 rounded-lg">Q2</button>
+                                        <button onclick="app.matrixMove('${t.id}', 3)" class="text-[9px] font-bold uppercase tracking-widest bg-blue-100 dark:bg-blue-900/30 text-blue-600 px-2 py-1 rounded-lg">Q3</button>
+                                        <button onclick="app.matrixMove('${t.id}', 4)" class="text-[9px] font-bold uppercase tracking-widest bg-stone-300 dark:bg-stone-600 text-stone-600 dark:text-stone-300 px-2 py-1 rounded-lg">Q4</button>
+                                    </div>
+                                    <button onclick="app.matrixDelete('${t.id}')" class="text-stone-400 hover:text-red-500 text-sm">&times;</button>
+                                </div>`).join('')}
+                            </div>` : ''}
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        ${quadrantBlock(1, 'Q1: Do First', 'Urgent & Important — handle now', 'bg-red-50 dark:bg-red-900/10', 'border-red-200 dark:border-red-800', 'text-red-600', q1)}
+                        ${quadrantBlock(2, 'Q2: Schedule', 'Important, Not Urgent — the power zone', 'bg-amber-50 dark:bg-amber-900/10', 'border-amber-200 dark:border-amber-800', 'text-amber-600', q2)}
+                        ${quadrantBlock(3, 'Q3: Minimise', "Urgent, Not Important — don't let these steal focus", 'bg-blue-50 dark:bg-blue-900/10', 'border-blue-200 dark:border-blue-800', 'text-blue-600', q3)}
+                        ${quadrantBlock(4, 'Q4: Limit', 'Not Urgent & Not Important — time disappears here', 'bg-stone-50 dark:bg-stone-800/50', 'border-stone-200 dark:border-stone-700', 'text-stone-500', q4)}
+                    </div>
+
+                    <div class="bg-amber-50 dark:bg-amber-900/10 rounded-[2rem] p-8 border border-amber-200 dark:border-amber-800">
+                        <h3 class="text-sm font-bold uppercase text-amber-600 tracking-widest mb-2">The Smart Shift</h3>
+                        <p class="text-sm text-stone-600 dark:text-stone-300 mb-4">Pick a Q1 task and ask: <strong>"What Q2 action could have prevented this?"</strong> Then pick a Q2 task and schedule it before it becomes urgent.</p>
+                        <textarea id="matrix-reflection" class="w-full h-20 bg-white dark:bg-stone-800 border border-amber-200 dark:border-amber-700 rounded-xl p-4 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none" placeholder="Write your reflection here..."></textarea>
+                        <button onclick="app.matrixSaveReflection()" class="mt-2 bg-amber-600 hover:bg-amber-500 text-white px-6 py-2 rounded-xl font-bold text-xs uppercase tracking-widest">Save Reflection</button>
+                        ${state.eisenhowerReflections.length > 0 ? `<div class="mt-4 space-y-2">${state.eisenhowerReflections.slice(-3).reverse().map(r => `<div class="bg-white dark:bg-stone-800 p-3 rounded-lg text-sm text-stone-600 dark:text-stone-300 italic">"${esc(r.text)}" <span class="text-[10px] text-stone-400 ml-2">${new Date(r.createdAt).toLocaleDateString()}</span></div>`).join('')}</div>` : ''}
+                    </div>
+
+                    <div class="bg-white dark:bg-[#292524] rounded-[2rem] p-8 border border-stone-100 dark:border-stone-800 shadow-sm">
+                        <h3 class="text-lg font-serif font-bold mb-3">The Daily Rule</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                            <div class="flex items-start gap-3 p-4 bg-red-50 dark:bg-red-900/10 rounded-xl"><span class="text-red-600 font-bold text-lg">1</span><div><strong class="text-red-600">Do 1 Q1 task</strong><p class="text-stone-500 text-xs mt-1">If needed — but don't live here</p></div></div>
+                            <div class="flex items-start gap-3 p-4 bg-amber-50 dark:bg-amber-900/10 rounded-xl"><span class="text-amber-600 font-bold text-lg">2</span><div><strong class="text-amber-600">Do at least 1 Q2 task</strong><p class="text-stone-500 text-xs mt-1">This is how top students win</p></div></div>
+                            <div class="flex items-start gap-3 p-4 bg-blue-50 dark:bg-blue-900/10 rounded-xl"><span class="text-blue-600 font-bold text-lg">3</span><div><strong class="text-blue-600">Limit Q3</strong><p class="text-stone-500 text-xs mt-1">Quick, delay, or minimise</p></div></div>
+                            <div class="flex items-start gap-3 p-4 bg-stone-100 dark:bg-stone-800 rounded-xl"><span class="text-stone-500 font-bold text-lg">4</span><div><strong class="text-stone-500">Exit Q4 consciously</strong><p class="text-stone-500 text-xs mt-1">Don't negotiate with distractions</p></div></div>
+                        </div>
+                    </div>
+
+                    ${completed.length > 0 ? `<div class="bg-white dark:bg-[#292524] rounded-[2rem] p-8 border border-stone-100 dark:border-stone-800 shadow-sm">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-serif font-bold">Completed (${completed.length})</h3>
+                            <button onclick="app.matrixClearCompleted()" class="text-xs font-bold uppercase tracking-widest text-stone-400 hover:text-red-500">Clear All</button>
+                        </div>
+                        <div class="space-y-2">${completed.slice(-5).reverse().map(t => `<div class="flex items-center gap-3 text-stone-400 line-through text-sm"><span>${esc(t.text)}</span></div>`).join('')}</div>
+                    </div>` : ''}
+
+                    <div class="text-center py-4">
+                        <p class="text-sm text-stone-400 italic max-w-lg mx-auto">"Successful students aren't better at doing work. They're better at choosing which work deserves their energy."</p>
+                    </div>
+                </div>`;
+            },
 
             getQuizHTML: () => {
                 if (state.quizPhase === 'loading') return `<div class="animate-fade-in text-center py-20"><div class="ai-loader mx-auto mb-4" style="width:32px;height:32px"></div><p class="text-stone-500 font-bold uppercase tracking-widest text-sm">Loading Questions...</p></div>`;

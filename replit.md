@@ -19,8 +19,8 @@ Preferred communication style: Simple, everyday language.
 ## System Architecture
 
 ### Frontend Architecture
-- **Single-page application (SPA):** The entire UI lives in a single `index.html` file (~1250 lines). All routing is handled client-side via `app.navTo()`. Express server has a catch-all route serving `index.html` for any path.
-- **Navigation sections:** Mission (dashboard), Vault (learning techniques), Decks (flashcard management), Quiz (trivia, isolated from progression), Blurt (blurting method), Rank (rank status & promotion requirements), Stats (session statistics).
+- **Single-page application (SPA):** The entire UI lives in a single `index.html` file (~1350 lines). All routing is handled client-side via `app.navTo()`. Express server has a catch-all route serving `index.html` for any path.
+- **Navigation sections:** Mission (dashboard), Vault (learning techniques), Decks (flashcard management), Quiz (trivia, isolated from progression), Blurt (blurting method), Matrix (Eisenhower Matrix prioritisation tool), Rank (rank status & promotion requirements), Stats (session statistics).
 - **Styling:** Tailwind CSS via CDN with dark mode support (class-based toggle), custom fonts (Inter for UI, Lora for headings).
 - **Data Visualization:** Chart.js via CDN for scatter, doughnut, and bar charts.
 - **Design Theme:** Warm paper-like color scheme (background `#FDFCF8`, text `#2D2A26`, accent `orange-600`).
@@ -39,6 +39,7 @@ Preferred communication style: Simple, everyday language.
   - `synapse_blurt` — Blurt sessions with source/recall/gaps
   - `cornellNotes` — Cornell notes content
   - `synapse_rank` — Current rank and rank evidence (blurtsCompleted, governorBreakdowns, cardsAdvanced, activeDays, pomodorosCompleted)
+  - `synapse_eisenhower` — Eisenhower Matrix tasks (with quadrant assignments) and reflections
 - **Firebase Firestore (optional):** Cloud persistence for notes and progress checkboxes. Graceful degradation via try-catch when `__firebase_config` unavailable.
 - **Export/Import:** JSON backup/restore of all localStorage data including rank progress.
 
@@ -50,10 +51,11 @@ Preferred communication style: Simple, everyday language.
 4. **Flashcard Decks:** Full deck/card CRUD with Leitner 5-box spaced repetition (intervals: 1/3/7/14/30 days). Study mode with 3D flip cards, due card filtering. Card study counts as rank evidence.
 5. **Blurting Method:** 4-phase active recall (list sessions → read source → blurt from memory → compare and fill gaps). Session persistence with review counting. Completed blurt sessions count as rank evidence.
 6. **Quiz Arena (Isolated):** Trivia game via Open Trivia Database API. 16 categories, 3 difficulty levels, timed questions (15s). Does NOT affect rank progression — standalone knowledge testing tool.
-7. **Charts:** Scatter (Effort vs Efficiency), Doughnut (Category Distribution) on dashboard. Bar chart (Weekly Activity) on stats page.
-8. **Session Statistics:** Total focus time, session count, deck count, weekly activity chart, top tasks by frequency.
-9. **Data Management:** Export all data as JSON, import from backup file.
-10. **XSS Protection:** `esc()` utility (DOM-based text node escaping) applied to all user-rendered content.
+7. **Eisenhower Matrix:** Interactive prioritisation tool. Brain dump tasks, sort into 4 quadrants (Q1: Do First, Q2: Schedule, Q3: Minimise, Q4: Limit). Smart Shift reflection prompts. Daily Rule guidance. Task completion tracking. Persists to localStorage.
+8. **Charts:** Scatter (Effort vs Efficiency), Doughnut (Category Distribution) on dashboard. Bar chart (Weekly Activity) on stats page.
+9. **Session Statistics:** Total focus time, session count, deck count, weekly activity chart, top tasks by frequency.
+10. **Data Management:** Export all data as JSON, import from backup file.
+11. **XSS Protection:** `esc()` utility (DOM-based text node escaping) applied to all user-rendered content.
 
 ### Rank Promotion Requirements
 
@@ -96,6 +98,15 @@ Preferred communication style: Simple, everyday language.
 - **Google Fonts** — Inter and Lora typefaces
 
 ## Recent Changes
+
+### Feb 11, 2026 — Eisenhower Matrix Module
+1. **Interactive prioritisation tool:** Brain dump tasks, sort into 4 colour-coded quadrants (Q1 Do First, Q2 Schedule, Q3 Minimise, Q4 Limit).
+2. **Smart Shift reflection:** Guided prompt asking "What Q2 action could have prevented this Q1 task?" with saved reflections.
+3. **Daily Rule guide:** Visual reference for daily prioritisation habits.
+4. **Full persistence:** Tasks and reflections saved to `synapse_eisenhower` localStorage key.
+5. **Added to Vault:** Eisenhower Matrix listed as Prioritisation technique (efficiency: 90, effort: 30).
+6. **Export/import updated:** Includes eisenhower data in backup/restore.
+7. **Isolated from rank:** The matrix is a standalone prioritisation tool — no rank progression effects.
 
 ### Feb 11, 2026 — Rank System Refactor (Philosophy Alignment)
 1. **Replaced XP/levels with 3-rank system:** Space Cadet → Second Officer → Flight Commander. Ranks are permanent, irreversible, evidence-based.
