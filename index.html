@@ -88,6 +88,7 @@
                     <button onclick="app.navTo('quiz')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-xs font-semibold tracking-wide transition-colors uppercase">Quiz</button>
                     <button onclick="app.navTo('blurt')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-xs font-semibold tracking-wide transition-colors uppercase">Blurt</button>
                     <button onclick="app.navTo('matrix')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-xs font-semibold tracking-wide transition-colors uppercase">Matrix</button>
+                    <button onclick="app.navTo('diagnostic')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-xs font-semibold tracking-wide transition-colors uppercase">Check</button>
                     <button onclick="app.navTo('rank')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-xs font-semibold tracking-wide transition-colors uppercase">Rank</button>
                     <button onclick="app.navTo('stats')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-xs font-semibold tracking-wide transition-colors uppercase">Stats</button>
                     <span id="nav-rank" class="text-xs font-bold text-orange-600 ml-2 bg-orange-50 dark:bg-orange-900/30 px-3 py-1 rounded-lg uppercase tracking-widest cursor-pointer" onclick="app.navTo('rank')">Space Cadet</span>
@@ -104,6 +105,7 @@
             <button onclick="app.navTo('quiz')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Quiz</button>
             <button onclick="app.navTo('blurt')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Blurt</button>
             <button onclick="app.navTo('matrix')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Matrix</button>
+            <button onclick="app.navTo('diagnostic')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Check</button>
             <button onclick="app.navTo('rank')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Rank</button>
             <button onclick="app.navTo('stats')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Stats</button>
         </div>
@@ -178,6 +180,162 @@
             { id: 5, title: "The Leitner System", category: "Retention", efficiency: 94, effort: 65, summary: "Box-based flashcards.", description: "A structured method using flashcards where correct cards move to less-frequent boxes, incorrect cards return to Box 1.", example: "Box 1: Daily. Box 2: Every 3 days. Box 3: Weekly.", steps: ["Setup 5 Boxes", "Test Box 1", "Correct? Advance", "Wrong? Reset to 1"] },
             { id: 6, title: "Eisenhower Matrix", category: "Prioritisation", efficiency: 90, effort: 30, summary: "Priority sorting.", description: "A decision-making framework that sorts tasks into four quadrants based on urgency and importance, training you to spend more time on what matters.", example: "Test tomorrow = Q1 (Do). Flashcards for next week = Q2 (Plan). Group chat = Q3 (Minimise). Scrolling = Q4 (Limit).", steps: ["Brain dump all tasks", "Sort by urgency + importance", "Act on Q1, plan Q2", "Minimise Q3, limit Q4"] }
         ];
+
+        const mcqBank = [
+          { mission: "Mission 1: The Launchpad", subtitle: "Crisis & Brain Science", description: "This diagnostic tests your understanding of how your brain learns, why some study methods fail, and what neuroplasticity means for you.", questions: [
+            { id:1, question:"What is the primary term for the brain's ability to physically rewire itself through experience?", options:["A) Neural Statics","B) Neuroplasticity","C) Cognitive Anchoring","D) Synaptic Locking"], answer:"B", concept:"Neuroplasticity" },
+            { id:2, question:"In the book's metaphor, where is information located when it is only in short-term memory?", options:["A) In stable orbit","B) At the navigation center","C) On the launch pad","D) In the black hole"], answer:"C", concept:"Short-term Memory" },
+            { id:3, question:"Which hormone, released during high stress, is known to physically cloud rational thinking and block memory?", options:["A) Dopamine","B) Serotonin","C) Cortisol","D) Adrenaline"], answer:"C", concept:"Stress & Cortisol" },
+            { id:4, question:"According to the sources, why does rereading create an 'illusion of competence'?", options:["A) It is too difficult","B) It confuses recognition with actual recall","C) It uses too much dopamine","D) It only works for math"], answer:"B", concept:"Illusion of Competence" },
+            { id:5, question:"What percentage of new information is typically lost within 24 hours if it is not reinforced?", options:["A) 10%","B) 30%","C) 50%","D) 70%"], answer:"D", concept:"Forgetting Curve" },
+            { id:6, question:"Which university conducted the study proving that active recall beats rereading for long-term retention?", options:["A) Stanford","B) MIT","C) Harvard","D) Yale"], answer:"C", concept:"Active Recall Research" },
+            { id:7, question:"The 'Modern Student Crisis' is primarily defined as being:", options:["A) Lazy","B) Under-talented","C) Overstimulated and overwhelmed","D) Uninterested in technology"], answer:"C", concept:"Modern Student Crisis" },
+            { id:8, question:"What is 'desirable difficulty' in the context of learning?", options:["A) Studying in a noisy room","B) Using effortful methods like self-testing to build stronger memories","C) Taking a test without having studied at all","D) Reading a textbook in a foreign language"], answer:"B", concept:"Desirable Difficulty" },
+            { id:9, question:"During which phase does the brain consolidate 'fragile sparks' into 'lasting constellations' of knowledge?", options:["A) Deep Work sessions","B) Deep Sleep","C) The Pomodoro break","D) Active Listening"], answer:"B", concept:"Sleep & Consolidation" },
+            { id:10, question:"What is the primary role of the 'co-pilot' in this book?", options:["A) To do the work for the student","B) To provide a calm, experienced guide through the learning galaxy","C) To grade the student's progress","D) To monitor the student's screen time"], answer:"B", concept:"Co-pilot Role" },
+            { id:11, question:"The brain contains approximately how many neurons?", options:["A) 86 million","B) 860 million","C) 86 billion","D) 86 trillion"], answer:"C", concept:"Brain Neurons" },
+            { id:12, question:"Which mode of thinking is laser-like and used for deep concentration on specific problems?", options:["A) Diffuse mode","B) Passive mode","C) Focused mode","D) Survival mode"], answer:"C", concept:"Focused Mode" },
+            { id:13, question:"The 'Vogon' style of studying refers to which ineffective method?", options:["A) Spaced repetition","B) Mind mapping","C) Passive, painful, and forced cramming","D) Active recall"], answer:"C", concept:"Ineffective Study Methods" },
+            { id:14, question:"What happens to the neural pathways every time you travel a specific route through practice?", options:["A) They become more tangled","B) They become smoother and faster","C) They eventually disappear","D) They switch to the other side of the brain"], answer:"B", concept:"Neural Pathway Strengthening" },
+            { id:15, question:"Motivation in the 'Learning Galaxy' is described as being:", options:["A) A permanent personality trait","B) Unreliable and fluctuating","C) More important than systems","D) Only for 'naturally smart' students"], answer:"B", concept:"Motivation vs Systems" },
+            { id:16, question:"What does the book suggest as the proper response to a 'Zero State' of overwhelm?", options:["A) Study 4 more hours","B) Use a manual override system to break the cycle","C) Give up and try next year","D) Drink more caffeine"], answer:"B", concept:"Zero State Override" },
+            { id:17, question:"Which type of cognitive load is 'effective' because it results in schema acquisition?", options:["A) Intrinsic Load","B) Extraneous Load","C) Germane Load","D) Passive Load"], answer:"C", concept:"Germane Cognitive Load" },
+            { id:18, question:"The feeling of confusion while learning is actually a signal of:", options:["A) Low intelligence","B) The start of neuroplastic change","C) A broken learning system","D) Future failure"], answer:"B", concept:"Confusion as Growth" },
+            { id:19, question:"Which part of the brain acts as the 'ancient alarm system' during panic?", options:["A) Prefrontal Cortex","B) Amygdala","C) Hippocampus","D) Neocortex"], answer:"B", concept:"Amygdala & Panic" },
+            { id:20, question:"What is the primary goal of becoming a 'Self-Directed Learner'?", options:["A) Studying alone in a room","B) Taking ownership of your own learning methods and progress","C) Replacing all teachers with AI","D) Never making a mistake"], answer:"B", concept:"Self-Directed Learning" }
+          ]},
+          { mission: "Mission 2: Navigation Systems", subtitle: "Study Methods", description: "This diagnostic checks whether you understand the core study tools — from Pomodoro to Cornell Notes to the Leitner System.", questions: [
+            { id:21, question:"Which technique involves explaining a concept in plain language to identify gaps in your knowledge?", options:["A) The Leitner System","B) The Feynman Technique","C) The Blurting Method","D) SQ3R"], answer:"B", concept:"Feynman Technique" },
+            { id:22, question:"How long is a standard Pomodoro sprint?", options:["A) 15 minutes","B) 25 minutes","C) 45 minutes","D) 60 minutes"], answer:"B", concept:"Pomodoro Technique" },
+            { id:23, question:"In the Cornell Note-taking method, what is the purpose of the 'Reduce' step in the cue column?", options:["A) To write less","B) To summarize facts to clarify relationships between key ideas","C) To remove all math from the notes","D) To highlight the most colorful parts"], answer:"B", concept:"Cornell Notes" },
+            { id:24, question:"What is 'Interleaving'?", options:["A) Focusing on one topic for 5 hours","B) Mixing different subjects or problem types in a single session","C) Placing notes inside a textbook","D) Highlighting with two different colors"], answer:"B", concept:"Interleaving" },
+            { id:25, question:"The 'Blurting Method' is a form of:", options:["A) Passive reading","B) Dual Coding","C) Intense Active Recall","D) Diffuse mode thinking"], answer:"C", concept:"Blurting Method" },
+            { id:26, question:"The Leitner System uses which tool to manage spaced repetition?", options:["A) Digital calendars","B) Physical or digital flashcard boxes","C) Highlighters","D) Voice recordings"], answer:"B", concept:"Leitner System" },
+            { id:27, question:"What is the core benefit of 'Dual Coding'?", options:["A) Learning two languages at once","B) Using both visual and verbal 'lanes' to double recall pathways","C) Coding with both hands","D) Summarizing a chapter into two sentences"], answer:"B", concept:"Dual Coding" },
+            { id:28, question:"In the SQ3R method, what does the first 'S' stand for?", options:["A) Study","B) Survey","C) Summarize","D) Space"], answer:"B", concept:"SQ3R Method" },
+            { id:29, question:"When using the Leitner System, what happens when you get a card wrong?", options:["A) It moves to a higher box","B) It stays in the same box","C) It moves back to Box 1 for aggressive review","D) You throw the card away"], answer:"C", concept:"Leitner Box Reset" },
+            { id:30, question:"Which study method involves asking 'Why' and 'How' to connect new info to prior knowledge?", options:["A) Elaborative Interrogation","B) Rote Memorization","C) Scanning","D) Skimming"], answer:"A", concept:"Elaborative Interrogation" },
+            { id:31, question:"A Mind Map mimics the brain's natural organization by using:", options:["A) Linear bullet points","B) Hierarchical networks and associations","C) Vertical columns","D) Verbatim transcripts"], answer:"B", concept:"Mind Mapping" },
+            { id:32, question:"Which of these is NOT an effective active recall tool?", options:["A) Practice tests","B) Flashcards","C) Passively rereading the chapter","D) Teaching a friend"], answer:"C", concept:"Active vs Passive Recall" },
+            { id:33, question:"What is the 'Production Effect'?", options:["A) Making a video for YouTube","B) Higher recall from speaking or reciting information out loud","C) Working in a factory","D) Writing as fast as possible"], answer:"B", concept:"Production Effect" },
+            { id:34, question:"How many Pomodoro cycles are recommended before taking a long break?", options:["A) 2","B) 3","C) 4","D) 5"], answer:"C", concept:"Pomodoro Cycles" },
+            { id:35, question:"What is the primary function of the 'Summary' section in Cornell Notes?", options:["A) To list all dates","B) To synthesize the entire page in 2-3 sentences","C) To draw a picture","D) To record the teacher's name"], answer:"B", concept:"Cornell Summary" },
+            { id:36, question:"According to research, which is more effective for long-term memory?", options:["A) Five 30-minute sessions spread over a week","B) One 5-hour session the night before","C) Rereading notes ten times in one day","D) Highlighting 100% of a textbook"], answer:"A", concept:"Spaced Practice" },
+            { id:37, question:"The 'Method of Loci' involves placing facts in:", options:["A) Alphabetical order","B) Familiar rooms of an imaginary 'Memory Palace'","C) Numerical lists","D) A digital folder"], answer:"B", concept:"Method of Loci" },
+            { id:38, question:"What is the recommended interval for the second review in a spaced repetition schedule?", options:["A) 10 minutes","B) 1 day","C) 1 week","D) 1 month"], answer:"B", concept:"Spaced Repetition Intervals" },
+            { id:39, question:"Which reading method uses the acronym THIEVES to scan a text?", options:["A) SQ3R","B) PQ4R","C) THIEVES","D) Active Reading"], answer:"C", concept:"THIEVES Method" },
+            { id:40, question:"Turning headings into questions is a 'hack' that switches the brain from passive reading to:", options:["A) Diffuse mode","B) Active retrieval","C) Creative writing","D) Multitasking"], answer:"B", concept:"Active Reading" }
+          ]},
+          { mission: "Mission 3: Galactic Engineers", subtitle: "Thinkers & Habits", description: "This diagnostic explores your understanding of the thinking systems and habit frameworks that power effective learners.", questions: [
+            { id:41, question:"Who developed the concept of 'Deep Work'?", options:["A) James Clear","B) Cal Newport","C) Barbara Oakley","D) John Sweller"], answer:"B", concept:"Deep Work" },
+            { id:42, question:"What is 'Diffuse Mode' thinking useful for?", options:["A) Memorizing a phone number","B) Creative problem solving and making connections","C) Reading a specific definition","D) Taking a timed quiz"], answer:"B", concept:"Diffuse Mode" },
+            { id:43, question:"James Clear states: 'You do not rise to the level of your goals. You fall to the level of your ______.'", options:["A) Intelligence","B) Systems","C) Teachers","D) Motivation"], answer:"B", concept:"Systems vs Goals" },
+            { id:44, question:"Which theory suggests we should not 'over-fill' a lesson with too much information at once?", options:["A) Atomic Habit Theory","B) Cognitive Load Theory","C) Relativity Theory","D) Deep Work Theory"], answer:"B", concept:"Cognitive Load Theory" },
+            { id:45, question:"Habit Stacking involves:", options:["A) Doing ten habits at once","B) Linking a new habit to an existing routine","C) Focusing on only one habit for a year","D) Deleting all bad habits immediately"], answer:"B", concept:"Habit Stacking" },
+            { id:46, question:"The '80/20 Rule' (Pareto Principle) suggests that 80% of your results come from:", options:["A) 80% of your study hours","B) 20% of high-impact activities","C) Reading 80% of the book","D) Attending 20% of classes"], answer:"B", concept:"Pareto Principle" },
+            { id:47, question:"According to Cal Newport, what is the 'attention residue' cost of multitasking?", options:["A) It makes you smarter","B) It takes time to regain original focus after a distraction","C) It improves your vision","D) It saves battery on your phone"], answer:"B", concept:"Attention Residue" },
+            { id:48, question:"Which thinker created the 'Learning How to Learn' course?", options:["A) James Clear","B) Barbara Oakley","C) Cal Newport","D) Lourens Breytenbach"], answer:"B", concept:"Learning How to Learn" },
+            { id:49, question:"What is the 'Two-Minute Rule' for starting tasks?", options:["A) Finish everything in 2 minutes","B) If a task takes less than 2 minutes, do it now","C) Take a 2-minute break every hour","D) Set a 2-minute timer for sleep"], answer:"B", concept:"Two-Minute Rule" },
+            { id:50, question:"Identity-Based Habits focus on:", options:["A) The results you want to achieve","B) The type of person you want to become","C) The grades you need to get","D) The rewards your parents will give you"], answer:"B", concept:"Identity-Based Habits" },
+            { id:51, question:"Cognitive Load Theory was developed by:", options:["A) Albert Einstein","B) John Sweller","C) David Allen","D) Brian Tracy"], answer:"B", concept:"CLT Origin" },
+            { id:52, question:"The 'Getting Things Done' (GTD) system's first step is to:", options:["A) Organize","B) Reflect","C) Capture everything that has your attention","D) Delete tasks"], answer:"C", concept:"GTD System" },
+            { id:53, question:"Why does the brain love 'finite challenges' like the 25-minute Pomodoro?", options:["A) It hates work","B) It loves countdowns and clear endpoints","C) It wants to play video games","D) It needs to sleep every 25 minutes"], answer:"B", concept:"Finite Challenges" },
+            { id:54, question:"Which quadrant of the Eisenhower Matrix should students aim to spend most of their time in?", options:["A) Urgent & Important","B) Important, Not Urgent (Quadrant 2)","C) Urgent, Not Important","D) Not Urgent & Not Important"], answer:"B", concept:"Eisenhower Q2" },
+            { id:55, question:"Gamification in learning primarily uses which neurotransmitter loop?", options:["A) Cortisol","B) Melatonin","C) Dopamine","D) Insulin"], answer:"C", concept:"Dopamine & Gamification" },
+            { id:56, question:"What does 'Eat the Frog' mean in productivity?", options:["A) Eating healthy snacks","B) Completing your hardest or most dreaded task first","C) Studying in a green room","D) Skipping breakfast"], answer:"B", concept:"Eat the Frog" },
+            { id:57, question:"Which thinker emphasizes that your IQ is not fixed and can grow?", options:["A) Carol Dweck","B) Cal Newport","C) David Allen","D) Brian Tracy"], answer:"A", concept:"Growth Mindset" },
+            { id:58, question:"What is 'Rubber Duck Debugging' in a study context?", options:["A) Swimming to relax","B) Explaining a concept out loud to an inanimate object","C) Buying a rubber duck for luck","D) Playing with water"], answer:"B", concept:"Rubber Duck Debugging" },
+            { id:59, question:"The 'Zeigarnik Effect' suggests the brain stays focused on:", options:["A) Completed tasks","B) Unfinished tasks","C) Future goals","D) Past mistakes"], answer:"B", concept:"Zeigarnik Effect" },
+            { id:60, question:"What is the dollar value of your time used for in the book?", options:["A) Calculating pocket money","B) Deciding what tasks to delegate","C) Buying a car","D) Paying teachers"], answer:"B", concept:"Value of Time" }
+          ]},
+          { mission: "Mission 4: Avoid the Black Holes", subtitle: "Systems & Tactics", description: "This diagnostic checks your knowledge of practical systems for focus, planning, and avoiding common traps.", questions: [
+            { id:61, question:"What is the 'External Device Rule'?", options:["A) Buying a new iPad","B) Putting your phone in another room during focus blocks","C) Using only digital books","D) Checking Instagram every 10 minutes"], answer:"B", concept:"External Device Rule" },
+            { id:62, question:"Which day is recommended for conducting a 'Weekly Review'?", options:["A) Monday morning","B) Wednesday afternoon","C) Friday night","D) Sunday evening"], answer:"D", concept:"Weekly Review" },
+            { id:63, question:"Why is 'Backward Planning' effective for exams?", options:["A) It's faster to write","B) It starts from the goal and sets realistic milestones","C) It uses less paper","D) You study the last chapter first"], answer:"B", concept:"Backward Planning" },
+            { id:64, question:"What color lighting is best for intense problem-solving (concentration)?", options:["A) Warm Amber (2700K)","B) Cool White (4000K-5000K)","C) Red (1000K)","D) Neon Purple"], answer:"B", concept:"Study Lighting" },
+            { id:65, question:"Procrastination is described as 'The ______ Enemy' in the Guide.", options:["A) Loud","B) Green","C) Silent","D) Fast"], answer:"C", concept:"Procrastination" },
+            { id:66, question:"A 'Daily Highlight' is:", options:["A) The funniest thing that happened","B) The one most important task you MUST get done today","C) The most colorful part of your notes","D) Your favorite meal"], answer:"B", concept:"Daily Highlight" },
+            { id:67, question:"Where should your study lamp be positioned to reduce glare?", options:["A) Directly in front of your eyes","B) Behind or to the side of your non-writing hand","C) Under the desk","D) In the next room"], answer:"B", concept:"Study Environment" },
+            { id:68, question:"What is the '20-30% rule' for backwards planning?", options:["A) Studying only 20% of the book","B) Adding a 20-30% time buffer for unexpected delays","C) Getting 20% higher grades","D) Sleeping 30% more"], answer:"B", concept:"Time Buffer Rule" },
+            { id:69, question:"Why is studying on a bed discouraged?", options:["A) It's too small","B) The brain associates the bed with sleep, reducing alertness","C) You might spill water","D) It breaks the bed"], answer:"B", concept:"Study Location" },
+            { id:70, question:"What happens in the first 5 minutes of a 'Brain Dump' exam strategy?", options:["A) You sleep","B) You write down key formulas and dates in the margins immediately","C) You read the whole test twice","D) You ask for a break"], answer:"B", concept:"Brain Dump Strategy" },
+            { id:71, question:"Which prioritized category in the ABCDE method is for tasks you SHOULD do, but have minor consequences if delayed?", options:["A) A tasks","B) B tasks","C) C tasks","D) D tasks"], answer:"B", concept:"ABCDE Method" },
+            { id:72, question:"What does turning your phone to 'Greyscale' do?", options:["A) Improves battery life","B) Makes social media less visually rewarding and addictive","C) Helps you see better at night","D) Breaks the phone"], answer:"B", concept:"Greyscale Strategy" },
+            { id:73, question:"A 'Towel Break' is used to:", options:["A) Take a shower","B) Reset the nervous system when a test feels like a supernova","C) Clean the desk","D) Signal you are finished"], answer:"B", concept:"Towel Break" },
+            { id:74, question:"What is 'Batching'?", options:["A) Baking cookies","B) Grouping similar tasks together to reduce context switching","C) Studying every subject for 5 minutes","D) Throwing away old notes"], answer:"B", concept:"Batching" },
+            { id:75, question:"The RICE framework scores tasks based on Reach, Impact, Confidence, and ______.", options:["A) Effort","B) Earnings","C) Energy","D) Exams"], answer:"A", concept:"RICE Framework" },
+            { id:76, question:"What is the 'Shutdown' rule for study time?", options:["A) Turn off the computer","B) Hard stop at a set time (e.g., 10 PM) to allow the brain to save","C) Close all windows","D) Lock the door"], answer:"B", concept:"Shutdown Rule" },
+            { id:77, question:"A 'Focus Zone' must be cleared of:", options:["A) Books","B) Visual clutter and electronic notifications","C) Chairs","D) Paper"], answer:"B", concept:"Focus Zone" },
+            { id:78, question:"How long should you wait before calling on a student after asking a question (Teacher Rule)?", options:["A) 5 seconds","B) 10 seconds","C) 42 seconds","D) 1 minute"], answer:"C", concept:"42-Second Rule" },
+            { id:79, question:"What does the MoSCoW method stand for?", options:["A) More, Some, Could, Won't","B) Must have, Should have, Could have, Won't have","C) Math, Science, Chemistry, Writing","D) Morning, Sunday, Calendar, Weekly"], answer:"B", concept:"MoSCoW Method" },
+            { id:80, question:"The primary benefit of 'Mock Testing' is:", options:["A) It counts for grades","B) It vaccinates you against exam-day nerves through simulation","C) It is shorter than real tests","D) It requires no preparation"], answer:"B", concept:"Mock Testing" }
+          ]},
+          { mission: "Mission 5: Life Support & Hero State", subtitle: "Wellbeing & Mastery", description: "This final diagnostic explores your understanding of the physical, emotional, and identity foundations that support lasting learning.", questions: [
+            { id:81, question:"Which breathing technique is recommended to calm the nervous system?", options:["A) 2-2-2","B) 4-2-6 (Box Breathing variant)","C) 10-10-10","D) Fast panting"], answer:"B", concept:"Box Breathing" },
+            { id:82, question:"Anxiety Reappraisal means telling yourself 'I am ______' instead of 'I am nervous'.", options:["A) Calm","B) Tired","C) Excited","D) Scared"], answer:"C", concept:"Anxiety Reappraisal" },
+            { id:83, question:"What is 'Learning Infrastructure'?", options:["A) The school building","B) Sleep","C) A computer","D) A desk"], answer:"B", concept:"Learning Infrastructure" },
+            { id:84, question:"How many hours of sleep do teenagers typically need for memory consolidation?", options:["A) 5-6","B) 7-9","C) 10-12","D) 4 or less"], answer:"B", concept:"Teen Sleep Needs" },
+            { id:85, question:"Which type of snack is best for sustained brain fuel?", options:["A) Candy and Coffee","B) Walnuts, apples, and dark chocolate","C) Energy drinks","D) Nothing"], answer:"B", concept:"Brain Nutrition" },
+            { id:86, question:"What is a 'Growth Mindset'?", options:["A) Wanting to get taller","B) Viewing intelligence as developable through effort","C) Only caring about 'A' grades","D) Believing you are better than others"], answer:"B", concept:"Growth Mindset" },
+            { id:87, question:"Exercise before studying helps by:", options:["A) Making you tired","B) Oxygenating the brain and growing new cells","C) Saving time","D) Reducing the need to study"], answer:"B", concept:"Exercise & Learning" },
+            { id:88, question:"What is the 'Rule of Five' in a learning toolkit?", options:["A) Studying for 5 hours","B) Having 5 core tools (Planning, Studying, Review, Focus, Wellbeing)","C) Passing 5 subjects","D) Taking 5 breaks"], answer:"B", concept:"Rule of Five" },
+            { id:89, question:"When does 'Identity-Based' success happen?", options:["A) When you get a medal","B) When you start seeing yourself as a capable learner","C) When you finish school","D) When your parents are happy"], answer:"B", concept:"Identity-Based Success" },
+            { id:90, question:"The 'Yet Game' involves adding the word 'yet' to which phrase?", options:["A) I'm finished","B) I'm not good at this","C) I'm smart","D) I'm late"], answer:"B", concept:"The Yet Game" },
+            { id:91, question:"Dehydration can cause a drop in:", options:["A) Height","B) Cognitive performance and focus","C) Eye color","D) Weight only"], answer:"B", concept:"Hydration & Focus" },
+            { id:92, question:"Why should students avoid high sugar spikes before studying?", options:["A) It's too expensive","B) It leads to an energy crash that kills focus","C) It makes the brain grow too fast","D) It is illegal"], answer:"B", concept:"Sugar & Energy Crashes" },
+            { id:93, question:"A 'Gap Effect' in learning is a short pause of:", options:["A) 10-30 seconds","B) 10-30 minutes","C) 1-2 hours","D) 1 day"], answer:"A", concept:"Gap Effect" },
+            { id:94, question:"Which thinking mode allows your mind to connect 'constellations of ideas' during rest?", options:["A) Laser mode","B) Diffuse mode","C) Vogon mode","D) Panic mode"], answer:"B", concept:"Diffuse Mode Rest" },
+            { id:95, question:"What is the 'Hero State' in the book's transformation guide?", options:["A) Being a celebrity","B) Being a proactive, balanced, and excellent learner","C) Getting a perfect 100% on every test","D) Teaching everyone else"], answer:"B", concept:"Hero State" },
+            { id:96, question:"The 'Galaxy Guide' suggests true confidence comes from:", options:["A) Luck","B) Consistent systems and preparation evidence","C) Arrogance","D) Ignoring your weaknesses"], answer:"B", concept:"Confidence & Systems" },
+            { id:97, question:"What is the 'Protege Effect'?", options:["A) Being the best student","B) Learning better by acting as a teacher for others","C) Following a famous scientist","D) Using AI for everything"], answer:"B", concept:"Protege Effect" },
+            { id:98, question:"What is the recommended light color 2 hours before bed?", options:["A) Blue-white","B) Bright White","C) Amber or Warm Light (under 3000K)","D) Flashing strobes"], answer:"C", concept:"Evening Light" },
+            { id:99, question:"The 'Sub-Etha' transmission metaphor refers to:", options:["A) Radio signals","B) Communication between home, student, and school","C) Underground tunnels","D) Secret notes"], answer:"B", concept:"Sub-Etha Communication" },
+            { id:100, question:"In the end, what decides your earning capacity and provides an 'unfair advantage'?", options:["A) Your parents' money","B) Your learning ability","C) Your high school medal","D) Your luck"], answer:"B", concept:"Learning Advantage" }
+          ]}
+        ];
+
+        const mcqStore = {
+            load() {
+                try {
+                    const d = JSON.parse(localStorage.getItem('synapse_mcq') || '{}');
+                    state.mcqAttempts = d.attempts || {};
+                    state.mcqGaps = d.gaps || [];
+                    state.mcqReflections = d.reflections || {};
+                } catch(e) { state.mcqAttempts = {}; state.mcqGaps = []; state.mcqReflections = {}; }
+            },
+            save() {
+                localStorage.setItem('synapse_mcq', JSON.stringify({
+                    attempts: state.mcqAttempts,
+                    gaps: state.mcqGaps,
+                    reflections: state.mcqReflections
+                }));
+            },
+            recordAttempt(missionIdx, answers, correct, total) {
+                if (!state.mcqAttempts[missionIdx]) state.mcqAttempts[missionIdx] = [];
+                state.mcqAttempts[missionIdx].push({ answers, correct, total, date: new Date().toISOString() });
+                this.save();
+            },
+            addGaps(concepts) {
+                concepts.forEach(c => { if (!state.mcqGaps.includes(c)) state.mcqGaps.push(c); });
+                this.save();
+            },
+            removeGap(concept) {
+                state.mcqGaps = state.mcqGaps.filter(g => g !== concept);
+                this.save();
+            },
+            saveReflection(missionIdx, text) {
+                state.mcqReflections[missionIdx] = text;
+                this.save();
+            },
+            getBestScore(missionIdx) {
+                const attempts = state.mcqAttempts[missionIdx] || [];
+                if (attempts.length === 0) return null;
+                return Math.max(...attempts.map(a => a.correct));
+            },
+            getAttemptCount(missionIdx) {
+                return (state.mcqAttempts[missionIdx] || []).length;
+            }
+        };
 
         const deckStore = {
             load() { try { state.fcDecks = JSON.parse(localStorage.getItem('synapse_decks') || '[]'); } catch(e) { state.fcDecks = []; } },
@@ -431,6 +589,7 @@
             fcDecks: [], fcCards: [], fcCurrentDeck: null, fcStudyQueue: [], fcStudyIndex: 0, fcFlipped: false,
             blurtSessions: [], blurtCurrentId: null, blurtPhase: 'list',
             eisenhowerTasks: [], eisenhowerReflections: [], missionTodos: [],
+            mcqAttempts: {}, mcqGaps: [], mcqReflections: {}, mcqView: 'list', mcqMissionIdx: 0, mcqQuestionIdx: 0, mcqAnswers: {}, mcqShowResults: false,
             rank: 'Space Cadet', rankEvidence: { blurtsCompleted: 0, governorBreakdowns: 0, cardsAdvanced: 0, activeDays: 0, pomodorosCompleted: 0, lastActiveDate: '', activeDateLog: [] },
             quizCategory: '', quizDifficulty: 'medium', quizQuestions: [], quizIndex: 0, quizScore: 0,
             quizStreak: 0, quizAnswered: false, quizSelectedAnswer: null, quizTimer: 15, quizTimerInterval: null,
@@ -448,7 +607,7 @@
                     if (state.view === 'dashboard') app.renderCharts();
                 });
 
-                deckStore.load(); cardStore.load(); pomodoroStore.load(); blurtStore.load(); eisenhowerStore.load(); todoStore.load();
+                deckStore.load(); cardStore.load(); pomodoroStore.load(); blurtStore.load(); eisenhowerStore.load(); todoStore.load(); mcqStore.load();
                 rankEngine.load(); rankEngine.trackActiveDay(); rankEngine.updateNavRank();
 
                 if (window.fb && window.fb.auth) {
@@ -745,6 +904,7 @@
                     rank: { rank: state.rank, rankEvidence: state.rankEvidence },
                     eisenhower: { tasks: state.eisenhowerTasks, reflections: state.eisenhowerReflections },
                     todos: state.missionTodos,
+                    mcq: { attempts: state.mcqAttempts, gaps: state.mcqGaps, reflections: state.mcqReflections },
                     exportedAt: new Date().toISOString()
                 };
                 const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -767,6 +927,7 @@
                         if (data.rank) { state.rank = data.rank.rank || 'Space Cadet'; state.rankEvidence = data.rank.rankEvidence || state.rankEvidence; rankEngine.save(); }
                         if (data.eisenhower) { state.eisenhowerTasks = data.eisenhower.tasks || []; state.eisenhowerReflections = data.eisenhower.reflections || []; eisenhowerStore.save(); }
                         if (data.todos) { state.missionTodos = data.todos; todoStore.save(); }
+                        if (data.mcq) { state.mcqAttempts = data.mcq.attempts || {}; state.mcqGaps = data.mcq.gaps || []; state.mcqReflections = data.mcq.reflections || {}; mcqStore.save(); }
                         app.showNotification('Data imported successfully!');
                         app.render();
                     } catch (err) { app.showNotification('Import failed. Invalid file.'); }
@@ -797,6 +958,8 @@
                     container.innerHTML = app.getQuizHTML();
                 } else if (state.view === 'matrix') {
                     container.innerHTML = app.getMatrixHTML();
+                } else if (state.view === 'diagnostic') {
+                    container.innerHTML = app.getDiagnosticHTML();
                 } else if (state.view === 'rank') {
                     container.innerHTML = app.getRankHTML();
                 } else if (state.view === 'stats') {
@@ -1583,6 +1746,257 @@
                             <div class="text-center p-4 bg-stone-50 dark:bg-stone-800 rounded-2xl"><div class="text-2xl font-serif font-bold text-orange-600">${state.rankEvidence.cardsAdvanced}</div><div class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mt-1">Cards Studied</div></div>
                             <div class="text-center p-4 bg-stone-50 dark:bg-stone-800 rounded-2xl"><div class="text-2xl font-serif font-bold text-orange-600">${state.rankEvidence.activeDays}</div><div class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mt-1">Active Days</div></div>
                         </div>
+                    </div>
+                </div>`;
+            },
+
+            mcqHasActivity() {
+                return state.rankEvidence.pomodorosCompleted > 0 || state.rankEvidence.blurtsCompleted > 0 || state.rankEvidence.cardsAdvanced > 0 || state.blurtSessions.length > 0 || (localStorage.getItem('cornellNotes') || '').length > 30;
+            },
+            mcqStartMission(idx) {
+                if (!app.mcqHasActivity()) {
+                    app.showNotification('Complete a study activity first (focus session, blurt, or flashcards) before running a diagnostic.');
+                    return;
+                }
+                state.mcqMissionIdx = idx;
+                state.mcqView = 'orient';
+                state.mcqQuestionIdx = 0;
+                state.mcqAnswers = {};
+                state.mcqShowResults = false;
+                app.render();
+            },
+            mcqBeginQuestions() {
+                state.mcqView = 'questions';
+                app.render();
+            },
+            mcqSelectAnswer(qId, letter) {
+                if (state.mcqShowResults) return;
+                state.mcqAnswers[qId] = letter;
+                app.render();
+            },
+            mcqNextQuestion() {
+                const mission = mcqBank[state.mcqMissionIdx];
+                if (state.mcqQuestionIdx < mission.questions.length - 1) {
+                    state.mcqQuestionIdx++;
+                    app.render();
+                }
+            },
+            mcqPrevQuestion() {
+                if (state.mcqQuestionIdx > 0) {
+                    state.mcqQuestionIdx--;
+                    app.render();
+                }
+            },
+            mcqSubmit() {
+                const mission = mcqBank[state.mcqMissionIdx];
+                const gaps = [];
+                let correct = 0;
+                mission.questions.forEach(q => {
+                    if (state.mcqAnswers[q.id] === q.answer) correct++;
+                    else gaps.push(q.concept);
+                });
+                mcqStore.recordAttempt(state.mcqMissionIdx, {...state.mcqAnswers}, correct, mission.questions.length);
+                if (gaps.length > 0) mcqStore.addGaps(gaps);
+                state.mcqShowResults = true;
+                state.mcqView = 'results';
+                app.render();
+            },
+            mcqSaveReflection() {
+                const el = document.getElementById('mcq-reflection-input');
+                if (el && el.value.trim()) {
+                    mcqStore.saveReflection(state.mcqMissionIdx, el.value.trim());
+                    app.showNotification('Reflection saved.');
+                    app.render();
+                }
+            },
+            mcqBackToList() {
+                state.mcqView = 'list';
+                state.mcqShowResults = false;
+                state.mcqAnswers = {};
+                app.render();
+            },
+
+            getDiagnosticHTML() {
+                if (state.mcqView === 'orient') return app.getMcqOrientHTML();
+                if (state.mcqView === 'questions') return app.getMcqQuestionHTML();
+                if (state.mcqView === 'results') return app.getMcqResultsHTML();
+                return app.getMcqListHTML();
+            },
+
+            getMcqListHTML() {
+                const hasActivity = app.mcqHasActivity();
+                return `<div class="animate-fade-in max-w-4xl mx-auto space-y-8">
+                    <div class="text-center mb-8">
+                        <h1 class="text-5xl font-serif font-bold mb-4">Navigation Check</h1>
+                        <p class="text-stone-500 dark:text-stone-400 italic">Systems diagnostic — confirm what you've learned, reveal what needs practice.</p>
+                    </div>
+                    ${!hasActivity ? '<div class="bg-amber-50 dark:bg-amber-900/20 rounded-[2rem] p-6 border border-amber-200 dark:border-amber-800 text-center"><p class="text-sm font-semibold text-amber-700 dark:text-amber-400">🔒 Complete a study activity first (focus session, blurt, or flashcard review) to unlock diagnostics.</p></div>' : ''}
+                    <div class="bg-orange-50 dark:bg-orange-900/20 rounded-[2rem] p-6 border border-orange-200 dark:border-orange-800">
+                        <h3 class="text-base font-serif font-bold text-orange-700 dark:text-orange-400 mb-3">📋 How this works</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div class="bg-white dark:bg-stone-800 rounded-xl p-4 border border-orange-100 dark:border-stone-700 text-center">
+                                <div class="text-2xl mb-1">1️⃣</div>
+                                <p class="text-xs font-semibold text-stone-700 dark:text-stone-200">Study first using the tools (focus timer, flashcards, blurting).</p>
+                            </div>
+                            <div class="bg-white dark:bg-stone-800 rounded-xl p-4 border border-orange-100 dark:border-stone-700 text-center">
+                                <div class="text-2xl mb-1">2️⃣</div>
+                                <p class="text-xs font-semibold text-stone-700 dark:text-stone-200">Run a diagnostic to check what you remember — no pressure, no timer.</p>
+                            </div>
+                            <div class="bg-white dark:bg-stone-800 rounded-xl p-4 border border-orange-100 dark:border-stone-700 text-center">
+                                <div class="text-2xl mb-1">3️⃣</div>
+                                <p class="text-xs font-semibold text-stone-700 dark:text-stone-200">Review your gaps and practice the concepts you missed.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        ${mcqBank.map((m, idx) => {
+                            const attempts = mcqStore.getAttemptCount(idx);
+                            const best = mcqStore.getBestScore(idx);
+                            const total = m.questions.length;
+                            const statusLabel = best === null ? 'Not attempted' : best + '/' + total + ' stable';
+                            const statusColor = best === null ? 'text-stone-400' : best >= total * 0.8 ? 'text-green-600' : best >= total * 0.5 ? 'text-orange-600' : 'text-red-500';
+                            const orbitLabel = best === null ? '⚪' : best >= total * 0.8 ? '🟢 Stable Orbit' : best >= total * 0.5 ? '🟠 Adjusting' : '🔴 Unstable';
+                            return '<div class="bg-white dark:bg-[#292524] rounded-2xl p-6 border border-stone-100 dark:border-stone-800 shadow-sm">' +
+                                '<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">' +
+                                '<div class="flex-grow">' +
+                                '<h3 class="text-lg font-serif font-bold text-stone-900 dark:text-stone-50">' + esc(m.mission) + '</h3>' +
+                                '<p class="text-xs text-stone-500 dark:text-stone-400 mt-1">' + esc(m.subtitle) + ' &middot; ' + total + ' questions</p>' +
+                                '<div class="flex items-center gap-3 mt-2"><span class="text-xs font-bold ' + statusColor + '">' + statusLabel + '</span>' +
+                                (attempts > 0 ? '<span class="text-[10px] text-stone-400">' + attempts + ' attempt' + (attempts > 1 ? 's' : '') + '</span>' : '') +
+                                '<span class="text-xs">' + orbitLabel + '</span></div>' +
+                                '</div>' +
+                                '<button onclick="app.mcqStartMission(' + idx + ')" class="bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest ' + (!hasActivity ? 'opacity-40 pointer-events-none' : 'hover:bg-stone-700 dark:hover:bg-stone-300') + ' transition-colors">Run Diagnostic</button>' +
+                                '</div></div>';
+                        }).join('')}
+                    </div>
+                    ${state.mcqGaps.length > 0 ? '<div class="bg-white dark:bg-[#292524] rounded-2xl p-6 border border-stone-100 dark:border-stone-800 shadow-sm">' +
+                        '<h3 class="text-lg font-serif font-bold mb-3">🔍 Knowledge Gaps Detected</h3>' +
+                        '<p class="text-xs text-stone-500 mb-3">These concepts need more practice. Use blurting, flashcards, or the Feynman technique to strengthen them.</p>' +
+                        '<div class="flex flex-wrap gap-2">' + state.mcqGaps.map(g =>
+                            '<span class="inline-flex items-center gap-1 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 px-3 py-1 rounded-lg text-xs font-bold">' + esc(g) +
+                            '<button onclick="mcqStore.removeGap(&quot;' + g.replace(/"/g, '') + '&quot;); app.render();" class="text-red-400 hover:text-red-600 ml-1">✕</button></span>'
+                        ).join('') + '</div></div>' : ''}
+                </div>`;
+            },
+
+            getMcqOrientHTML() {
+                const m = mcqBank[state.mcqMissionIdx];
+                return `<div class="animate-fade-in max-w-2xl mx-auto space-y-8">
+                    <div class="text-center">
+                        <button onclick="app.mcqBackToList()" class="text-sm text-stone-400 hover:text-orange-600 mb-4 inline-block">&larr; Back to missions</button>
+                        <h1 class="text-4xl font-serif font-bold mb-2">${esc(m.mission)}</h1>
+                        <p class="text-stone-500 dark:text-stone-400 italic">${esc(m.subtitle)}</p>
+                    </div>
+                    <div class="bg-white dark:bg-[#292524] rounded-[2rem] p-8 border border-stone-100 dark:border-stone-800 shadow-sm space-y-6">
+                        <div class="bg-orange-50 dark:bg-orange-900/20 rounded-2xl p-6 border border-orange-200 dark:border-orange-800">
+                            <h3 class="font-serif font-bold text-orange-700 dark:text-orange-400 mb-2">🛰️ Mission Briefing</h3>
+                            <p class="text-sm text-stone-700 dark:text-stone-300 leading-relaxed">${esc(m.description)}</p>
+                        </div>
+                        <div class="space-y-3">
+                            <div class="flex items-start gap-3"><span class="text-lg">📋</span><p class="text-sm text-stone-600 dark:text-stone-300"><strong>20 questions</strong> — answer from memory, no notes.</p></div>
+                            <div class="flex items-start gap-3"><span class="text-lg">⏳</span><p class="text-sm text-stone-600 dark:text-stone-300"><strong>No time limit</strong> — take as long as you need.</p></div>
+                            <div class="flex items-start gap-3"><span class="text-lg">🔍</span><p class="text-sm text-stone-600 dark:text-stone-300"><strong>Not a test</strong> — this is a diagnostic to find gaps, not judge you.</p></div>
+                        </div>
+                        <button onclick="app.mcqBeginQuestions()" class="w-full bg-orange-600 hover:bg-orange-500 text-white py-4 rounded-2xl font-bold text-sm uppercase tracking-widest transition-all">Begin Navigation Check</button>
+                    </div>
+                </div>`;
+            },
+
+            getMcqQuestionHTML() {
+                const m = mcqBank[state.mcqMissionIdx];
+                const q = m.questions[state.mcqQuestionIdx];
+                const total = m.questions.length;
+                const idx = state.mcqQuestionIdx;
+                const selected = state.mcqAnswers[q.id] || null;
+                const answeredCount = Object.keys(state.mcqAnswers).length;
+                const allAnswered = answeredCount === total;
+                return `<div class="animate-fade-in max-w-2xl mx-auto space-y-6">
+                    <div class="flex items-center justify-between">
+                        <button onclick="app.mcqBackToList()" class="text-sm text-stone-400 hover:text-orange-600">&larr; Exit</button>
+                        <span class="text-xs font-bold text-stone-400 uppercase tracking-widest">${esc(m.mission)}</span>
+                        <span class="text-xs font-bold text-orange-600">${idx + 1} / ${total}</span>
+                    </div>
+                    <div class="w-full bg-stone-100 dark:bg-stone-800 rounded-full h-1.5 overflow-hidden"><div class="h-full rounded-full bg-orange-600 transition-all" style="width:${((idx + 1) / total) * 100}%"></div></div>
+                    <div class="bg-white dark:bg-[#292524] rounded-[2rem] p-8 border border-stone-100 dark:border-stone-800 shadow-sm">
+                        <p class="text-lg font-serif font-semibold text-stone-900 dark:text-stone-50 mb-6 leading-relaxed">${esc(q.question)}</p>
+                        <div class="space-y-3">
+                            ${q.options.map(opt => {
+                                const letter = opt.charAt(0);
+                                const isSelected = selected === letter;
+                                return '<button onclick="app.mcqSelectAnswer(' + q.id + ', &quot;' + letter + '&quot;)" class="w-full text-left p-4 rounded-xl border-2 transition-all text-sm font-medium ' +
+                                    (isSelected ? 'border-orange-600 bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300' : 'border-stone-200 dark:border-stone-700 hover:border-stone-300 dark:hover:border-stone-600 text-stone-700 dark:text-stone-300') + '">' + esc(opt) + '</button>';
+                            }).join('')}
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <button onclick="app.mcqPrevQuestion()" class="px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest ${idx === 0 ? 'opacity-30 pointer-events-none' : ''} bg-stone-200 dark:bg-stone-700 text-stone-600 dark:text-stone-300">Previous</button>
+                        ${idx < total - 1 ?
+                            '<button onclick="app.mcqNextQuestion()" class="px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900">Next</button>' :
+                            '<button onclick="app.mcqSubmit()" class="px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest ' + (allAnswered ? 'bg-orange-600 text-white hover:bg-orange-500' : 'bg-stone-300 text-stone-500 pointer-events-none opacity-50') + '">Complete Diagnostic</button>'
+                        }
+                    </div>
+                    <div class="flex flex-wrap gap-1.5 justify-center">${m.questions.map((mq, i) => {
+                        const answered = state.mcqAnswers[mq.id];
+                        const current = i === idx;
+                        return '<button onclick="state.mcqQuestionIdx=' + i + '; app.render();" class="w-7 h-7 rounded-lg text-[10px] font-bold ' +
+                            (current ? 'bg-orange-600 text-white' : answered ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-600' : 'bg-stone-100 dark:bg-stone-800 text-stone-400') + '">' + (i+1) + '</button>';
+                    }).join('')}</div>
+                </div>`;
+            },
+
+            getMcqResultsHTML() {
+                const m = mcqBank[state.mcqMissionIdx];
+                const attempts = state.mcqAttempts[state.mcqMissionIdx] || [];
+                const latest = attempts[attempts.length - 1];
+                const correct = latest ? latest.correct : 0;
+                const total = m.questions.length;
+                const gaps = [];
+                const stable = [];
+                m.questions.forEach(q => {
+                    if (state.mcqAnswers[q.id] === q.answer) stable.push(q);
+                    else gaps.push(q);
+                });
+                const pct = Math.round((correct / total) * 100);
+                const orbitStatus = pct >= 80 ? '🟢 Stable Orbit' : pct >= 50 ? '🟠 Adjusting Course' : '🔴 Unstable — Review Needed';
+                const reflection = state.mcqReflections[state.mcqMissionIdx] || '';
+                return `<div class="animate-fade-in max-w-2xl mx-auto space-y-8">
+                    <div class="text-center">
+                        <h1 class="text-4xl font-serif font-bold mb-2">Diagnostic Complete</h1>
+                        <p class="text-stone-500 dark:text-stone-400 italic">${esc(m.mission)}</p>
+                    </div>
+                    <div class="bg-white dark:bg-[#292524] rounded-[2rem] p-8 border border-stone-100 dark:border-stone-800 shadow-sm text-center">
+                        <div class="text-5xl font-serif font-bold text-orange-600 mb-2">${correct} / ${total}</div>
+                        <p class="text-sm font-bold">${orbitStatus}</p>
+                        <div class="w-full bg-stone-100 dark:bg-stone-800 rounded-full h-3 overflow-hidden mt-4"><div class="h-full rounded-full ${pct >= 80 ? 'bg-green-500' : pct >= 50 ? 'bg-orange-600' : 'bg-red-500'} transition-all" style="width:${pct}%"></div></div>
+                    </div>
+                    ${gaps.length > 0 ? '<div class="bg-white dark:bg-[#292524] rounded-[2rem] p-8 border border-stone-100 dark:border-stone-800 shadow-sm">' +
+                        '<h3 class="text-lg font-serif font-bold mb-1 text-red-600">🔍 Knowledge Gaps Detected</h3>' +
+                        '<p class="text-xs text-stone-500 mb-4">These concepts were not recalled correctly. Practice them using blurting, flashcards, or explanation.</p>' +
+                        '<div class="space-y-3">' + gaps.map(q => {
+                            const userAns = state.mcqAnswers[q.id] || '—';
+                            const userOpt = q.options.find(o => o.charAt(0) === userAns) || '—';
+                            const correctOpt = q.options.find(o => o.charAt(0) === q.answer);
+                            return '<div class="bg-red-50 dark:bg-red-900/10 rounded-xl p-4 border border-red-100 dark:border-red-900/30">' +
+                                '<p class="text-sm font-semibold text-stone-800 dark:text-stone-200 mb-2">' + esc(q.question) + '</p>' +
+                                '<p class="text-xs text-red-600">Your answer: ' + esc(userOpt) + '</p>' +
+                                '<p class="text-xs text-green-600">Correct: ' + esc(correctOpt) + '</p>' +
+                                '<span class="inline-block mt-2 bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400 px-2 py-0.5 rounded text-[10px] font-bold">Gap: ' + esc(q.concept) + '</span>' +
+                                '</div>';
+                        }).join('') + '</div></div>' : ''}
+                    ${stable.length > 0 ? '<div class="bg-white dark:bg-[#292524] rounded-[2rem] p-8 border border-stone-100 dark:border-stone-800 shadow-sm">' +
+                        '<h3 class="text-lg font-serif font-bold mb-3 text-green-600">✅ Stable Concepts (' + stable.length + ')</h3>' +
+                        '<div class="flex flex-wrap gap-2">' + stable.map(q =>
+                            '<span class="bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 px-3 py-1 rounded-lg text-xs font-bold">' + esc(q.concept) + '</span>'
+                        ).join('') + '</div></div>' : ''}
+                    <div class="bg-white dark:bg-[#292524] rounded-[2rem] p-8 border border-stone-100 dark:border-stone-800 shadow-sm">
+                        <h3 class="text-lg font-serif font-bold mb-3">💭 Reflection</h3>
+                        <p class="text-xs text-stone-500 mb-3">What changed in how you think about this topic? What will you practise next?</p>
+                        <textarea id="mcq-reflection-input" rows="3" class="w-full bg-stone-50 dark:bg-stone-800 px-4 py-3 rounded-xl border border-stone-200 dark:border-stone-700 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none">${esc(reflection)}</textarea>
+                        <button onclick="app.mcqSaveReflection()" class="mt-2 bg-orange-600 hover:bg-orange-500 text-white px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-colors">Save Reflection</button>
+                    </div>
+                    <div class="flex gap-3">
+                        <button onclick="app.mcqBackToList()" class="flex-1 bg-stone-200 dark:bg-stone-700 text-stone-700 dark:text-stone-200 py-3 rounded-xl font-bold text-sm uppercase tracking-widest">Back to Missions</button>
+                        <button onclick="app.mcqStartMission(${state.mcqMissionIdx})" class="flex-1 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 py-3 rounded-xl font-bold text-sm uppercase tracking-widest">Retry After Practice</button>
                     </div>
                 </div>`;
             },

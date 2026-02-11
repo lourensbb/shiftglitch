@@ -1,0 +1,837 @@
+Read the following data and after the end of the 100 multiple choice questions, implement the instructions that follow
+
+---- Start of 100 Multiple choice Questions ----
+
+I have prepared the **Full 100 MCQ Bank** for "The Successful Student’s Guide to the Galaxy," specifically formatted as a structured "Quiz Journey" suitable for a Replit coding project (such as a Python dictionary or JSON file). 
+
+This bank has been cross-referenced with the source material to ensure all 100 questions are unique, stylistically consistent, and grounded in the provided research. The questions are divided into **five "Missions"** to create a sense of progression through the learning galaxy.
+
+### Research Foundation Summary
+The following quiz is anchored in core principles found in the sources: **Neuroplasticity** (the brain's ability to rewire), **Active Recall** (retrieval vs. recognition), and **Spaced Repetition** (beating the forgetting curve). It incorporates the "Galaxy" metaphor of moving from a **"Launch Pad"** (short-term memory) to **"Orbit"** (long-term memory).
+
+---
+
+### The Successful Student Quiz Data (JSON Format)
+
+```json
+[
+  {
+    "mission": "Mission 1: The Launchpad (Crisis & Brain Science)",
+    "questions": [
+      {
+        "id": 1,
+        "question": "What is the primary term for the brain's ability to physically rewire itself through experience?",
+        "options": ["A) Neural Statics", "B) Neuroplasticity", "C) Cognitive Anchoring", "D) Synaptic Locking"],
+        "answer": "B"
+      },
+      {
+        "id": 2,
+        "question": "In the book's metaphor, where is information located when it is only in short-term memory?",
+        "options": ["A) In stable orbit", "B) At the navigation center", "C) On the launch pad", "D) In the black hole"],
+        "answer": "C"
+      },
+      {
+        "id": 3,
+        "question": "Which hormone, released during high stress, is known to physically cloud rational thinking and block memory?",
+        "options": ["A) Dopamine", "B) Serotonin", "C) Cortisol", "D) Adrenaline"],
+        "answer": "C"
+      },
+      {
+        "id": 4,
+        "question": "According to the sources, why does rereading create an 'illusion of competence'?",
+        "options": ["A) It is too difficult", "B) It confuses recognition with actual recall", "C) It uses too much dopamine", "D) It only works for math"],
+        "answer": "B"
+      },
+      {
+        "id": 5,
+        "question": "What percentage of new information is typically lost within 24 hours if it is not reinforced?",
+        "options": ["A) 10%", "B) 30%", "C) 50%", "D) 70%"],
+        "answer": "D"
+      },
+      {
+        "id": 6,
+        "question": "Which university conducted the study proving that active recall beats rereading for long-term retention?",
+        "options": ["A) Stanford", "B) MIT", "C) Harvard", "D) Yale"],
+        "answer": "C"
+      },
+      {
+        "id": 7,
+        "question": "The 'Modern Student Crisis' is primarily defined as being:",
+        "options": ["A) Lazy", "B) Under-talented", "C) Overstimulated and overwhelmed", "D) Uninterested in technology"],
+        "answer": "C"
+      },
+      {
+        "id": 8,
+        "question": "What is 'desirable difficulty' in the context of learning?",
+        "options": ["A) Studying in a noisy room", "B) Using effortful methods like self-testing to build stronger memories", "C) Taking a test without having studied at all", "D) Reading a textbook in a foreign language"],
+        "answer": "B"
+      },
+      {
+        "id": 9,
+        "question": "During which phase does the brain consolidate 'fragile sparks' into 'lasting constellations' of knowledge?",
+        "options": ["A) Deep Work sessions", "B) Deep Sleep", "C) The Pomodoro break", "D) Active Listening"],
+        "answer": "B"
+      },
+      {
+        "id": 10,
+        "question": "What is the primary role of the 'co-pilot' in this book?",
+        "options": ["A) To do the work for the student", "B) To provide a calm, experienced guide through the learning galaxy", "C) To grade the student's progress", "D) To monitor the student's screen time"],
+        "answer": "B"
+      },
+      {
+        "id": 11,
+        "question": "The brain contains approximately how many neurons?",
+        "options": ["A) 86 million", "B) 860 million", "C) 86 billion", "D) 86 trillion"],
+        "answer": "C"
+      },
+      {
+        "id": 12,
+        "question": "Which mode of thinking is laser-like and used for deep concentration on specific problems?",
+        "options": ["A) Diffuse mode", "B) Passive mode", "C) Focused mode", "D) Survival mode"],
+        "answer": "C"
+      },
+      {
+        "id": 13,
+        "question": "The 'Vogon' style of studying refers to which ineffective method?",
+        "options": ["A) Spaced repetition", "B) Mind mapping", "C) Passive, painful, and forced cramming", "D) Active recall"],
+        "answer": "C"
+      },
+      {
+        "id": 14,
+        "question": "What happens to the neural pathways every time you travel a specific route through practice?",
+        "options": ["A) They become more tangled", "B) They become smoother and faster", "C) They eventually disappear", "D) They switch to the other side of the brain"],
+        "answer": "B"
+      },
+      {
+        "id": 15,
+        "question": "Motivation in the 'Learning Galaxy' is described as being:",
+        "options": ["A) A permanent personality trait", "B) Unreliable and fluctuating", "C) More important than systems", "D) Only for 'naturally smart' students"],
+        "answer": "B"
+      },
+      {
+        "id": 16,
+        "question": "What does the book suggest as the proper response to a 'Zero State' of overwhelm?",
+        "options": ["A) Study 4 more hours", "B) Use a manual override system to break the cycle", "C) Give up and try next year", "D) Drink more caffeine"],
+        "answer": "B"
+      },
+      {
+        "id": 17,
+        "question": "Which type of cognitive load is 'effective' because it results in schema acquisition?",
+        "options": ["A) Intrinsic Load", "B) Extraneous Load", "C) Germane Load", "D) Passive Load"],
+        "answer": "C"
+      },
+      {
+        "id": 18,
+        "question": "The feeling of confusion while learning is actually a signal of:",
+        "options": ["A) Low intelligence", "B) The start of neuroplastic change", "C) A broken learning system", "D) Future failure"],
+        "answer": "B"
+      },
+      {
+        "id": 19,
+        "question": "Which part of the brain acts as the 'ancient alarm system' during panic?",
+        "options": ["A) Prefrontal Cortex", "B) Amygdala", ") Hippocampus", "D) Neocortex"],
+        "answer": "B"
+      },
+      {
+        "id": 20,
+        "question": "What is the primary goal of becoming a 'Self-Directed Learner'?",
+        "options": ["A) Studying alone in a room", "B) Taking ownership of your own learning methods and progress", "C) Replacing all teachers with AI", "D) Never making a mistake"],
+        "answer": "B"
+      }
+    ]
+  },
+  {
+    "mission": "Mission 2: Navigation Systems (Study Methods)",
+    "questions": [
+      {
+        "id": 21,
+        "question": "Which technique involves explaining a concept in plain language to identify gaps in your knowledge?",
+        "options": ["A) The Leitner System", "B) The Feynman Technique", "C) The Blurting Method", "D) SQ3R"],
+        "answer": "B"
+      },
+      {
+        "id": 22,
+        "question": "How long is a standard Pomodoro sprint?",
+        "options": ["A) 15 minutes", "B) 25 minutes", "C) 45 minutes", "D) 60 minutes"],
+        "answer": "B"
+      },
+      {
+        "id": 23,
+        "question": "In the Cornell Note-taking method, what is the purpose of the 'Reduce' step in the cue column?",
+        "options": ["A) To write less", "B) To summarize facts to clarify relationships between key ideas", "C) To remove all math from the notes", "D) To highlight the most colorful parts"],
+        "answer": "B"
+      },
+      {
+        "id": 24,
+        "question": "What is 'Interleaving'?",
+        "options": ["A) Focusing on one topic for 5 hours", "B) Mixing different subjects or problem types in a single session", "C) Placing notes inside a textbook", "D) Highlighting with two different colors"],
+        "answer": "B"
+      },
+      {
+        "id": 25,
+        "question": "The 'Blurting Method' is a form of:",
+        "options": ["A) Passive reading", "B) Dual Coding", "C) Intense Active Recall", "D) Diffuse mode thinking"],
+        "answer": "C"
+      },
+      {
+        "id": 26,
+        "question": "The Leitner System uses which tool to manage spaced repetition?",
+        "options": ["A) Digital calendars", "B) Physical or digital flashcard boxes", "C) Highlighters", "D) Voice recordings"],
+        "answer": "B"
+      },
+      {
+        "id": 27,
+        "question": "What is the core benefit of 'Dual Coding'?",
+        "options": ["A) Learning two languages at once", "B) Using both visual and verbal 'lanes' to double recall pathways", "C) Coding with both hands", "D) Summarizing a chapter into two sentences"],
+        "answer": "B"
+      },
+      {
+        "id": 28,
+        "question": "In the SQ3R method, what does the first 'S' stand for?",
+        "options": ["A) Study", "B) Survey", "C) Summarize", "D) Space"],
+        "answer": "B"
+      },
+      {
+        "id": 29,
+        "question": "When using the Leitner System, what happens when you get a card wrong?",
+        "options": ["A) It moves to a higher box", "B) It stays in the same box", "C) It moves back to Box 1 for aggressive review", "D) You throw the card away"],
+        "answer": "C"
+      },
+      {
+        "id": 30,
+        "question": "Which study method involves asking 'Why' and 'How' to connect new info to prior knowledge?",
+        "options": ["A) Elaborative Interrogation", "B) Rote Memorization", "C) Scanning", "D) Skimming"],
+        "answer": "A"
+      },
+      {
+        "id": 31,
+        "question": "A Mind Map mimics the brain's natural organization by using:",
+        "options": ["A) Linear bullet points", "B) Hierarchical networks and associations", "C) Vertical columns", "D) Verbatim transcripts"],
+        "answer": "B"
+      },
+      {
+        "id": 32,
+        "question": "Which of these is NOT an effective active recall tool?",
+        "options": ["A) Practice tests", "B) Flashcards", "C) Passively rereading the chapter", "D) Teaching a friend"],
+        "answer": "C"
+      },
+      {
+        "id": 33,
+        "question": "What is the 'Production Effect'?",
+        "options": ["A) Making a video for YouTube", "B) Higher recall from speaking or reciting information out loud", "C) Working in a factory", "D) Writing as fast as possible"],
+        "answer": "B"
+      },
+      {
+        "id": 34,
+        "question": "How many Pomodoro cycles are recommended before taking a long break?",
+        "options": ["A) 2", "B) 3", "C) 4", "D) 5"],
+        "answer": "C"
+      },
+      {
+        "id": 35,
+        "question": "What is the primary function of the 'Summary' section in Cornell Notes?",
+        "options": ["A) To list all dates", "B) To synthesize the entire page in 2-3 sentences", "C) To draw a picture", "D) To record the teacher's name"],
+        "answer": "B"
+      },
+      {
+        "id": 36,
+        "question": "According to research, which is more effective for long-term memory?",
+        "options": ["A) Five 30-minute sessions spread over a week", "B) One 5-hour session the night before", "C) Rereading notes ten times in one day", "D) Highlighting 100% of a textbook"],
+        "answer": "A"
+      },
+      {
+        "id": 37,
+        "question": "The 'Method of Loci' involves placing facts in:",
+        "options": ["A) Alphabetical order", "B) Familiar rooms of an imaginary 'Memory Palace'", "C) Numerical lists", "D) A digital folder"],
+        "answer": "B"
+      },
+      {
+        "id": 38,
+        "question": "What is the recommended interval for the second review in a spaced repetition schedule?",
+        "options": ["A) 10 minutes", "B) 1 day", "C) 1 week", "D) 1 month"],
+        "answer": "B"
+      },
+      {
+        "id": 39,
+        "question": "Which reading method uses the acronym THIEVES to scan a text?",
+        "options": ["A) SQ3R", "B) PQ4R", "C) THIEVES", "D) Active Reading"],
+        "answer": "C"
+      },
+      {
+        "id": 40,
+        "question": "Turning headings into questions is a 'hack' that switches the brain from passive reading to:",
+        "options": ["A) Diffuse mode", "B) Active retrieval", "C) Creative writing", "D) Multitasking"],
+        "answer": "B"
+      }
+    ]
+  },
+  {
+    "mission": "Mission 3: Galactic Engineers (Thinkers & Habits)",
+    "questions": [
+      {
+        "id": 41,
+        "question": "Who developed the concept of 'Deep Work'?",
+        "options": ["A) James Clear", "B) Cal Newport", "C) Barbara Oakley", "D) John Sweller"],
+        "answer": "B"
+      },
+      {
+        "id": 42,
+        "question": "What is 'Diffuse Mode' thinking useful for?",
+        "options": ["A) Memorizing a phone number", "B) Creative problem solving and making connections", "C) Reading a specific definition", "D) Taking a timed quiz"],
+        "answer": "B"
+      },
+      {
+        "id": 43,
+        "question": "James Clear states: 'You do not rise to the level of your goals. You fall to the level of your ______.'",
+        "options": ["A) Intelligence", "B) Systems", "C) Teachers", "D) Motivation"],
+        "answer": "B"
+      },
+      {
+        "id": 44,
+        "question": "Which theory suggests we should not 'over-fill' a lesson with too much information at once?",
+        "options": ["A) Atomic Habit Theory", "B) Cognitive Load Theory", "C) Relativity Theory", "D) Deep Work Theory"],
+        "answer": "B"
+      },
+      {
+        "id": 45,
+        "question": "Habit Stacking involves:",
+        "options": ["A) Doing ten habits at once", "B) Linking a new habit to an existing routine", "C) Focusing on only one habit for a year", "D) Deleting all bad habits immediately"],
+        "answer": "B"
+      },
+      {
+        "id": 46,
+        "question": "The '80/20 Rule' (Pareto Principle) suggest that 80% of your results come from:",
+        "options": ["A) 80% of your study hours", "B) 20% of high-impact activities", "C) Reading 80% of the book", "D) Attending 20% of classes"],
+        "answer": "B"
+      },
+      {
+        "id": 47,
+        "question": "According to Cal Newport, what is the 'attention residue' cost of multitasking?",
+        "options": ["A) It makes you smarter", "B) It takes time to regain original focus after a distraction", "C) It improves your vision", "D) It saves battery on your phone"],
+        "answer": "B"
+      },
+      {
+        "id": 48,
+        "question": "Which thinker created the 'Learning How to Learn' course?",
+        "options": ["A) James Clear", "B) Barbara Oakley", "C) Cal Newport", "D) Lourens Breytenbach"],
+        "answer": "B"
+      },
+      {
+        "id": 49,
+        "question": "What is the 'Two-Minute Rule' for starting tasks?",
+        "options": ["A) Finish everything in 2 minutes", "B) If a task takes less than 2 minutes, do it now", "C) Take a 2-minute break every hour", "D) Set a 2-minute timer for sleep"],
+        "answer": "B"
+      },
+      {
+        "id": 50,
+        "question": "Identity-Based Habits focus on:",
+        "options": ["A) The results you want to achieve", "B) The type of person you want to become", "C) The grades you need to get", "D) The rewards your parents will give you"],
+        "answer": "B"
+      },
+      {
+        "id": 51,
+        "question": "Cognitive Load Theory was developed by:",
+        "options": ["A) Albert Einstein", "B) John Sweller", "C) David Allen", "D) Brian Tracy"],
+        "answer": "B"
+      },
+      {
+        "id": 52,
+        "question": "The 'Getting Things Done' (GTD) system's first step is to:",
+        "options": ["A) Organize", "B) Reflect", "C) Capture everything that has your attention", "D) Delete tasks"],
+        "answer": "C"
+      },
+      {
+        "id": 53,
+        "question": "Why does the brain love 'finite challenges' like the 25-minute Pomodoro?",
+        "options": ["A) It hates work", "B) It loves countdowns and clear endpoints", "C) It wants to play video games", "D) It needs to sleep every 25 minutes"],
+        "answer": "B"
+      },
+      {
+        "id": 54,
+        "question": "Which quadrant of the Eisenhower Matrix should students aim to spend most of their time in?",
+        "options": ["A) Urgent & Important", "B) Important, Not Urgent (Quadrant 2)", "C) Urgent, Not Important", "D) Not Urgent & Not Important"],
+        "answer": "B"
+      },
+      {
+        "id": 55,
+        "question": "Gamification in learning primarily uses which neurotransmitter loop?",
+        "options": ["A) Cortisol", "B) Melatonin", "C) Dopamine", "D) Insulin"],
+        "answer": "C"
+      },
+      {
+        "id": 56,
+        "question": "What does 'Eat the Frog' mean in productivity?",
+        "options": ["A) Eating healthy snacks", "B) Completing your hardest or most dreaded task first", "C) Studying in a green room", "D) Skipping breakfast"],
+        "answer": "B"
+      },
+      {
+        "id": 57,
+        "question": "Which thinker emphasizes that your IQ is not fixed and can grow?",
+        "options": ["A) Carol Dweck", "B) Cal Newport", "C) David Allen", "D) Brian Tracy"],
+        "answer": "A"
+      },
+      {
+        "id": 58,
+        "question": "What is 'Rubber Duck Debugging' in a study context?",
+        "options": ["A) Swimming to relax", "B) Explaining a concept out loud to an inanimate object", "C) Buying a rubber duck for luck", "D) Playing with water"],
+        "answer": "B"
+      },
+      {
+        "id": 59,
+        "question": "The 'Zeigarnik Effect' suggests the brain stays focused on:",
+        "options": ["A) Completed tasks", "B) Unfinished tasks", "C) Future goals", "D) Past mistakes"],
+        "answer": "B"
+      },
+      {
+        "id": 60,
+        "question": "What is the dollar value of your time used for in the book?",
+        "options": ["A) Calculating pocket money", "B) Deciding what tasks to delegate", "C) Buying a car", "D) Paying teachers"],
+        "answer": "B"
+      }
+    ]
+  },
+  {
+    "mission": "Mission 4: Avoid the Black Holes (Systems & Tactics)",
+    "questions": [
+      {
+        "id": 61,
+        "question": "What is the 'External Device Rule'?",
+        "options": ["A) Buying a new iPad", "B) Putting your phone in another room during focus blocks", "C) Using only digital books", "D) Checking Instagram every 10 minutes"],
+        "answer": "B"
+      },
+      {
+        "id": 62,
+        "question": "Which day is recommended for conducting a 'Weekly Review'?",
+        "options": ["A) Monday morning", "B) Wednesday afternoon", "C) Friday night", "D) Sunday evening"],
+        "answer": "D"
+      },
+      {
+        "id": 63,
+        "question": "Why is 'Backward Planning' effective for exams?",
+        "options": ["A) It's faster to write", "B) It starts from the goal and sets realistic milestones", "C) It uses less paper", "D) You study the last chapter first"],
+        "answer": "B"
+      },
+      {
+        "id": 64,
+        "question": "What color lighting is best for intense problem-solving (concentration)?",
+        "options": ["A) Warm Amber (2700K)", "B) Cool White (4000K-5000K)", "C) Red (1000K)", "D) Neon Purple"],
+        "answer": "B"
+      },
+      {
+        "id": 65,
+        "question": "Procrastination is described as 'The ______ Enemy' in the Guide.",
+        "options": ["A) Loud", "B) Green", "C) Silent", "D) Fast"],
+        "answer": "C"
+      },
+      {
+        "id": 66,
+        "question": "A 'Daily Highlight' is:",
+        "options": ["A) The funniest thing that happened", "B) The one most important task you MUST get done today", "C) The most colorful part of your notes", "D) Your favorite meal"],
+        "answer": "B"
+      },
+      {
+        "id": 67,
+        "question": "Where should your study lamp be positioned to reduce glare?",
+        "options": ["A) Directly in front of your eyes", "B) Behind or to the side of your non-writing hand", "C) Under the desk", "D) In the next room"],
+        "answer": "B"
+      },
+      {
+        "id": 68,
+        "question": "What is the '20-30% rule' for backwards planning?",
+        "options": ["A) Studying only 20% of the book", "B) Adding a 20-30% time buffer for unexpected delays", "C) Getting 20% higher grades", "D) Sleeping 30% more"],
+        "answer": "B"
+      },
+      {
+        "id": 69,
+        "question": "Why is studying on a bed discouraged?",
+        "options": ["A) It's too small", "B) The brain associates the bed with sleep, reducing alertness", "C) You might spill water", "D) It breaks the bed"],
+        "answer": "B"
+      },
+      {
+        "id": 70,
+        "question": "What happens in the first 5 minutes of a 'Brain Dump' exam strategy?",
+        "options": ["A) You sleep", "B) You write down key formulas and dates in the margins immediately", "C) You read the whole test twice", "D) You ask for a break"],
+        "answer": "B"
+      },
+      {
+        "id": 71,
+        "question": "Which prioritized category in the ABCDE method is for tasks you SHOULD do, but have minor consequences if delayed?",
+        "options": ["A) A tasks", "B) B tasks", "C) C tasks", "D) D tasks"],
+        "answer": "B"
+      },
+      {
+        "id": 72,
+        "question": "What does turning your phone to 'Greyscale' do?",
+        "options": ["A) Improves battery life", "B) Makes social media less visually rewarding and addictive", "C) Helps you see better at night", "D) Breaks the phone"],
+        "answer": "B"
+      },
+      {
+        "id": 73,
+        "question": "A 'Towel Break' is used to:",
+        "options": ["A) Take a shower", "B) Reset the nervous system when a test feels like a supernova", "C) Clean the desk", "D) Signal you are finished"],
+        "answer": "B"
+      },
+      {
+        "id": 74,
+        "question": "What is 'Batching'?",
+        "options": ["A) Baking cookies", "B) Grouping similar tasks together to reduce context switching", "C) Studying every subject for 5 minutes", "D) Throwing away old notes"],
+        "answer": "B"
+      },
+      {
+        "id": 75,
+        "question": "The RICE framework scores tasks based on Reach, Impact, Confidence, and ______.",
+        "options": ["A) Effort", "B) Earnings", "C) Energy", "D) Exams"],
+        "answer": "A"
+      },
+      {
+        "id": 76,
+        "question": "What is the 'Shutdown' rule for study time?",
+        "options": ["A) Turn off the computer", "B) Hard stop at a set time (e.g., 10 PM) to allow the brain to save", "C) Close all windows", "D) Lock the door"],
+        "answer": "B"
+      },
+      {
+        "id": 77,
+        "question": "A 'Focus Zone' must be cleared of:",
+        "options": ["A) Books", "B) Visual clutter and electronic notifications", "C) Chairs", "D) Paper"],
+        "answer": "B"
+      },
+      {
+        "id": 78,
+        "question": "How long should you wait before calling on a student after asking a question (Teacher Rule)?",
+        "options": ["A) 5 seconds", "B) 10 seconds", "C) 42 seconds", "D) 1 minute"],
+        "answer": "C"
+      },
+      {
+        "id": 79,
+        "question": "What does the MoSCoW method stand for?",
+        "options": ["A) More, Some, Could, Won't", "B) Must have, Should have, Could have, Won't have", "C) Math, Science, Chemistry, Writing", "D) Morning, Sunday, Calendar, Weekly"],
+        "answer": "B"
+      },
+      {
+        "id": 80,
+        "question": "The primary benefit of 'Mock Testing' is:",
+        "options": ["A) It counts for grades", "B) It vaccinates you against exam-day nerves through simulation", "C) It is shorter than real tests", "D) It requires no preparation"],
+        "answer": "B"
+      }
+    ]
+  },
+  {
+    "mission": "Mission 5: Life Support & Hero State (Wellbeing & Mastery)",
+    "questions": [
+      {
+        "id": 81,
+        "question": "Which breathing technique is recommended to calm the nervous system?",
+        "options": ["A) 2-2-2", "B) 4-2-6 (Box Breathing variant)", "C) 10-10-10", "D) Fast panting"],
+        "answer": "B"
+      },
+      {
+        "id": 82,
+        "question": "Anxiety Reappraisal means telling yourself 'I am ______' instead of 'I am nervous'.",
+        "options": ["A) Calm", "B) Tired", "C) Excited", "D) Scared"],
+        "answer": "C"
+      },
+      {
+        "id": 83,
+        "question": "What is 'Learning Infrastructure'?",
+        "options": ["A) The school building", "B) Sleep", "C) A computer", "D) A desk"],
+        "answer": "B"
+      },
+      {
+        "id": 84,
+        "question": "How many hours of sleep do teenagers typically need for memory consolidation?",
+        "options": ["A) 5-6", "B) 7-9", "C) 10-12", "D) 4 or less"],
+        "answer": "B"
+      },
+      {
+        "id": 85,
+        "question": "Which type of snack is best for sustained brain fuel?",
+        "options": ["A) Candy and Coffee", "B) Walnuts, apples, and dark chocolate", "C) Energy drinks", "D) Nothing"],
+        "answer": "B"
+      },
+      {
+        "id": 86,
+        "question": "What is a 'Growth Mindset'?",
+        "options": ["A) Wanting to get taller", "B) Viewing intelligence as developable through effort", "C) Only caring about 'A' grades", "D) Believing you are better than others"],
+        "answer": "B"
+      },
+      {
+        "id": 87,
+        "question": "Exercise before studying helps by:",
+        "options": ["A) Making you tired", "B) Oxygenating the brain and growing new cells", "C) Saving time", "D) Reducing the need to study"],
+        "answer": "B"
+      },
+      {
+        "id": 88,
+        "question": "What is the 'Rule of Five' in a learning toolkit?",
+        "options": ["A) Studying for 5 hours", "B) Having 5 core tools (Planning, Studying, Review, Focus, Wellbeing)", "C) Passing 5 subjects", "D) Taking 5 breaks"],
+        "answer": "B"
+      },
+      {
+        "id": 89,
+        "question": "When does 'Identity-Based' success happen?",
+        "options": ["A) When you get a medal", "B) When you start seeing yourself as a capable learner", "C) When you finish school", "D) When your parents are happy"],
+        "answer": "B"
+      },
+      {
+        "id": 90,
+        "question": "The 'Yet Game' involves adding the word 'yet' to which phrase?",
+        "options": ["A) I'm finished", "B) I'm not good at this", "C) I'm smart", "D) I'm late"],
+        "answer": "B"
+      },
+      {
+        "id": 91,
+        "question": "Dehydration can cause a drop in:",
+        "options": ["A) Height", "B) Cognitive performance and focus", "C) Eye color", "D) Weight only"],
+        "answer": "B"
+      },
+      {
+        "id": 92,
+        "question": "Why should students avoid high sugar spikes before studying?",
+        "options": ["A) It's too expensive", "B) It leads to an energy crash that kills focus", "C) It makes the brain grow too fast", "D) It is illegal"],
+        "answer": "B"
+      },
+      {
+        "id": 93,
+        "question": "A 'Gap Effect' in learning is a short pause of:",
+        "options": ["A) 10-30 seconds", "B) 10-30 minutes", "C) 1-2 hours", "D) 1 day"],
+        "answer": "A"
+      },
+      {
+        "id": 94,
+        "question": "Which thinking mode allows your mind to connect 'constellations of ideas' during rest?",
+        "options": ["A) Laser mode", "B) Diffuse mode", "C) Vogon mode", "D) Panic mode"],
+        "answer": "B"
+      },
+      {
+        "id": 95,
+        "question": "What is the 'Hero State' in the book's transformation guide?",
+        "options": ["A) Being a celebrity", "B) Being a proactive, balanced, and excellent learner", "C) Getting a perfect 100% on every test", "D) Teaching everyone else"],
+        "answer": "B"
+      },
+      {
+        "id": 96,
+        "question": "The 'Galaxy Guide' suggests true confidence comes from:",
+        "options": ["A) Luck", "B) Consistent systems and preparation evidence", "C) Arrogance", "D) Ignoring your weaknesses"],
+        "answer": "B"
+      },
+      {
+        "id": 97,
+        "question": "What is the 'Protégé Effect'?",
+        "options": ["A) Being the best student", "B) Learning better by acting as a teacher for others", "C) Following a famous scientist", "D) Using AI for everything"],
+        "answer": "B"
+      },
+      {
+        "id": 98,
+        "question": "What is the recommended light color 2 hours before bed?",
+        "options": ["A) Blue-white", "B) Bright White", "C) Amber or Warm Light (under 3000K)", "D) Flashing strobes"],
+        "answer": "C"
+      },
+      {
+        "id": 99,
+        "question": "The 'Sub-Etha' transmission metaphor refers to:",
+        "options": ["A) Radio signals", "B) Communication between home, student, and school", "C) Underground tunnels", "D) Secret notes"],
+        "answer": "B"
+      },
+      {
+        "id": 100,
+        "question": "In the end, what decides your earning capacity and provides an 'unfair advantage'?",
+        "options": ["A) Your parents' money", "B) Your learning ability", "C) Your high school medal", "D) Your luck"],
+        "answer": "B"
+      }
+    ]
+  }
+]
+```
+
+---- END of 100 Multiple choice Questions ----
+
+# Synapse – MCQ Mission System (FINAL Design Direction)
+
+Thank you for the work done so far. The structure, UI quality, and learning workflows are strong. I now want to clearly define **how the 100-question MCQ bank should function inside Synapse**, so it enhances learning rather than turning into a trivia or XP-driven system.
+
+This is a refinement of direction, not a reset.
+
+---
+
+## 1. Purpose of the MCQ Bank
+
+The MCQ content is **not** intended to be a standalone quiz game.
+
+Instead, it functions as:
+
+* a **navigation checkpoint**
+* a **diagnostic tool**
+* a **gate** that reveals learning gaps
+
+MCQs should **never be the primary activity**. They validate learning *after* work has been done.
+
+---
+
+## 2. Structural Overview
+
+The MCQ bank is divided into **five Missions**, each representing a stage in the learning journey:
+
+1. The Launchpad – Brain Science & Crisis Awareness
+2. Navigation Systems – Study Methods
+3. Galactic Engineers – Thinking & Habits
+4. Avoid the Black Holes – Systems & Tactics
+5. Life Support & Hero State – Wellbeing & Mastery
+
+These Missions are **progressive**, but not game levels.
+
+---
+
+## 3. Access Rules (Important)
+
+A Mission may only be attempted if **learning activity has already occurred**, for example:
+
+* a completed Pomodoro session
+* a blurting session
+* flashcard review
+* notes created or revised
+
+No activity → no MCQs.
+
+This ensures MCQs measure **recall**, not guessing.
+
+---
+
+## 4. How a Mission Attempt Works
+
+### Step 1: Orientation
+
+The student is told:
+
+* what the Mission tests
+* why it matters
+* that this is a *diagnostic*, not a score challenge
+
+### Step 2: Recall Attempt
+
+* Questions are answered **from memory**
+* No notes visible
+* No instant retries
+* No timers or streak pressure
+
+### Step 3: Gap Detection
+
+Incorrect answers do **not** cause penalties.
+
+Instead, they:
+
+* flag a *concept name*
+* create a “Knowledge Gap” marker
+* generate a practice prompt (e.g. blurting or explanation)
+
+### Step 4: Reflection
+
+Each Mission ends with:
+
+* one short reflective prompt (e.g. “What changed in how you think?”)
+* optional retry after practice
+
+---
+
+## 5. MCQs Are Gates, Not Rewards
+
+MCQs:
+
+* do not generate XP
+* do not award points
+* do not unlock cosmetic rewards
+
+Their only function is to:
+
+* reveal understanding
+* confirm readiness
+* guide next practice
+
+---
+
+## 6. Relationship to Rank Progression
+
+Synapse uses **three permanent ranks**:
+
+1. Space Cadet
+2. Second Officer
+3. Flight Commander
+
+MCQs interact with rank progression as follows:
+
+* **Space Cadet**
+  MCQs are used for exposure and awareness. Accuracy is not critical.
+
+* **Second Officer**
+  MCQs must show improvement over time. Reattempts should reveal fewer gaps.
+
+* **Flight Commander**
+  MCQs are optional. Priority shifts to explanation, planning, and teaching output.
+
+As rank increases, MCQs **fade in importance**.
+
+---
+
+## 7. Language & Tone
+
+Avoid framing such as:
+
+* “Quiz”
+* “Trivia”
+* “Score”
+* “XP”
+
+Preferred language:
+
+* Navigation Check
+* Systems Diagnostic
+* Stability Check
+* Knowledge Gap Detected
+* Stable Orbit
+
+This keeps the app serious and respectful.
+
+---
+
+## 8. What Not to Add
+
+Please do not add:
+
+* leaderboards
+* time pressure
+* streak multipliers
+* random rewards
+* XP grinding
+* retry-until-perfect loops
+
+These undermine the learning intent.
+
+---
+
+## 9. Technical Notes
+
+The MCQ bank is already provided in structured JSON format and can be:
+
+* loaded as a static dataset
+* filtered by Mission
+* evaluated for correctness
+* mapped to concept tags for gap detection
+
+No additional content generation is required at this stage.
+
+---
+
+## 10. Summary (One Sentence)
+
+The MCQ system exists to **confirm learning, not replace it**.
+
+---
+
+This direction preserves the quality of the existing work while ensuring Synapse remains:
+
+* disciplined
+* evidence-based
+* behaviour-focused
+* meaningfully different from generic study apps
+
+Thank you for building within these constraints.
+
