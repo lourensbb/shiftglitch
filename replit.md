@@ -99,6 +99,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### Feb 11, 2026 — MCQ Diagnostic System
+1. **Navigation Check:** 100 multiple-choice questions across 5 missions (The Launchpad, Navigation Systems, Galactic Engineers, Avoid the Black Holes, Life Support & Hero State). Diagnostic framing — no timers, XP, or leaderboards.
+2. **Access gating:** Missions locked until user completes at least one learning activity (pomodoro, blurt, flashcard review, or Cornell notes). Enforces "confirm learning, not replace it" philosophy.
+3. **Gap detection:** Incorrect answers tagged by concept. Knowledge gaps displayed on results page and persistent gap tracker on mission list.
+4. **Orbit status:** Per-mission scoring with orbit metaphor (🟢 Stable / 🟠 Adjusting / 🔴 Unstable). Best score and attempt count tracked.
+5. **Reflection prompts:** Post-diagnostic reflection textarea saved per mission to encourage metacognition.
+6. **mcqStore:** localStorage persistence (`synapse_mcq`) for attempts, gaps, and reflections. Included in export/import.
+7. **Nav item:** "Check" added to desktop and mobile navigation, routing to `diagnostic` view.
+
 ### Feb 11, 2026 — Mission Simplification for Teens
 1. **Mission Guide:** Added "How to Use Synapse" 3-step instruction box (Pick a topic → Use the tools → Level up your rank) with numbered emoji cards.
 2. **To-Do List:** Replaced Quest Log with interactive emoji to-do list (⬜/✅ toggle, add/remove tasks). Persisted to `synapse_todos` localStorage key via `todoStore`. Included in export/import.
