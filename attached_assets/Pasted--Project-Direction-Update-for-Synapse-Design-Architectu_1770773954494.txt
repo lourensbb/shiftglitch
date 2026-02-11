@@ -1,0 +1,142 @@
+### Project Direction Update for Synapse (Design & Architecture Clarification)
+
+First, thank you for the depth, polish, and technical quality of what has been produced so far. The UI, data handling, and feature completeness are genuinely impressive, and many of the learning workflows (Pomodoro governor, blurting flow, Leitner decks) align well with the educational intent of the project.
+
+After reviewing the current implementation in full, I need to clarify and **narrow the product direction** to better match the original philosophy and long-term goal of Synapse.
+
+#### Core Product Philosophy (Non-Negotiable)
+
+Synapse is not intended to be a general gamified productivity app or trivia-based learning game. It is a **study-methods operating system** whose primary function is to *change learner behaviour* and *enforce evidence-based learning practices*. The app should feel structured, serious, and progression-oriented rather than dopamine-driven.
+
+For this reason, I need to reduce overlapping gamification systems and establish **one single, authoritative progression spine**.
+
+---
+
+### 1. Replace XP/Levels With a Permanent Rank System
+
+Please discontinue development around:
+
+* XP grinding
+* Numerical levels
+* Daily quests
+* Achievement badges as primary progression
+* Streak-based optimisation loops
+
+Instead, progression should be based on **exactly three irreversible ranks**:
+
+1. **Space Cadet**
+2. **Second Officer**
+3. **Flight Commander**
+
+Key rules:
+
+* Ranks are **earned once and never revoked or downgraded**
+* Progression is **not linear XP-based**
+* Rank promotion occurs only when **specific behavioural evidence** is met
+* There is no benefit to “grinding”; quality and consistency matter more than volume
+
+Technically, this means replacing `xpTotal`, `levels`, and related mechanics with a single `rank` state and a small, explicit evidence object.
+
+Example (illustrative only):
+
+```js
+state.rank = "Space Cadet";
+state.rankEvidence = {
+  blurtsCompleted: 0,
+  governorBreakdownsCompleted: 0,
+  decksAdvanced: 0,
+  activeDays: 0
+};
+```
+
+Promotion logic should be deterministic and auditable, not probabilistic or reward-stacked.
+
+---
+
+### 2. Rank Promotion Is Evidence-Based, Not Numeric
+
+Promotion should require **completion of defined learning behaviours**, such as:
+
+* Successful blurting sessions
+* Governor-enforced task breakdowns
+* Sustained spaced-repetition progress
+* Consistent use over time
+
+Once the evidence threshold is met:
+
+* Promotion is triggered
+* The new rank is locked permanently
+* No further tracking of prior ranks is needed
+
+This is intentionally designed as a **rite-of-passage system**, not a game loop.
+
+---
+
+### 3. Preserve and Prioritise These Existing Systems
+
+The following systems are aligned with the product vision and should remain central:
+
+* The **Pomodoro Learning Governor** (4-session lock + forced breakdown)
+* The **Blurting workflow** (read → hide → blurt → compare → fill gaps)
+* The **Leitner flashcard system**
+* Local-first persistence (Firebase optional, not required)
+
+These systems should be considered *core*, not optional features.
+
+---
+
+### 4. De-emphasise or Isolate Gamified Elements
+
+Modules such as:
+
+* Trivia / Quiz Arena
+* Streak multipliers
+* Token hunting
+* Random rewards
+
+Either:
+
+* disable them for now, or
+* clearly isolate them so they do not affect rank progression
+
+Surface-level trivia should never be required for advancement.
+
+---
+
+### 5. Monetisation Guardrails (For Later Phases)
+
+No monetisation should:
+
+* affect rank
+* accelerate promotion
+* provide learning advantages
+
+Acceptable future monetisation directions may include:
+
+* access to rank-promotion review or validation
+* parent / educator dashboards
+* advanced reporting or export features
+* one-time unlocks of advanced modes (not power boosts)
+
+This is not a free-to-play game model.
+
+---
+
+### 6. Immediate Implementation Focus
+
+For now, please focus only on:
+
+* defining the rank state
+* defining promotion evidence requirements
+* implementing promotion checks
+* displaying current rank and next promotion requirements clearly in the UI
+
+No new features or modules are needed at this stage.
+
+---
+
+Again, the quality of the existing work is appreciated. This adjustment is about **philosophical alignment and long-term coherence**, not dissatisfaction with execution. The goal is to make Synapse opinionated, restrained, and meaningfully different from generic productivity or gamified study apps.
+
+Thank you for working with these constraints.
+
+---
