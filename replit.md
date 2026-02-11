@@ -67,6 +67,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### Feb 11, 2026 — Learning Governor (Cognitive Load Enforcement)
+1. **Pomodoro task labeling:** Timer now requires a task label before starting a focus session. Label input is disabled while timer is running.
+2. **Consecutive streak tracking:** `pomodoroStore` logs completed pomodoros with normalized task labels (trim, lowercase, collapse whitespace) to localStorage. `consecutiveCount()` walks the log backwards counting matching labels until a different entry is found.
+3. **Governor blocking:** After 4 consecutive pomodoros on the same task without a breakdown, the timer blocks with a Governor banner. Two options: "I've Broken It Down" (inserts `__breakdown__` sentinel into log, resets streak) or "Switch Task" (clears label so user picks a new one).
+4. **Visual streak indicator:** 4 dots below the timer show current streak progress (filled orange = completed, gray = remaining).
+5. **State resets:** Governor blocked state properly clears on mode switch, timer reset, and task switch to prevent stale blocking.
+6. **XSS protection:** Task labels escaped via `esc()` in all HTML rendering.
+
 ### Feb 10, 2026 — The Blurting Method
 1. **Blurting Method feature:** New "Blurt" section added to navigation. An active recall study tool where students read notes, hide them, write everything they remember, then compare to fill in gaps.
 2. **Four-phase flow:** List (manage sessions) → Read (enter source notes) → Blurt (recall from memory in dark mode UI) → Compare (side-by-side source vs recall, with orange-highlighted gap-filling textarea).
