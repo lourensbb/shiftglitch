@@ -246,6 +246,14 @@
             get(id) { return state.blurtSessions.find(s => s.id === id); }
         };
 
+        const todoStore = {
+            load() { try { state.missionTodos = JSON.parse(localStorage.getItem('synapse_todos') || '[]'); } catch(e) { state.missionTodos = []; } },
+            save() { localStorage.setItem('synapse_todos', JSON.stringify(state.missionTodos)); },
+            add(text) { state.missionTodos.push({ id: Date.now().toString(), text, done: false }); this.save(); },
+            toggle(id) { const t = state.missionTodos.find(x => x.id === id); if (t) { t.done = !t.done; this.save(); } },
+            remove(id) { state.missionTodos = state.missionTodos.filter(x => x.id !== id); this.save(); },
+        };
+
         const eisenhowerStore = {
             load() {
                 try {
@@ -422,7 +430,7 @@
             timerTaskLabel: '', governorBlocked: false, pomodoroLog: [],
             fcDecks: [], fcCards: [], fcCurrentDeck: null, fcStudyQueue: [], fcStudyIndex: 0, fcFlipped: false,
             blurtSessions: [], blurtCurrentId: null, blurtPhase: 'list',
-            eisenhowerTasks: [], eisenhowerReflections: [],
+            eisenhowerTasks: [], eisenhowerReflections: [], missionTodos: [],
             rank: 'Space Cadet', rankEvidence: { blurtsCompleted: 0, governorBreakdowns: 0, cardsAdvanced: 0, activeDays: 0, pomodorosCompleted: 0, lastActiveDate: '', activeDateLog: [] },
             quizCategory: '', quizDifficulty: 'medium', quizQuestions: [], quizIndex: 0, quizScore: 0,
             quizStreak: 0, quizAnswered: false, quizSelectedAnswer: null, quizTimer: 15, quizTimerInterval: null,
@@ -440,7 +448,7 @@
                     if (state.view === 'dashboard') app.renderCharts();
                 });
 
-                deckStore.load(); cardStore.load(); pomodoroStore.load(); blurtStore.load(); eisenhowerStore.load();
+                deckStore.load(); cardStore.load(); pomodoroStore.load(); blurtStore.load(); eisenhowerStore.load(); todoStore.load();
                 rankEngine.load(); rankEngine.trackActiveDay(); rankEngine.updateNavRank();
 
                 if (window.fb && window.fb.auth) {
@@ -582,11 +590,21 @@
                 if (!subject) return;
                 state.isAiLoading = true; app.render();
                 const res = await aiService.callGemini(
-                    `Draft a 3-stage mission plan for learning "${esc(subject)}" using these techniques: ${learningData.map(t => t.title).join(', ')}.`,
-                    "You are an expert learning coach. Give a clear, actionable study plan in 3 stages. Be concise but thorough."
+                    `I'm a student and I want to study "${esc(subject)}". Give me a simple, short study plan I can start right now.`,
+                    "You are a friendly study buddy helping a teenager. Keep it SHORT (max 150 words). Use simple language. Give exactly 3 clear steps numbered 1, 2, 3. Each step should be one sentence. Add a quick tip at the end. No jargon, no long paragraphs. Be encouraging."
                 );
                 state.aiOutput = res; state.isAiLoading = false; app.render();
             },
+
+            addTodo() {
+                const input = document.getElementById('todo-input');
+                if (!input || !input.value.trim()) return;
+                todoStore.add(input.value.trim());
+                input.value = '';
+                app.render();
+            },
+            toggleTodo(id) { todoStore.toggle(id); app.render(); },
+            removeTodo(id) { todoStore.remove(id); app.render(); },
 
             openModal: (id) => {
                 const t = learningData.find(x => x.id === id);
@@ -726,6 +744,7 @@
                     pomodoroLog: state.pomodoroLog, notes: localStorage.getItem('cornellNotes') || '',
                     rank: { rank: state.rank, rankEvidence: state.rankEvidence },
                     eisenhower: { tasks: state.eisenhowerTasks, reflections: state.eisenhowerReflections },
+                    todos: state.missionTodos,
                     exportedAt: new Date().toISOString()
                 };
                 const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -747,6 +766,7 @@
                         if (data.notes) localStorage.setItem('cornellNotes', data.notes);
                         if (data.rank) { state.rank = data.rank.rank || 'Space Cadet'; state.rankEvidence = data.rank.rankEvidence || state.rankEvidence; rankEngine.save(); }
                         if (data.eisenhower) { state.eisenhowerTasks = data.eisenhower.tasks || []; state.eisenhowerReflections = data.eisenhower.reflections || []; eisenhowerStore.save(); }
+                        if (data.todos) { state.missionTodos = data.todos; todoStore.save(); }
                         app.showNotification('Data imported successfully!');
                         app.render();
                     } catch (err) { app.showNotification('Import failed. Invalid file.'); }
@@ -813,25 +833,45 @@
                 return `
                 <div class="animate-fade-in space-y-12">
                     <section class="text-center">
-                        <h1 class="text-5xl md:text-7xl font-serif font-bold mb-4">The Mission.</h1>
-                        <p class="text-stone-500 dark:text-stone-400 max-w-xl mx-auto italic font-medium mb-6">Strategic intelligence synthesis powered by Gemini API.</p>
+                        <h1 class="text-5xl md:text-7xl font-serif font-bold mb-4">Your Mission</h1>
+                        <p class="text-stone-500 dark:text-stone-400 max-w-xl mx-auto font-medium mb-6">Your study home base. Everything starts here.</p>
                         <blockquote class="max-w-2xl mx-auto px-6">
                             <p class="text-base md:text-lg font-serif italic text-stone-600 dark:text-stone-300 leading-relaxed">"${esc(q.text)}"</p>
                             <footer class="mt-2 text-xs font-bold uppercase tracking-widest text-orange-600">— ${esc(q.author)}</footer>
                         </blockquote>
                     </section>
-                    <section class="bg-stone-900 dark:bg-stone-800 rounded-[2.5rem] p-10 text-white shadow-2xl relative overflow-hidden">
-                        <div class="relative z-10 flex flex-col gap-6">
-                            <h2 class="text-3xl font-serif font-semibold text-white">Mission Architect</h2>
-                            <p class="text-sm text-stone-300">What would you like to learn about? Enter a topic and get a study plan.</p>
+                    <section class="bg-orange-50 dark:bg-orange-900/20 rounded-[2rem] p-8 border border-orange-200 dark:border-orange-800">
+                        <h3 class="text-lg font-serif font-bold text-orange-700 dark:text-orange-400 mb-4">📋 How to Use Synapse</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div class="bg-white dark:bg-stone-800 rounded-2xl p-5 border border-orange-100 dark:border-stone-700 text-center">
+                                <div class="text-3xl mb-2">1️⃣</div>
+                                <p class="text-sm font-semibold text-stone-700 dark:text-stone-200 mb-1">Pick a topic</p>
+                                <p class="text-xs text-stone-500 dark:text-stone-400">Type what you want to study below and get a quick plan.</p>
+                            </div>
+                            <div class="bg-white dark:bg-stone-800 rounded-2xl p-5 border border-orange-100 dark:border-stone-700 text-center">
+                                <div class="text-3xl mb-2">2️⃣</div>
+                                <p class="text-sm font-semibold text-stone-700 dark:text-stone-200 mb-1">Use the tools</p>
+                                <p class="text-xs text-stone-500 dark:text-stone-400">Start a focus timer, make flashcards, or try a blurt session from the menu.</p>
+                            </div>
+                            <div class="bg-white dark:bg-stone-800 rounded-2xl p-5 border border-orange-100 dark:border-stone-700 text-center">
+                                <div class="text-3xl mb-2">3️⃣</div>
+                                <p class="text-sm font-semibold text-stone-700 dark:text-stone-200 mb-1">Level up your rank</p>
+                                <p class="text-xs text-stone-500 dark:text-stone-400">Keep studying consistently and you'll earn your next rank!</p>
+                            </div>
+                        </div>
+                    </section>
+                    <section class="bg-stone-900 dark:bg-stone-800 rounded-[2.5rem] p-8 md:p-10 text-white shadow-2xl relative overflow-hidden">
+                        <div class="relative z-10 flex flex-col gap-5">
+                            <h2 class="text-2xl font-serif font-semibold text-white">🤖 Study Plan Generator</h2>
+                            <p class="text-sm text-stone-300">Type any topic and get a simple 3-step study plan from AI.</p>
                             <div class="flex flex-col sm:flex-row gap-3">
-                                <input id="subjectInput" type="text" placeholder="e.g. Organic Chemistry, Python basics..." class="flex-grow bg-white/10 px-6 py-4 rounded-2xl border border-white/20 text-white font-sans focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all" onkeydown="if(event.key==='Enter')app.generateMissionPlan()">
+                                <input id="subjectInput" type="text" placeholder="e.g. Photosynthesis, World War 2, Algebra..." class="flex-grow bg-white/10 px-6 py-4 rounded-2xl border border-white/20 text-white font-sans focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all" onkeydown="if(event.key==='Enter')app.generateMissionPlan()">
                                 <button onclick="app.generateMissionPlan()" class="bg-orange-600 px-8 py-4 rounded-2xl font-bold tracking-wide hover:bg-orange-500 transition-all">
-                                    ${state.isAiLoading ? '<span class="ai-loader"></span>' : 'Synthesize'}
+                                    ${state.isAiLoading ? '<span class="ai-loader"></span>' : 'Go!'}
                                 </button>
                             </div>
                             <div class="bg-white/5 p-6 rounded-2xl border border-white/10 text-stone-300 leading-relaxed font-sans text-sm md:text-base">
-                                ${state.aiOutput ? mdToHtml(state.aiOutput) : 'Awaiting mission input...'}
+                                ${state.aiOutput ? mdToHtml(state.aiOutput) : 'Type a topic above and hit Go! to get your study plan ✨'}
                             </div>
                         </div>
                     </section>
@@ -910,9 +950,21 @@
                                 <button onclick="app.navTo('rank')" class="w-full bg-stone-100 dark:bg-stone-800 py-2 rounded-xl text-xs font-bold uppercase tracking-widest text-stone-500 hover:text-orange-600 transition-colors mt-3">View Rank</button>
                             </div>
                             <div class="bg-white dark:bg-[#292524] p-6 rounded-[2rem] border border-stone-100 dark:border-stone-800 shadow-sm">
-                                <h3 class="text-lg font-serif font-bold mb-4 text-stone-900 dark:text-stone-50">Quest Log</h3>
-                                <ul id="progress-list" class="space-y-3">
-                                    ${['Recall', 'Space It', 'Teach It', 'Mix It', 'The Box'].map((l, i) => `<li class="flex items-center gap-3"><input type="checkbox" id="m${i+1}" ${state.progress['m'+(i+1)] ? 'checked' : ''} onchange="app.saveUserData()"><label for="m${i+1}" class="text-sm font-semibold text-stone-600 dark:text-stone-300">Lvl ${i+1}: ${l}</label></li>`).join('')}
+                                <h3 class="text-lg font-serif font-bold mb-3 text-stone-900 dark:text-stone-50">📝 My To-Do List</h3>
+                                <div class="flex gap-2 mb-3">
+                                    <input id="todo-input" type="text" placeholder="Add a task..." class="flex-grow bg-stone-50 dark:bg-stone-800 px-3 py-2 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" onkeydown="if(event.key==='Enter')app.addTodo()">
+                                    <button onclick="app.addTodo()" class="bg-orange-600 hover:bg-orange-500 text-white px-3 py-2 rounded-xl text-sm font-bold transition-colors">+</button>
+                                </div>
+                                <ul class="space-y-2 max-h-48 overflow-y-auto">
+                                    ${state.missionTodos.length === 0 ? '<li class="text-xs text-stone-400 italic text-center py-2">No tasks yet — add one above!</li>' :
+                                    state.missionTodos.map(t => {
+                                        const tid = t.id;
+                                        return '<li class="flex items-center gap-2 group">' +
+                                        '<button onclick="app.toggleTodo(&quot;'+tid+'&quot;)" class="text-lg flex-shrink-0">' + (t.done ? '✅' : '⬜') + '</button>' +
+                                        '<span class="flex-grow text-sm ' + (t.done ? 'line-through text-stone-400' : 'text-stone-700 dark:text-stone-200') + '">' + esc(t.text) + '</span>' +
+                                        '<button onclick="app.removeTodo(&quot;'+tid+'&quot;)" class="text-stone-300 hover:text-red-500 text-xs opacity-0 group-hover:opacity-100 transition-opacity">✕</button>' +
+                                        '</li>';
+                                    }).join('')}
                                 </ul>
                             </div>
                         </div>
