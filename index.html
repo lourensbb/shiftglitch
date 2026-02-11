@@ -263,6 +263,9 @@
             timerIsRunning: false,
             timerMode: 'work',
             timerInterval: null,
+            timerTaskLabel: '',
+            pomodoroLog: [],
+            governorBlocked: false,
             fcDecks: [],
             fcCards: [],
             fcCurrentDeck: null,
@@ -338,6 +341,38 @@
             }
         };
 
+        const pomodoroStore = {
+            load() {
+                try {
+                    const d = localStorage.getItem('synapse_pomodoro_log');
+                    state.pomodoroLog = d ? JSON.parse(d) : [];
+                } catch(e) { state.pomodoroLog = []; }
+            },
+            save() {
+                localStorage.setItem('synapse_pomodoro_log', JSON.stringify(state.pomodoroLog));
+            },
+            normalize(label) {
+                return label.trim().replace(/\s+/g, ' ').toLowerCase();
+            },
+            log(taskLabel) {
+                state.pomodoroLog.push({ task: this.normalize(taskLabel), completedAt: Date.now() });
+                this.save();
+            },
+            consecutiveCount(taskLabel) {
+                const key = this.normalize(taskLabel);
+                let count = 0;
+                for (let i = state.pomodoroLog.length - 1; i >= 0; i--) {
+                    if (state.pomodoroLog[i].task === key) count++;
+                    else break;
+                }
+                return count;
+            },
+            clearStreak() {
+                state.pomodoroLog.push({ task: '__breakdown__', completedAt: Date.now() });
+                this.save();
+            }
+        };
+
         const blurtStore = {
             load() {
                 try {
@@ -377,6 +412,7 @@
             init: async () => {
                 fcStore.load();
                 blurtStore.load();
+                pomodoroStore.load();
 
                 const toggle = document.getElementById('theme-toggle');
                 toggle.addEventListener('click', () => {
@@ -435,13 +471,36 @@
 
             startTimer: () => {
                 if (state.timerIsRunning) return;
+                if (state.timerMode === 'work') {
+                    const labelEl = document.getElementById('timer-task-label');
+                    const label = labelEl?.value.trim() || '';
+                    if (!label) {
+                        app.showNotification('Name your task before starting.');
+                        if (labelEl) labelEl.focus();
+                        return;
+                    }
+                    state.timerTaskLabel = label;
+                    const streak = pomodoroStore.consecutiveCount(label);
+                    if (streak >= 4) {
+                        state.governorBlocked = true;
+                        app.render();
+                        return;
+                    }
+                }
+                state.governorBlocked = false;
                 state.timerIsRunning = true;
                 state.timerInterval = setInterval(() => {
                     state.timerSeconds--;
                     app.updateTimerUI();
                     if (state.timerSeconds <= 0) {
                         app.pauseTimer();
-                        app.showNotification(state.timerMode === 'work' ? "Focus complete!" : "Break over!");
+                        if (state.timerMode === 'work') {
+                            pomodoroStore.log(state.timerTaskLabel);
+                            const newStreak = pomodoroStore.consecutiveCount(state.timerTaskLabel);
+                            app.showNotification(`Focus complete! (${newStreak}/4 on this task)`);
+                        } else {
+                            app.showNotification("Break over!");
+                        }
                     }
                 }, 1000);
                 app.updateTimerUI();
@@ -456,7 +515,8 @@
             resetTimer: () => {
                 app.pauseTimer();
                 state.timerSeconds = state.timerInitialSeconds;
-                app.updateTimerUI();
+                state.governorBlocked = false;
+                app.render();
             },
 
             switchTimerMode: (mode) => {
@@ -464,7 +524,8 @@
                 state.timerMode = mode;
                 state.timerInitialSeconds = mode === 'work' ? 25 * 60 : 5 * 60;
                 state.timerSeconds = state.timerInitialSeconds;
-                app.updateTimerUI();
+                state.governorBlocked = false;
+                app.render();
             },
 
             updateTimerUI: () => {
@@ -666,13 +727,34 @@
                     <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
                         <div class="lg:col-span-1 space-y-8">
                             <div class="bg-white dark:bg-[#292524] p-6 rounded-[2rem] border border-stone-100 dark:border-stone-800 shadow-sm flex flex-col items-center">
-                                <div class="relative w-40 h-40 mb-6">
+                                ${state.governorBlocked ? `
+                                <div class="w-full mb-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl p-4 text-center">
+                                    <p class="text-xs font-bold uppercase tracking-widest text-red-600 dark:text-red-400 mb-1">Governor: Blocked</p>
+                                    <p class="text-sm text-red-700 dark:text-red-300">4 pomodoros on "${esc(state.timerTaskLabel)}" — break it down or switch tasks.</p>
+                                    <div class="flex gap-2 mt-3">
+                                        <button onclick="app.governorBreakdown()" class="flex-1 bg-orange-600 text-white py-2 rounded-xl text-xs font-bold uppercase tracking-widest">I've Broken It Down</button>
+                                        <button onclick="app.governorSwitch()" class="flex-1 bg-stone-200 dark:bg-stone-700 text-stone-700 dark:text-stone-200 py-2 rounded-xl text-xs font-bold uppercase tracking-widest">Switch Task</button>
+                                    </div>
+                                </div>
+                                ` : ''}
+                                <div class="relative w-40 h-40 mb-4">
                                     <svg class="w-full h-full transform -rotate-90">
                                         <circle cx="80" cy="80" r="45" stroke-width="6" stroke="currentColor" fill="transparent" class="text-stone-100 dark:text-stone-800" />
                                         <circle id="timer-progress" cx="80" cy="80" r="45" stroke-width="6" stroke="currentColor" fill="transparent" class="timer-circle ${state.timerMode === 'work' ? 'text-orange-600' : 'text-stone-400'}" />
                                     </svg>
                                     <div id="timer-display" class="absolute inset-0 flex items-center justify-center text-3xl font-bold font-sans">25:00</div>
                                 </div>
+                                ${state.timerMode === 'work' ? `
+                                <input id="timer-task-label" type="text" value="${esc(state.timerTaskLabel)}" placeholder="What are you working on?" class="w-full bg-stone-50 dark:bg-stone-800 px-4 py-2.5 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 mb-3 ${state.timerIsRunning ? 'opacity-50 pointer-events-none' : ''}" ${state.timerIsRunning ? 'disabled' : ''}>
+                                ` : ''}
+                                ${state.timerTaskLabel && state.timerMode === 'work' ? `
+                                <div class="w-full flex items-center gap-2 mb-3">
+                                    <div class="flex gap-1">
+                                        ${[1,2,3,4].map(i => `<div class="w-2.5 h-2.5 rounded-full ${pomodoroStore.consecutiveCount(state.timerTaskLabel) >= i ? 'bg-orange-600' : 'bg-stone-200 dark:bg-stone-700'}"></div>`).join('')}
+                                    </div>
+                                    <span class="text-[10px] font-bold uppercase tracking-widest text-stone-400">${pomodoroStore.consecutiveCount(state.timerTaskLabel)}/4</span>
+                                </div>
+                                ` : ''}
                                 <div class="flex gap-2 mb-3 w-full">
                                     <button onclick="app.switchTimerMode('work')" class="flex-1 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-all ${state.timerMode === 'work' ? 'bg-orange-600 text-white' : 'bg-stone-100 dark:bg-stone-800 text-stone-500'}">Focus</button>
                                     <button onclick="app.switchTimerMode('break')" class="flex-1 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-all ${state.timerMode === 'break' ? 'bg-stone-600 text-white' : 'bg-stone-100 dark:bg-stone-800 text-stone-500'}">Break</button>
@@ -1256,6 +1338,19 @@
             blurtDelete: (id) => {
                 if (!confirm('Delete this blurt session?')) return;
                 blurtStore.remove(id);
+                app.render();
+            },
+
+            governorBreakdown: () => {
+                pomodoroStore.clearStreak();
+                state.governorBlocked = false;
+                app.showNotification('Streak reset. You can continue with this task.');
+                app.render();
+            },
+
+            governorSwitch: () => {
+                state.governorBlocked = false;
+                state.timerTaskLabel = '';
                 app.render();
             },
 
