@@ -99,6 +99,12 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+### Feb 11, 2026 — Study Streak Tracker
+1. **Streak calculation:** `rankEngine.getStreak()` calculates consecutive active days from `activeDateLog` array.
+2. **Dashboard card:** Study Streak card in sidebar shows current streak count, emoji indicator (🔥/🟠/🟡/⚪), motivational message, and 7-day visual calendar with filled/empty dots.
+3. **Active date logging:** `trackActiveDay()` now records dates in ISO format to `activeDateLog` array for streak calculation.
+4. **Data persistence:** `activeDateLog` stored in `synapse_rank` localStorage key, included in export/import.
+
 ### Feb 11, 2026 — Eisenhower Matrix Module
 1. **Interactive prioritisation tool:** Brain dump tasks, sort into 4 colour-coded quadrants (Q1 Do First, Q2 Schedule, Q3 Minimise, Q4 Limit).
 2. **Smart Shift reflection:** Guided prompt asking "What Q2 action could have prevented this Q1 task?" with saved reflections.

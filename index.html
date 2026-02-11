@@ -314,20 +314,41 @@
                 try {
                     const d = JSON.parse(localStorage.getItem('synapse_rank') || '{}');
                     state.rank = d.rank || 'Space Cadet';
-                    state.rankEvidence = d.rankEvidence || { blurtsCompleted: 0, governorBreakdowns: 0, cardsAdvanced: 0, activeDays: 0, pomodorosCompleted: 0, lastActiveDate: '' };
-                } catch(e) { state.rank = 'Space Cadet'; state.rankEvidence = { blurtsCompleted: 0, governorBreakdowns: 0, cardsAdvanced: 0, activeDays: 0, pomodorosCompleted: 0, lastActiveDate: '' }; }
+                    state.rankEvidence = d.rankEvidence || { blurtsCompleted: 0, governorBreakdowns: 0, cardsAdvanced: 0, activeDays: 0, pomodorosCompleted: 0, lastActiveDate: '', activeDateLog: [] };
+                    if (!state.rankEvidence.activeDateLog) state.rankEvidence.activeDateLog = [];
+                } catch(e) { state.rank = 'Space Cadet'; state.rankEvidence = { blurtsCompleted: 0, governorBreakdowns: 0, cardsAdvanced: 0, activeDays: 0, pomodorosCompleted: 0, lastActiveDate: '', activeDateLog: [] }; }
             },
             save() {
                 localStorage.setItem('synapse_rank', JSON.stringify({ rank: state.rank, rankEvidence: state.rankEvidence }));
             },
             trackActiveDay() {
-                const today = new Date().toDateString();
+                const today = new Date().toISOString().slice(0, 10);
                 if (state.rankEvidence.lastActiveDate !== today) {
                     state.rankEvidence.lastActiveDate = today;
                     state.rankEvidence.activeDays++;
+                    if (!state.rankEvidence.activeDateLog.includes(today)) {
+                        state.rankEvidence.activeDateLog.push(today);
+                    }
                     this.save();
                     this.checkPromotion();
                 }
+            },
+            getStreak() {
+                const log = state.rankEvidence.activeDateLog || [];
+                if (log.length === 0) return 0;
+                const sorted = [...log].sort().reverse();
+                const today = new Date().toISOString().slice(0, 10);
+                const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+                if (sorted[0] !== today && sorted[0] !== yesterday) return 0;
+                let streak = 1;
+                for (let i = 1; i < sorted.length; i++) {
+                    const prev = new Date(sorted[i - 1]);
+                    const curr = new Date(sorted[i]);
+                    const diff = (prev - curr) / 86400000;
+                    if (diff === 1) streak++;
+                    else break;
+                }
+                return streak;
             },
             recordPomodoro() {
                 state.rankEvidence.pomodorosCompleted++;
@@ -402,7 +423,7 @@
             fcDecks: [], fcCards: [], fcCurrentDeck: null, fcStudyQueue: [], fcStudyIndex: 0, fcFlipped: false,
             blurtSessions: [], blurtCurrentId: null, blurtPhase: 'list',
             eisenhowerTasks: [], eisenhowerReflections: [],
-            rank: 'Space Cadet', rankEvidence: { blurtsCompleted: 0, governorBreakdowns: 0, cardsAdvanced: 0, activeDays: 0, pomodorosCompleted: 0, lastActiveDate: '' },
+            rank: 'Space Cadet', rankEvidence: { blurtsCompleted: 0, governorBreakdowns: 0, cardsAdvanced: 0, activeDays: 0, pomodorosCompleted: 0, lastActiveDate: '', activeDateLog: [] },
             quizCategory: '', quizDifficulty: 'medium', quizQuestions: [], quizIndex: 0, quizScore: 0,
             quizStreak: 0, quizAnswered: false, quizSelectedAnswer: null, quizTimer: 15, quizTimerInterval: null,
             quizPhase: 'setup', quizSessionCorrect: 0, quizSessionTotal: 0,
@@ -821,6 +842,24 @@
                                     <button onclick="app.switchTimerMode('work')" class="flex-1 py-2 rounded-xl text-xs font-bold uppercase tracking-widest ${state.timerMode === 'work' ? 'bg-orange-600 text-white' : 'bg-stone-100 dark:bg-stone-800 text-stone-500'}">Focus</button>
                                     <button onclick="app.switchTimerMode('break')" class="flex-1 py-2 rounded-xl text-xs font-bold uppercase tracking-widest ${state.timerMode === 'break' ? 'bg-stone-600 text-white' : 'bg-stone-100 dark:bg-stone-800 text-stone-500'}">Break</button>
                                 </div>
+                            </div>
+                            <div class="bg-white dark:bg-[#292524] p-6 rounded-[2rem] border border-stone-100 dark:border-stone-800 shadow-sm">
+                                <h3 class="text-lg font-serif font-bold text-stone-900 dark:text-stone-50 mb-3">Study Streak</h3>
+                                ${(() => {
+                                    const streak = rankEngine.getStreak();
+                                    const flame = streak >= 7 ? '🔥' : streak >= 3 ? '🟠' : streak >= 1 ? '🟡' : '⚪';
+                                    const msg = streak === 0 ? 'Start a session to begin your streak!' : streak === 1 ? '1 day — keep it going!' : streak + ' days in a row!';
+                                    const dots = [];
+                                    for (let i = 0; i < 7; i++) {
+                                        const d = new Date(); d.setDate(d.getDate() - (6 - i));
+                                        const dateStr = d.toISOString().slice(0, 10);
+                                        const active = (state.rankEvidence.activeDateLog || []).includes(dateStr);
+                                        const dayLabel = ['S','M','T','W','T','F','S'][d.getDay()];
+                                        dots.push('<div class="flex flex-col items-center gap-1"><div class="w-5 h-5 rounded-full ' + (active ? 'bg-orange-600' : 'bg-stone-200 dark:bg-stone-700') + '"></div><span class="text-[9px] font-bold text-stone-400">' + dayLabel + '</span></div>');
+                                    }
+                                    return '<div class="flex items-center gap-3 mb-4"><span class="text-4xl">' + flame + '</span><div><div class="text-2xl font-serif font-bold text-orange-600">' + streak + '</div><div class="text-[10px] font-bold uppercase tracking-widest text-stone-400">' + msg + '</div></div></div>' +
+                                        '<div class="flex justify-between gap-1">' + dots.join('') + '</div>';
+                                })()}
                             </div>
                             <div class="bg-white dark:bg-[#292524] p-6 rounded-[2rem] border border-stone-100 dark:border-stone-800 shadow-sm">
                                 <div class="flex items-center justify-between mb-3">
