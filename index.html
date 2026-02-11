@@ -1086,9 +1086,26 @@
                         <h1 class="text-5xl font-serif font-bold mb-4">Flashcard Decks</h1>
                         <p class="text-stone-500 dark:text-stone-400 italic">Leitner System: 5-box spaced repetition</p>
                     </div>
+                    <div class="bg-orange-50 dark:bg-orange-900/20 rounded-[2rem] p-6 border border-orange-200 dark:border-orange-800">
+                        <h3 class="text-base font-serif font-bold text-orange-700 dark:text-orange-400 mb-3">📋 How to use this</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div class="bg-white dark:bg-stone-800 rounded-xl p-4 border border-orange-100 dark:border-stone-700 text-center">
+                                <div class="text-2xl mb-1">1️⃣</div>
+                                <p class="text-xs font-semibold text-stone-700 dark:text-stone-200">Create a new deck about a topic. Give it a name like "Biology Chapter 3".</p>
+                            </div>
+                            <div class="bg-white dark:bg-stone-800 rounded-xl p-4 border border-orange-100 dark:border-stone-700 text-center">
+                                <div class="text-2xl mb-1">2️⃣</div>
+                                <p class="text-xs font-semibold text-stone-700 dark:text-stone-200">Click on your deck and add cards with a question on the front and answer on the back.</p>
+                            </div>
+                            <div class="bg-white dark:bg-stone-800 rounded-xl p-4 border border-orange-100 dark:border-stone-700 text-center">
+                                <div class="text-2xl mb-1">3️⃣</div>
+                                <p class="text-xs font-semibold text-stone-700 dark:text-stone-200">Hit "Study" to quiz yourself. Cards you get right move up a box, wrong ones go back to box 1.</p>
+                            </div>
+                        </div>
+                    </div>
                     <div class="bg-white dark:bg-[#292524] rounded-[2rem] p-8 border border-stone-100 dark:border-stone-800">
                         <div class="flex gap-3">
-                            <input id="new-deck-title" type="text" placeholder="New deck name..." class="flex-grow bg-stone-50 dark:bg-stone-800 px-4 py-3 rounded-xl border border-stone-200 dark:border-stone-700 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+                            <input id="new-deck-title" type="text" placeholder="e.g. Spanish Vocab, History Dates, Math Formulas..." class="flex-grow bg-stone-50 dark:bg-stone-800 px-4 py-3 rounded-xl border border-stone-200 dark:border-stone-700 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" onkeydown="if(event.key==='Enter')app.deckCreate()">
                             <button onclick="app.deckCreate()" class="bg-orange-600 hover:bg-orange-500 text-white px-6 py-3 rounded-xl font-bold text-sm uppercase tracking-widest">Create Deck</button>
                         </div>
                     </div>
