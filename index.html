@@ -66,6 +66,14 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         input[type="checkbox"] { accent-color: #ea580c; width: 1.1rem; height: 1.1rem; cursor: pointer; }
         .timer-circle { transition: stroke-dashoffset 1s linear; }
+        .xp-bar-fill { transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+        .xp-popup { animation: xpFloat 1.2s ease-out forwards; position: fixed; z-index: 200; pointer-events: none; }
+        @keyframes xpFloat { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-60px) scale(1.3); } }
+        .token-glow { animation: tokenGlow 2s ease-in-out infinite alternate; }
+        @keyframes tokenGlow { from { box-shadow: 0 0 5px rgba(234,88,12,0.3); } to { box-shadow: 0 0 20px rgba(234,88,12,0.6); } }
+        .quiz-timer-ring { transition: stroke-dashoffset 1s linear; }
+        .streak-fire { animation: firePulse 0.6s ease-in-out; }
+        @keyframes firePulse { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
     </style>
 </head>
 <body class="antialiased selection:bg-orange-100 dark:selection:bg-orange-900 selection:text-orange-900 dark:selection:text-orange-100 font-sans">
@@ -80,14 +88,18 @@
                     </div>
                     <button id="theme-toggle" class="text-2xl hover:scale-110 transition-transform focus:outline-none">&#x1F319;</button>
                 </div>
-                <div class="hidden md:flex items-center gap-6" id="desktop-nav">
-                    <button onclick="app.navTo('dashboard')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-sm font-semibold tracking-wide transition-colors uppercase">Mission</button>
-                    <button onclick="app.navTo('explore')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-sm font-semibold tracking-wide transition-colors uppercase">Vault</button>
-                    <button onclick="app.navTo('spaced')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-sm font-semibold tracking-wide transition-colors uppercase">Spaced</button>
-                    <button onclick="app.navTo('decks')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-sm font-semibold tracking-wide transition-colors uppercase">Decks</button>
-                    <button onclick="app.navTo('blurt')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-sm font-semibold tracking-wide transition-colors uppercase">Blurt</button>
-                    <button onclick="app.navTo('stats')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-sm font-semibold tracking-wide transition-colors uppercase">Stats</button>
-                    <button onclick="app.showAbout()" class="text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-sm font-semibold tracking-wide transition-colors uppercase">About</button>
+                <div class="hidden md:flex items-center gap-4" id="desktop-nav">
+                    <button onclick="app.navTo('dashboard')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-xs font-semibold tracking-wide transition-colors uppercase">Mission</button>
+                    <button onclick="app.navTo('explore')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-xs font-semibold tracking-wide transition-colors uppercase">Vault</button>
+                    <button onclick="app.navTo('decks')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-xs font-semibold tracking-wide transition-colors uppercase">Decks</button>
+                    <button onclick="app.navTo('quiz')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-xs font-semibold tracking-wide transition-colors uppercase">Quiz</button>
+                    <button onclick="app.navTo('blurt')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-xs font-semibold tracking-wide transition-colors uppercase">Blurt</button>
+                    <button onclick="app.navTo('quests')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-xs font-semibold tracking-wide transition-colors uppercase">Quests</button>
+                    <button onclick="app.navTo('stats')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-xs font-semibold tracking-wide transition-colors uppercase">Stats</button>
+                    <div id="nav-xp-bar" class="flex items-center gap-2 ml-2 cursor-pointer" onclick="app.navTo('quests')">
+                        <span id="nav-level" class="text-xs font-bold text-orange-600">Lv 1</span>
+                        <div class="w-20 h-2 bg-stone-200 dark:bg-stone-700 rounded-full overflow-hidden"><div id="nav-xp-fill" class="xp-bar-fill h-full bg-orange-600 rounded-full" style="width:0%"></div></div>
+                    </div>
                 </div>
                 <div class="md:hidden flex items-center">
                     <button onclick="app.toggleMobileMenu()" class="text-stone-600 dark:text-stone-400 p-2 text-2xl"><span id="menu-icon">&#x2630;</span></button>
@@ -97,9 +109,10 @@
         <div id="mobile-menu" class="hidden md:hidden bg-[#FDFCF8] dark:bg-[#1c1917] border-b border-stone-200 dark:border-stone-800 px-4 pt-2 pb-6 space-y-1">
             <button onclick="app.navTo('dashboard')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Mission</button>
             <button onclick="app.navTo('explore')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Vault</button>
-            <button onclick="app.navTo('spaced')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Spaced</button>
             <button onclick="app.navTo('decks')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Decks</button>
+            <button onclick="app.navTo('quiz')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Quiz</button>
             <button onclick="app.navTo('blurt')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Blurt</button>
+            <button onclick="app.navTo('quests')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Quests</button>
             <button onclick="app.navTo('stats')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Stats</button>
         </div>
     </nav>
@@ -216,12 +229,177 @@
             get(id) { return state.blurtSessions.find(s => s.id === id); }
         };
 
+        const LEVEL_THRESHOLDS = [0,100,250,500,850,1300,1900,2600,3500,4600,6000,7800,10000,13000,17000,22000];
+        const ACHIEVEMENTS = [
+            { id: 'first_focus', name: 'First Focus', desc: 'Complete your first pomodoro', icon: '\\u{1F525}', check: s => s.pomodoroLog.filter(p=>p.task!=='__breakdown__').length >= 1 },
+            { id: 'focus_10', name: 'Deep Work', desc: 'Complete 10 pomodoros', icon: '\u{1F3AF}', check: s => s.pomodoroLog.filter(p=>p.task!=='__breakdown__').length >= 10 },
+            { id: 'focus_50', name: 'Marathon Mind', desc: 'Complete 50 pomodoros', icon: '\u{1F3C6}', check: s => s.pomodoroLog.filter(p=>p.task!=='__breakdown__').length >= 50 },
+            { id: 'first_deck', name: 'Card Crafter', desc: 'Create your first deck', icon: '\\u{1F0CF}', check: s => s.fcDecks.length >= 1 },
+            { id: 'cards_50', name: 'Knowledge Vault', desc: 'Create 50 flashcards', icon: '\\u{1F4DA}', check: s => s.fcCards.length >= 50 },
+            { id: 'first_blurt', name: 'Brain Dump', desc: 'Complete a blurt session', icon: '\u{1F4A1}', check: s => s.blurtSessions.length >= 1 },
+            { id: 'quiz_10', name: 'Trivia Novice', desc: 'Answer 10 quiz questions', icon: '\u{2753}', check: s => (s.quizStats.totalAnswered || 0) >= 10 },
+            { id: 'quiz_streak_5', name: 'On Fire', desc: 'Get a 5-answer streak in quiz', icon: '\u{1F525}', check: s => (s.quizStats.bestStreak || 0) >= 5 },
+            { id: 'quiz_streak_10', name: 'Unstoppable', desc: 'Get a 10-answer streak', icon: '\u{26A1}', check: s => (s.quizStats.bestStreak || 0) >= 10 },
+            { id: 'level_5', name: 'Rising Scholar', desc: 'Reach Level 5', icon: '\\u{2B50}', check: s => questEngine.getLevel(s.xpTotal) >= 5 },
+            { id: 'level_10', name: 'Master Learner', desc: 'Reach Level 10', icon: '\u{1F451}', check: s => questEngine.getLevel(s.xpTotal) >= 10 },
+            { id: 'token_3', name: 'Token Hunter', desc: 'Collect 3 tokens', icon: '\u{1F48E}', check: s => s.tokens.length >= 3 },
+            { id: 'daily_7', name: 'Week Warrior', desc: 'Login 7 days total', icon: '\u{1F4C5}', check: s => (s.totalLoginDays || 0) >= 7 },
+        ];
+        const TOKENS = [
+            { id: 'full_circuit', name: 'Full Circuit', desc: 'Complete a pomodoro, study flashcards, and do a blurt session in one day', icon: '\u{26A1}' },
+            { id: 'quiz_master', name: 'Quiz Master', desc: 'Score 100% on a 10-question quiz', icon: '\\u{1F3C6}' },
+            { id: 'night_owl', name: 'Night Owl', desc: 'Study after 10 PM', icon: '\\u{1F989}' },
+            { id: 'early_bird', name: 'Early Bird', desc: 'Study before 7 AM', icon: '\u{1F426}' },
+            { id: 'speed_demon', name: 'Speed Demon', desc: 'Answer a quiz question in under 3 seconds', icon: '\u{1F3CE}' },
+            { id: 'deck_master', name: 'Deck Master', desc: 'Get all cards in a deck to Box 5', icon: '\\u{1F48E}' },
+        ];
+        const DAILY_QUEST_TEMPLATES = [
+            { id: 'dq_focus_2', name: 'Focus x2', desc: 'Complete 2 pomodoro sessions', xp: 30, check: s => { const today = new Date(); today.setHours(0,0,0,0); return s.pomodoroLog.filter(p => p.task !== '__breakdown__' && p.completedAt >= today.getTime()).length >= 2; } },
+            { id: 'dq_focus_4', name: 'Focus x4', desc: 'Complete 4 pomodoro sessions', xp: 60, check: s => { const today = new Date(); today.setHours(0,0,0,0); return s.pomodoroLog.filter(p => p.task !== '__breakdown__' && p.completedAt >= today.getTime()).length >= 4; } },
+            { id: 'dq_cards_10', name: 'Review 10 Cards', desc: 'Study 10 flashcards', xp: 25, check: s => (s.dailyCardsStudied || 0) >= 10 },
+            { id: 'dq_quiz_5', name: 'Quiz x5', desc: 'Answer 5 quiz questions', xp: 25, check: s => (s.dailyQuizAnswered || 0) >= 5 },
+            { id: 'dq_blurt_1', name: 'Blurt It', desc: 'Complete a blurt session', xp: 20, check: s => (s.dailyBlurts || 0) >= 1 },
+            { id: 'dq_perfect_3', name: 'Perfect 3', desc: 'Get 3 quiz answers correct in a row', xp: 35, check: s => (s.quizStreak || 0) >= 3 },
+        ];
+
+        const questEngine = {
+            getLevel(xp) { let lvl = 1; for (let i = 1; i < LEVEL_THRESHOLDS.length; i++) { if (xp >= LEVEL_THRESHOLDS[i]) lvl = i + 1; else break; } return lvl; },
+            xpForLevel(lvl) { return LEVEL_THRESHOLDS[Math.min(lvl - 1, LEVEL_THRESHOLDS.length - 1)] || 0; },
+            xpForNextLevel(lvl) { return LEVEL_THRESHOLDS[Math.min(lvl, LEVEL_THRESHOLDS.length - 1)] || LEVEL_THRESHOLDS[LEVEL_THRESHOLDS.length - 1]; },
+            xpProgress(xp) {
+                const lvl = this.getLevel(xp);
+                const cur = this.xpForLevel(lvl);
+                const next = this.xpForNextLevel(lvl);
+                if (next === cur) return 100;
+                return Math.min(100, ((xp - cur) / (next - cur)) * 100);
+            },
+            addXP(amount, source) {
+                const oldLevel = this.getLevel(state.xpTotal);
+                state.xpTotal += amount;
+                state.xpHistory.push({ amount, source, time: Date.now() });
+                const newLevel = this.getLevel(state.xpTotal);
+                this.save();
+                this.updateNavXP();
+                this.showXPPopup(amount, source);
+                if (newLevel > oldLevel) app.showNotification(`Level Up! You are now Level ${newLevel}!`);
+                this.checkAchievements();
+                this.checkDailyQuests();
+            },
+            showXPPopup(amount, source) {
+                const el = document.createElement('div');
+                el.className = 'xp-popup text-orange-600 font-bold text-lg';
+                el.textContent = `+${amount} XP`;
+                el.style.left = '50%'; el.style.top = '80px'; el.style.transform = 'translateX(-50%)';
+                document.body.appendChild(el);
+                setTimeout(() => el.remove(), 1300);
+            },
+            updateNavXP() {
+                const lvlEl = document.getElementById('nav-level');
+                const fillEl = document.getElementById('nav-xp-fill');
+                if (lvlEl) lvlEl.textContent = `Lv ${this.getLevel(state.xpTotal)}`;
+                if (fillEl) fillEl.style.width = `${this.xpProgress(state.xpTotal)}%`;
+            },
+            checkAchievements() {
+                let newUnlock = false;
+                ACHIEVEMENTS.forEach(a => {
+                    if (!state.achievements.includes(a.id) && a.check(state)) {
+                        state.achievements.push(a.id);
+                        newUnlock = true;
+                        app.showNotification(`Achievement Unlocked: ${a.icon} ${a.name}!`);
+                    }
+                });
+                if (newUnlock) this.save();
+            },
+            checkTokens() {
+                const now = new Date();
+                const hour = now.getHours();
+                const today = new Date(); today.setHours(0,0,0,0); const todayMs = today.getTime();
+                const earnToken = (id) => { if (!state.tokens.includes(id)) { state.tokens.push(id); const t = TOKENS.find(x=>x.id===id); app.showNotification(`Token Found: ${t.icon} ${t.name}!`); this.addXP(50, 'token'); } };
+                if (hour >= 22) earnToken('night_owl');
+                if (hour < 7) earnToken('early_bird');
+                const todayPomodoros = state.pomodoroLog.filter(p => p.task !== '__breakdown__' && p.completedAt >= todayMs).length;
+                const todayBlurts = state.blurtSessions.filter(s => s.updatedAt >= todayMs && s.reviewCount > 0).length;
+                if (todayPomodoros > 0 && (state.dailyCardsStudied || 0) > 0 && todayBlurts > 0) earnToken('full_circuit');
+                this.save();
+            },
+            checkDeckMaster(deckId) {
+                const cards = cardStore.getForDeck(deckId);
+                if (cards.length > 0 && cards.every(c => c.box === 5)) {
+                    if (!state.tokens.includes('deck_master')) { state.tokens.push('deck_master'); const t = TOKENS.find(x=>x.id==='deck_master'); app.showNotification(`Token Found: ${t.icon} ${t.name}!`); this.addXP(50, 'token'); }
+                }
+            },
+            dailyLogin() {
+                const today = new Date().toDateString();
+                if (state.lastLoginDate !== today) {
+                    state.lastLoginDate = today;
+                    state.totalLoginDays = (state.totalLoginDays || 0) + 1;
+                    state.dailyCardsStudied = 0;
+                    state.dailyQuizAnswered = 0;
+                    state.dailyBlurts = 0;
+                    this.rotateDailyQuests();
+                    this.addXP(10, 'daily login');
+                }
+                this.save();
+            },
+            rotateDailyQuests() {
+                const shuffled = [...DAILY_QUEST_TEMPLATES].sort(() => Math.random() - 0.5);
+                state.dailyQuests = shuffled.slice(0, 3).map(q => ({ ...q, completed: false }));
+                state.dailyQuestDate = new Date().toDateString();
+                this.save();
+            },
+            checkDailyQuests() {
+                if (!state.dailyQuests) return;
+                state.dailyQuests.forEach(q => {
+                    if (!q.completed) {
+                        const template = DAILY_QUEST_TEMPLATES.find(t => t.id === q.id);
+                        if (template && template.check(state)) { q.completed = true; this.addXP(q.xp, 'daily quest'); app.showNotification(`Daily Quest Complete: ${q.name}! +${q.xp} XP`); }
+                    }
+                });
+                this.save();
+            },
+            load() {
+                try {
+                    const d = JSON.parse(localStorage.getItem('synapse_quest') || '{}');
+                    state.xpTotal = d.xpTotal || 0;
+                    state.xpHistory = d.xpHistory || [];
+                    state.achievements = d.achievements || [];
+                    state.tokens = d.tokens || [];
+                    state.lastLoginDate = d.lastLoginDate || '';
+                    state.totalLoginDays = d.totalLoginDays || 0;
+                    state.dailyQuests = d.dailyQuests || [];
+                    state.dailyQuestDate = d.dailyQuestDate || '';
+                    state.dailyCardsStudied = d.dailyCardsStudied || 0;
+                    state.dailyQuizAnswered = d.dailyQuizAnswered || 0;
+                    state.dailyBlurts = d.dailyBlurts || 0;
+                } catch(e) { state.xpTotal = 0; state.xpHistory = []; state.achievements = []; state.tokens = []; state.dailyQuests = []; }
+                try {
+                    const q = JSON.parse(localStorage.getItem('synapse_quiz_stats') || '{}');
+                    state.quizStats = { totalAnswered: q.totalAnswered || 0, totalCorrect: q.totalCorrect || 0, bestStreak: q.bestStreak || 0 };
+                } catch(e) { state.quizStats = { totalAnswered: 0, totalCorrect: 0, bestStreak: 0 }; }
+            },
+            save() {
+                localStorage.setItem('synapse_quest', JSON.stringify({
+                    xpTotal: state.xpTotal, xpHistory: state.xpHistory, achievements: state.achievements,
+                    tokens: state.tokens, lastLoginDate: state.lastLoginDate, totalLoginDays: state.totalLoginDays,
+                    dailyQuests: state.dailyQuests, dailyQuestDate: state.dailyQuestDate,
+                    dailyCardsStudied: state.dailyCardsStudied, dailyQuizAnswered: state.dailyQuizAnswered, dailyBlurts: state.dailyBlurts,
+                }));
+                localStorage.setItem('synapse_quiz_stats', JSON.stringify(state.quizStats));
+            },
+        };
+
         const state = {
             view: 'dashboard', search: '', aiOutput: '', isAiLoading: false, user: null, breakdown: '', progress: {},
             timerSeconds: 25 * 60, timerInitialSeconds: 25 * 60, timerIsRunning: false, timerMode: 'work', timerInterval: null,
             timerTaskLabel: '', governorBlocked: false, pomodoroLog: [],
             fcDecks: [], fcCards: [], fcCurrentDeck: null, fcStudyQueue: [], fcStudyIndex: 0, fcFlipped: false,
             blurtSessions: [], blurtCurrentId: null, blurtPhase: 'list',
+            xpTotal: 0, xpHistory: [], achievements: [], tokens: [], lastLoginDate: '', totalLoginDays: 0,
+            dailyQuests: [], dailyQuestDate: '', dailyCardsStudied: 0, dailyQuizAnswered: 0, dailyBlurts: 0,
+            quizStats: { totalAnswered: 0, totalCorrect: 0, bestStreak: 0 },
+            quizCategory: '', quizDifficulty: 'medium', quizQuestions: [], quizIndex: 0, quizScore: 0,
+            quizStreak: 0, quizAnswered: false, quizSelectedAnswer: null, quizTimer: 15, quizTimerInterval: null,
+            quizPhase: 'setup', quizSessionCorrect: 0, quizSessionTotal: 0,
         };
 
         const app = {
@@ -236,6 +414,7 @@
                 });
 
                 deckStore.load(); cardStore.load(); pomodoroStore.load(); blurtStore.load();
+                questEngine.load(); questEngine.dailyLogin(); questEngine.updateNavXP();
 
                 if (window.fb && window.fb.auth) {
                     try {
@@ -263,7 +442,7 @@
                 if (menu) menu.classList.add('hidden');
                 document.querySelectorAll('.nav-btn').forEach(btn => {
                     btn.classList.remove('text-orange-600', 'font-bold');
-                    const map = { dashboard: 'Mission', explore: 'Vault', spaced: 'Spaced', decks: 'Decks', blurt: 'Blurt', stats: 'Stats' };
+                    const map = { dashboard: 'Mission', explore: 'Vault', spaced: 'Spaced', decks: 'Decks', quiz: 'Quiz', blurt: 'Blurt', quests: 'Quests', stats: 'Stats' };
                     if (btn.textContent.trim().toUpperCase() === (map[tabId] || '').toUpperCase()) btn.classList.add('text-orange-600', 'font-bold');
                 });
                 app.render();
@@ -287,6 +466,8 @@
                         if (state.timerMode === 'work' && state.timerTaskLabel) {
                             pomodoroStore.log(state.timerTaskLabel);
                             const newStreak = pomodoroStore.consecutiveCount(state.timerTaskLabel);
+                            questEngine.addXP(25, 'pomodoro');
+                            questEngine.checkTokens();
                             app.showNotification(`Focus complete! Streak: ${newStreak}/4`);
                             if (newStreak >= 4) { state.governorBlocked = true; }
                         } else {
@@ -442,11 +623,14 @@
             studyRate: (correct) => {
                 const card = state.fcStudyQueue[state.fcStudyIndex];
                 if (!card) return;
-                if (correct) { cardStore.promote(card); } else { cardStore.demote(card); state.fcStudyQueue.push(card); }
+                if (correct) { cardStore.promote(card); questEngine.addXP(15, 'flashcard correct'); } else { cardStore.demote(card); state.fcStudyQueue.push(card); questEngine.addXP(5, 'flashcard attempt'); }
+                state.dailyCardsStudied = (state.dailyCardsStudied || 0) + 1; questEngine.save();
                 state.fcStudyIndex++;
                 state.fcFlipped = false;
                 if (state.fcStudyIndex >= state.fcStudyQueue.length) {
                     app.showNotification('Study session complete!');
+                    questEngine.checkDeckMaster(card.deckId);
+                    questEngine.checkTokens();
                     state.view = 'decks'; state.fcCurrentDeck = card.deckId;
                 }
                 app.render();
@@ -476,7 +660,7 @@
                     blurtStore.update(state.blurtCurrentId, { gaps: el.value, reviewCount: (s?.reviewCount || 0) + 1 });
                 }
             },
-            blurtFinish: () => { app.blurtSaveGaps(); state.blurtPhase = 'list'; state.blurtCurrentId = null; app.render(); },
+            blurtFinish: () => { app.blurtSaveGaps(); questEngine.addXP(20, 'blurt session'); state.dailyBlurts = (state.dailyBlurts || 0) + 1; questEngine.checkTokens(); state.blurtPhase = 'list'; state.blurtCurrentId = null; app.render(); },
             blurtDelete: (id) => { if (!confirm('Delete this blurt session?')) return; blurtStore.remove(id); app.render(); },
             blurtReBlurt: (id) => { state.blurtCurrentId = id; state.blurtPhase = 'blurt'; app.render(); },
 
@@ -484,6 +668,8 @@
                 const data = {
                     decks: state.fcDecks, cards: state.fcCards, blurtSessions: state.blurtSessions,
                     pomodoroLog: state.pomodoroLog, notes: localStorage.getItem('cornellNotes') || '',
+                    quest: { xpTotal: state.xpTotal, xpHistory: state.xpHistory, achievements: state.achievements, tokens: state.tokens, totalLoginDays: state.totalLoginDays },
+                    quizStats: state.quizStats,
                     exportedAt: new Date().toISOString()
                 };
                 const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -503,6 +689,8 @@
                         if (data.blurtSessions) { state.blurtSessions = data.blurtSessions; blurtStore.save(); }
                         if (data.pomodoroLog) { state.pomodoroLog = data.pomodoroLog; pomodoroStore.save(); }
                         if (data.notes) localStorage.setItem('cornellNotes', data.notes);
+                        if (data.quest) { Object.assign(state, { xpTotal: data.quest.xpTotal || 0, xpHistory: data.quest.xpHistory || [], achievements: data.quest.achievements || [], tokens: data.quest.tokens || [], totalLoginDays: data.quest.totalLoginDays || 0 }); questEngine.save(); }
+                        if (data.quizStats) { state.quizStats = data.quizStats; questEngine.save(); }
                         app.showNotification('Data imported successfully!');
                         app.render();
                     } catch (err) { app.showNotification('Import failed. Invalid file.'); }
@@ -529,10 +717,15 @@
                     container.innerHTML = app.getStudyHTML();
                 } else if (state.view === 'blurt') {
                     container.innerHTML = app.getBlurtHTML();
+                } else if (state.view === 'quiz') {
+                    container.innerHTML = app.getQuizHTML();
+                } else if (state.view === 'quests') {
+                    container.innerHTML = app.getQuestsHTML();
                 } else if (state.view === 'stats') {
                     container.innerHTML = app.getStatsHTML();
                     app.renderStatsCharts();
                 }
+                questEngine.updateNavXP();
             },
 
             getDashboardHTML: (savedNotes) => `
@@ -591,9 +784,23 @@
                                     <button onclick="app.switchTimerMode('break')" class="flex-1 py-2 rounded-xl text-xs font-bold uppercase tracking-widest ${state.timerMode === 'break' ? 'bg-stone-600 text-white' : 'bg-stone-100 dark:bg-stone-800 text-stone-500'}">Break</button>
                                 </div>
                             </div>
-                            <div class="bg-white dark:bg-[#292524] p-8 rounded-[2rem] border border-stone-100 dark:border-stone-800 shadow-sm">
-                                <h3 class="text-xl font-serif font-bold mb-6 text-stone-900 dark:text-stone-50">Quest Log</h3>
-                                <ul id="progress-list" class="space-y-4">
+                            <div class="bg-white dark:bg-[#292524] p-6 rounded-[2rem] border border-stone-100 dark:border-stone-800 shadow-sm">
+                                <div class="flex items-center justify-between mb-3">
+                                    <h3 class="text-lg font-serif font-bold text-stone-900 dark:text-stone-50">Quest Status</h3>
+                                    <span class="text-xs font-bold text-orange-600">Lv ${questEngine.getLevel(state.xpTotal)}</span>
+                                </div>
+                                <div class="w-full bg-stone-100 dark:bg-stone-800 rounded-full h-2 mb-2 overflow-hidden"><div class="xp-bar-fill h-full bg-gradient-to-r from-orange-600 to-yellow-500 rounded-full" style="width:${questEngine.xpProgress(state.xpTotal)}%"></div></div>
+                                <p class="text-[10px] text-stone-400 font-bold uppercase tracking-widest mb-4">${state.xpTotal} XP Total</p>
+                                <div class="grid grid-cols-3 gap-2 mb-4">
+                                    <div class="text-center p-2 bg-stone-50 dark:bg-stone-800 rounded-lg"><div class="text-sm font-bold text-orange-600">${state.achievements.length}</div><div class="text-[9px] text-stone-400 uppercase font-bold">Badges</div></div>
+                                    <div class="text-center p-2 bg-stone-50 dark:bg-stone-800 rounded-lg"><div class="text-sm font-bold text-orange-600">${state.tokens.length}</div><div class="text-[9px] text-stone-400 uppercase font-bold">Tokens</div></div>
+                                    <div class="text-center p-2 bg-stone-50 dark:bg-stone-800 rounded-lg"><div class="text-sm font-bold text-orange-600">${state.quizStats.bestStreak}</div><div class="text-[9px] text-stone-400 uppercase font-bold">Streak</div></div>
+                                </div>
+                                <button onclick="app.navTo('quests')" class="w-full bg-stone-100 dark:bg-stone-800 py-2 rounded-xl text-xs font-bold uppercase tracking-widest text-stone-500 hover:text-orange-600 transition-colors">View Quests</button>
+                            </div>
+                            <div class="bg-white dark:bg-[#292524] p-6 rounded-[2rem] border border-stone-100 dark:border-stone-800 shadow-sm">
+                                <h3 class="text-lg font-serif font-bold mb-4 text-stone-900 dark:text-stone-50">Quest Log</h3>
+                                <ul id="progress-list" class="space-y-3">
                                     ${['Recall', 'Space It', 'Teach It', 'Mix It', 'The Box'].map((l, i) => `<li class="flex items-center gap-3"><input type="checkbox" id="m${i+1}" ${state.progress['m'+(i+1)] ? 'checked' : ''} onchange="app.saveUserData()"><label for="m${i+1}" class="text-sm font-semibold text-stone-600 dark:text-stone-300">Lvl ${i+1}: ${l}</label></li>`).join('')}
                                 </ul>
                             </div>
@@ -931,7 +1138,221 @@
                 }
             },
 
-            showAbout: () => alert("Synapse OS v5.0 - Interactive Learning OS")
+            quizStart: async () => {
+                const catEl = document.getElementById('quiz-category');
+                const diffEl = document.getElementById('quiz-difficulty');
+                state.quizCategory = catEl ? catEl.value : '';
+                state.quizDifficulty = diffEl ? diffEl.value : 'medium';
+                state.quizPhase = 'loading'; app.render();
+                try {
+                    let url = `https://opentdb.com/api.php?amount=10&type=multiple&difficulty=${state.quizDifficulty}`;
+                    if (state.quizCategory) url += `&category=${state.quizCategory}`;
+                    const res = await fetch(url);
+                    const data = await res.json();
+                    if (!data.results || data.results.length === 0) { app.showNotification('No questions found. Try a different category.'); state.quizPhase = 'setup'; app.render(); return; }
+                    state.quizQuestions = data.results.map(q => {
+                        const answers = [...q.incorrect_answers, q.correct_answer].sort(() => Math.random() - 0.5);
+                        return { question: q.question, correct: q.correct_answer, answers, category: q.category };
+                    });
+                    state.quizIndex = 0; state.quizScore = 0; state.quizStreak = 0; state.quizAnswered = false;
+                    state.quizSelectedAnswer = null; state.quizSessionCorrect = 0; state.quizSessionTotal = 0;
+                    state.quizPhase = 'playing'; state.quizTimer = 15;
+                    app.render(); app.startQuizTimer();
+                } catch(e) { app.showNotification('Failed to load questions. Check your connection.'); state.quizPhase = 'setup'; app.render(); }
+            },
+            startQuizTimer: () => {
+                clearInterval(state.quizTimerInterval);
+                state.quizTimer = 15; app.updateQuizTimerUI();
+                state.quizTimerInterval = setInterval(() => {
+                    state.quizTimer--;
+                    app.updateQuizTimerUI();
+                    if (state.quizTimer <= 0) { clearInterval(state.quizTimerInterval); if (!state.quizAnswered) app.quizAnswer(null); }
+                }, 1000);
+            },
+            updateQuizTimerUI: () => {
+                const el = document.getElementById('quiz-timer-text');
+                const ring = document.getElementById('quiz-timer-ring');
+                if (el) el.textContent = state.quizTimer;
+                if (ring) { const c = 2 * Math.PI * 20; ring.style.strokeDasharray = `${c} ${c}`; ring.style.strokeDashoffset = c - (state.quizTimer / 15) * c; }
+            },
+            quizAnswer: (ansIdx) => {
+                if (state.quizAnswered) return;
+                state.quizAnswered = true;
+                clearInterval(state.quizTimerInterval);
+                const q = state.quizQuestions[state.quizIndex];
+                const answer = ansIdx !== null ? q.answers[ansIdx] : null;
+                const correct = answer === q.correct;
+                const timeUsed = 15 - state.quizTimer;
+                state.quizSelectedAnswer = answer;
+                state.quizSessionTotal++;
+                state.quizStats.totalAnswered++;
+                state.dailyQuizAnswered = (state.dailyQuizAnswered || 0) + 1;
+                if (correct) {
+                    state.quizStreak++;
+                    state.quizSessionCorrect++;
+                    state.quizStats.totalCorrect++;
+                    const multiplier = Math.min(state.quizStreak, 5);
+                    const xp = 15 * multiplier;
+                    questEngine.addXP(xp, `quiz x${multiplier}`);
+                    if (state.quizStreak > state.quizStats.bestStreak) state.quizStats.bestStreak = state.quizStreak;
+                    if (timeUsed <= 3 && !state.tokens.includes('speed_demon')) { state.tokens.push('speed_demon'); const t = TOKENS.find(x=>x.id==='speed_demon'); app.showNotification(`Token Found: ${t.icon} ${t.name}!`); questEngine.addXP(50, 'token'); }
+                } else { state.quizStreak = 0; }
+                questEngine.save();
+                app.render();
+            },
+            quizNext: () => {
+                state.quizIndex++;
+                state.quizAnswered = false;
+                state.quizSelectedAnswer = null;
+                if (state.quizIndex >= state.quizQuestions.length) {
+                    state.quizPhase = 'results';
+                    if (state.quizSessionCorrect === state.quizSessionTotal && state.quizSessionTotal >= 10) {
+                        if (!state.tokens.includes('quiz_master')) { state.tokens.push('quiz_master'); const t = TOKENS.find(x=>x.id==='quiz_master'); app.showNotification(`Token Found: ${t.icon} ${t.name}!`); questEngine.addXP(50, 'token'); }
+                    }
+                    questEngine.checkTokens();
+                    app.render(); return;
+                }
+                state.quizTimer = 15;
+                app.render(); app.startQuizTimer();
+            },
+            quizReset: () => { clearInterval(state.quizTimerInterval); state.quizPhase = 'setup'; state.quizQuestions = []; app.render(); },
+            decodeHTML: (html) => { const d = document.createElement('div'); d.innerHTML = html; return d.textContent; },
+
+            getQuizHTML: () => {
+                if (state.quizPhase === 'loading') return `<div class="animate-fade-in text-center py-20"><div class="ai-loader mx-auto mb-4" style="width:32px;height:32px"></div><p class="text-stone-500 font-bold uppercase tracking-widest text-sm">Loading Questions...</p></div>`;
+                if (state.quizPhase === 'results') {
+                    const pct = Math.round((state.quizSessionCorrect / state.quizSessionTotal) * 100);
+                    return `<div class="animate-fade-in max-w-2xl mx-auto space-y-8 text-center">
+                        <h1 class="text-5xl font-serif font-bold mb-2">Quiz Complete!</h1>
+                        <div class="bg-white dark:bg-[#292524] rounded-[2.5rem] p-10 border border-stone-100 dark:border-stone-800 shadow-sm">
+                            <div class="text-6xl font-serif font-bold text-orange-600 mb-2">${state.quizSessionCorrect}/${state.quizSessionTotal}</div>
+                            <div class="text-stone-500 text-sm font-bold uppercase tracking-widest mb-6">${pct}% Correct</div>
+                            <div class="flex justify-center gap-4 mb-4">
+                                <div class="bg-stone-100 dark:bg-stone-800 px-4 py-3 rounded-xl text-center"><div class="text-xl font-bold text-orange-600">${state.quizStats.bestStreak}</div><div class="text-[10px] font-bold uppercase text-stone-400 tracking-widest">Best Streak</div></div>
+                                <div class="bg-stone-100 dark:bg-stone-800 px-4 py-3 rounded-xl text-center"><div class="text-xl font-bold text-orange-600">${state.quizStats.totalAnswered}</div><div class="text-[10px] font-bold uppercase text-stone-400 tracking-widest">All Time</div></div>
+                            </div>
+                        </div>
+                        <button onclick="app.quizReset()" class="bg-orange-600 hover:bg-orange-500 text-white px-10 py-4 rounded-2xl font-bold uppercase tracking-widest text-sm">Play Again</button>
+                    </div>`;
+                }
+                if (state.quizPhase === 'playing') {
+                    const q = state.quizQuestions[state.quizIndex];
+                    const progress = ((state.quizIndex) / state.quizQuestions.length) * 100;
+                    return `<div class="animate-fade-in max-w-2xl mx-auto space-y-6">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-stone-400 uppercase tracking-widest">Question ${state.quizIndex + 1}/${state.quizQuestions.length}</span>
+                            <div class="flex items-center gap-3">
+                                ${state.quizStreak > 0 ? `<span class="streak-fire text-sm font-bold text-orange-600">${state.quizStreak}x Streak</span>` : ''}
+                                <div class="relative w-12 h-12">
+                                    <svg class="w-full h-full transform -rotate-90"><circle cx="24" cy="24" r="20" stroke-width="3" stroke="currentColor" fill="transparent" class="text-stone-200 dark:text-stone-700"/><circle id="quiz-timer-ring" cx="24" cy="24" r="20" stroke-width="3" stroke="currentColor" fill="transparent" class="quiz-timer-ring ${state.quizTimer <= 5 ? 'text-red-500' : 'text-orange-600'}"/></svg>
+                                    <span id="quiz-timer-text" class="absolute inset-0 flex items-center justify-center text-sm font-bold">${state.quizTimer}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="w-full bg-stone-200 dark:bg-stone-700 rounded-full h-1.5"><div class="bg-orange-600 h-full rounded-full transition-all" style="width:${progress}%"></div></div>
+                        <div class="bg-white dark:bg-[#292524] rounded-[2rem] p-8 border border-stone-100 dark:border-stone-800 shadow-sm">
+                            <span class="text-[10px] font-bold text-orange-600 uppercase tracking-widest">${esc(app.decodeHTML(q.category))}</span>
+                            <h2 class="text-2xl font-serif font-bold mt-2 mb-6">${q.question}</h2>
+                            <div class="grid grid-cols-1 gap-3">${q.answers.map((a, i) => {
+                                let cls = 'bg-stone-50 dark:bg-stone-800 border-stone-200 dark:border-stone-700 hover:border-orange-500 cursor-pointer';
+                                if (state.quizAnswered) {
+                                    if (a === q.correct) cls = 'bg-green-100 dark:bg-green-900/30 border-green-500 text-green-800 dark:text-green-300';
+                                    else if (a === state.quizSelectedAnswer) cls = 'bg-red-100 dark:bg-red-900/30 border-red-500 text-red-800 dark:text-red-300';
+                                    else cls = 'bg-stone-50 dark:bg-stone-800 border-stone-200 dark:border-stone-700 opacity-50';
+                                }
+                                return `<button onclick="app.quizAnswer(${i})" class="w-full text-left p-4 rounded-xl border-2 ${cls} font-medium text-sm transition-all ${state.quizAnswered ? 'pointer-events-none' : ''}">${String.fromCharCode(65 + i)}. ${a}</button>`;
+                            }).join('')}</div>
+                        </div>
+                        ${state.quizAnswered ? `<button onclick="app.quizNext()" class="w-full bg-orange-600 hover:bg-orange-500 text-white py-4 rounded-2xl font-bold uppercase tracking-widest text-sm">${state.quizIndex < state.quizQuestions.length - 1 ? 'Next Question' : 'See Results'}</button>` : ''}
+                    </div>`;
+                }
+                return `<div class="animate-fade-in max-w-2xl mx-auto space-y-8">
+                    <div class="text-center mb-8">
+                        <h1 class="text-5xl font-serif font-bold mb-4">Quiz Arena</h1>
+                        <p class="text-stone-500 dark:text-stone-400 italic">Test your knowledge. Build streaks. Earn XP.</p>
+                    </div>
+                    <div class="bg-white dark:bg-[#292524] rounded-[2.5rem] p-10 border border-stone-100 dark:border-stone-800 shadow-sm space-y-6">
+                        <div>
+                            <label class="text-sm font-bold uppercase text-stone-500 tracking-widest block mb-2">Category</label>
+                            <select id="quiz-category" class="w-full bg-stone-50 dark:bg-stone-800 px-4 py-3 rounded-xl border border-stone-200 dark:border-stone-700 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+                                <option value="">Any Category</option>
+                                <option value="9">General Knowledge</option><option value="17">Science & Nature</option><option value="18">Computers</option><option value="19">Mathematics</option>
+                                <option value="22">Geography</option><option value="23">History</option><option value="21">Sports</option><option value="25">Art</option>
+                                <option value="11">Film</option><option value="12">Music</option><option value="14">Television</option><option value="15">Video Games</option>
+                                <option value="27">Animals</option><option value="26">Celebrities</option><option value="20">Mythology</option><option value="24">Politics</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-sm font-bold uppercase text-stone-500 tracking-widest block mb-2">Difficulty</label>
+                            <div class="flex gap-3">
+                                <button onclick="document.getElementById('quiz-difficulty').value='easy'" class="flex-1 py-3 rounded-xl border-2 border-stone-200 dark:border-stone-700 text-sm font-bold uppercase tracking-widest hover:border-green-500 hover:text-green-600 transition-all">Easy</button>
+                                <button onclick="document.getElementById('quiz-difficulty').value='medium'" class="flex-1 py-3 rounded-xl border-2 border-orange-500 text-orange-600 text-sm font-bold uppercase tracking-widest">Medium</button>
+                                <button onclick="document.getElementById('quiz-difficulty').value='hard'" class="flex-1 py-3 rounded-xl border-2 border-stone-200 dark:border-stone-700 text-sm font-bold uppercase tracking-widest hover:border-red-500 hover:text-red-600 transition-all">Hard</button>
+                            </div>
+                            <input type="hidden" id="quiz-difficulty" value="medium">
+                        </div>
+                        <div class="grid grid-cols-3 gap-4 pt-4">
+                            <div class="text-center"><div class="text-2xl font-serif font-bold text-orange-600">${state.quizStats.totalAnswered}</div><div class="text-[10px] font-bold uppercase text-stone-400 tracking-widest">Answered</div></div>
+                            <div class="text-center"><div class="text-2xl font-serif font-bold text-orange-600">${state.quizStats.totalCorrect}</div><div class="text-[10px] font-bold uppercase text-stone-400 tracking-widest">Correct</div></div>
+                            <div class="text-center"><div class="text-2xl font-serif font-bold text-orange-600">${state.quizStats.bestStreak}</div><div class="text-[10px] font-bold uppercase text-stone-400 tracking-widest">Best Streak</div></div>
+                        </div>
+                        <button onclick="app.quizStart()" class="w-full bg-orange-600 hover:bg-orange-500 text-white py-4 rounded-2xl font-bold uppercase tracking-widest text-sm mt-4">Start Quiz</button>
+                    </div>
+                </div>`;
+            },
+
+            getQuestsHTML: () => {
+                const lvl = questEngine.getLevel(state.xpTotal);
+                const curXP = state.xpTotal - questEngine.xpForLevel(lvl);
+                const needXP = questEngine.xpForNextLevel(lvl) - questEngine.xpForLevel(lvl);
+                const pct = questEngine.xpProgress(state.xpTotal);
+                return `<div class="animate-fade-in max-w-4xl mx-auto space-y-8">
+                    <div class="text-center mb-4">
+                        <h1 class="text-5xl font-serif font-bold mb-2">Quest Journal</h1>
+                        <p class="text-stone-500 dark:text-stone-400 italic">Your learning adventure at a glance</p>
+                    </div>
+                    <div class="bg-stone-900 dark:bg-stone-800 rounded-[2.5rem] p-10 text-white shadow-2xl">
+                        <div class="flex items-center justify-between mb-4">
+                            <div><span class="text-orange-400 font-bold text-xs uppercase tracking-widest">Level ${lvl}</span><h2 class="text-4xl font-serif font-bold mt-1">${state.xpTotal} XP</h2></div>
+                            <div class="text-right text-stone-400 text-sm">${curXP} / ${needXP} to next level</div>
+                        </div>
+                        <div class="w-full bg-white/10 rounded-full h-4 overflow-hidden"><div class="xp-bar-fill h-full bg-gradient-to-r from-orange-600 to-yellow-500 rounded-full" style="width:${pct}%"></div></div>
+                    </div>
+                    <div class="bg-white dark:bg-[#292524] rounded-[2rem] p-8 border border-stone-100 dark:border-stone-800">
+                        <h3 class="text-xl font-serif font-bold mb-4">Daily Quests</h3>
+                        ${!state.dailyQuests || state.dailyQuests.length === 0 ? '<p class="text-stone-400 text-sm">No quests today. Come back tomorrow!</p>' :
+                        `<div class="space-y-3">${state.dailyQuests.map(q => `<div class="flex items-center gap-4 p-4 rounded-xl ${q.completed ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800' : 'bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700'}">
+                            <div class="w-8 h-8 rounded-full ${q.completed ? 'bg-green-500 text-white' : 'bg-stone-200 dark:bg-stone-700'} flex items-center justify-center text-sm font-bold">${q.completed ? '\\u2713' : '!'}</div>
+                            <div class="flex-grow"><div class="font-semibold text-sm">${esc(q.name)}</div><div class="text-xs text-stone-400">${esc(q.desc)}</div></div>
+                            <span class="text-xs font-bold ${q.completed ? 'text-green-600' : 'text-orange-600'}">+${q.xp} XP</span>
+                        </div>`).join('')}</div>`}
+                    </div>
+                    <div class="bg-white dark:bg-[#292524] rounded-[2rem] p-8 border border-stone-100 dark:border-stone-800">
+                        <h3 class="text-xl font-serif font-bold mb-4">Tokens <span class="text-sm font-sans text-stone-400">${state.tokens.length}/${TOKENS.length}</span></h3>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">${TOKENS.map(t => {
+                            const owned = state.tokens.includes(t.id);
+                            return `<div class="p-4 rounded-xl border-2 ${owned ? 'border-orange-500 token-glow bg-orange-50 dark:bg-orange-900/20' : 'border-stone-200 dark:border-stone-700 opacity-40'} text-center">
+                                <div class="text-3xl mb-2">${t.icon}</div>
+                                <div class="text-xs font-bold uppercase tracking-widest ${owned ? 'text-orange-600' : 'text-stone-400'}">${esc(t.name)}</div>
+                                <div class="text-[10px] text-stone-400 mt-1">${esc(t.desc)}</div>
+                            </div>`;
+                        }).join('')}</div>
+                    </div>
+                    <div class="bg-white dark:bg-[#292524] rounded-[2rem] p-8 border border-stone-100 dark:border-stone-800">
+                        <h3 class="text-xl font-serif font-bold mb-4">Achievements <span class="text-sm font-sans text-stone-400">${state.achievements.length}/${ACHIEVEMENTS.length}</span></h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">${ACHIEVEMENTS.map(a => {
+                            const unlocked = state.achievements.includes(a.id);
+                            return `<div class="flex items-center gap-3 p-3 rounded-xl ${unlocked ? 'bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800' : 'bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 opacity-50'}">
+                                <span class="text-2xl">${a.icon}</span>
+                                <div><div class="text-sm font-bold ${unlocked ? 'text-orange-600' : ''}">${esc(a.name)}</div><div class="text-xs text-stone-400">${esc(a.desc)}</div></div>
+                                ${unlocked ? '<span class="ml-auto text-green-600 text-sm font-bold">\\u2713</span>' : ''}
+                            </div>`;
+                        }).join('')}</div>
+                    </div>
+                </div>`;
+            },
+
+            showAbout: () => alert("Synapse OS v6.0 - Interactive Learning OS with Quest Engine")
         };
 
         document.addEventListener('DOMContentLoaded', app.init);
