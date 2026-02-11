@@ -2,7 +2,7 @@
 
 ## Overview
 
-Synapse is an interactive learning operating system built as a single-page web application. It provides an educational platform with features likely including progress tracking, data visualization (via Chart.js), and optional cloud persistence through Firebase. The application is served via an Express.js static file server and is primarily a frontend-heavy application with minimal backend logic.
+Synapse is an interactive learning operating system built as a single-page web application. It enforces Cognitive Load Theory through mandatory task breakdown (Learning Governor), provides AI-powered study planning via Gemini API, flashcard decks with Leitner spaced repetition, The Blurting Method (active recall), Cornell notes, Pomodoro timer with cognitive load enforcement, session statistics, and data export/import. Uses Firebase optionally for cloud sync and localStorage for local persistence.
 
 ## User Preferences
 
@@ -11,86 +11,74 @@ Preferred communication style: Simple, everyday language.
 ## System Architecture
 
 ### Frontend Architecture
-- **Single-page application (SPA):** The entire UI lives in a single `index.html` file. All routing is handled client-side — the Express server has a catch-all route that serves `index.html` for any path.
-- **Styling:** Uses Tailwind CSS loaded via CDN (`cdn.tailwindcss.com`) with a custom configuration that includes dark mode support (class-based toggle) and custom fonts (Inter for sans-serif, Lora for serif).
-- **Typography:** Google Fonts are loaded for Inter (UI text) and Lora (content/reading text), suggesting a design that distinguishes between interface elements and reading content.
-- **Data Visualization:** Chart.js is included via CDN for rendering charts, likely for learning progress or analytics dashboards.
-- **Design Theme:** The app uses a warm, paper-like color scheme (background `#FDFCF8`, text `#2D2A26`) suggesting an educational/reading-focused aesthetic.
+- **Single-page application (SPA):** The entire UI lives in a single `index.html` file (~940 lines). All routing is handled client-side via `app.navTo()`. Express server has a catch-all route serving `index.html` for any path.
+- **Navigation sections:** Mission (dashboard), Vault (learning techniques), Spaced (spaced repetition info), Decks (flashcard management), Blurt (blurting method), Stats (session statistics), About.
+- **Styling:** Tailwind CSS via CDN with dark mode support (class-based toggle), custom fonts (Inter for UI, Lora for headings).
+- **Data Visualization:** Chart.js via CDN for scatter, doughnut, and bar charts.
+- **Design Theme:** Warm paper-like color scheme (background `#FDFCF8`, text `#2D2A26`, accent `orange-600`).
 
 ### Backend Architecture
-- **Express.js v5:** A minimal static file server (`server.js`) that serves the frontend files. It runs on port 5000.
-- **Caching:** All responses have cache-control headers set to prevent caching (`no-cache, no-store, must-revalidate`), which is useful during development.
-- **SPA routing:** The catch-all route `/{*splat}` ensures all paths serve `index.html`, enabling client-side routing.
-- **API proxy:** `/api/gemini` POST endpoint proxies requests to the Gemini API, keeping the API key server-side only (stored in `GEMINI_API_KEY` env var).
+- **Express.js v5:** Minimal static file server (`server.js`) on port 5000.
+- **Caching:** All responses use `no-cache, no-store, must-revalidate` headers.
+- **SPA routing:** Catch-all route `/{*splat}` serves `index.html`.
+- **API proxy:** `/api/gemini` POST endpoint proxies requests to Gemini API, keeping API key server-side only (`GEMINI_API_KEY` env var).
 
 ### Data Storage
-- **Firebase Firestore (optional):** The app is designed to optionally connect to Firebase for cloud persistence. It uses Firestore for document-based storage (`getDoc`, `setDoc`) and Firebase Auth for user identity.
-- **Graceful degradation:** If Firebase configuration (`__firebase_config`) is not available, the app falls back to "local-only mode" without crashing. This is handled with a try-catch that sets `window.fb = null`.
-- **Firebase Auth:** Supports anonymous sign-in and custom token sign-in. The auth state is tracked via `onAuthStateChanged`.
-- **App ID:** Uses `__app_id` global variable for multi-tenant or app-specific data scoping in Firestore.
+- **localStorage (primary):** All features work offline via localStorage stores:
+  - `synapse_decks` — Flashcard deck metadata
+  - `synapse_cards` — Flashcard cards with Leitner box/nextReview
+  - `synapse_pomodoro_log` — Completed pomodoro sessions with task labels and durations
+  - `synapse_blurt` — Blurt sessions with source/recall/gaps
+  - `cornellNotes` — Cornell notes content
+- **Firebase Firestore (optional):** Cloud persistence for notes and progress checkboxes. Graceful degradation via try-catch when `__firebase_config` unavailable.
+- **Export/Import:** JSON backup/restore of all localStorage data.
+
+### Key Features
+
+1. **Mission Architect (AI):** Gemini-powered study plan generation via `/api/gemini` proxy.
+2. **Flashcard Decks:** Full deck/card CRUD with Leitner 5-box spaced repetition (intervals: 1/3/7/14/30 days). Study mode with 3D flip cards, due card filtering.
+3. **Learning Governor:** Pomodoro timer with task labels, normalized consecutive streak tracking, blocks at 4 consecutive sessions without breakdown. Visual streak dots (4 indicators).
+4. **Blurting Method:** 4-phase active recall (list sessions → read source → blurt from memory → compare and fill gaps). Session persistence with review counting.
+5. **Charts:** Scatter (Effort vs Efficiency), Doughnut (Category Distribution) on dashboard. Bar chart (Weekly Activity) on stats page.
+6. **Session Statistics:** Total focus time, session count, deck count, weekly activity chart, top tasks by frequency.
+7. **Data Management:** Export all data as JSON, import from backup file.
+8. **XSS Protection:** `esc()` utility (DOM-based text node escaping) applied to all user-rendered content (26 uses).
 
 ### Key Design Decisions
 
-1. **CDN-based dependencies instead of a build system**
-   - All frontend libraries (Tailwind, Chart.js, Firebase) are loaded from CDNs rather than bundled
-   - Pros: Zero build step, simple setup, fast iteration
-   - Cons: No tree-shaking, depends on CDN availability, no TypeScript support
-   - This means when adding new frontend features, prefer CDN imports or inline code over npm packages for frontend libraries
-
-2. **Firebase as optional cloud layer**
-   - The app works without Firebase, storing data locally
-   - When Firebase is available, it syncs data to Firestore
-   - This pattern means all features should work in both modes
-
-3. **Monolithic HTML file**
-   - The entire frontend is in one `index.html` file
-   - If the app grows, consider splitting into separate JS/CSS files served from the same Express static server
+1. **CDN-based dependencies** — No build system. Tailwind, Chart.js, Firebase all loaded from CDNs. Prefer CDN imports or inline code for frontend libraries.
+2. **Firebase as optional cloud layer** — App works fully offline with localStorage. Firebase syncs notes/progress when available.
+3. **Monolithic HTML file** — All frontend code in `index.html`. Consider splitting if file grows past ~1200 lines.
+4. **Server-side API key** — Gemini API key never exposed to client. All AI calls go through Express proxy.
 
 ## External Dependencies
 
 ### NPM Packages
-- **express v5.2.1** — Static file server and SPA routing
+- **express v5.2.1** — Static file server, SPA routing, API proxy
 
 ### CDN Dependencies (Frontend)
-- **Tailwind CSS** — Utility-first CSS framework (loaded via CDN script)
-- **Chart.js** — Charting library for data visualization
-- **Firebase v11.6.1** — Suite of services loaded as ES modules:
-  - `firebase-app` — Core Firebase initialization
-  - `firebase-auth` — Authentication (anonymous + custom token)
-  - `firebase-firestore` — Cloud document database
+- **Tailwind CSS** — Utility-first CSS framework
+- **Chart.js** — Charting library (scatter, doughnut, bar)
+- **Firebase v11.6.1** — App, Auth, Firestore (optional cloud sync)
 
 ### External Services
-- **Firebase/Firestore** — Cloud database for persisting user data (optional, requires `__firebase_config` global)
-- **Firebase Authentication** — User identity management (optional)
+- **Gemini API** — AI study plan generation (proxied via `/api/gemini`, key in `GEMINI_API_KEY`)
 - **Google Fonts** — Inter and Lora typefaces
-- **Gemini API** — AI-powered mission plan generation (API key stored server-side in `GEMINI_API_KEY` env var, proxied via `/api/gemini`)
 
 ## Recent Changes
 
-### Feb 11, 2026 — Learning Governor (Cognitive Load Enforcement)
-1. **Pomodoro task labeling:** Timer now requires a task label before starting a focus session. Label input is disabled while timer is running.
-2. **Consecutive streak tracking:** `pomodoroStore` logs completed pomodoros with normalized task labels (trim, lowercase, collapse whitespace) to localStorage. `consecutiveCount()` walks the log backwards counting matching labels until a different entry is found.
-3. **Governor blocking:** After 4 consecutive pomodoros on the same task without a breakdown, the timer blocks with a Governor banner. Two options: "I've Broken It Down" (inserts `__breakdown__` sentinel into log, resets streak) or "Switch Task" (clears label so user picks a new one).
-4. **Visual streak indicator:** 4 dots below the timer show current streak progress (filled orange = completed, gray = remaining).
-5. **State resets:** Governor blocked state properly clears on mode switch, timer reset, and task switch to prevent stale blocking.
-6. **XSS protection:** Task labels escaped via `esc()` in all HTML rendering.
-
-### Feb 10, 2026 — The Blurting Method
-1. **Blurting Method feature:** New "Blurt" section added to navigation. An active recall study tool where students read notes, hide them, write everything they remember, then compare to fill in gaps.
-2. **Four-phase flow:** List (manage sessions) → Read (enter source notes) → Blurt (recall from memory in dark mode UI) → Compare (side-by-side source vs recall, with orange-highlighted gap-filling textarea).
-3. **Session persistence:** All blurt sessions saved to localStorage with title, source, recall, gaps, review count, and timestamps. Sessions can be reviewed, re-blurted, or deleted.
-4. **XSS protection:** All user input in blurt sessions is escaped via `esc()` before rendering.
-
-### Feb 10, 2026 — Flashcard System & Security Fixes
-1. **Flashcard system:** Full deck/card CRUD with localStorage persistence. "Decks" nav link added. Deck list view, deck detail view (card list with Leitner box status), and study mode with card flipping.
-2. **Leitner spaced repetition:** 5-box system (New/Learning/Review/Familiar/Mastered) with intervals of 1/3/7/14/30 days. "Again" re-queues incorrect cards to end of current session for retry.
-3. **XSS protection:** All user-generated content (deck titles, card front/back) is HTML-escaped via `esc()` utility before rendering.
-4. **Gemini API security:** Moved API key to server-side environment variable (`GEMINI_API_KEY`). Frontend calls `/api/gemini` proxy endpoint instead of exposing key in client code.
-
-### Feb 10, 2026 — Bug Fix Session
-1. **Firebase crash fix:** Wrapped Firebase initialization in try-catch so the app gracefully falls back to local-only mode when `__firebase_config` is not available, instead of crashing.
-2. **Charts now render:** `renderCharts()` previously only destroyed charts without creating them, and the dashboard HTML had no `<canvas>` elements. Added scatter chart (Effort vs Efficiency) and doughnut chart (Category Distribution) with full Chart.js implementations and dark mode support.
-3. **Notes preservation:** Fixed bug where notes typed by the user were overwritten every time the dashboard re-rendered (e.g., after AI generation). Notes content is now preserved across re-renders.
-4. **Timer controls:** Added missing Focus/Break mode toggle buttons and a Reset button to the Pomodoro timer. The code for these features existed but had no UI controls.
-5. **API key validation:** The empty Gemini API key now returns a clear error message immediately instead of silently retrying 5 times and failing.
-6. **Line endings:** Converted file from Windows (CRLF) to Unix (LF) line endings.
+### Feb 11, 2026 — Major Enhancement: 8-Feature Rebuild
+1. **AI integration fixed:** `aiService.callGemini` now calls `/api/gemini` proxy instead of direct Google API with empty key. Removed client-side API key variable.
+2. **XSS protection added:** `esc()` utility function using DOM text node escaping. Applied across all 26 user-rendered HTML injection points.
+3. **localStorage data stores:** Added `deckStore`, `cardStore`, `pomodoroStore`, `blurtStore` with full CRUD, persistence, and load/save methods.
+4. **Flashcard deck system:** Deck list, deck detail with card management, Leitner 5-box spaced repetition (New/Learning/Review/Familiar/Mastered), study mode with 3D flip cards, due card filtering by nextReview timestamp.
+5. **Learning Governor:** Task label required before starting focus, normalized label matching, consecutiveCount tracking, blocks at 4 consecutive same-task sessions, "I've Broken It Down" and "Switch Task" options, visual streak dots.
+6. **Blurting Method:** 4-phase active recall flow (list/read/blurt/compare), session CRUD with localStorage, re-blurt capability, gap-filling comparison view.
+7. **Chart.js charts implemented:** Scatter (Effort vs Efficiency) and Doughnut (Category Distribution) with canvas elements, dark mode color support, proper destroy/recreate lifecycle.
+8. **Session statistics page:** Total focus time, session count, deck count, weekly activity bar chart, top tasks by frequency with progress bars.
+9. **Export/import data:** JSON backup of all localStorage data (decks, cards, blurt sessions, pomodoro log, notes). File picker import with validation.
+10. **Navigation expanded:** Added Decks, Blurt, Stats links to both desktop and mobile nav. Active state highlighting for all nav items.
+11. **Timer controls restored:** Focus/Break mode toggle buttons, Reset button, task label input with disabled state while running.
+12. **Firebase graceful degradation:** try-catch with dynamic import, sets `window.fb = null` on failure.
+13. **Notes preservation:** Dashboard passes saved notes to prevent overwrite on re-render.
+14. **Auto-dismiss notifications:** Notifications auto-hide after 4 seconds.
