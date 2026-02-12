@@ -165,6 +165,29 @@
             return h;
         }
 
+        const STUDY_QUOTES = [
+            { text: "The more that you read, the more things you will know. The more that you learn, the more places you'll go.", author: "Dr. Seuss" },
+            { text: "Education is not the filling of a pail, but the lighting of a fire.", author: "W.B. Yeats" },
+            { text: "The beautiful thing about learning is that nobody can take it away from you.", author: "B.B. King" },
+            { text: "Learning is not attained by chance, it must be sought for with ardour and attended to with diligence.", author: "Abigail Adams" },
+            { text: "Tell me and I forget. Teach me and I remember. Involve me and I learn.", author: "Benjamin Franklin" },
+            { text: "The expert in anything was once a beginner.", author: "Helen Hayes" },
+            { text: "It does not matter how slowly you go as long as you do not stop.", author: "Confucius" },
+            { text: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
+            { text: "Study without desire spoils the memory, and it retains nothing that it takes in.", author: "Leonardo da Vinci" },
+            { text: "The mind is not a vessel to be filled, but a fire to be kindled.", author: "Plutarch" },
+            { text: "Live as if you were to die tomorrow. Learn as if you were to live forever.", author: "Mahatma Gandhi" },
+            { text: "The roots of education are bitter, but the fruit is sweet.", author: "Aristotle" },
+            { text: "An investment in knowledge pays the best interest.", author: "Benjamin Franklin" },
+            { text: "You don't have to be great to start, but you have to start to be great.", author: "Zig Ziglar" },
+            { text: "Success is the sum of small efforts, repeated day in and day out.", author: "Robert Collier" },
+            { text: "The capacity to learn is a gift; the ability to learn is a skill; the willingness to learn is a choice.", author: "Brian Herbert" },
+            { text: "What we learn with pleasure we never forget.", author: "Alfred Mercier" },
+            { text: "Knowledge is power. Information is liberating.", author: "Kofi Annan" },
+            { text: "The more I learn, the more I realise how much I don't know.", author: "Albert Einstein" },
+            { text: "Discipline is the bridge between goals and accomplishment.", author: "Jim Rohn" },
+        ];
+
         const AI_MODEL = "gemini-2.0-flash";
 
         const aiService = {
@@ -1047,66 +1070,49 @@
 
             render: () => {
                 const container = document.getElementById('app-container');
-                const savedNotes = localStorage.getItem('cornellNotes');
-                if (state.view === 'dashboard') {
-                    container.innerHTML = app.getDashboardHTML(savedNotes);
-                    app.renderCharts();
-                    app.loadUserData();
-                    app.updateTimerUI();
-                } else if (state.view === 'explore') {
-                    container.innerHTML = app.getExploreHTML();
-                    app.renderVault();
-                } else if (state.view === 'spaced') {
-                    container.innerHTML = app.getSpacedHTML();
-                } else if (state.view === 'decks') {
-                    container.innerHTML = app.getDecksHTML();
-                } else if (state.view === 'study') {
-                    container.innerHTML = app.getStudyHTML();
-                } else if (state.view === 'blurt') {
-                    container.innerHTML = app.getBlurtHTML();
-                } else if (state.view === 'quiz') {
-                    container.innerHTML = app.getQuizHTML();
-                } else if (state.view === 'babel') {
-                    container.innerHTML = app.getBabelHTML();
-                } else if (state.view === 'matrix') {
-                    container.innerHTML = app.getMatrixHTML();
-                } else if (state.view === 'recal') {
-                    container.innerHTML = app.getRecalHTML();
-                } else if (state.view === 'diagnostic') {
-                    container.innerHTML = app.getDiagnosticHTML();
-                } else if (state.view === 'rank') {
-                    container.innerHTML = app.getRankHTML();
-                } else if (state.view === 'stats') {
-                    container.innerHTML = app.getStatsHTML();
-                    app.renderStatsCharts();
+                try {
+                    const savedNotes = localStorage.getItem('cornellNotes');
+                    if (state.view === 'dashboard') {
+                        container.innerHTML = app.getDashboardHTML(savedNotes);
+                        app.renderCharts();
+                        if (!state._dashboardDataLoaded) { app.loadUserData(); state._dashboardDataLoaded = true; }
+                        app.updateTimerUI();
+                    } else if (state.view === 'explore') {
+                        container.innerHTML = app.getExploreHTML();
+                        app.renderVault();
+                    } else if (state.view === 'spaced') {
+                        container.innerHTML = app.getSpacedHTML();
+                    } else if (state.view === 'decks') {
+                        container.innerHTML = app.getDecksHTML();
+                    } else if (state.view === 'study') {
+                        container.innerHTML = app.getStudyHTML();
+                    } else if (state.view === 'blurt') {
+                        container.innerHTML = app.getBlurtHTML();
+                    } else if (state.view === 'quiz') {
+                        container.innerHTML = app.getQuizHTML();
+                    } else if (state.view === 'babel') {
+                        container.innerHTML = app.getBabelHTML();
+                    } else if (state.view === 'matrix') {
+                        container.innerHTML = app.getMatrixHTML();
+                    } else if (state.view === 'recal') {
+                        container.innerHTML = app.getRecalHTML();
+                    } else if (state.view === 'diagnostic') {
+                        container.innerHTML = app.getDiagnosticHTML();
+                    } else if (state.view === 'rank') {
+                        container.innerHTML = app.getRankHTML();
+                    } else if (state.view === 'stats') {
+                        container.innerHTML = app.getStatsHTML();
+                        app.renderStatsCharts();
+                    }
+                    rankEngine.updateNavRank();
+                } catch (err) {
+                    console.error('Render error:', err);
+                    container.innerHTML = '<div class="text-center py-20"><h2 class="text-2xl font-serif font-bold text-red-600 mb-4">Something went wrong</h2><p class="text-stone-500 mb-6">An error occurred while loading this view.</p><button onclick="app.navTo(\'dashboard\')" class="bg-orange-600 text-white px-6 py-3 rounded-xl font-bold text-sm uppercase tracking-widest">Go to Dashboard</button></div>';
                 }
-                rankEngine.updateNavRank();
             },
 
             getDashboardHTML: (savedNotes) => {
-                const studyQuotes = [
-                    { text: "The more that you read, the more things you will know. The more that you learn, the more places you'll go.", author: "Dr. Seuss" },
-                    { text: "Education is not the filling of a pail, but the lighting of a fire.", author: "W.B. Yeats" },
-                    { text: "The beautiful thing about learning is that nobody can take it away from you.", author: "B.B. King" },
-                    { text: "Learning is not attained by chance, it must be sought for with ardour and attended to with diligence.", author: "Abigail Adams" },
-                    { text: "Tell me and I forget. Teach me and I remember. Involve me and I learn.", author: "Benjamin Franklin" },
-                    { text: "The expert in anything was once a beginner.", author: "Helen Hayes" },
-                    { text: "It does not matter how slowly you go as long as you do not stop.", author: "Confucius" },
-                    { text: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
-                    { text: "Study without desire spoils the memory, and it retains nothing that it takes in.", author: "Leonardo da Vinci" },
-                    { text: "The mind is not a vessel to be filled, but a fire to be kindled.", author: "Plutarch" },
-                    { text: "Live as if you were to die tomorrow. Learn as if you were to live forever.", author: "Mahatma Gandhi" },
-                    { text: "The roots of education are bitter, but the fruit is sweet.", author: "Aristotle" },
-                    { text: "An investment in knowledge pays the best interest.", author: "Benjamin Franklin" },
-                    { text: "You don't have to be great to start, but you have to start to be great.", author: "Zig Ziglar" },
-                    { text: "Success is the sum of small efforts, repeated day in and day out.", author: "Robert Collier" },
-                    { text: "The capacity to learn is a gift; the ability to learn is a skill; the willingness to learn is a choice.", author: "Brian Herbert" },
-                    { text: "What we learn with pleasure we never forget.", author: "Alfred Mercier" },
-                    { text: "Knowledge is power. Information is liberating.", author: "Kofi Annan" },
-                    { text: "The more I learn, the more I realise how much I don't know.", author: "Albert Einstein" },
-                    { text: "Discipline is the bridge between goals and accomplishment.", author: "Jim Rohn" },
-                ];
-                const q = studyQuotes[Math.floor(Math.random() * studyQuotes.length)];
+                const q = STUDY_QUOTES[Math.floor(Math.random() * STUDY_QUOTES.length)];
                 return `
                 <div class="animate-fade-in space-y-12">
                     <section class="text-center">
@@ -1603,13 +1609,14 @@
             },
 
             renderStatsCharts: () => {
+                if (app.charts.weekly) { app.charts.weekly.destroy(); app.charts.weekly = null; }
                 const isDark = document.body.classList.contains('dark');
                 const textColor = isDark ? '#a8a29e' : '#78716c';
                 const gridColor = isDark ? '#44403c' : '#e7e5e4';
                 const weeklyCanvas = document.getElementById('weeklyChart');
                 if (weeklyCanvas) {
                     const days = pomodoroStore.recentDays(7);
-                    new Chart(weeklyCanvas, {
+                    app.charts.weekly = new Chart(weeklyCanvas, {
                         type: 'bar',
                         data: { labels: days.map(d => d.label), datasets: [{ label: 'Sessions', data: days.map(d => d.count), backgroundColor: '#ea580c', borderRadius: 8 }] },
                         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, ticks: { color: textColor } }, y: { beginAtZero: true, ticks: { stepSize: 1, color: textColor }, grid: { color: gridColor } } } }
@@ -1834,7 +1841,7 @@
                         <div class="w-full bg-stone-200 dark:bg-stone-700 rounded-full h-1.5"><div class="bg-orange-600 h-full rounded-full transition-all" style="width:${progress}%"></div></div>
                         <div class="bg-white dark:bg-[#292524] rounded-[2rem] p-8 border border-stone-100 dark:border-stone-800 shadow-sm">
                             <span class="text-[10px] font-bold text-orange-600 uppercase tracking-widest">${esc(app.decodeHTML(q.category))}</span>
-                            <h2 class="text-2xl font-serif font-bold mt-2 mb-6">${q.question}</h2>
+                            <h2 class="text-2xl font-serif font-bold mt-2 mb-6">${esc(app.decodeHTML(q.question))}</h2>
                             <div class="grid grid-cols-1 gap-3">${q.answers.map((a, i) => {
                                 let cls = 'bg-stone-50 dark:bg-stone-800 border-stone-200 dark:border-stone-700 hover:border-orange-500 cursor-pointer';
                                 if (state.quizAnswered) {
@@ -1842,7 +1849,7 @@
                                     else if (a === state.quizSelectedAnswer) cls = 'bg-red-100 dark:bg-red-900/30 border-red-500 text-red-800 dark:text-red-300';
                                     else cls = 'bg-stone-50 dark:bg-stone-800 border-stone-200 dark:border-stone-700 opacity-50';
                                 }
-                                return `<button onclick="app.quizAnswer(${i})" class="w-full text-left p-4 rounded-xl border-2 ${cls} font-medium text-sm transition-all ${state.quizAnswered ? 'pointer-events-none' : ''}">${String.fromCharCode(65 + i)}. ${a}</button>`;
+                                return `<button onclick="app.quizAnswer(${i})" class="w-full text-left p-4 rounded-xl border-2 ${cls} font-medium text-sm transition-all ${state.quizAnswered ? 'pointer-events-none' : ''}">${String.fromCharCode(65 + i)}. ${esc(app.decodeHTML(a))}</button>`;
                             }).join('')}</div>
                         </div>
                         ${state.quizAnswered ? `<button onclick="app.quizNext()" class="w-full bg-orange-600 hover:bg-orange-500 text-white py-4 rounded-2xl font-bold uppercase tracking-widest text-sm">${state.quizIndex < state.quizQuestions.length - 1 ? 'Next Question' : 'See Results'}</button>` : ''}

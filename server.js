@@ -15,6 +15,10 @@ app.post('/api/gemini', async (req, res) => {
     return res.status(500).json({ error: 'Gemini API key not configured on the server.' });
   }
   const { model, contents, systemInstruction } = req.body;
+  const allowedModels = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-pro'];
+  if (!model || !allowedModels.includes(model)) {
+    return res.status(400).json({ error: 'Invalid or unsupported model.' });
+  }
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
   try {
     const response = await fetch(url, {
