@@ -1,0 +1,73 @@
+# The Neural Constellation Architect
+
+An addictive learning app that transforms studying into an **interstellar construction game**.  
+Students become **Galactic Navigators** who must prevent their **knowledge stars** from fading into the void of space.
+
+## Core Concept
+Frame learning as **"Hacking the Universe of Information"** — respecting brain biology (active recall, spaced repetition, dopamine dynamics, growth mindset) while making it visually stunning and psychologically compelling.
+
+## Main Mechanics
+
+### 1. Retrieval Forge (Active Recall Engine)
+- **Theme**: Mining for Knowledge-Energy  
+- **How it works**: Upload notes → AI generates **Knowledge Asteroids** (flashcards / short quizzes)  
+- **Reward**: Correct recall from memory (no peeking) creates a **Neural Spark**  
+- **Rule**: Cannot mine the same asteroid twice in one day — must wait for the **Spacing Window**
+
+### 2. Orbit Tracker (Spaced Repetition Visualizer)
+- **Core mechanic**: Uses the **Forgetting Curve** as gameplay — concepts physically **drift outward** from the center over time  
+- **Progression**:
+  - New concepts start in **Box 1 (The Launchpad)**
+  - Ignored → drifts into the **Dark Nebula** (forgetting zone)
+  - Correctly recalled at increasing intervals (1 day → 3 days → 7 days → 14 days) → enters **Stable Orbit**
+- **Mastery reward**: Stars in stable orbit glow permanently and add to **Galaxy Mastery Score**
+
+### 3. Dopamine Recalibrator (Anti-Procrastination Hub)
+- **Theme**: Phone = dangerous **Black Hole** threatening your galaxy  
+- **Features**:
+  - **15-Minute Boredom Challenge** ("Stealth Mode"): Stare at blank star-field for 15 min (no devices) to reset dopamine baseline
+  - **2-Minute Entry Rocket**: Press **Ignition** → commit to just 120 seconds of work
+  - **Reward**: Completing the 2 minutes grants a **Momentum Boost** (makes continuing ~80% more likely)
+
+### 4. Babel Fish Metaphor Lab (Feynman Technique Game)
+- **Mission**: "Translate this concept for a 5-year-old alien from the Andromeda Galaxy"  
+- **Dual-coding bonus**: Draw a **Stupid Doodle** / simple icon for the concept  
+- **Reward**: Weird + memorable pairing (e.g. angry baguette = French Revolution) earns a **Sync Badge** → doubles memory orbit stability
+
+### 5. Yet Growth Shield (Growth Mindset Reinforcement)
+- **Trigger**: Fail a quiz or mark something "too hard"  
+- **Mechanic**: App forces user to rephrase status by adding **"YET"**  
+  - "I don't understand this" → "I don't understand this **YET**"  
+- **Impact**: Shifts identity from "failing student" to **"Galactic Explorer in Training"** (reinforces malleable intelligence)
+
+## Example Data Structure (JSON – for app state / save system)
+
+```json
+{
+  "app_name": "The Neural Constellation Architect",
+  "player": {
+    "identity": "Galactic Navigator",
+    "current_orbit_status": "Stable",
+    "dopamine_level": "Calibrated",
+    "galaxy_mastery_score": 1420
+  },
+  "mechanics": [
+    {
+      "tool": "Retrieval Forge",
+      "principle": "Active Recall > Rereading",
+      "core_action": "Close book, blurt, check gaps"
+    },
+    {
+      "tool": "Orbit Tracker",
+      "intervals_days": [1, 3, 7, 14],
+      "penalty": "Star fades / drifts if interval missed"
+    },
+    {
+      "tool": "Dopamine Recalibrator",
+      "quick_reset": "4-2-6 Box Breathing",
+      "reset_duration_seconds": 90,
+      "entry_rocket_duration_seconds": 120
+    }
+  ],
+  "last_active": "2025-07-10T14:30:00Z"
+}
