@@ -124,6 +124,7 @@
     <div class="bg-[#FDFCF8] dark:bg-[#1c1917] border-b border-stone-200 dark:border-stone-700 transition-colors">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-1.5 flex justify-between items-center">
             <a href="https://www.paypal.com/donate/?hosted_button_id=YNP4RJ24MDV4C" target="_blank" rel="noopener noreferrer" class="text-sm font-semibold text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 transition-colors underline underline-offset-2">My app is FREE to play, but please donate today!</a>
+            <span class="text-sm font-medium text-stone-500 dark:text-stone-400">Brought to you by Lourens Breytenbach</span>
             <a href="https://lourensbreytenbach.com" target="_blank" rel="noopener noreferrer" class="text-sm font-semibold text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 transition-colors underline underline-offset-2">Lourens's Home Page</a>
         </div>
     </div>
@@ -1123,39 +1124,23 @@
                     </section>
                     <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
                         <div class="lg:col-span-1 space-y-8">
-                            <div class="bg-white dark:bg-[#292524] p-6 rounded-[2rem] border border-stone-100 dark:border-stone-800 shadow-sm flex flex-col items-center">
-                                ${state.governorBlocked ? `
-                                    <div class="w-full mb-4 p-4 bg-red-50 dark:bg-red-900/20 rounded-2xl border border-red-200 dark:border-red-800 text-center">
-                                        <p class="text-xs font-bold uppercase tracking-widest text-red-600 dark:text-red-400 mb-1">Governor: Blocked</p>
-                                        <p class="text-xs text-stone-500 dark:text-stone-400 mb-3">4 consecutive sessions on same task. Break it down or switch.</p>
-                                        <div class="flex gap-2">
-                                            <button onclick="app.governorBreakdown()" class="flex-1 bg-orange-600 text-white py-2 rounded-xl text-xs font-bold uppercase tracking-widest">I've Broken It Down</button>
-                                            <button onclick="app.governorSwitch()" class="flex-1 bg-stone-200 dark:bg-stone-700 text-stone-700 dark:text-stone-200 py-2 rounded-xl text-xs font-bold uppercase tracking-widest">Switch Task</button>
-                                        </div>
-                                    </div>
-                                ` : ''}
-                                <div class="relative w-40 h-40 mb-4">
-                                    <svg class="w-full h-full transform -rotate-90">
-                                        <circle cx="80" cy="80" r="45" stroke-width="6" stroke="currentColor" fill="transparent" class="text-stone-100 dark:text-stone-800" />
-                                        <circle id="timer-progress" cx="80" cy="80" r="45" stroke-width="6" stroke="currentColor" fill="transparent" class="timer-circle ${state.timerMode === 'work' ? 'text-orange-600' : 'text-stone-400'}" />
-                                    </svg>
-                                    <div id="timer-display" class="absolute inset-0 flex items-center justify-center text-3xl font-bold font-sans">25:00</div>
+                            <div class="bg-white dark:bg-[#292524] p-6 rounded-[2rem] border border-stone-100 dark:border-stone-800 shadow-sm">
+                                <h3 class="text-lg font-serif font-bold mb-3 text-stone-900 dark:text-stone-50">📝 My To-Do List</h3>
+                                <div class="flex gap-2 mb-3">
+                                    <input id="todo-input" type="text" placeholder="Add a task..." class="flex-grow bg-stone-50 dark:bg-stone-800 px-3 py-2 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" onkeydown="if(event.key==='Enter')app.addTodo()">
+                                    <button onclick="app.addTodo()" class="bg-orange-600 hover:bg-orange-500 text-white px-3 py-2 rounded-xl text-sm font-bold transition-colors">+</button>
                                 </div>
-                                <input id="timer-task-label" type="text" value="${esc(state.timerTaskLabel)}" placeholder="What are you working on?" class="w-full bg-stone-50 dark:bg-stone-800 px-4 py-2.5 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 mb-3 ${state.timerIsRunning ? 'opacity-50 pointer-events-none' : ''}" ${state.timerIsRunning ? 'disabled' : ''}>
-                                <div class="flex items-center justify-center gap-2 mb-3">
-                                    <div class="flex gap-1">
-                                        ${[1,2,3,4].map(i => `<div class="w-2.5 h-2.5 rounded-full ${pomodoroStore.consecutiveCount(state.timerTaskLabel) >= i ? 'bg-orange-600' : 'bg-stone-200 dark:bg-stone-700'}"></div>`).join('')}
-                                    </div>
-                                    <span class="text-[10px] font-bold uppercase tracking-widest text-stone-400">${pomodoroStore.consecutiveCount(state.timerTaskLabel)}/4</span>
-                                </div>
-                                <div class="flex gap-2 w-full mb-2">
-                                    <button id="timer-toggle-btn" onclick="state.timerIsRunning ? app.pauseTimer() : app.startTimer()" class="flex-grow bg-stone-900 dark:bg-stone-50 text-white dark:text-stone-900 py-3 rounded-2xl font-bold uppercase tracking-widest text-xs">Start</button>
-                                    <button onclick="app.resetTimer()" class="bg-stone-200 dark:bg-stone-700 text-stone-600 dark:text-stone-300 px-4 py-3 rounded-2xl font-bold uppercase tracking-widest text-xs">Reset</button>
-                                </div>
-                                <div class="flex gap-2 w-full">
-                                    <button onclick="app.switchTimerMode('work')" class="flex-1 py-2 rounded-xl text-xs font-bold uppercase tracking-widest ${state.timerMode === 'work' ? 'bg-orange-600 text-white' : 'bg-stone-100 dark:bg-stone-800 text-stone-500'}">Focus</button>
-                                    <button onclick="app.switchTimerMode('break')" class="flex-1 py-2 rounded-xl text-xs font-bold uppercase tracking-widest ${state.timerMode === 'break' ? 'bg-stone-600 text-white' : 'bg-stone-100 dark:bg-stone-800 text-stone-500'}">Break</button>
-                                </div>
+                                <ul class="space-y-2 max-h-48 overflow-y-auto">
+                                    ${state.missionTodos.length === 0 ? '<li class="text-xs text-stone-400 italic text-center py-2">No tasks yet — add one above!</li>' :
+                                    state.missionTodos.map(t => {
+                                        const tid = t.id;
+                                        return '<li class="flex items-center gap-2 group">' +
+                                        '<button onclick="app.toggleTodo(&quot;'+tid+'&quot;)" class="text-lg flex-shrink-0">' + (t.done ? '✅' : '⬜') + '</button>' +
+                                        '<span class="flex-grow text-sm ' + (t.done ? 'line-through text-stone-400' : 'text-stone-700 dark:text-stone-200') + '">' + esc(t.text) + '</span>' +
+                                        '<button onclick="app.removeTodo(&quot;'+tid+'&quot;)" class="text-stone-300 hover:text-red-500 text-xs opacity-0 group-hover:opacity-100 transition-opacity">✕</button>' +
+                                        '</li>';
+                                    }).join('')}
+                                </ul>
                             </div>
                             <div class="bg-white dark:bg-[#292524] p-6 rounded-[2rem] border border-stone-100 dark:border-stone-800 shadow-sm">
                                 <h3 class="text-lg font-serif font-bold text-stone-900 dark:text-stone-50 mb-3">Study Streak</h3>
@@ -1195,24 +1180,6 @@
                                 })()}
                                 <button onclick="app.navTo('rank')" class="w-full bg-stone-100 dark:bg-stone-800 py-2 rounded-xl text-xs font-bold uppercase tracking-widest text-stone-500 hover:text-orange-600 transition-colors mt-3">View Rank</button>
                             </div>
-                            <div class="bg-white dark:bg-[#292524] p-6 rounded-[2rem] border border-stone-100 dark:border-stone-800 shadow-sm">
-                                <h3 class="text-lg font-serif font-bold mb-3 text-stone-900 dark:text-stone-50">📝 My To-Do List</h3>
-                                <div class="flex gap-2 mb-3">
-                                    <input id="todo-input" type="text" placeholder="Add a task..." class="flex-grow bg-stone-50 dark:bg-stone-800 px-3 py-2 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" onkeydown="if(event.key==='Enter')app.addTodo()">
-                                    <button onclick="app.addTodo()" class="bg-orange-600 hover:bg-orange-500 text-white px-3 py-2 rounded-xl text-sm font-bold transition-colors">+</button>
-                                </div>
-                                <ul class="space-y-2 max-h-48 overflow-y-auto">
-                                    ${state.missionTodos.length === 0 ? '<li class="text-xs text-stone-400 italic text-center py-2">No tasks yet — add one above!</li>' :
-                                    state.missionTodos.map(t => {
-                                        const tid = t.id;
-                                        return '<li class="flex items-center gap-2 group">' +
-                                        '<button onclick="app.toggleTodo(&quot;'+tid+'&quot;)" class="text-lg flex-shrink-0">' + (t.done ? '✅' : '⬜') + '</button>' +
-                                        '<span class="flex-grow text-sm ' + (t.done ? 'line-through text-stone-400' : 'text-stone-700 dark:text-stone-200') + '">' + esc(t.text) + '</span>' +
-                                        '<button onclick="app.removeTodo(&quot;'+tid+'&quot;)" class="text-stone-300 hover:text-red-500 text-xs opacity-0 group-hover:opacity-100 transition-opacity">✕</button>' +
-                                        '</li>';
-                                    }).join('')}
-                                </ul>
-                            </div>
                         </div>
                         <div class="lg:col-span-3 space-y-8">
                             <div class="bg-white dark:bg-[#292524] rounded-[2.5rem] p-10 border border-stone-100 dark:border-stone-800 shadow-sm flex flex-col">
@@ -1241,7 +1208,35 @@
 
             getExploreHTML: () => `
                 <div class="animate-fade-in text-center">
-                    <h1 class="text-6xl font-serif font-bold mb-12">The Vault</h1>
+                    <h1 class="text-6xl font-serif font-bold mb-8">The Vault</h1>
+                    <div class="max-w-sm mx-auto mb-12">
+                        <div class="bg-white dark:bg-[#292524] p-6 rounded-[2rem] border border-stone-100 dark:border-stone-800 shadow-sm flex flex-col items-center">
+                            <h3 class="text-xs font-bold uppercase tracking-widest text-stone-400 mb-4">Learning Governor</h3>
+                            ${state.governorBlocked ? '<div class="w-full mb-4 p-4 bg-red-50 dark:bg-red-900/20 rounded-2xl border border-red-200 dark:border-red-800 text-center"><p class="text-xs font-bold uppercase tracking-widest text-red-600 dark:text-red-400 mb-1">Governor: Blocked</p><p class="text-xs text-stone-500 dark:text-stone-400 mb-3">4 consecutive sessions on same task. Break it down or switch.</p><div class="flex gap-2"><button onclick="app.governorBreakdown()" class="flex-1 bg-orange-600 text-white py-2 rounded-xl text-xs font-bold uppercase tracking-widest">I\'ve Broken It Down</button><button onclick="app.governorSwitch()" class="flex-1 bg-stone-200 dark:bg-stone-700 text-stone-700 dark:text-stone-200 py-2 rounded-xl text-xs font-bold uppercase tracking-widest">Switch Task</button></div></div>' : ''}
+                            <div class="relative w-40 h-40 mb-4">
+                                <svg class="w-full h-full transform -rotate-90">
+                                    <circle cx="80" cy="80" r="45" stroke-width="6" stroke="currentColor" fill="transparent" class="text-stone-100 dark:text-stone-800" />
+                                    <circle id="timer-progress" cx="80" cy="80" r="45" stroke-width="6" stroke="currentColor" fill="transparent" class="timer-circle ${state.timerMode === 'work' ? 'text-orange-600' : 'text-stone-400'}" />
+                                </svg>
+                                <div id="timer-display" class="absolute inset-0 flex items-center justify-center text-3xl font-bold font-sans">25:00</div>
+                            </div>
+                            <input id="timer-task-label" type="text" value="${esc(state.timerTaskLabel)}" placeholder="What are you working on?" class="w-full bg-stone-50 dark:bg-stone-800 px-4 py-2.5 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 mb-3 ${state.timerIsRunning ? 'opacity-50 pointer-events-none' : ''}" ${state.timerIsRunning ? 'disabled' : ''}>
+                            <div class="flex items-center justify-center gap-2 mb-3">
+                                <div class="flex gap-1">
+                                    ${[1,2,3,4].map(i => '<div class="w-2.5 h-2.5 rounded-full ' + (pomodoroStore.consecutiveCount(state.timerTaskLabel) >= i ? 'bg-orange-600' : 'bg-stone-200 dark:bg-stone-700') + '"></div>').join('')}
+                                </div>
+                                <span class="text-[10px] font-bold uppercase tracking-widest text-stone-400">${pomodoroStore.consecutiveCount(state.timerTaskLabel)}/4</span>
+                            </div>
+                            <div class="flex gap-2 w-full mb-2">
+                                <button id="timer-toggle-btn" onclick="state.timerIsRunning ? app.pauseTimer() : app.startTimer()" class="flex-grow bg-stone-900 dark:bg-stone-50 text-white dark:text-stone-900 py-3 rounded-2xl font-bold uppercase tracking-widest text-xs">Start</button>
+                                <button onclick="app.resetTimer()" class="bg-stone-200 dark:bg-stone-700 text-stone-600 dark:text-stone-300 px-4 py-3 rounded-2xl font-bold uppercase tracking-widest text-xs">Reset</button>
+                            </div>
+                            <div class="flex gap-2 w-full">
+                                <button onclick="app.switchTimerMode('work')" class="flex-1 py-2 rounded-xl text-xs font-bold uppercase tracking-widest ${state.timerMode === 'work' ? 'bg-orange-600 text-white' : 'bg-stone-100 dark:bg-stone-800 text-stone-500'}">Focus</button>
+                                <button onclick="app.switchTimerMode('break')" class="flex-1 py-2 rounded-xl text-xs font-bold uppercase tracking-widest ${state.timerMode === 'break' ? 'bg-stone-600 text-white' : 'bg-stone-100 dark:bg-stone-800 text-stone-500'}">Break</button>
+                            </div>
+                        </div>
+                    </div>
                     <div id="vault-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6"></div>
                 </div>`,
 
