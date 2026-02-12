@@ -65,6 +65,7 @@ Preferred communication style: Simple, everyday language.
 - 50 flashcards studied
 - 7 active days
 - 15 focus sessions (pomodoros)
+- 2 diagnostics completed
 
 **Second Officer → Flight Commander:**
 - 30 blurt sessions completed
@@ -72,6 +73,7 @@ Preferred communication style: Simple, everyday language.
 - 150 flashcards studied
 - 21 active days
 - 50 focus sessions (pomodoros)
+- 5 diagnostics completed
 
 ### Key Design Decisions
 
@@ -98,6 +100,15 @@ Preferred communication style: Simple, everyday language.
 - **Google Fonts** — Inter and Lora typefaces
 
 ## Recent Changes
+
+### Feb 12, 2026 — Diagnostics Journey & Rank Integration
+1. **Diagnostics as promotion requirement:** `diagnosticsCompleted` added to rankEvidence. Second Officer requires 2 diagnostics, Flight Commander requires 5.
+2. **Rank evidence recording:** Each completed diagnostic mission increments `diagnosticsCompleted` and triggers promotion check.
+3. **Diagnostics Journey:** Complete all 5 missions to earn the Explorer badge (🏅). Progress tracked on Rank page and MCQ list.
+4. **Explorer Badge:** Visual badge on Rank page when all missions completed. Journey progress bar with per-mission orbit indicators.
+5. **Default to-do:** "Complete the Diagnostics Journey" auto-added to to-do list on first load. Auto-checked when journey completed.
+6. **Evidence Log updated:** Diagnostics count shown in Evidence Log grid on Rank page.
+7. **Journey progress banner:** MCQ list page shows journey progress with motivational text about promotion benefits.
 
 ### Feb 11, 2026 — MCQ Diagnostic System
 1. **Navigation Check:** 100 multiple-choice questions across 5 missions (The Launchpad, Navigation Systems, Galactic Engineers, Avoid the Black Holes, Life Support & Hero State). Diagnostic framing — no timers, XP, or leaderboards.
