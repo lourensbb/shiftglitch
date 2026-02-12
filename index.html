@@ -85,12 +85,17 @@
                     <button onclick="app.navTo('dashboard')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-xs font-semibold tracking-wide transition-colors uppercase">Mission</button>
                     <button onclick="app.navTo('explore')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-xs font-semibold tracking-wide transition-colors uppercase">Vault</button>
                     <button onclick="app.navTo('decks')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-xs font-semibold tracking-wide transition-colors uppercase">Decks</button>
-                    <button onclick="app.navTo('quiz')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-xs font-semibold tracking-wide transition-colors uppercase">Quiz</button>
-                    <button onclick="app.navTo('blurt')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-xs font-semibold tracking-wide transition-colors uppercase">Blurt</button>
-                    <button onclick="app.navTo('babel')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-xs font-semibold tracking-wide transition-colors uppercase">Babel</button>
-                    <button onclick="app.navTo('matrix')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-xs font-semibold tracking-wide transition-colors uppercase">Matrix</button>
-                    <button onclick="app.navTo('recal')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-xs font-semibold tracking-wide transition-colors uppercase">Recal</button>
-                    <button onclick="app.navTo('diagnostic')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-xs font-semibold tracking-wide transition-colors uppercase">Check</button>
+                    <div class="relative" id="tools-dropdown">
+                        <button onclick="app.toggleToolsMenu()" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-xs font-semibold tracking-wide transition-colors uppercase flex items-center gap-1">Tools <svg class="w-3 h-3 transition-transform" id="tools-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></button>
+                        <div id="tools-menu" class="hidden absolute top-full left-1/2 -translate-x-1/2 mt-2 w-44 bg-[#FDFCF8] dark:bg-stone-800 rounded-xl shadow-lg border border-stone-200 dark:border-stone-700 py-2 z-50">
+                            <button onclick="app.navTo('blurt')" class="nav-btn block w-full text-left px-4 py-2.5 text-xs font-semibold tracking-wide uppercase text-stone-500 dark:text-stone-400 hover:text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors">Blurt</button>
+                            <button onclick="app.navTo('babel')" class="nav-btn block w-full text-left px-4 py-2.5 text-xs font-semibold tracking-wide uppercase text-stone-500 dark:text-stone-400 hover:text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors">Babel Fish</button>
+                            <button onclick="app.navTo('quiz')" class="nav-btn block w-full text-left px-4 py-2.5 text-xs font-semibold tracking-wide uppercase text-stone-500 dark:text-stone-400 hover:text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors">Quiz Arena</button>
+                            <button onclick="app.navTo('matrix')" class="nav-btn block w-full text-left px-4 py-2.5 text-xs font-semibold tracking-wide uppercase text-stone-500 dark:text-stone-400 hover:text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors">Matrix</button>
+                            <button onclick="app.navTo('recal')" class="nav-btn block w-full text-left px-4 py-2.5 text-xs font-semibold tracking-wide uppercase text-stone-500 dark:text-stone-400 hover:text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors">Recalibrator</button>
+                            <button onclick="app.navTo('diagnostic')" class="nav-btn block w-full text-left px-4 py-2.5 text-xs font-semibold tracking-wide uppercase text-stone-500 dark:text-stone-400 hover:text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors">Nav Check</button>
+                        </div>
+                    </div>
                     <button onclick="app.navTo('rank')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-xs font-semibold tracking-wide transition-colors uppercase">Rank</button>
                     <button onclick="app.navTo('stats')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-xs font-semibold tracking-wide transition-colors uppercase">Stats</button>
                     <span id="nav-rank" class="text-xs font-bold text-orange-600 ml-2 bg-orange-50 dark:bg-orange-900/30 px-3 py-1 rounded-lg uppercase tracking-widest cursor-pointer" onclick="app.navTo('rank')">Space Cadet</span>
@@ -104,12 +109,14 @@
             <button onclick="app.navTo('dashboard')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Mission</button>
             <button onclick="app.navTo('explore')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Vault</button>
             <button onclick="app.navTo('decks')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Decks</button>
-            <button onclick="app.navTo('quiz')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Quiz</button>
+            <div class="px-4 pt-3 pb-1 text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-widest">Tools</div>
             <button onclick="app.navTo('blurt')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Blurt</button>
-            <button onclick="app.navTo('babel')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Babel</button>
+            <button onclick="app.navTo('babel')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Babel Fish</button>
+            <button onclick="app.navTo('quiz')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Quiz Arena</button>
             <button onclick="app.navTo('matrix')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Matrix</button>
-            <button onclick="app.navTo('recal')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Recal</button>
-            <button onclick="app.navTo('diagnostic')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Check</button>
+            <button onclick="app.navTo('recal')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Recalibrator</button>
+            <button onclick="app.navTo('diagnostic')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Nav Check</button>
+            <div class="border-t border-stone-200 dark:border-stone-700 my-2"></div>
             <button onclick="app.navTo('rank')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Rank</button>
             <button onclick="app.navTo('stats')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Stats</button>
         </div>
@@ -669,21 +676,42 @@
 
                 app.navTo('dashboard');
                 window.addEventListener('resize', app.handleResize);
+                document.addEventListener('click', (e) => { if (!e.target.closest('#tools-dropdown')) app.closeToolsMenu(); });
+                document.addEventListener('keydown', (e) => { if (e.key === 'Escape') app.closeToolsMenu(); });
             },
 
             handleResize: () => { if (state.view === 'dashboard') app.renderCharts(); },
             toggleMobileMenu: () => { const m = document.getElementById('mobile-menu'); if (m) m.classList.toggle('hidden'); },
+            toggleToolsMenu: () => {
+                const menu = document.getElementById('tools-menu');
+                const chevron = document.getElementById('tools-chevron');
+                if (menu) { menu.classList.toggle('hidden'); }
+                if (chevron) { chevron.style.transform = menu && !menu.classList.contains('hidden') ? 'rotate(180deg)' : ''; }
+            },
+            closeToolsMenu: () => {
+                const menu = document.getElementById('tools-menu');
+                const chevron = document.getElementById('tools-chevron');
+                if (menu) menu.classList.add('hidden');
+                if (chevron) chevron.style.transform = '';
+            },
 
             navTo: (tabId) => {
                 state.view = tabId;
                 window.scrollTo(0, 0);
                 const menu = document.getElementById('mobile-menu');
                 if (menu) menu.classList.add('hidden');
+                app.closeToolsMenu();
                 document.querySelectorAll('.nav-btn').forEach(btn => {
                     btn.classList.remove('text-orange-600', 'font-bold');
-                    const map = { dashboard: 'Mission', explore: 'Vault', decks: 'Decks', quiz: 'Quiz', blurt: 'Blurt', matrix: 'Matrix', rank: 'Rank', stats: 'Stats' };
+                    const map = { dashboard: 'Mission', explore: 'Vault', decks: 'Decks', quiz: 'Quiz Arena', blurt: 'Blurt', babel: 'Babel Fish', matrix: 'Matrix', recal: 'Recalibrator', diagnostic: 'Nav Check', rank: 'Rank', stats: 'Stats' };
                     if (btn.textContent.trim().toUpperCase() === (map[tabId] || '').toUpperCase()) btn.classList.add('text-orange-600', 'font-bold');
                 });
+                const toolsViews = ['blurt','babel','quiz','matrix','recal','diagnostic'];
+                const toolsBtn = document.querySelector('#tools-dropdown > button');
+                if (toolsBtn) {
+                    if (toolsViews.includes(tabId)) { toolsBtn.classList.add('text-orange-600','font-bold'); toolsBtn.classList.remove('text-stone-500','dark:text-stone-400'); }
+                    else { toolsBtn.classList.remove('text-orange-600','font-bold'); toolsBtn.classList.add('text-stone-500','dark:text-stone-400'); }
+                }
                 app.render();
             },
 
