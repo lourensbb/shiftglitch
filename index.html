@@ -465,6 +465,7 @@
                 cardsAdvanced: 50,
                 activeDays: 7,
                 pomodorosCompleted: 15,
+                diagnosticsCompleted: 2,
             },
             'Flight Commander': {
                 blurtsCompleted: 30,
@@ -472,6 +473,7 @@
                 cardsAdvanced: 150,
                 activeDays: 21,
                 pomodorosCompleted: 50,
+                diagnosticsCompleted: 5,
             },
         };
 
@@ -480,9 +482,10 @@
                 try {
                     const d = JSON.parse(localStorage.getItem('synapse_rank') || '{}');
                     state.rank = d.rank || 'Space Cadet';
-                    state.rankEvidence = d.rankEvidence || { blurtsCompleted: 0, governorBreakdowns: 0, cardsAdvanced: 0, activeDays: 0, pomodorosCompleted: 0, lastActiveDate: '', activeDateLog: [] };
+                    state.rankEvidence = d.rankEvidence || { blurtsCompleted: 0, governorBreakdowns: 0, cardsAdvanced: 0, activeDays: 0, pomodorosCompleted: 0, diagnosticsCompleted: 0, lastActiveDate: '', activeDateLog: [] };
                     if (!state.rankEvidence.activeDateLog) state.rankEvidence.activeDateLog = [];
-                } catch(e) { state.rank = 'Space Cadet'; state.rankEvidence = { blurtsCompleted: 0, governorBreakdowns: 0, cardsAdvanced: 0, activeDays: 0, pomodorosCompleted: 0, lastActiveDate: '', activeDateLog: [] }; }
+                    if (state.rankEvidence.diagnosticsCompleted === undefined) state.rankEvidence.diagnosticsCompleted = 0;
+                } catch(e) { state.rank = 'Space Cadet'; state.rankEvidence = { blurtsCompleted: 0, governorBreakdowns: 0, cardsAdvanced: 0, activeDays: 0, pomodorosCompleted: 0, diagnosticsCompleted: 0, lastActiveDate: '', activeDateLog: [] }; }
             },
             save() {
                 localStorage.setItem('synapse_rank', JSON.stringify({ rank: state.rank, rankEvidence: state.rankEvidence }));
@@ -536,6 +539,11 @@
                 this.save();
                 this.checkPromotion();
             },
+            recordDiagnostic() {
+                state.rankEvidence.diagnosticsCompleted++;
+                this.save();
+                this.checkPromotion();
+            },
             checkPromotion() {
                 const currentIdx = RANKS.indexOf(state.rank);
                 if (currentIdx >= RANKS.length - 1) return;
@@ -547,7 +555,8 @@
                             ev.governorBreakdowns >= reqs.governorBreakdowns &&
                             ev.cardsAdvanced >= reqs.cardsAdvanced &&
                             ev.activeDays >= reqs.activeDays &&
-                            ev.pomodorosCompleted >= reqs.pomodorosCompleted;
+                            ev.pomodorosCompleted >= reqs.pomodorosCompleted &&
+                            (ev.diagnosticsCompleted || 0) >= reqs.diagnosticsCompleted;
                 if (met) {
                     state.rank = nextRank;
                     this.save();
@@ -575,6 +584,7 @@
                         { label: 'Blurt Sessions', current: ev.blurtsCompleted, required: reqs.blurtsCompleted },
                         { label: 'Governor Breakdowns', current: ev.governorBreakdowns, required: reqs.governorBreakdowns },
                         { label: 'Cards Studied', current: ev.cardsAdvanced, required: reqs.cardsAdvanced },
+                        { label: 'Diagnostics Completed', current: ev.diagnosticsCompleted || 0, required: reqs.diagnosticsCompleted },
                         { label: 'Active Days', current: ev.activeDays, required: reqs.activeDays },
                         { label: 'Focus Sessions', current: ev.pomodorosCompleted, required: reqs.pomodorosCompleted },
                     ]
@@ -590,7 +600,7 @@
             blurtSessions: [], blurtCurrentId: null, blurtPhase: 'list',
             eisenhowerTasks: [], eisenhowerReflections: [], missionTodos: [],
             mcqAttempts: {}, mcqGaps: [], mcqReflections: {}, mcqView: 'list', mcqMissionIdx: 0, mcqQuestionIdx: 0, mcqAnswers: {}, mcqShowResults: false,
-            rank: 'Space Cadet', rankEvidence: { blurtsCompleted: 0, governorBreakdowns: 0, cardsAdvanced: 0, activeDays: 0, pomodorosCompleted: 0, lastActiveDate: '', activeDateLog: [] },
+            rank: 'Space Cadet', rankEvidence: { blurtsCompleted: 0, governorBreakdowns: 0, cardsAdvanced: 0, activeDays: 0, pomodorosCompleted: 0, diagnosticsCompleted: 0, lastActiveDate: '', activeDateLog: [] },
             quizCategory: '', quizDifficulty: 'medium', quizQuestions: [], quizIndex: 0, quizScore: 0,
             quizStreak: 0, quizAnswered: false, quizSelectedAnswer: null, quizTimer: 15, quizTimerInterval: null,
             quizPhase: 'setup', quizSessionCorrect: 0, quizSessionTotal: 0,
@@ -609,6 +619,11 @@
 
                 deckStore.load(); cardStore.load(); pomodoroStore.load(); blurtStore.load(); eisenhowerStore.load(); todoStore.load(); mcqStore.load();
                 rankEngine.load(); rankEngine.trackActiveDay(); rankEngine.updateNavRank();
+
+                const djTodoText = 'Complete the Diagnostics Journey';
+                if (!state.missionTodos.some(t => t.text === djTodoText)) {
+                    todoStore.add(djTodoText);
+                }
 
                 if (window.fb && window.fb.auth) {
                     try {
@@ -1737,6 +1752,33 @@
                         '<h3 class="text-2xl font-serif font-bold text-green-700 dark:text-green-400 mb-2">Maximum Rank Achieved</h3>' +
                         '<p class="text-stone-500">You have demonstrated mastery of evidence-based learning methods.</p>' +
                         '</div>'}
+                    ${(() => {
+                        const completedMissions = mcqBank.filter((m, i) => mcqStore.getAttemptCount(i) > 0).length;
+                        const journeyComplete = completedMissions >= mcqBank.length;
+                        return '<div class="bg-white dark:bg-[#292524] rounded-[2.5rem] p-10 border border-stone-100 dark:border-stone-800 shadow-sm">' +
+                            '<h3 class="text-lg font-serif font-bold mb-3">🛰️ Diagnostics Journey</h3>' +
+                            '<p class="text-sm text-stone-500 dark:text-stone-400 mb-4">To get started on your Adventure into the Learning Universe (and to get promoted!) you should complete the Diagnostics Journey.</p>' +
+                            '<div class="flex items-center gap-3 mb-4">' +
+                            '<div class="flex-grow"><div class="w-full bg-stone-100 dark:bg-stone-800 rounded-full h-3 overflow-hidden"><div class="h-full rounded-full transition-all ' + (journeyComplete ? 'bg-green-500' : 'bg-orange-600') + '" style="width:' + ((completedMissions / mcqBank.length) * 100) + '%"></div></div></div>' +
+                            '<span class="text-sm font-bold ' + (journeyComplete ? 'text-green-600' : 'text-orange-600') + '">' + completedMissions + ' / ' + mcqBank.length + '</span>' +
+                            '</div>' +
+                            '<div class="grid grid-cols-1 sm:grid-cols-5 gap-2">' + mcqBank.map((m, i) => {
+                                const attempted = mcqStore.getAttemptCount(i) > 0;
+                                const best = mcqStore.getBestScore(i);
+                                const total = m.questions.length;
+                                const orbit = best === null ? '⚪' : best >= total * 0.8 ? '🟢' : best >= total * 0.5 ? '🟠' : '🔴';
+                                return '<div class="text-center p-3 rounded-xl border ' + (attempted ? 'bg-orange-50 dark:bg-orange-900/10 border-orange-200 dark:border-orange-800' : 'bg-stone-50 dark:bg-stone-800 border-stone-200 dark:border-stone-700') + '">' +
+                                    '<div class="text-lg">' + orbit + '</div>' +
+                                    '<div class="text-[9px] font-bold uppercase tracking-widest mt-1 ' + (attempted ? 'text-orange-600' : 'text-stone-400') + '">M' + (i+1) + '</div>' +
+                                    '</div>';
+                            }).join('') + '</div>' +
+                            (journeyComplete ? '<div class="mt-4 bg-green-50 dark:bg-green-900/20 rounded-2xl p-4 border border-green-200 dark:border-green-800 text-center">' +
+                                '<span class="text-3xl">🏅</span>' +
+                                '<p class="text-sm font-bold text-green-700 dark:text-green-400 mt-1">Explorer Badge Earned</p>' +
+                                '<p class="text-xs text-stone-500">You completed the full Diagnostics Journey — every mission attempted!</p>' +
+                                '</div>' : '<button onclick="app.navTo(\'diagnostic\')" class="mt-4 w-full bg-orange-600 hover:bg-orange-500 text-white py-3 rounded-xl text-xs font-bold uppercase tracking-widest transition-colors">Continue the Journey</button>') +
+                            '</div>';
+                    })()}
                     <div class="bg-white dark:bg-[#292524] rounded-[2.5rem] p-10 border border-stone-100 dark:border-stone-800 shadow-sm">
                         <h3 class="text-lg font-serif font-bold mb-4">Evidence Log</h3>
                         <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
@@ -1745,6 +1787,7 @@
                             <div class="text-center p-4 bg-stone-50 dark:bg-stone-800 rounded-2xl"><div class="text-2xl font-serif font-bold text-orange-600">${state.rankEvidence.governorBreakdowns}</div><div class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mt-1">Breakdowns</div></div>
                             <div class="text-center p-4 bg-stone-50 dark:bg-stone-800 rounded-2xl"><div class="text-2xl font-serif font-bold text-orange-600">${state.rankEvidence.cardsAdvanced}</div><div class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mt-1">Cards Studied</div></div>
                             <div class="text-center p-4 bg-stone-50 dark:bg-stone-800 rounded-2xl"><div class="text-2xl font-serif font-bold text-orange-600">${state.rankEvidence.activeDays}</div><div class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mt-1">Active Days</div></div>
+                            <div class="text-center p-4 bg-stone-50 dark:bg-stone-800 rounded-2xl"><div class="text-2xl font-serif font-bold text-orange-600">${state.rankEvidence.diagnosticsCompleted || 0}</div><div class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mt-1">Diagnostics</div></div>
                         </div>
                     </div>
                 </div>`;
@@ -1797,8 +1840,15 @@
                 });
                 mcqStore.recordAttempt(state.mcqMissionIdx, {...state.mcqAnswers}, correct, mission.questions.length);
                 if (gaps.length > 0) mcqStore.addGaps(gaps);
+                rankEngine.recordDiagnostic();
                 state.mcqShowResults = true;
                 state.mcqView = 'results';
+                const completedMissions = mcqBank.filter((m, i) => mcqStore.getAttemptCount(i) > 0).length;
+                if (completedMissions >= mcqBank.length) {
+                    app.showNotification('🏅 Diagnostics Journey Complete! You earned the Explorer badge and bonus rank evidence!');
+                    const djTodo = state.missionTodos.find(t => t.text === 'Complete the Diagnostics Journey');
+                    if (djTodo && !djTodo.done) { djTodo.done = true; todoStore.save(); }
+                }
                 app.render();
             },
             mcqSaveReflection() {
@@ -1825,10 +1875,20 @@
 
             getMcqListHTML() {
                 const hasActivity = app.mcqHasActivity();
+                const completedMissions = mcqBank.filter((m, i) => mcqStore.getAttemptCount(i) > 0).length;
+                const journeyComplete = completedMissions >= mcqBank.length;
                 return `<div class="animate-fade-in max-w-4xl mx-auto space-y-8">
                     <div class="text-center mb-8">
                         <h1 class="text-5xl font-serif font-bold mb-4">Navigation Check</h1>
                         <p class="text-stone-500 dark:text-stone-400 italic">Systems diagnostic — confirm what you've learned, reveal what needs practice.</p>
+                    </div>
+                    <div class="bg-white dark:bg-[#292524] rounded-[2rem] p-6 border border-stone-100 dark:border-stone-800 shadow-sm">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-base font-serif font-bold">🛰️ Diagnostics Journey ${journeyComplete ? '<span class="text-green-600 text-sm ml-2">🏅 Complete!</span>' : ''}</h3>
+                            <span class="text-xs font-bold ${journeyComplete ? 'text-green-600' : 'text-orange-600'}">${completedMissions} / ${mcqBank.length} missions</span>
+                        </div>
+                        <div class="w-full bg-stone-100 dark:bg-stone-800 rounded-full h-2.5 overflow-hidden mb-3"><div class="h-full rounded-full transition-all ${journeyComplete ? 'bg-green-500' : 'bg-orange-600'}" style="width:${(completedMissions / mcqBank.length) * 100}%"></div></div>
+                        <p class="text-xs text-stone-500 dark:text-stone-400">${journeyComplete ? 'You earned the Explorer badge! Each completed diagnostic counts toward your rank promotion.' : 'Complete all 5 missions to earn the Explorer badge and bonus rank evidence. Each diagnostic you finish counts toward your promotion!'}</p>
                     </div>
                     ${!hasActivity ? '<div class="bg-amber-50 dark:bg-amber-900/20 rounded-[2rem] p-6 border border-amber-200 dark:border-amber-800 text-center"><p class="text-sm font-semibold text-amber-700 dark:text-amber-400">🔒 Complete a study activity first (focus session, blurt, or flashcard review) to unlock diagnostics.</p></div>' : ''}
                     <div class="bg-orange-50 dark:bg-orange-900/20 rounded-[2rem] p-6 border border-orange-200 dark:border-orange-800">
