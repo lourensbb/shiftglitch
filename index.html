@@ -87,7 +87,9 @@
                     <button onclick="app.navTo('decks')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-xs font-semibold tracking-wide transition-colors uppercase">Decks</button>
                     <button onclick="app.navTo('quiz')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-xs font-semibold tracking-wide transition-colors uppercase">Quiz</button>
                     <button onclick="app.navTo('blurt')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-xs font-semibold tracking-wide transition-colors uppercase">Blurt</button>
+                    <button onclick="app.navTo('babel')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-xs font-semibold tracking-wide transition-colors uppercase">Babel</button>
                     <button onclick="app.navTo('matrix')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-xs font-semibold tracking-wide transition-colors uppercase">Matrix</button>
+                    <button onclick="app.navTo('recal')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-xs font-semibold tracking-wide transition-colors uppercase">Recal</button>
                     <button onclick="app.navTo('diagnostic')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-xs font-semibold tracking-wide transition-colors uppercase">Check</button>
                     <button onclick="app.navTo('rank')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-xs font-semibold tracking-wide transition-colors uppercase">Rank</button>
                     <button onclick="app.navTo('stats')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-xs font-semibold tracking-wide transition-colors uppercase">Stats</button>
@@ -104,7 +106,9 @@
             <button onclick="app.navTo('decks')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Decks</button>
             <button onclick="app.navTo('quiz')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Quiz</button>
             <button onclick="app.navTo('blurt')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Blurt</button>
+            <button onclick="app.navTo('babel')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Babel</button>
             <button onclick="app.navTo('matrix')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Matrix</button>
+            <button onclick="app.navTo('recal')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Recal</button>
             <button onclick="app.navTo('diagnostic')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Check</button>
             <button onclick="app.navTo('rank')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Rank</button>
             <button onclick="app.navTo('stats')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Stats</button>
@@ -178,7 +182,9 @@
             { id: 3, title: "Feynman Technique", category: "Understanding", efficiency: 88, effort: 90, summary: "Simplify to teach.", description: "Teaching a concept in simple terms to identify gaps.", example: "Explain 'Quantum Entanglement' to a 10-year-old.", steps: ["Pick topic", "Teach child", "Spot logic gaps"] },
             { id: 4, title: "Interleaving", category: "Application", efficiency: 85, effort: 75, summary: "Subject shuffling.", description: "Mixing different subjects or problem types in a single session.", example: "Alternate between tennis serves and volleys.", steps: ["Pick 3 topics", "Rotate 25 mins", "Compare logic"] },
             { id: 5, title: "The Leitner System", category: "Retention", efficiency: 94, effort: 65, summary: "Box-based flashcards.", description: "A structured method using flashcards where correct cards move to less-frequent boxes, incorrect cards return to Box 1.", example: "Box 1: Daily. Box 2: Every 3 days. Box 3: Weekly.", steps: ["Setup 5 Boxes", "Test Box 1", "Correct? Advance", "Wrong? Reset to 1"] },
-            { id: 6, title: "Eisenhower Matrix", category: "Prioritisation", efficiency: 90, effort: 30, summary: "Priority sorting.", description: "A decision-making framework that sorts tasks into four quadrants based on urgency and importance, training you to spend more time on what matters.", example: "Test tomorrow = Q1 (Do). Flashcards for next week = Q2 (Plan). Group chat = Q3 (Minimise). Scrolling = Q4 (Limit).", steps: ["Brain dump all tasks", "Sort by urgency + importance", "Act on Q1, plan Q2", "Minimise Q3, limit Q4"] }
+            { id: 6, title: "Eisenhower Matrix", category: "Prioritisation", efficiency: 90, effort: 30, summary: "Priority sorting.", description: "A decision-making framework that sorts tasks into four quadrants based on urgency and importance, training you to spend more time on what matters.", example: "Test tomorrow = Q1 (Do). Flashcards for next week = Q2 (Plan). Group chat = Q3 (Minimise). Scrolling = Q4 (Limit).", steps: ["Brain dump all tasks", "Sort by urgency + importance", "Act on Q1, plan Q2", "Minimise Q3, limit Q4"] },
+            { id: 7, title: "Dopamine Recalibration", category: "Focus", efficiency: 80, effort: 20, summary: "Reset your reward system.", description: "Combat phone addiction and procrastination by resetting your dopamine baseline through boredom, then using micro-commitments to build momentum.", example: "15 min boredom challenge, then 2 min of work — momentum carries you.", steps: ["Stealth Mode (15 min)", "Entry Rocket (2 min)", "Ride the momentum"] },
+            { id: 8, title: "Babel Fish Method", category: "Understanding", efficiency: 90, effort: 80, summary: "Explain to an alien.", description: "The Feynman Technique reimagined: explain concepts so simply that a 5-year-old alien could understand. Add weird memory hooks for dual-coding.", example: "Explain gravity: 'Everything is like a magnet for everything else, bigger things pull harder.' Doodle: Earth eating a sandwich.", steps: ["Pick concept", "Explain to alien child", "Add weird doodle hook"] }
         ];
 
         const mcqBank = [
@@ -457,6 +463,26 @@
             },
         };
 
+        const recalStore = {
+            load() { try { const d = JSON.parse(localStorage.getItem('synapse_recal') || '{}'); state.recalSessions = d.sessions || []; state.recalStealthCount = d.stealthCount || 0; state.recalRocketCount = d.rocketCount || 0; } catch(e) { state.recalSessions = []; state.recalStealthCount = 0; state.recalRocketCount = 0; } },
+            save() { localStorage.setItem('synapse_recal', JSON.stringify({ sessions: state.recalSessions, stealthCount: state.recalStealthCount, rocketCount: state.recalRocketCount })); },
+            recordStealth() { state.recalStealthCount++; state.recalSessions.push({ type: 'stealth', date: new Date().toISOString() }); this.save(); },
+            recordRocket() { state.recalRocketCount++; state.recalSessions.push({ type: 'rocket', date: new Date().toISOString() }); this.save(); },
+        };
+
+        const babelStore = {
+            load() { try { state.babelSessions = JSON.parse(localStorage.getItem('synapse_babel') || '[]'); } catch(e) { state.babelSessions = []; } },
+            save() { localStorage.setItem('synapse_babel', JSON.stringify(state.babelSessions)); },
+            add(concept, explanation, doodle) { state.babelSessions.push({ id: Date.now().toString(), concept, explanation, doodle, createdAt: new Date().toISOString(), hasBadge: true }); this.save(); },
+            remove(id) { state.babelSessions = state.babelSessions.filter(s => s.id !== id); this.save(); },
+        };
+
+        const yetStore = {
+            load() { try { state.yetMoments = JSON.parse(localStorage.getItem('synapse_yet') || '[]'); } catch(e) { state.yetMoments = []; } },
+            save() { localStorage.setItem('synapse_yet', JSON.stringify(state.yetMoments)); },
+            add(concept) { state.yetMoments.push({ concept, date: new Date().toISOString() }); this.save(); },
+        };
+
         const RANKS = ['Space Cadet', 'Second Officer', 'Flight Commander'];
         const RANK_REQUIREMENTS = {
             'Second Officer': {
@@ -604,6 +630,10 @@
             quizCategory: '', quizDifficulty: 'medium', quizQuestions: [], quizIndex: 0, quizScore: 0,
             quizStreak: 0, quizAnswered: false, quizSelectedAnswer: null, quizTimer: 15, quizTimerInterval: null,
             quizPhase: 'setup', quizSessionCorrect: 0, quizSessionTotal: 0,
+            recalSessions: [], recalStealthCount: 0, recalRocketCount: 0,
+            recalMode: 'menu', recalTimer: 0, recalTimerRunning: false, recalTimerInterval: null,
+            babelSessions: [], babelPhase: 'list',
+            yetMoments: [], showYetShield: false, yetConcept: '',
         };
 
         const app = {
@@ -617,7 +647,7 @@
                     if (state.view === 'dashboard') app.renderCharts();
                 });
 
-                deckStore.load(); cardStore.load(); pomodoroStore.load(); blurtStore.load(); eisenhowerStore.load(); todoStore.load(); mcqStore.load();
+                deckStore.load(); cardStore.load(); pomodoroStore.load(); blurtStore.load(); eisenhowerStore.load(); todoStore.load(); mcqStore.load(); recalStore.load(); babelStore.load(); yetStore.load();
                 rankEngine.load(); rankEngine.trackActiveDay(); rankEngine.updateNavRank();
 
                 const djTodoText = 'Complete the Diagnostics Journey';
@@ -841,7 +871,7 @@
             studyRate: (correct) => {
                 const card = state.fcStudyQueue[state.fcStudyIndex];
                 if (!card) return;
-                if (correct) { cardStore.promote(card); } else { cardStore.demote(card); state.fcStudyQueue.push(card); }
+                if (correct) { cardStore.promote(card); } else { cardStore.demote(card); state.fcStudyQueue.push(card); state.showYetShield = true; state.yetConcept = card.front; }
                 rankEngine.recordCardStudy();
                 state.fcStudyIndex++;
                 state.fcFlipped = false;
@@ -920,6 +950,9 @@
                     eisenhower: { tasks: state.eisenhowerTasks, reflections: state.eisenhowerReflections },
                     todos: state.missionTodos,
                     mcq: { attempts: state.mcqAttempts, gaps: state.mcqGaps, reflections: state.mcqReflections },
+                    recal: { sessions: state.recalSessions, stealthCount: state.recalStealthCount, rocketCount: state.recalRocketCount },
+                    babel: state.babelSessions,
+                    yetMoments: state.yetMoments,
                     exportedAt: new Date().toISOString()
                 };
                 const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -943,6 +976,9 @@
                         if (data.eisenhower) { state.eisenhowerTasks = data.eisenhower.tasks || []; state.eisenhowerReflections = data.eisenhower.reflections || []; eisenhowerStore.save(); }
                         if (data.todos) { state.missionTodos = data.todos; todoStore.save(); }
                         if (data.mcq) { state.mcqAttempts = data.mcq.attempts || {}; state.mcqGaps = data.mcq.gaps || []; state.mcqReflections = data.mcq.reflections || {}; mcqStore.save(); }
+                        if (data.recal) { state.recalSessions = data.recal.sessions || []; state.recalStealthCount = data.recal.stealthCount || 0; state.recalRocketCount = data.recal.rocketCount || 0; recalStore.save(); }
+                        if (data.babel) { state.babelSessions = data.babel; babelStore.save(); }
+                        if (data.yetMoments) { state.yetMoments = data.yetMoments; yetStore.save(); }
                         app.showNotification('Data imported successfully!');
                         app.render();
                     } catch (err) { app.showNotification('Import failed. Invalid file.'); }
@@ -971,8 +1007,12 @@
                     container.innerHTML = app.getBlurtHTML();
                 } else if (state.view === 'quiz') {
                     container.innerHTML = app.getQuizHTML();
+                } else if (state.view === 'babel') {
+                    container.innerHTML = app.getBabelHTML();
                 } else if (state.view === 'matrix') {
                     container.innerHTML = app.getMatrixHTML();
+                } else if (state.view === 'recal') {
+                    container.innerHTML = app.getRecalHTML();
                 } else if (state.view === 'diagnostic') {
                     container.innerHTML = app.getDiagnosticHTML();
                 } else if (state.view === 'rank') {
@@ -1225,7 +1265,7 @@
                     const deck = state.fcDecks.find(d => d.id === state.fcCurrentDeck);
                     const cards = cardStore.getForDeck(state.fcCurrentDeck);
                     const dueCount = cardStore.getDue(state.fcCurrentDeck).length;
-                    const boxNames = ['New', 'Learning', 'Review', 'Familiar', 'Mastered'];
+                    const boxNames = ['🚀 Launchpad', '🟠 Learning', '🟢 Reviewing', '💫 Familiar', '✨ Stable Orbit'];
                     return `<div class="animate-fade-in max-w-4xl mx-auto space-y-8">
                         <div class="flex items-center gap-4">
                             <button onclick="app.deckBack()" class="text-stone-400 hover:text-stone-900 dark:hover:text-white text-2xl">&larr;</button>
@@ -1251,11 +1291,22 @@
                             </div>
                         </div>
                         <div class="space-y-3">${cards.length === 0 ? '<p class="text-stone-400 text-center py-8">No cards yet. Add one above.</p>' :
-                            cards.map(c => `<div class="bg-white dark:bg-[#292524] p-4 rounded-xl border border-stone-100 dark:border-stone-800 flex items-center gap-4">
-                                <div class="flex-grow"><span class="font-semibold text-sm">${esc(c.front)}</span> <span class="text-stone-400 mx-2">&rarr;</span> <span class="text-stone-500 text-sm">${esc(c.back)}</span></div>
-                                <span class="text-[10px] font-bold uppercase text-stone-400 tracking-widest">Box ${c.box}</span>
-                                <button onclick="app.cardDelete('${c.id}')" class="text-stone-400 hover:text-red-500 text-sm">&times;</button>
-                            </div>`).join('')}
+                            cards.map(c => {
+                                const now = Date.now();
+                                const overdueDays = Math.max(0, Math.floor((now - c.nextReview) / 86400000));
+                                const isOverdue = c.nextReview <= now;
+                                const orbitStatus = c.box >= 5 ? { icon: '✨', label: 'Stable Orbit', color: 'text-green-500', bg: 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800' }
+                                    : c.box >= 3 ? { icon: '🟢', label: 'Approaching Orbit', color: 'text-emerald-500', bg: 'bg-white dark:bg-[#292524] border-stone-100 dark:border-stone-800' }
+                                    : isOverdue && overdueDays > 3 ? { icon: '🔴', label: 'Drifting to Dark Nebula', color: 'text-red-500', bg: 'bg-red-50 dark:bg-red-900/10 border-red-200 dark:border-red-800' }
+                                    : isOverdue ? { icon: '🟠', label: 'Review needed', color: 'text-orange-500', bg: 'bg-orange-50 dark:bg-orange-900/10 border-orange-200 dark:border-orange-800' }
+                                    : { icon: '⚪', label: 'In transit', color: 'text-stone-400', bg: 'bg-white dark:bg-[#292524] border-stone-100 dark:border-stone-800' };
+                                return `<div class="${orbitStatus.bg} p-4 rounded-xl border flex items-center gap-4 transition-all">
+                                    <span class="text-lg flex-shrink-0" title="${orbitStatus.label}">${orbitStatus.icon}</span>
+                                    <div class="flex-grow"><span class="font-semibold text-sm">${esc(c.front)}</span> <span class="text-stone-400 mx-2">&rarr;</span> <span class="text-stone-500 text-sm">${esc(c.back)}</span></div>
+                                    <span class="text-[10px] font-bold uppercase ${orbitStatus.color} tracking-widest whitespace-nowrap">Box ${c.box}</span>
+                                    <button onclick="app.cardDelete('${c.id}')" class="text-stone-400 hover:text-red-500 text-sm">&times;</button>
+                                </div>`;
+                            }).join('')}
                         </div>
                     </div>`;
                 }
@@ -1291,10 +1342,22 @@
                         state.fcDecks.map(d => {
                             const cards = cardStore.getForDeck(d.id);
                             const due = cardStore.getDue(d.id).length;
+                            const now = Date.now();
+                            const stableCount = cards.filter(c => c.box >= 5).length;
+                            const driftCount = cards.filter(c => c.nextReview <= now && c.box < 5 && (now - c.nextReview) > 3 * 86400000).length;
+                            const orbitPct = cards.length > 0 ? Math.round((stableCount / cards.length) * 100) : 0;
                             return `<div class="card-hover bg-white dark:bg-[#292524] p-6 rounded-2xl border border-stone-100 dark:border-stone-800 cursor-pointer flex flex-col transition-all" onclick="app.deckOpen('${d.id}')">
                                 <h3 class="text-xl font-serif font-bold mb-2">${esc(d.title)}</h3>
-                                <p class="text-sm text-stone-500 flex-grow">${cards.length} cards &middot; ${due} due</p>
-                                <div class="flex justify-between items-center mt-4">
+                                <p class="text-sm text-stone-500">${cards.length} cards &middot; ${due} due</p>
+                                ${cards.length > 0 ? `<div class="flex items-center gap-2 mt-2 mb-1">
+                                    <div class="flex-grow bg-stone-100 dark:bg-stone-800 rounded-full h-1.5 overflow-hidden"><div class="h-full rounded-full bg-green-500 transition-all" style="width:${orbitPct}%"></div></div>
+                                    <span class="text-[9px] font-bold ${orbitPct >= 80 ? 'text-green-500' : orbitPct > 0 ? 'text-orange-500' : 'text-stone-400'}">${orbitPct}% stable</span>
+                                </div>
+                                <div class="flex gap-2 text-[9px] font-bold">
+                                    ${stableCount > 0 ? '<span class="text-green-500">✨ ' + stableCount + ' orbiting</span>' : ''}
+                                    ${driftCount > 0 ? '<span class="text-red-500">🔴 ' + driftCount + ' drifting</span>' : ''}
+                                </div>` : ''}
+                                <div class="flex justify-between items-center mt-auto pt-3">
                                     ${due > 0 ? `<button onclick="event.stopPropagation(); app.studyStart('${d.id}')" class="bg-orange-600 text-white px-4 py-2 rounded-lg text-xs font-bold uppercase">Study</button>` : '<span class="text-xs text-stone-400 uppercase font-bold">All caught up</span>'}
                                     <button onclick="event.stopPropagation(); app.deckDelete('${d.id}')" class="text-stone-400 hover:text-red-500 text-sm">&times;</button>
                                 </div>
@@ -1316,6 +1379,14 @@
                             <div class="backface-hidden rotate-y-180 absolute inset-0 bg-orange-50 dark:bg-orange-900/20 rounded-[2rem] border border-orange-200 dark:border-orange-800 flex items-center justify-center p-8 shadow-sm"><p class="text-2xl font-serif font-bold text-center text-orange-700 dark:text-orange-300">${esc(card.back)}</p></div>
                         </div>
                     </div>
+                    ${state.showYetShield ? `<div class="bg-purple-50 dark:bg-purple-900/20 rounded-2xl p-6 border-2 border-purple-300 dark:border-purple-700 text-center">
+                        <div class="text-3xl mb-2">🛡️</div>
+                        <h3 class="text-lg font-serif font-bold text-purple-700 dark:text-purple-400 mb-1">Growth Shield Activated</h3>
+                        <p class="text-sm text-stone-600 dark:text-stone-300">You don't know <strong class="text-purple-600">${esc(state.yetConcept)}</strong>...</p>
+                        <p class="text-xl font-serif font-bold text-purple-600 dark:text-purple-400 my-2">...YET! 💪</p>
+                        <p class="text-xs text-stone-500 mb-3">You're a Galactic Explorer in Training. This card will come back — and next time, you'll nail it.</p>
+                        <button onclick="app.yetDismiss()" class="bg-purple-600 hover:bg-purple-500 text-white px-5 py-2 rounded-xl font-bold text-xs uppercase tracking-widest transition-colors">I'll learn this — continue</button>
+                    </div>` : ''}
                     ${state.fcFlipped ? `<div class="flex gap-4"><button onclick="app.studyRate(false)" class="flex-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 py-4 rounded-2xl font-bold uppercase tracking-widest text-sm">Again</button><button onclick="app.studyRate(true)" class="flex-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 py-4 rounded-2xl font-bold uppercase tracking-widest text-sm">Got It</button></div>` : '<p class="text-center text-stone-400 text-sm">Tap card to reveal answer</p>'}
                 </div>`;
             },
@@ -1809,6 +1880,7 @@
                             <div class="text-center p-4 bg-stone-50 dark:bg-stone-800 rounded-2xl"><div class="text-2xl font-serif font-bold text-orange-600">${state.rankEvidence.cardsAdvanced}</div><div class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mt-1">Cards Studied</div></div>
                             <div class="text-center p-4 bg-stone-50 dark:bg-stone-800 rounded-2xl"><div class="text-2xl font-serif font-bold text-orange-600">${state.rankEvidence.activeDays}</div><div class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mt-1">Active Days</div></div>
                             <div class="text-center p-4 bg-stone-50 dark:bg-stone-800 rounded-2xl"><div class="text-2xl font-serif font-bold text-orange-600">${state.rankEvidence.diagnosticsCompleted || 0}</div><div class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mt-1">Diagnostics</div></div>
+                            <div class="text-center p-4 bg-purple-50 dark:bg-purple-900/20 rounded-2xl"><div class="text-2xl font-serif font-bold text-purple-600">${state.yetMoments.length}</div><div class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mt-1">YET Moments</div></div>
                         </div>
                     </div>
                 </div>`;
@@ -1860,7 +1932,7 @@
                     else gaps.push(q.concept);
                 });
                 mcqStore.recordAttempt(state.mcqMissionIdx, {...state.mcqAnswers}, correct, mission.questions.length);
-                if (gaps.length > 0) mcqStore.addGaps(gaps);
+                if (gaps.length > 0) { mcqStore.addGaps(gaps); state.showYetShield = true; state.yetConcept = gaps[0]; }
                 rankEngine.recordDiagnostic();
                 state.mcqShowResults = true;
                 state.mcqView = 'results';
@@ -2041,6 +2113,14 @@
                 const orbitStatus = pct >= 80 ? '🟢 Stable Orbit' : pct >= 50 ? '🟠 Adjusting Course' : '🔴 Unstable — Review Needed';
                 const reflection = state.mcqReflections[state.mcqMissionIdx] || '';
                 return `<div class="animate-fade-in max-w-2xl mx-auto space-y-8">
+                    ${state.showYetShield ? `<div class="bg-purple-50 dark:bg-purple-900/20 rounded-[2rem] p-8 border-2 border-purple-300 dark:border-purple-700 text-center mb-6">
+                        <div class="text-4xl mb-3">🛡️</div>
+                        <h3 class="text-xl font-serif font-bold text-purple-700 dark:text-purple-400 mb-2">Growth Shield Activated</h3>
+                        <p class="text-sm text-stone-600 dark:text-stone-300 mb-4">You don't understand <strong class="text-purple-600">${esc(state.yetConcept)}</strong>...</p>
+                        <p class="text-2xl font-serif font-bold text-purple-600 dark:text-purple-400 mb-4">...YET! 💪</p>
+                        <p class="text-xs text-stone-500 mb-4">You're not a failing student — you're a <strong>Galactic Explorer in Training</strong>. Every gap is a star waiting to be discovered.</p>
+                        <button onclick="app.yetDismiss()" class="bg-purple-600 hover:bg-purple-500 text-white px-6 py-3 rounded-xl font-bold text-sm uppercase tracking-widest transition-colors">I'll learn this — continue</button>
+                    </div>` : ''}
                     <div class="text-center">
                         <h1 class="text-4xl font-serif font-bold mb-2">Diagnostic Complete</h1>
                         <p class="text-stone-500 dark:text-stone-400 italic">${esc(m.mission)}</p>
@@ -2080,6 +2160,237 @@
                         <button onclick="app.mcqStartMission(${state.mcqMissionIdx})" class="flex-1 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 py-3 rounded-xl font-bold text-sm uppercase tracking-widest">Retry After Practice</button>
                     </div>
                 </div>`;
+            },
+
+            startStealth() {
+                state.recalMode = 'stealth';
+                state.recalTimer = 900;
+                state.recalTimerRunning = true;
+                clearInterval(state.recalTimerInterval);
+                state.recalTimerInterval = setInterval(() => app.recalTick(), 1000);
+                app.render();
+            },
+            startRocket() {
+                state.recalMode = 'rocket';
+                state.recalTimer = 120;
+                state.recalTimerRunning = true;
+                clearInterval(state.recalTimerInterval);
+                state.recalTimerInterval = setInterval(() => app.recalTick(), 1000);
+                app.render();
+            },
+            recalTick() {
+                state.recalTimer--;
+                if (state.recalTimer <= 0) {
+                    clearInterval(state.recalTimerInterval);
+                    state.recalTimerRunning = false;
+                    if (state.recalMode === 'stealth') {
+                        recalStore.recordStealth();
+                        app.showNotification('🌑 Stealth Mode complete! Your dopamine baseline is resetting.');
+                    } else {
+                        recalStore.recordRocket();
+                        app.showNotification('🚀 Ignition complete! Ride the momentum!');
+                    }
+                    state.recalMode = 'complete';
+                }
+                app.render();
+            },
+            recalStop() {
+                clearInterval(state.recalTimerInterval);
+                state.recalTimerRunning = false;
+                state.recalMode = 'menu';
+                app.render();
+            },
+            recalBack() {
+                state.recalMode = 'menu';
+                app.render();
+            },
+            getRecalHTML() {
+                const fmtTime = (s) => { const m = Math.floor(s / 60); const sec = s % 60; return String(m).padStart(2, '0') + ':' + String(sec).padStart(2, '0'); };
+                if (state.recalMode === 'stealth' || state.recalMode === 'rocket') {
+                    const total = state.recalMode === 'stealth' ? 900 : 120;
+                    const pct = ((total - state.recalTimer) / total) * 100;
+                    const circumference = 2 * Math.PI * 90;
+                    const offset = circumference - (pct / 100) * circumference;
+                    const label = state.recalMode === 'stealth' ? '🌑 Stealth Mode' : '🚀 Entry Rocket';
+                    const color = state.recalMode === 'stealth' ? 'text-stone-400' : 'text-orange-600';
+                    return `<div class="animate-fade-in max-w-2xl mx-auto space-y-8 text-center">
+                        <h1 class="text-5xl font-serif font-bold mb-2">${label}</h1>
+                        <p class="text-stone-500 dark:text-stone-400 italic">${state.recalMode === 'stealth' ? 'Embrace the void. Let your brain reset.' : 'Just 2 minutes. Momentum takes over.'}</p>
+                        <div class="bg-white dark:bg-[#292524] rounded-[2.5rem] p-10 border border-stone-100 dark:border-stone-800 shadow-sm flex flex-col items-center">
+                            <div class="relative w-56 h-56 mb-6">
+                                <svg class="w-full h-full transform -rotate-90">
+                                    <circle cx="112" cy="112" r="90" stroke-width="8" stroke="currentColor" fill="transparent" class="text-stone-100 dark:text-stone-800" />
+                                    <circle cx="112" cy="112" r="90" stroke-width="8" stroke="currentColor" fill="transparent" class="${color}" style="stroke-dasharray:${circumference} ${circumference}; stroke-dashoffset:${offset}; transition: stroke-dashoffset 1s linear;" />
+                                </svg>
+                                <div class="absolute inset-0 flex items-center justify-center text-5xl font-bold font-sans">${fmtTime(state.recalTimer)}</div>
+                            </div>
+                            <button onclick="app.recalStop()" class="bg-red-600 hover:bg-red-500 text-white px-8 py-3 rounded-2xl font-bold text-sm uppercase tracking-widest transition-colors">Stop</button>
+                        </div>
+                    </div>`;
+                }
+                if (state.recalMode === 'complete') {
+                    return `<div class="animate-fade-in max-w-2xl mx-auto space-y-8 text-center">
+                        <div class="text-6xl mb-4">🎉</div>
+                        <h1 class="text-5xl font-serif font-bold mb-2">Session Complete!</h1>
+                        <p class="text-stone-500 dark:text-stone-400 italic">You did it. Your brain thanks you.</p>
+                        <div class="bg-white dark:bg-[#292524] rounded-[2.5rem] p-10 border border-stone-100 dark:border-stone-800 shadow-sm">
+                            <p class="text-lg font-serif font-semibold text-stone-700 dark:text-stone-200 mb-6">Now ride the momentum — start a focus session or dive into your study material.</p>
+                            <button onclick="app.recalBack()" class="bg-orange-600 hover:bg-orange-500 text-white px-8 py-3 rounded-2xl font-bold text-sm uppercase tracking-widest transition-colors">Back to Recalibrator</button>
+                        </div>
+                    </div>`;
+                }
+                return `<div class="animate-fade-in max-w-4xl mx-auto space-y-8">
+                    <div class="text-center mb-4">
+                        <h1 class="text-5xl font-serif font-bold mb-3">Dopamine Recalibrator</h1>
+                        <p class="text-stone-500 dark:text-stone-400 italic max-w-xl mx-auto">Reset your brain. Reclaim your focus.</p>
+                    </div>
+                    <div class="bg-orange-50 dark:bg-orange-900/20 rounded-[2rem] p-6 border border-orange-200 dark:border-orange-800">
+                        <h3 class="text-base font-serif font-bold text-orange-700 dark:text-orange-400 mb-3">📋 How to Recalibrate</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div class="bg-white dark:bg-stone-800 rounded-xl p-4 border border-orange-100 dark:border-stone-700 text-center">
+                                <div class="text-2xl mb-1">1️⃣</div>
+                                <p class="text-sm font-bold text-stone-800 dark:text-stone-100">The Black Hole</p>
+                                <p class="text-xs text-stone-500 dark:text-stone-400 mt-1">Your phone is a Black Hole pulling you away from focus</p>
+                            </div>
+                            <div class="bg-white dark:bg-stone-800 rounded-xl p-4 border border-orange-100 dark:border-stone-700 text-center">
+                                <div class="text-2xl mb-1">2️⃣</div>
+                                <p class="text-sm font-bold text-stone-800 dark:text-stone-100">Stealth Mode</p>
+                                <p class="text-xs text-stone-500 dark:text-stone-400 mt-1">Use Stealth Mode (15 min) to reset your dopamine baseline</p>
+                            </div>
+                            <div class="bg-white dark:bg-stone-800 rounded-xl p-4 border border-orange-100 dark:border-stone-700 text-center">
+                                <div class="text-2xl mb-1">3️⃣</div>
+                                <p class="text-sm font-bold text-stone-800 dark:text-stone-100">Entry Rocket</p>
+                                <p class="text-xs text-stone-500 dark:text-stone-400 mt-1">Use the Entry Rocket (2 min) to launch into work — momentum does the rest</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-white dark:bg-[#292524] rounded-[2rem] p-8 border border-stone-100 dark:border-stone-800 shadow-sm text-center">
+                            <div class="text-5xl mb-4">🌑</div>
+                            <h3 class="text-2xl font-serif font-bold mb-2">Stealth Mode</h3>
+                            <p class="text-sm text-stone-500 dark:text-stone-400 mb-4">15-Minute Boredom Challenge — Stare at the void. No devices. Reset your brain.</p>
+                            <div class="text-xs font-bold uppercase tracking-widest text-stone-400 mb-4">${state.recalStealthCount} sessions completed</div>
+                            <button onclick="app.startStealth()" class="bg-stone-900 dark:bg-stone-50 text-white dark:text-stone-900 px-8 py-3 rounded-2xl font-bold text-sm uppercase tracking-widest transition-colors">Start Stealth</button>
+                        </div>
+                        <div class="bg-white dark:bg-[#292524] rounded-[2rem] p-8 border border-stone-100 dark:border-stone-800 shadow-sm text-center">
+                            <div class="text-5xl mb-4">🚀</div>
+                            <h3 class="text-2xl font-serif font-bold mb-2">Entry Rocket</h3>
+                            <p class="text-sm text-stone-500 dark:text-stone-400 mb-4">2-Minute Ignition — Just 120 seconds. That's all. Momentum takes over.</p>
+                            <div class="text-xs font-bold uppercase tracking-widest text-stone-400 mb-4">${state.recalRocketCount} sessions completed</div>
+                            <button onclick="app.startRocket()" class="bg-orange-600 hover:bg-orange-500 text-white px-8 py-3 rounded-2xl font-bold text-sm uppercase tracking-widest transition-colors">Ignition</button>
+                        </div>
+                    </div>
+                    <div class="bg-white dark:bg-[#292524] rounded-[2rem] p-8 border border-stone-100 dark:border-stone-800 shadow-sm">
+                        <h3 class="text-lg font-serif font-bold mb-4">Session Stats</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="text-center p-4 bg-stone-50 dark:bg-stone-800 rounded-2xl"><div class="text-2xl font-serif font-bold text-stone-600 dark:text-stone-300">${state.recalStealthCount}</div><div class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mt-1">Stealth Sessions</div></div>
+                            <div class="text-center p-4 bg-stone-50 dark:bg-stone-800 rounded-2xl"><div class="text-2xl font-serif font-bold text-orange-600">${state.recalRocketCount}</div><div class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mt-1">Rocket Sessions</div></div>
+                        </div>
+                    </div>
+                </div>`;
+            },
+
+            babelStart() {
+                state.babelPhase = 'create';
+                app.render();
+            },
+            babelSubmit() {
+                const concept = document.getElementById('babel-concept')?.value.trim();
+                const explanation = document.getElementById('babel-explanation')?.value.trim();
+                const doodle = document.getElementById('babel-doodle')?.value.trim() || '';
+                if (!concept || !explanation) {
+                    app.showNotification('Please fill in both the concept and explanation.');
+                    return;
+                }
+                babelStore.add(concept, explanation, doodle);
+                app.showNotification('🏅 Sync Badge earned! Your weird pairing will make this unforgettable.');
+                state.babelPhase = 'list';
+                app.render();
+            },
+            babelDelete(id) {
+                if (confirm('Delete this translation?')) {
+                    babelStore.remove(id);
+                    app.render();
+                }
+            },
+            babelBack() {
+                state.babelPhase = 'list';
+                app.render();
+            },
+            getBabelHTML() {
+                if (state.babelPhase === 'create') {
+                    return `<div class="animate-fade-in max-w-2xl mx-auto space-y-8">
+                        <div class="flex items-center gap-4">
+                            <button onclick="app.babelBack()" class="text-stone-400 hover:text-stone-900 dark:hover:text-white text-2xl">&larr;</button>
+                            <h1 class="text-4xl font-serif font-bold">New Translation</h1>
+                        </div>
+                        <div class="bg-white dark:bg-[#292524] rounded-[2.5rem] p-10 border border-stone-100 dark:border-stone-800 shadow-sm space-y-6">
+                            <div>
+                                <label class="text-sm font-bold uppercase text-stone-500 tracking-widest block mb-2">Concept</label>
+                                <input id="babel-concept" type="text" placeholder="e.g. Photosynthesis, Supply & Demand, Mitosis..." class="w-full bg-stone-50 dark:bg-stone-800 px-4 py-3 rounded-xl border border-stone-200 dark:border-stone-700 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+                            </div>
+                            <div>
+                                <label class="text-sm font-bold uppercase text-stone-500 tracking-widest block mb-2">Alien-Simple Explanation</label>
+                                <textarea id="babel-explanation" rows="6" class="w-full bg-stone-50 dark:bg-stone-800 px-4 py-3 rounded-xl border border-stone-200 dark:border-stone-700 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none" placeholder="Pretend you're talking to a curious alien child who has never heard of this..."></textarea>
+                            </div>
+                            <div>
+                                <label class="text-sm font-bold uppercase text-stone-500 tracking-widest block mb-2">Weird Doodle Description <span class="text-stone-400 normal-case">(optional)</span></label>
+                                <input id="babel-doodle" type="text" placeholder="Describe a silly picture that represents this concept — the weirder the better!" class="w-full bg-stone-50 dark:bg-stone-800 px-4 py-3 rounded-xl border border-stone-200 dark:border-stone-700 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+                            </div>
+                            <button onclick="app.babelSubmit()" class="w-full bg-orange-600 hover:bg-orange-500 text-white py-4 rounded-2xl font-bold uppercase tracking-widest text-sm">Submit Translation</button>
+                        </div>
+                    </div>`;
+                }
+                return `<div class="animate-fade-in max-w-4xl mx-auto space-y-8">
+                    <div class="text-center mb-4">
+                        <h1 class="text-5xl font-serif font-bold mb-3">Babel Fish Metaphor Lab</h1>
+                        <p class="text-stone-500 dark:text-stone-400 italic max-w-xl mx-auto">Translate complex ideas for a 5-year-old alien from Andromeda</p>
+                    </div>
+                    <div class="bg-orange-50 dark:bg-orange-900/20 rounded-[2rem] p-6 border border-orange-200 dark:border-orange-800">
+                        <h3 class="text-base font-serif font-bold text-orange-700 dark:text-orange-400 mb-3">📋 How to use the Babel Fish Method</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div class="bg-white dark:bg-stone-800 rounded-xl p-4 border border-orange-100 dark:border-stone-700 text-center">
+                                <div class="text-2xl mb-1">1️⃣</div>
+                                <p class="text-sm font-bold text-stone-800 dark:text-stone-100">Pick a concept</p>
+                                <p class="text-xs text-stone-500 dark:text-stone-400 mt-1">Pick a concept you're studying</p>
+                            </div>
+                            <div class="bg-white dark:bg-stone-800 rounded-xl p-4 border border-orange-100 dark:border-stone-700 text-center">
+                                <div class="text-2xl mb-1">2️⃣</div>
+                                <p class="text-sm font-bold text-stone-800 dark:text-stone-100">Explain simply</p>
+                                <p class="text-xs text-stone-500 dark:text-stone-400 mt-1">Explain it so simply a 5-year-old alien could get it</p>
+                            </div>
+                            <div class="bg-white dark:bg-stone-800 rounded-xl p-4 border border-orange-100 dark:border-stone-700 text-center">
+                                <div class="text-2xl mb-1">3️⃣</div>
+                                <p class="text-sm font-bold text-stone-800 dark:text-stone-100">Add a weird doodle</p>
+                                <p class="text-xs text-stone-500 dark:text-stone-400 mt-1">Add a weird doodle description — the weirder, the more memorable</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <button onclick="app.babelStart()" class="bg-orange-600 hover:bg-orange-500 text-white px-10 py-4 rounded-2xl font-bold uppercase tracking-widest text-sm transition-colors">New Translation</button>
+                    </div>
+                    ${state.babelSessions.length === 0 ? '<div class="text-center py-8"><p class="text-stone-400 italic">No translations yet — create your first one above!</p></div>' :
+                    '<div class="space-y-4">' + state.babelSessions.slice().reverse().map(s => `<div class="bg-white dark:bg-[#292524] rounded-[2rem] p-8 border border-stone-100 dark:border-stone-800 shadow-sm">
+                        <div class="flex items-start justify-between gap-4">
+                            <div class="flex-grow">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <h3 class="text-xl font-serif font-bold">${esc(s.concept)}</h3>
+                                    ${s.hasBadge ? '<span class="text-lg" title="Sync Badge">🏅</span>' : ''}
+                                </div>
+                                <p class="text-sm text-stone-600 dark:text-stone-300 mb-2 leading-relaxed">${esc(s.explanation.length > 200 ? s.explanation.slice(0, 200) + '...' : s.explanation)}</p>
+                                ${s.doodle ? '<p class="text-xs text-stone-400 italic">🎨 ' + esc(s.doodle) + '</p>' : ''}
+                                <p class="text-[10px] text-stone-400 mt-2">${new Date(s.createdAt).toLocaleDateString()}</p>
+                            </div>
+                            <button onclick="app.babelDelete(\'${s.id}\')" class="text-stone-400 hover:text-red-500 text-sm flex-shrink-0">&times;</button>
+                        </div>
+                    </div>`).join('') + '</div>'}
+                </div>`;
+            },
+
+            yetDismiss() {
+                state.showYetShield = false;
+                yetStore.add(state.yetConcept);
+                app.render();
             },
 
             showAbout: () => alert("Synapse OS v7.0 - Interactive Learning OS with Rank System")
