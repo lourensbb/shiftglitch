@@ -176,6 +176,21 @@
             { q: "How do I balance school with sports and social life?", a: "Protect your <strong>non-study time</strong> as carefully as study time. Block fixed commitments first, schedule study in focused blocks, use theme days, and remember: rest and friends are <strong>fuel</strong> for good studying." },
         ];
 
+        const reflectionQuestions = [
+            { q: "Why is testing yourself better than rereading your notes?", a: "Testing yourself forces your brain to actively retrieve information, which strengthens memory pathways. Rereading feels easy but creates an illusion of knowing — you recognise the words without truly remembering them." },
+            { q: "What happens to your memory if you only study the night before a test?", a: "Cramming can help short-term, but most of it fades within days. Without spaced repetition, your brain treats the information as unimportant and lets it decay. Spreading study over several days builds much stronger, longer-lasting memories." },
+            { q: "Why does explaining a concept in simple words help you learn it?", a: "When you simplify an idea, you have to truly understand its core logic. If you can't explain it simply, you've found a gap in your understanding. Teaching forces you to organise your thoughts and fill those gaps." },
+            { q: "What is the difference between being busy and being productive?", a: "Being busy means doing lots of tasks — but they might not matter. Being productive means focusing on the tasks that actually move you forward. The Eisenhower Matrix helps you sort urgent from important so you work on what counts." },
+            { q: "Why should you take breaks during study sessions?", a: "Your brain needs rest to consolidate what you've learned. Studying without breaks leads to fatigue, reduced focus, and diminishing returns. Short breaks (like in the Pomodoro method) actually help you learn more in less total time." },
+            { q: "How does mixing different subjects in one session help learning?", a: "Interleaving (switching between subjects) forces your brain to constantly retrieve and adapt, which strengthens understanding. It feels harder in the moment, but produces better long-term results than studying one topic for hours." },
+            { q: "Why is it better to write flashcard answers from memory than to just read them?", a: "Writing from memory is a form of active recall — it makes your brain work to retrieve the answer. Just reading the back of a card is passive and doesn't strengthen the memory pathway nearly as much." },
+            { q: "What role does sleep play in learning?", a: "During sleep, your brain replays and consolidates the day's learning, moving information from short-term to long-term memory. Poor sleep dramatically reduces your ability to remember and think clearly the next day." },
+            { q: "Why does starting with just 2 minutes of work help beat procrastination?", a: "The hardest part of any task is starting. A 2-minute commitment feels so small that your brain doesn't resist it. Once you begin, momentum usually carries you forward — motivation follows action, not the other way around." },
+            { q: "How can you tell if you truly understand something versus just recognising it?", a: "If you can explain it to someone else without notes, apply it to a new problem, or answer unexpected questions about it — you understand it. If you only recognise it when you see it written down, that's just familiarity, not understanding." },
+        ];
+
+        let reflectionState = { currentIndex: 0, userAnswer: '', revealed: false, score: { attempted: 0, total: reflectionQuestions.length } };
+
         const deckStore = {
             load() { try { state.fcDecks = JSON.parse(localStorage.getItem('demo_decks') || '[]'); } catch(e) { state.fcDecks = []; } },
             save() { localStorage.setItem('demo_decks', JSON.stringify(state.fcDecks)); },
@@ -447,6 +462,30 @@
                 if (chevron) chevron.style.transform = '';
             },
 
+            reflectionReveal: () => {
+                const input = document.getElementById('reflection-input');
+                reflectionState.userAnswer = input ? input.value.trim() : '';
+                reflectionState.revealed = true;
+                reflectionState.score.attempted++;
+                app.render();
+                setTimeout(() => { const m = document.getElementById('reflection-module'); if (m) m.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+            },
+
+            reflectionSkip: () => {
+                reflectionState.userAnswer = '';
+                reflectionState.revealed = false;
+                reflectionState.currentIndex = (reflectionState.currentIndex + 1) % reflectionQuestions.length;
+                app.render();
+            },
+
+            reflectionNext: () => {
+                reflectionState.userAnswer = '';
+                reflectionState.revealed = false;
+                reflectionState.currentIndex = (reflectionState.currentIndex + 1) % reflectionQuestions.length;
+                app.render();
+                setTimeout(() => { const m = document.getElementById('reflection-module'); if (m) m.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+            },
+
             lockedTool: () => {
                 app.showNotification('This tool is available in the full version of Synapse');
             },
@@ -691,6 +730,37 @@
                             '<div class="bg-white dark:bg-stone-800 rounded-2xl p-5 border border-orange-100 dark:border-stone-700 text-center"><div class="text-3xl mb-2">2\uFE0F\u20E3</div><p class="text-sm font-semibold text-stone-700 dark:text-stone-200 mb-1">Use the tools</p><p class="text-xs text-stone-500 dark:text-stone-400">Start a focus timer, make flashcards, or sort your tasks.</p></div>' +
                             '<div class="bg-white dark:bg-stone-800 rounded-2xl p-5 border border-orange-100 dark:border-stone-700 text-center"><div class="text-3xl mb-2">3\uFE0F\u20E3</div><p class="text-sm font-semibold text-stone-700 dark:text-stone-200 mb-1">Level up your rank</p><p class="text-xs text-stone-500 dark:text-stone-400">Keep studying consistently and you\'ll earn your next rank!</p></div>' +
                         '</div>' +
+                    '</section>' +
+                    '<section id="reflection-module" class="bg-white dark:bg-[#292524] rounded-[2rem] p-8 border-2 border-orange-300 dark:border-orange-700 shadow-lg">' +
+                        '<div class="flex items-center justify-between mb-6">' +
+                            '<div><h3 class="text-xl font-serif font-bold text-stone-900 dark:text-stone-50">\uD83E\uDDE0 Reflection Quiz</h3>' +
+                            '<p class="text-sm text-stone-500 dark:text-stone-400 mt-1">Think first, then compare your answer with ours.</p></div>' +
+                            '<span class="text-xs font-bold bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300 px-3 py-1 rounded-full">' + (reflectionState.currentIndex + 1) + ' / ' + reflectionQuestions.length + '</span>' +
+                        '</div>' +
+                        '<div class="bg-orange-50 dark:bg-stone-800 rounded-2xl p-6 mb-5 border border-orange-100 dark:border-stone-700">' +
+                            '<p class="text-base font-semibold text-stone-800 dark:text-stone-100 leading-relaxed">' + esc(reflectionQuestions[reflectionState.currentIndex].q) + '</p>' +
+                        '</div>' +
+                        (reflectionState.revealed ?
+                            '<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">' +
+                                '<div class="rounded-2xl p-5 border-2 border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20">' +
+                                    '<p class="text-xs font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400 mb-2">Your Answer</p>' +
+                                    '<p class="text-sm text-stone-700 dark:text-stone-200 leading-relaxed">' + esc(reflectionState.userAnswer || '(no answer written)') + '</p>' +
+                                '</div>' +
+                                '<div class="rounded-2xl p-5 border-2 border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20">' +
+                                    '<p class="text-xs font-bold uppercase tracking-widest text-green-600 dark:text-green-400 mb-2">Model Answer</p>' +
+                                    '<p class="text-sm text-stone-700 dark:text-stone-200 leading-relaxed">' + esc(reflectionQuestions[reflectionState.currentIndex].a) + '</p>' +
+                                '</div>' +
+                            '</div>' +
+                            '<div class="flex gap-3 justify-center">' +
+                                '<button onclick="app.reflectionNext()" class="bg-orange-600 hover:bg-orange-500 text-white px-6 py-3 rounded-xl font-bold text-sm transition-colors">Next Question \u2192</button>' +
+                            '</div>'
+                        :
+                            '<textarea id="reflection-input" rows="4" placeholder="Type your answer here before revealing..." class="w-full bg-stone-50 dark:bg-stone-800 px-4 py-3 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none mb-4">' + esc(reflectionState.userAnswer) + '</textarea>' +
+                            '<div class="flex gap-3 justify-center">' +
+                                '<button onclick="app.reflectionReveal()" class="bg-orange-600 hover:bg-orange-500 text-white px-6 py-3 rounded-xl font-bold text-sm transition-colors">Reveal & Compare \uD83D\uDD0D</button>' +
+                                '<button onclick="app.reflectionSkip()" class="bg-stone-200 dark:bg-stone-700 hover:bg-stone-300 dark:hover:bg-stone-600 text-stone-700 dark:text-stone-200 px-6 py-3 rounded-xl font-bold text-sm transition-colors">Skip</button>' +
+                            '</div>'
+                        ) +
                     '</section>' +
                     '<section class="bg-gradient-to-br from-orange-600 to-orange-700 rounded-[2.5rem] p-8 md:p-10 text-white shadow-2xl relative overflow-hidden">' +
                         '<div class="relative z-10 flex flex-col gap-5 text-center">' +
