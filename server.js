@@ -38,6 +38,10 @@ app.post('/api/gemini', async (req, res) => {
 
 app.use(express.static(path.join(__dirname)));
 
+app.get('/demo', (req, res) => {
+  res.sendFile(path.join(__dirname, 'demo.html'));
+});
+
 app.get('/{*splat}', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
