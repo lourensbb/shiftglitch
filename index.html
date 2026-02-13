@@ -8,16 +8,22 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 
+    <script>
+        if (typeof SYNAPSE_FIREBASE_CONFIG === 'undefined') var SYNAPSE_FIREBASE_CONFIG = null;
+    </script>
+    <script src="config.js" onerror=""></script>
     <script type="module">
         try {
+            if (!SYNAPSE_FIREBASE_CONFIG || SYNAPSE_FIREBASE_CONFIG.apiKey === 'YOUR_API_KEY_HERE') {
+                throw new Error("Firebase not configured — edit config.js to enable cloud sync");
+            }
             const { initializeApp } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js");
             const { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js");
             const { getFirestore, doc, getDoc, setDoc, collection, addDoc, updateDoc, getDocs, deleteDoc } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
-            const firebaseConfig = JSON.parse(__firebase_config);
-            const app_fb = initializeApp(firebaseConfig);
+            const app_fb = initializeApp(SYNAPSE_FIREBASE_CONFIG);
             window.fb = {
                 auth: getAuth(app_fb), db: getFirestore(app_fb),
-                appId: typeof __app_id !== 'undefined' ? __app_id : 'default-app-id',
+                appId: 'synapse-app',
                 doc, getDoc, setDoc, collection, addDoc, updateDoc, getDocs, deleteDoc,
                 signInAnonymously, signInWithCustomToken, onAuthStateChanged
             };
@@ -1617,6 +1623,30 @@
                                 <svg class="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
                                 <span><strong>Private &amp; Secure</strong> — Your API key is stored in your browser's local storage only. It is never sent to our servers, never stored in any database, and never shared with anyone. You have full control over your own AI usage.</span>
                             </p>
+                        </div>
+                    </div>
+                    <div class="bg-white dark:bg-stone-800 rounded-2xl border border-stone-200 dark:border-stone-700 p-8 space-y-6">
+                        <div>
+                            <h2 class="text-xl font-serif font-bold mb-2 flex items-center gap-2">
+                                <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/></svg>
+                                Cloud Sync (Firebase)
+                            </h2>
+                            <p class="text-sm text-stone-500 dark:text-stone-400 mb-1">Optional — Synapse works fully offline without Firebase. Cloud sync lets you access your data across multiple devices.</p>
+                            <p class="text-xs font-semibold ${window.fb ? 'text-green-600' : 'text-stone-400'}">${window.fb ? 'Connected' : 'Not configured — running in offline mode'}</p>
+                        </div>
+                        <div class="border-t border-stone-200 dark:border-stone-700 pt-4 space-y-3">
+                            <h3 class="text-sm font-bold text-stone-600 dark:text-stone-400 uppercase tracking-widest">How to set up Firebase (free)</h3>
+                            <ol class="text-sm text-stone-600 dark:text-stone-400 space-y-2 list-decimal list-inside">
+                                <li>Go to <a href="https://console.firebase.google.com/" target="_blank" rel="noopener noreferrer" class="text-orange-600 dark:text-orange-400 underline underline-offset-2 hover:text-orange-700">Firebase Console</a> and click <strong>"Create a project"</strong></li>
+                                <li>Name your project (e.g. "my-synapse") and follow the prompts</li>
+                                <li>In Project Settings, scroll to "Your apps" and click the web icon <strong>&lt;/&gt;</strong></li>
+                                <li>Register an app name, then copy the <strong>firebaseConfig</strong> values shown</li>
+                                <li>Open the file <code class="bg-stone-100 dark:bg-stone-900 px-1.5 py-0.5 rounded text-xs font-mono">config.js</code> and paste your values in place of the placeholders</li>
+                                <li>In the Firebase Console sidebar, go to <strong>Authentication</strong> and enable <strong>Anonymous</strong> sign-in</li>
+                                <li>Go to <strong>Firestore Database</strong> and click <strong>Create database</strong> (start in test mode)</li>
+                                <li>Refresh Synapse — you should see "Connected" above</li>
+                            </ol>
+                            <p class="text-xs text-stone-400 dark:text-stone-500 italic mt-2">Firebase's free Spark plan is generous — more than enough for personal use.</p>
                         </div>
                     </div>
                 </div>`;

@@ -45,7 +45,8 @@ Primary data storage is `localStorage` for offline functionality, persisting fla
 ### Key Design Decisions
 - **CDN-based dependencies:** No build system; libraries like Tailwind, Chart.js, and Firebase are loaded via CDNs.
 - **Firebase as optional:** The application functions fully offline with `localStorage`; Firebase provides an optional cloud sync layer.
-- **Monolithic HTML:** All frontend code resides in a single `index.html` file.
+- **Monolithic HTML:** All frontend code resides in a single `index.html` file. Demo version in `demo.html`.
+- **Externalised Firebase config:** Firebase credentials live in `config.js` (loaded by `index.html`). Buyers copy `config.example.js` → `config.js` and fill in their own values. The app detects placeholder values and falls back to offline mode gracefully.
 - **BYOK (Bring Your Own Key):** Users provide their own Gemini API key via the Settings page. Key is stored in localStorage only (never sent to any server/database). When a user key is present, API calls go directly from browser to Google. Falls back to server proxy if no user key is set (for development/hosted mode).
 - **API key excluded from export:** The Gemini key is intentionally excluded from data export/import for security.
 - **Evidence-based progression:** Rank advancement is based on quality learning behaviors, not gamified XP systems.
