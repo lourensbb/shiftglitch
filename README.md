@@ -140,25 +140,9 @@ For the simplest offline use, buyers can just open `index.html` in their browser
 
 ---
 
-## Pricing Recommendations
+## Customisation
 
-| Price | Strategy |
-|-------|----------|
-| **$19–29** | Sweet spot for indie digital tools on Gumroad — affordable for students, high enough to signal quality |
-
-### Pricing tips:
-
-- Start at **$19** to build initial reviews and social proof, then raise to $29
-- Offer a **launch discount** (e.g., "Launch price: $14, normally $29")
-- Use Gumroad's **"pay what you want"** with a minimum of $14–19
-- The **demo version drives conversions** — let people try the core features before buying
-- Consider a **license tier**: personal use ($19) vs. classroom/school use ($99)
-
----
-
-## Customisation for Buyers
-
-Buyers can easily customise:
+You can easily customise Synapse to make it your own:
 - **Branding**: Search for "Synapse" in `index.html` to rename
 - **Colors**: Change `orange-600` references for a different accent color
 - **Quotes**: Edit the `STUDY_QUOTES` array near the top of `index.html`
