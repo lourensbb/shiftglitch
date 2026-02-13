@@ -142,26 +142,16 @@ For the simplest offline use, buyers can just open `index.html` in their browser
 
 ## Pricing Recommendations
 
-### Standalone Synapse App
-
-| Tier | Price | What's included |
-|------|-------|-----------------|
-| **Standard** | $19–29 | Source code + README setup guide |
-| **Premium** | $39–49 | Source code + video setup walkthrough + email support |
-| **Bundle** | $49–79 | Synapse + your eBook/course content |
-
-### Why these prices work:
-
-- **$19–29 is the sweet spot** for indie digital tools on Gumroad. It's low enough for impulse buys but high enough to signal quality.
-- **Students are price-sensitive** — keeping it under $30 removes friction.
-- **Bundling with your eBook/course** adds perceived value and justifies higher pricing.
-- **The demo version drives conversions** — let people try the core features before buying.
+| Price | Strategy |
+|-------|----------|
+| **$19–29** | Sweet spot for indie digital tools on Gumroad — affordable for students, high enough to signal quality |
 
 ### Pricing tips:
 
 - Start at **$19** to build initial reviews and social proof, then raise to $29
 - Offer a **launch discount** (e.g., "Launch price: $14, normally $29")
 - Use Gumroad's **"pay what you want"** with a minimum of $14–19
+- The **demo version drives conversions** — let people try the core features before buying
 - Consider a **license tier**: personal use ($19) vs. classroom/school use ($99)
 
 ---
