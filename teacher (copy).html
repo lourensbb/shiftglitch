@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synapse — Teacher Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'], serif: ['Lora', 'serif'] },
+                    colors: { stone: { 850: '#1f1c1a' } }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root { --bg-color: #FDFCF8; --text-color: #2D2A26; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-color); line-height: 1.6; }
+        h1, h2, h3, h4 { font-family: 'Lora', serif; letter-spacing: -0.02em; }
+        .animate-fade-in { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .drop-zone { border: 3px dashed #d6d3d1; transition: all 0.2s ease; }
+        .drop-zone.drag-over { border-color: #ea580c; background-color: #fff7ed; }
+        .chart-container { position: relative; width: 100%; max-width: 500px; margin: 0 auto; height: 280px; }
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white; }
+            .print-break { page-break-before: always; }
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-orange-100 selection:text-orange-900 font-sans">
+
+    <nav class="sticky top-0 z-50 bg-[#FDFCF8]/90 backdrop-blur-md border-b border-stone-200 no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-stone-800 rounded-full flex items-center justify-center text-[#FDFCF8] font-serif font-bold text-lg">S</div>
+                    <span class="font-serif text-xl font-bold tracking-tight text-stone-900">Synapse</span>
+                    <span class="bg-orange-100 text-orange-700 text-xs font-bold px-3 py-1 rounded-lg uppercase tracking-widest">Teacher Dashboard</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="exportClassReport()" class="bg-stone-900 text-white px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-stone-700 transition-colors">Print Class Report</button>
+                    <button onclick="clearAll()" class="bg-stone-200 text-stone-700 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-stone-300 transition-colors">Clear All</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pb-24">
+        <div id="import-section" class="animate-fade-in">
+            <div class="text-center mb-10">
+                <h1 class="text-4xl md:text-5xl font-serif font-bold text-stone-900 mb-3">Class Overview</h1>
+                <p class="text-stone-500 text-lg">Import student data files to view progress across your classroom.</p>
+            </div>
+
+            <div id="drop-zone" class="drop-zone rounded-[2rem] p-12 text-center cursor-pointer mb-10 no-print" onclick="document.getElementById('file-input').click()">
+                <input type="file" id="file-input" accept=".json" multiple class="hidden" onchange="handleFiles(this.files)">
+                <div class="text-5xl mb-4">&#128230;</div>
+                <h3 class="text-xl font-serif font-bold text-stone-700 mb-2">Drop Student Files Here</h3>
+                <p class="text-stone-400 text-sm">Or click to browse. Accept <code>.json</code> files exported from Synapse.</p>
+                <p class="text-stone-400 text-xs mt-2">Students click <strong>Export for Teacher</strong> in Stats &rarr; Data Management</p>
+            </div>
+
+            <div id="students-loaded" class="hidden mb-6 no-print">
+                <div class="flex items-center justify-between bg-green-50 border border-green-200 rounded-2xl px-6 py-4">
+                    <span class="text-green-800 font-semibold"><span id="student-count">0</span> student(s) loaded</span>
+                    <button onclick="document.getElementById('file-input').click()" class="text-green-700 underline text-sm font-medium">Add more</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="dashboard-content" class="hidden animate-fade-in space-y-10">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6" id="summary-cards"></div>
+
+            <div class="bg-white rounded-[2rem] p-8 border border-stone-100">
+                <h2 class="text-2xl font-serif font-bold mb-6">Student Roster</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="border-b-2 border-stone-200">
+                                <th class="pb-3 text-xs font-bold uppercase tracking-widest text-stone-400">#</th>
+                                <th class="pb-3 text-xs font-bold uppercase tracking-widest text-stone-400">Student</th>
+                                <th class="pb-3 text-xs font-bold uppercase tracking-widest text-stone-400">Rank</th>
+                                <th class="pb-3 text-xs font-bold uppercase tracking-widest text-stone-400">Focus Sessions</th>
+                                <th class="pb-3 text-xs font-bold uppercase tracking-widest text-stone-400">Focus Time</th>
+                                <th class="pb-3 text-xs font-bold uppercase tracking-widest text-stone-400">Flashcards</th>
+                                <th class="pb-3 text-xs font-bold uppercase tracking-widest text-stone-400">Blurt Sessions</th>
+                                <th class="pb-3 text-xs font-bold uppercase tracking-widest text-stone-400">Active Days</th>
+                                <th class="pb-3 text-xs font-bold uppercase tracking-widest text-stone-400 no-print">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="roster-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white rounded-[2rem] p-8 border border-stone-100">
+                    <h3 class="text-lg font-serif font-bold mb-4">Rank Distribution</h3>
+                    <div class="chart-container"><canvas id="rankChart"></canvas></div>
+                </div>
+                <div class="bg-white rounded-[2rem] p-8 border border-stone-100">
+                    <h3 class="text-lg font-serif font-bold mb-4">Class Activity (Total Sessions per Student)</h3>
+                    <div class="chart-container"><canvas id="activityChart"></canvas></div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-[2rem] p-8 border border-stone-100">
+                <h3 class="text-lg font-serif font-bold mb-4">Students Needing Attention</h3>
+                <p class="text-stone-400 text-sm mb-4">Students with fewer than 5 focus sessions or no blurt sessions.</p>
+                <div id="attention-list"></div>
+            </div>
+        </div>
+
+        <div id="student-detail" class="hidden animate-fade-in space-y-8">
+            <button onclick="showOverview()" class="text-orange-600 font-bold text-sm uppercase tracking-widest hover:text-orange-700 no-print">&larr; Back to Class Overview</button>
+            <div id="detail-content"></div>
+        </div>
+    </main>
+
+    <script>
+        function esc(str) {
+            const d = document.createElement('div');
+            d.appendChild(document.createTextNode(str || ''));
+            return d.innerHTML;
+        }
+
+        let students = [];
+        let charts = {};
+
+        const dropZone = document.getElementById('drop-zone');
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+        dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('drag-over'); });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('drag-over');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        async function handleFiles(files) {
+            for (const file of files) {
+                if (!file.name.endsWith('.json')) continue;
+                try {
+                    const text = await file.text();
+                    const data = JSON.parse(text);
+                    const studentName = file.name.replace('synapse-backup-', '').replace('.json', '').replace(/-/g, ' ');
+                    data._studentName = data._studentName || studentName;
+                    data._fileName = file.name;
+                    const existingIdx = students.findIndex(s => s._fileName === file.name);
+                    if (existingIdx >= 0) {
+                        students[existingIdx] = data;
+                    } else {
+                        students.push(data);
+                    }
+                } catch (err) {
+                    console.error('Failed to parse', file.name, err);
+                }
+            }
+            if (students.length > 0) {
+                document.getElementById('students-loaded').classList.remove('hidden');
+                document.getElementById('student-count').textContent = students.length;
+                renderDashboard();
+            }
+        }
+
+        function analyzeStudent(data) {
+            const pomodoros = (data.pomodoroLog || []).filter(p => p.task !== '__breakdown__');
+            const totalFocusSeconds = pomodoros.filter(p => p.duration).reduce((s, p) => s + p.duration, 0);
+            const totalSessions = pomodoros.length;
+
+            const blurts = data.blurtSessions || [];
+            const decks = data.decks || [];
+            const cards = data.cards || [];
+
+            const rank = data.rank ? (data.rank.rank || 'Space Cadet') : 'Space Cadet';
+            const evidence = data.rank ? (data.rank.rankEvidence || {}) : {};
+
+            const activeDays = new Set();
+            pomodoros.forEach(p => {
+                if (p.completedAt) {
+                    activeDays.add(new Date(p.completedAt).toDateString());
+                }
+            });
+            blurts.forEach(b => {
+                if (b.createdAt) activeDays.add(new Date(b.createdAt).toDateString());
+            });
+
+            const mcqAttempts = data.mcq ? Object.keys(data.mcq.attempts || {}).length : 0;
+            const mcqGaps = data.mcq ? (data.mcq.gaps || []).length : 0;
+
+            const babelCount = (data.babel || []).length;
+            const yetCount = (data.yetMoments || []).length;
+
+            const recal = data.recal || {};
+            const stealthCount = recal.stealthCount || 0;
+            const rocketCount = recal.rocketCount || 0;
+
+            const todosDone = (data.todos || []).filter(t => t.done).length;
+            const todosTotal = (data.todos || []).length;
+
+            const breakdowns = evidence.governorBreakdowns || 0;
+            const cardsAdvanced = evidence.cardsAdvanced || 0;
+
+            return {
+                name: data._studentName || 'Unknown',
+                fileName: data._fileName || '',
+                rank,
+                totalSessions,
+                totalFocusSeconds,
+                totalFocusMinutes: Math.round(totalFocusSeconds / 60),
+                totalFocusHours: (totalFocusSeconds / 3600).toFixed(1),
+                blurtCount: blurts.length,
+                deckCount: decks.length,
+                cardCount: cards.length,
+                activeDays: activeDays.size,
+                mcqAttempts,
+                mcqGaps,
+                babelCount,
+                yetCount,
+                stealthCount,
+                rocketCount,
+                todosDone,
+                todosTotal,
+                breakdowns,
+                cardsAdvanced,
+                evidence,
+                rawData: data
+            };
+        }
+
+        function renderDashboard() {
+            document.getElementById('dashboard-content').classList.remove('hidden');
+            document.getElementById('student-detail').classList.add('hidden');
+
+            const analyzed = students.map(analyzeStudent);
+
+            const totalStudents = analyzed.length;
+            const avgSessions = totalStudents > 0 ? Math.round(analyzed.reduce((s, a) => s + a.totalSessions, 0) / totalStudents) : 0;
+            const avgFocusHrs = totalStudents > 0 ? (analyzed.reduce((s, a) => s + parseFloat(a.totalFocusHours), 0) / totalStudents).toFixed(1) : '0';
+            const rankCounts = { 'Space Cadet': 0, 'Second Officer': 0, 'Flight Commander': 0 };
+            analyzed.forEach(a => { rankCounts[a.rank] = (rankCounts[a.rank] || 0) + 1; });
+            const highestRank = rankCounts['Flight Commander'] > 0 ? 'Flight Commander' : rankCounts['Second Officer'] > 0 ? 'Second Officer' : 'Space Cadet';
+
+            document.getElementById('summary-cards').innerHTML = `
+                <div class="bg-white rounded-2xl p-6 border border-stone-100 text-center">
+                    <div class="text-3xl font-bold text-stone-900">${totalStudents}</div>
+                    <div class="text-xs font-bold uppercase tracking-widest text-stone-400 mt-1">Students</div>
+                </div>
+                <div class="bg-white rounded-2xl p-6 border border-stone-100 text-center">
+                    <div class="text-3xl font-bold text-orange-600">${avgSessions}</div>
+                    <div class="text-xs font-bold uppercase tracking-widest text-stone-400 mt-1">Avg Sessions</div>
+                </div>
+                <div class="bg-white rounded-2xl p-6 border border-stone-100 text-center">
+                    <div class="text-3xl font-bold text-stone-900">${avgFocusHrs}h</div>
+                    <div class="text-xs font-bold uppercase tracking-widest text-stone-400 mt-1">Avg Focus Time</div>
+                </div>
+                <div class="bg-white rounded-2xl p-6 border border-stone-100 text-center">
+                    <div class="text-lg font-bold text-orange-600">${esc(highestRank)}</div>
+                    <div class="text-xs font-bold uppercase tracking-widest text-stone-400 mt-1">Highest Rank</div>
+                </div>
+            `;
+
+            const rankColors = { 'Space Cadet': '#d6d3d1', 'Second Officer': '#f59e0b', 'Flight Commander': '#ea580c' };
+
+            const tbody = document.getElementById('roster-body');
+            tbody.innerHTML = analyzed.sort((a, b) => b.totalSessions - a.totalSessions).map((s, i) => `
+                <tr class="border-b border-stone-100 hover:bg-stone-50 transition-colors">
+                    <td class="py-4 text-sm text-stone-400 font-mono">${i + 1}</td>
+                    <td class="py-4 font-semibold text-stone-900">${esc(s.name)}</td>
+                    <td class="py-4"><span class="px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-widest" style="background-color: ${rankColors[s.rank]}20; color: ${rankColors[s.rank] === '#d6d3d1' ? '#78716c' : rankColors[s.rank]}">${esc(s.rank)}</span></td>
+                    <td class="py-4 text-sm font-mono text-stone-700">${s.totalSessions}</td>
+                    <td class="py-4 text-sm font-mono text-stone-700">${s.totalFocusHours}h</td>
+                    <td class="py-4 text-sm font-mono text-stone-700">${s.cardCount}</td>
+                    <td class="py-4 text-sm font-mono text-stone-700">${s.blurtCount}</td>
+                    <td class="py-4 text-sm font-mono text-stone-700">${s.activeDays}</td>
+                    <td class="py-4 no-print">
+                        <button onclick="showStudent(${i})" class="text-orange-600 hover:text-orange-700 text-xs font-bold uppercase tracking-widest">View</button>
+                        <button onclick="printStudentReport(${i})" class="text-stone-400 hover:text-stone-600 text-xs font-bold uppercase tracking-widest ml-3">Print</button>
+                    </td>
+                </tr>
+            `).join('');
+
+            const needAttention = analyzed.filter(s => s.totalSessions < 5 || s.blurtCount === 0);
+            document.getElementById('attention-list').innerHTML = needAttention.length === 0
+                ? '<p class="text-green-600 font-medium">All students are making good progress!</p>'
+                : needAttention.map(s => {
+                    const reasons = [];
+                    if (s.totalSessions < 5) reasons.push(`only ${s.totalSessions} focus session(s)`);
+                    if (s.blurtCount === 0) reasons.push('no blurt sessions');
+                    return `<div class="flex items-center justify-between py-3 border-b border-stone-100">
+                        <span class="font-semibold text-stone-900">${esc(s.name)}</span>
+                        <span class="text-sm text-red-500">${reasons.join(', ')}</span>
+                    </div>`;
+                }).join('');
+
+            renderCharts(analyzed, rankCounts);
+        }
+
+        function renderCharts(analyzed, rankCounts) {
+            if (charts.rank) charts.rank.destroy();
+            if (charts.activity) charts.activity.destroy();
+
+            const rankCanvas = document.getElementById('rankChart');
+            if (rankCanvas) {
+                charts.rank = new Chart(rankCanvas, {
+                    type: 'doughnut',
+                    data: {
+                        labels: Object.keys(rankCounts),
+                        datasets: [{
+                            data: Object.values(rankCounts),
+                            backgroundColor: ['#d6d3d1', '#f59e0b', '#ea580c']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom', labels: { padding: 20, font: { family: 'Inter', size: 12, weight: '600' } } }
+                        }
+                    }
+                });
+            }
+
+            const activityCanvas = document.getElementById('activityChart');
+            if (activityCanvas && analyzed.length > 0) {
+                const sorted = [...analyzed].sort((a, b) => b.totalSessions - a.totalSessions);
+                charts.activity = new Chart(activityCanvas, {
+                    type: 'bar',
+                    data: {
+                        labels: sorted.map(s => s.name.length > 12 ? s.name.slice(0, 12) + '...' : s.name),
+                        datasets: [{
+                            label: 'Focus Sessions',
+                            data: sorted.map(s => s.totalSessions),
+                            backgroundColor: '#ea580c',
+                            borderRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { beginAtZero: true, grid: { color: '#e7e5e4' }, ticks: { color: '#78716c', font: { family: 'Inter' } } },
+                            x: { grid: { display: false }, ticks: { color: '#78716c', font: { family: 'Inter', size: 11 } } }
+                        }
+                    }
+                });
+            }
+        }
+
+        function showStudent(index) {
+            const analyzed = students.map(analyzeStudent);
+            const s = analyzed[index];
+            document.getElementById('dashboard-content').classList.add('hidden');
+            document.getElementById('student-detail').classList.remove('hidden');
+
+            const evidence = s.evidence;
+            const secondOfficerReqs = { blurtsCompleted: 10, governorBreakdowns: 10, cardsAdvanced: 50, activeDays: 7, pomodorosCompleted: 15, diagnosticsCompleted: 2 };
+            const flightCommanderReqs = { blurtsCompleted: 30, governorBreakdowns: 30, cardsAdvanced: 150, activeDays: 21, pomodorosCompleted: 50, diagnosticsCompleted: 5 };
+            const nextRankReqs = s.rank === 'Space Cadet' ? secondOfficerReqs : s.rank === 'Second Officer' ? flightCommanderReqs : null;
+
+            document.getElementById('detail-content').innerHTML = `
+                <div class="flex items-center justify-between mb-8">
+                    <div>
+                        <h1 class="text-3xl font-serif font-bold text-stone-900">${esc(s.name)}</h1>
+                        <span class="text-orange-600 font-bold text-sm uppercase tracking-widest">${esc(s.rank)}</span>
+                    </div>
+                    <button onclick="printStudentReport(${index})" class="bg-stone-900 text-white px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-stone-700 transition-colors no-print">Print Report</button>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                    <div class="bg-white rounded-2xl p-5 border border-stone-100 text-center">
+                        <div class="text-2xl font-bold text-stone-900">${s.totalSessions}</div>
+                        <div class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mt-1">Focus Sessions</div>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 border border-stone-100 text-center">
+                        <div class="text-2xl font-bold text-orange-600">${s.totalFocusHours}h</div>
+                        <div class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mt-1">Focus Time</div>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 border border-stone-100 text-center">
+                        <div class="text-2xl font-bold text-stone-900">${s.blurtCount}</div>
+                        <div class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mt-1">Blurt Sessions</div>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 border border-stone-100 text-center">
+                        <div class="text-2xl font-bold text-stone-900">${s.activeDays}</div>
+                        <div class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mt-1">Active Days</div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                    <div class="bg-white rounded-2xl p-5 border border-stone-100 text-center">
+                        <div class="text-2xl font-bold text-stone-900">${s.cardCount}</div>
+                        <div class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mt-1">Flashcards</div>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 border border-stone-100 text-center">
+                        <div class="text-2xl font-bold text-stone-900">${s.deckCount}</div>
+                        <div class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mt-1">Decks</div>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 border border-stone-100 text-center">
+                        <div class="text-2xl font-bold text-stone-900">${s.babelCount}</div>
+                        <div class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mt-1">Babel Fish</div>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 border border-stone-100 text-center">
+                        <div class="text-2xl font-bold text-stone-900">${s.yetCount}</div>
+                        <div class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mt-1">Growth Moments</div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                    <div class="bg-white rounded-[2rem] p-8 border border-stone-100">
+                        <h3 class="text-lg font-serif font-bold mb-4">Rank Evidence</h3>
+                        <div class="space-y-3">
+                            ${renderEvidenceBar('Blurts Completed', evidence.blurtsCompleted || 0, nextRankReqs ? nextRankReqs.blurtsCompleted : s.evidence.blurtsCompleted || 1)}
+                            ${renderEvidenceBar('Governor Breakdowns', evidence.governorBreakdowns || 0, nextRankReqs ? nextRankReqs.governorBreakdowns : evidence.governorBreakdowns || 1)}
+                            ${renderEvidenceBar('Cards Advanced', evidence.cardsAdvanced || 0, nextRankReqs ? nextRankReqs.cardsAdvanced : evidence.cardsAdvanced || 1)}
+                            ${renderEvidenceBar('Active Days', evidence.activeDays || 0, nextRankReqs ? nextRankReqs.activeDays : evidence.activeDays || 1)}
+                            ${renderEvidenceBar('Pomodoros', evidence.pomodorosCompleted || 0, nextRankReqs ? nextRankReqs.pomodorosCompleted : evidence.pomodorosCompleted || 1)}
+                            ${renderEvidenceBar('Diagnostics', evidence.diagnosticsCompleted || 0, nextRankReqs ? nextRankReqs.diagnosticsCompleted : evidence.diagnosticsCompleted || 1)}
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-[2rem] p-8 border border-stone-100">
+                        <h3 class="text-lg font-serif font-bold mb-4">Activity Summary</h3>
+                        <div class="space-y-4">
+                            <div class="flex justify-between py-2 border-b border-stone-100">
+                                <span class="text-stone-500 text-sm">MCQ Diagnostics Attempted</span>
+                                <span class="font-bold text-stone-900">${s.mcqAttempts}</span>
+                            </div>
+                            <div class="flex justify-between py-2 border-b border-stone-100">
+                                <span class="text-stone-500 text-sm">Knowledge Gaps Found</span>
+                                <span class="font-bold text-stone-900">${s.mcqGaps}</span>
+                            </div>
+                            <div class="flex justify-between py-2 border-b border-stone-100">
+                                <span class="text-stone-500 text-sm">Stealth Mode Uses</span>
+                                <span class="font-bold text-stone-900">${s.stealthCount}</span>
+                            </div>
+                            <div class="flex justify-between py-2 border-b border-stone-100">
+                                <span class="text-stone-500 text-sm">Entry Rocket Uses</span>
+                                <span class="font-bold text-stone-900">${s.rocketCount}</span>
+                            </div>
+                            <div class="flex justify-between py-2 border-b border-stone-100">
+                                <span class="text-stone-500 text-sm">Tasks Completed</span>
+                                <span class="font-bold text-stone-900">${s.todosDone} / ${s.todosTotal}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                ${s.rank === 'Flight Commander' ? `
+                <div class="bg-orange-50 border border-orange-200 rounded-2xl p-6 text-center">
+                    <div class="text-3xl mb-2">&#127942;</div>
+                    <h3 class="font-serif font-bold text-orange-800 text-lg">Flight Commander</h3>
+                    <p class="text-orange-600 text-sm">This student has achieved the highest rank!</p>
+                </div>` : ''}
+            `;
+        }
+
+        function renderEvidenceBar(label, current, target) {
+            const pct = Math.min(100, Math.round((current / Math.max(target, 1)) * 100));
+            const complete = current >= target;
+            return `
+                <div>
+                    <div class="flex justify-between text-xs mb-1">
+                        <span class="text-stone-500">${label}</span>
+                        <span class="font-mono font-bold ${complete ? 'text-green-600' : 'text-stone-700'}">${current} / ${target} ${complete ? '&#10003;' : ''}</span>
+                    </div>
+                    <div class="bg-stone-100 rounded-full h-2 overflow-hidden">
+                        <div class="${complete ? 'bg-green-500' : 'bg-orange-500'} h-full rounded-full transition-all" style="width: ${pct}%"></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showOverview() {
+            document.getElementById('dashboard-content').classList.remove('hidden');
+            document.getElementById('student-detail').classList.add('hidden');
+            renderDashboard();
+        }
+
+        function printStudentReport(index) {
+            const analyzed = students.map(analyzeStudent);
+            const s = analyzed[index];
+            const date = new Date().toLocaleDateString('en', { year: 'numeric', month: 'long', day: 'numeric' });
+
+            const printWin = window.open('', '_blank');
+            printWin.document.write(`<!DOCTYPE html><html><head><title>Progress Report — ${esc(s.name)}</title>
+            <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;0,700&display=swap" rel="stylesheet">
+            <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body { font-family: 'Inter', sans-serif; color: #2D2A26; padding: 40px; max-width: 800px; margin: 0 auto; }
+                h1, h2, h3 { font-family: 'Lora', serif; }
+                .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #ea580c; padding-bottom: 20px; margin-bottom: 30px; }
+                .logo { display: flex; align-items: center; gap: 10px; }
+                .logo-circle { width: 32px; height: 32px; background: #292524; border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-family: 'Lora', serif; font-weight: bold; font-size: 16px; }
+                .rank-badge { background: #fff7ed; color: #ea580c; padding: 4px 14px; border-radius: 8px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; }
+                .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 30px; }
+                .stat-card { background: #fafaf9; border: 1px solid #e7e5e4; border-radius: 12px; padding: 16px; text-align: center; }
+                .stat-value { font-size: 24px; font-weight: 700; color: #292524; }
+                .stat-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #a8a29e; margin-top: 4px; }
+                .section { margin-bottom: 24px; }
+                .section h3 { font-size: 16px; margin-bottom: 12px; color: #292524; }
+                .evidence-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f5f5f4; }
+                .evidence-label { font-size: 13px; color: #78716c; }
+                .evidence-value { font-size: 13px; font-weight: 700; font-family: monospace; }
+                .bar-bg { height: 6px; background: #e7e5e4; border-radius: 3px; flex: 1; margin: 0 12px; }
+                .bar-fill { height: 100%; border-radius: 3px; }
+                .bar-fill.complete { background: #22c55e; }
+                .bar-fill.incomplete { background: #ea580c; }
+                .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #e7e5e4; text-align: center; font-size: 11px; color: #a8a29e; }
+                @media print { body { padding: 20px; } }
+            </style></head><body>
+            <div class="header">
+                <div>
+                    <div class="logo"><div class="logo-circle">S</div><span style="font-family: Lora, serif; font-size: 20px; font-weight: 700;">Synapse</span></div>
+                    <h1 style="font-size: 28px; margin-top: 12px;">${esc(s.name)}</h1>
+                    <p style="font-size: 13px; color: #78716c; margin-top: 4px;">Progress Report — ${date}</p>
+                </div>
+                <div style="text-align: right;">
+                    <span class="rank-badge">${esc(s.rank)}</span>
+                </div>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card"><div class="stat-value">${s.totalSessions}</div><div class="stat-label">Focus Sessions</div></div>
+                <div class="stat-card"><div class="stat-value">${s.totalFocusHours}h</div><div class="stat-label">Focus Time</div></div>
+                <div class="stat-card"><div class="stat-value">${s.blurtCount}</div><div class="stat-label">Blurt Sessions</div></div>
+                <div class="stat-card"><div class="stat-value">${s.activeDays}</div><div class="stat-label">Active Days</div></div>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card"><div class="stat-value">${s.cardCount}</div><div class="stat-label">Flashcards</div></div>
+                <div class="stat-card"><div class="stat-value">${s.deckCount}</div><div class="stat-label">Decks</div></div>
+                <div class="stat-card"><div class="stat-value">${s.babelCount}</div><div class="stat-label">Explanations</div></div>
+                <div class="stat-card"><div class="stat-value">${s.yetCount}</div><div class="stat-label">Growth Moments</div></div>
+            </div>
+            <div class="section">
+                <h3>Rank Evidence Progress</h3>
+                ${printEvidenceRow('Blurts Completed', s.evidence.blurtsCompleted || 0, s.rank === 'Space Cadet' ? 10 : 30)}
+                ${printEvidenceRow('Governor Breakdowns', s.evidence.governorBreakdowns || 0, s.rank === 'Space Cadet' ? 10 : 30)}
+                ${printEvidenceRow('Cards Advanced', s.evidence.cardsAdvanced || 0, s.rank === 'Space Cadet' ? 50 : 150)}
+                ${printEvidenceRow('Active Days', s.evidence.activeDays || 0, s.rank === 'Space Cadet' ? 7 : 21)}
+                ${printEvidenceRow('Pomodoros', s.evidence.pomodorosCompleted || 0, s.rank === 'Space Cadet' ? 15 : 50)}
+                ${printEvidenceRow('Diagnostics', s.evidence.diagnosticsCompleted || 0, s.rank === 'Space Cadet' ? 2 : 5)}
+            </div>
+            <div class="section">
+                <h3>Additional Activity</h3>
+                <div class="evidence-row"><span class="evidence-label">MCQ Diagnostics Attempted</span><span class="evidence-value">${s.mcqAttempts}</span></div>
+                <div class="evidence-row"><span class="evidence-label">Knowledge Gaps Found</span><span class="evidence-value">${s.mcqGaps}</span></div>
+                <div class="evidence-row"><span class="evidence-label">Dopamine Recalibrator Uses</span><span class="evidence-value">${s.stealthCount + s.rocketCount}</span></div>
+                <div class="evidence-row"><span class="evidence-label">Tasks Completed</span><span class="evidence-value">${s.todosDone} / ${s.todosTotal}</span></div>
+            </div>
+            <div class="footer">
+                <p>Generated by Synapse — Interactive Learning OS</p>
+                <p style="margin-top: 4px;">This report reflects the student's learning activity and rank progress as of ${date}.</p>
+            </div>
+            <script>window.onload = function() { window.print(); }<\/script>
+            </body></html>`);
+            printWin.document.close();
+        }
+
+        function printEvidenceRow(label, current, target) {
+            const pct = Math.min(100, Math.round((current / Math.max(target, 1)) * 100));
+            const complete = current >= target;
+            return `<div class="evidence-row">
+                <span class="evidence-label" style="min-width: 160px;">${label}</span>
+                <div class="bar-bg"><div class="bar-fill ${complete ? 'complete' : 'incomplete'}" style="width: ${pct}%"></div></div>
+                <span class="evidence-value" style="color: ${complete ? '#22c55e' : '#292524'}">${current} / ${target}</span>
+            </div>`;
+        }
+
+        function exportClassReport() {
+            window.print();
+        }
+
+        function clearAll() {
+            if (confirm('Remove all loaded student data?')) {
+                students = [];
+                document.getElementById('dashboard-content').classList.add('hidden');
+                document.getElementById('student-detail').classList.add('hidden');
+                document.getElementById('students-loaded').classList.add('hidden');
+                document.getElementById('student-count').textContent = '0';
+            }
+        }
+    </script>
+</body>
+</html>
