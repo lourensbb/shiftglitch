@@ -39,7 +39,9 @@ Primary data storage is `localStorage` for offline functionality, persisting fla
 - **Yet Growth Shield:** Reinforces a growth mindset by reframing "I don't understand X" to "I don't understand X YET" upon learning gaps.
 - **MCQ Diagnostics:** 100-question multiple-choice diagnostic across 5 missions, access-gated, tracking knowledge gaps and providing reflection prompts, contributing to rank promotion.
 - **Charts & Statistics:** Various charts (scatter, doughnut, bar) and session statistics (focus time, session count, weekly activity).
-- **Data Management:** JSON export/import for all user data.
+- **Data Management:** JSON export/import for all user data. "Export for Teacher" button for classroom use.
+- **Teacher Dashboard:** (`teacher.html`) Classroom-only feature. Import student JSON exports, view class overview with rank distribution, activity charts, student roster, and "students needing attention" alerts.
+- **Printable Progress Reports:** Generate clean, printer-friendly student summaries with rank evidence bars, activity stats, and metrics. Accessible from Teacher Dashboard.
 - **XSS Protection:** `esc()` utility for user-rendered content.
 
 ### Key Design Decisions

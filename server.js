@@ -42,6 +42,10 @@ app.get('/demo', (req, res) => {
   res.sendFile(path.join(__dirname, 'demo.html'));
 });
 
+app.get('/teacher', (req, res) => {
+  res.sendFile(path.join(__dirname, 'teacher.html'));
+});
+
 app.get('/{*splat}', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });

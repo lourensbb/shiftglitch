@@ -1076,6 +1076,29 @@
                 a.click(); URL.revokeObjectURL(a.href);
                 app.showNotification('Data exported successfully!');
             },
+            exportForTeacher: () => {
+                const studentName = prompt('Enter your name (your teacher will see this):');
+                if (!studentName || !studentName.trim()) return;
+                const data = {
+                    _studentName: studentName.trim(),
+                    decks: state.fcDecks, cards: state.fcCards, blurtSessions: state.blurtSessions,
+                    pomodoroLog: state.pomodoroLog, notes: localStorage.getItem('cornellNotes') || '',
+                    rank: { rank: state.rank, rankEvidence: state.rankEvidence },
+                    eisenhower: { tasks: state.eisenhowerTasks, reflections: state.eisenhowerReflections },
+                    todos: state.missionTodos,
+                    mcq: { attempts: state.mcqAttempts, gaps: state.mcqGaps, reflections: state.mcqReflections },
+                    recal: { sessions: state.recalSessions, stealthCount: state.recalStealthCount, rocketCount: state.recalRocketCount },
+                    babel: state.babelSessions,
+                    yetMoments: state.yetMoments,
+                    exportedAt: new Date().toISOString()
+                };
+                const safeName = studentName.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-');
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+                a.download = `synapse-${safeName}-${new Date().toISOString().slice(0, 10)}.json`;
+                a.click(); URL.revokeObjectURL(a.href);
+                app.showNotification('Report exported for your teacher!');
+            },
             importData: () => {
                 const input = document.createElement('input'); input.type = 'file'; input.accept = '.json';
                 input.onchange = async (e) => {
@@ -1696,10 +1719,12 @@
                         <div class="bg-white dark:bg-[#292524] rounded-[2rem] p-8 border border-stone-100 dark:border-stone-800">
                             <h3 class="text-lg font-serif font-bold mb-4">Data Management</h3>
                             <p class="text-sm text-stone-500 mb-6">Export all your data (decks, blurt sessions, notes, timer history) or import a previous backup.</p>
-                            <div class="flex gap-3">
+                            <div class="flex gap-3 mb-3">
                                 <button onclick="app.exportData()" class="flex-1 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 py-3 rounded-xl font-bold text-sm uppercase tracking-widest">Export</button>
                                 <button onclick="app.importData()" class="flex-1 bg-stone-200 dark:bg-stone-700 text-stone-700 dark:text-stone-200 py-3 rounded-xl font-bold text-sm uppercase tracking-widest">Import</button>
                             </div>
+                            <button onclick="app.exportForTeacher()" class="w-full bg-orange-600 hover:bg-orange-700 text-white py-3 rounded-xl font-bold text-sm uppercase tracking-widest transition-colors">Export for Teacher</button>
+                            <p class="text-xs text-stone-400 mt-2 text-center">Creates a file your teacher can import into the Teacher Dashboard</p>
                         </div>
                     </div>
                 </div>`;

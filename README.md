@@ -58,10 +58,14 @@ const SYNAPSE_FIREBASE_CONFIG = {
 |------|---------|
 | `index.html` | Full version of Synapse (all features) |
 | `demo.html` | Limited demo version (for marketing — links to your Gumroad) |
+| `teacher.html` | Teacher Dashboard (Classroom License only) |
 | `config.js` | Your Firebase credentials (edit this file) |
 | `config.example.js` | Blank template for reference |
 | `server.js` | Simple Express server for local hosting |
 | `package.json` | Node.js dependencies |
+| `LICENSE-PERSONAL.txt` | Personal use license |
+| `LICENSE-CLASSROOM.txt` | Classroom use license (Classroom License only) |
+| `PRO-INSTRUCTIONS.md` | Teacher setup guide (Classroom License only) |
 
 ### Full Version Features
 - Mission Architect (AI study planning via Gemini)
@@ -78,6 +82,7 @@ const SYNAPSE_FIREBASE_CONFIG = {
 - Rank Progression System (Space Cadet → Second Officer → Flight Commander)
 - Session Statistics & Charts
 - Data Export/Import (JSON backup)
+- Export for Teacher (named exports for classroom use)
 - Dark Mode
 
 ### Demo Version Features (Limited)
@@ -87,19 +92,57 @@ const SYNAPSE_FIREBASE_CONFIG = {
 
 ---
 
+## Classroom Edition (Classroom License Only)
+
+The Classroom License includes the **Teacher Dashboard** and **Printable
+Progress Reports**. See `PRO-INSTRUCTIONS.md` for the full teacher guide.
+
+### Teacher Dashboard (`/teacher`)
+- Import student JSON export files
+- View class-wide summary (ranks, sessions, focus time)
+- Student roster with sortable columns
+- Rank distribution and activity charts
+- "Students Needing Attention" alerts
+- Click into individual student profiles
+
+### Printable Progress Reports
+- Professional, printer-friendly student summaries
+- Rank evidence progress bars
+- Activity statistics and metrics
+- Print from the roster or individual student views
+- Perfect for parent-teacher conferences
+
+### How It Works
+1. Students study using Synapse as normal
+2. Students click **"Export for Teacher"** in Stats → Data Management
+3. Teacher collects the `.json` files
+4. Teacher opens `/teacher` and drops in all files
+5. Instant class overview with charts and reports
+
+---
+
 ## Packaging for Sale
 
 ### What to include in your download:
 
+**Standard License:**
 ```
 synapse/
-├── index.html           (full version)
-├── demo.html            (demo for marketing)
-├── config.js            (Firebase config — buyers edit this with their keys)
-├── config.example.js    (blank backup template for reference)
-├── server.js            (Express server)
-├── package.json         (dependencies)
-└── README.md            (this file — setup instructions for buyers)
+├── index.html              (full version)
+├── demo.html               (demo for marketing)
+├── config.js               (Firebase config — buyers edit this)
+├── config.example.js       (blank backup template)
+├── server.js               (Express server)
+├── package.json            (dependencies)
+├── LICENSE-PERSONAL.txt    (personal use license)
+└── README.md               (setup instructions)
+```
+
+**Classroom License (all of the above, plus):**
+```
+├── teacher.html            (Teacher Dashboard)
+├── LICENSE-CLASSROOM.txt   (classroom use license)
+└── PRO-INSTRUCTIONS.md     (teacher setup guide)
 ```
 
 **Do NOT include:**
