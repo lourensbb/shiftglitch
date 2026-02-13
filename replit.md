@@ -26,7 +26,8 @@ An Express.js v5 server provides minimal static file serving and acts as an API 
 Primary data storage is `localStorage` for offline functionality, persisting flashcards, pomodoro logs, blurt sessions, Cornell notes, rank progress, Eisenhower Matrix tasks, dopamine recalibrator sessions, Babel Fish exercises, Growth Shield moments, and MCQ diagnostic data. Optional cloud persistence for notes and progress checkboxes is available through Firebase Firestore, with graceful degradation if unavailable. A JSON export/import feature allows for backup and restoration of all localStorage data.
 
 ### Key Features
-- **Mission Architect (AI):** Gemini-powered study plan generation.
+- **Mission Architect (AI):** Gemini-powered study plan generation. Uses BYOK (Bring Your Own Key) model — users enter their own Google Gemini API key in Settings, stored in localStorage only.
+- **Settings Page:** API key management with save/remove, masked display, step-by-step setup instructions, and privacy messaging.
 - **Rank System:** An evidence-based, 3-rank progression system (Space Cadet → Second Officer → Flight Commander) requiring specific learning behaviors for promotion.
 - **Learning Governor:** A Pomodoro timer that tracks streaks and enforces breakdowns, which count as rank evidence.
 - **Flashcard Decks:** Full CRUD for decks and cards, featuring a Leitner 5-box spaced repetition system with visual orbit indicators for card stability.
@@ -45,7 +46,8 @@ Primary data storage is `localStorage` for offline functionality, persisting fla
 - **CDN-based dependencies:** No build system; libraries like Tailwind, Chart.js, and Firebase are loaded via CDNs.
 - **Firebase as optional:** The application functions fully offline with `localStorage`; Firebase provides an optional cloud sync layer.
 - **Monolithic HTML:** All frontend code resides in a single `index.html` file.
-- **Server-side API key:** The Gemini API key is secured on the server-side via an Express proxy.
+- **BYOK (Bring Your Own Key):** Users provide their own Gemini API key via the Settings page. Key is stored in localStorage only (never sent to any server/database). When a user key is present, API calls go directly from browser to Google. Falls back to server proxy if no user key is set (for development/hosted mode).
+- **API key excluded from export:** The Gemini key is intentionally excluded from data export/import for security.
 - **Evidence-based progression:** Rank advancement is based on quality learning behaviors, not gamified XP systems.
 - **Quiz isolation:** The Quiz Arena is a standalone tool and does not impact rank progression.
 
