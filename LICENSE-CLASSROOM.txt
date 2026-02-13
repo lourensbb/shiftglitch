@@ -1,0 +1,33 @@
+SYNAPSE — CLASSROOM LICENSE
+
+Copyright (c) 2026 Lourens Breytenbach. All rights reserved.
+
+This license grants the purchasing individual or organisation ("You")
+the following rights:
+
+PERMITTED USES
+- Install and use Synapse on devices within a single school,
+  classroom, tutoring centre, or educational organisation
+- Deploy Synapse on a shared network or server for student access
+  within your organisation
+- Allow students and staff within your organisation to use Synapse
+- Modify the source code to suit your organisation's needs
+- Host Synapse privately for your organisation's use
+
+NOT PERMITTED
+- Sharing, redistributing, or reselling Synapse to individuals
+  or organisations outside your own
+- Uploading the source code to any public repository
+- Sub-licensing Synapse to other schools or organisations
+  (each organisation requires its own Classroom License)
+- Claiming authorship of the original work
+
+SCOPE
+This license covers one (1) organisation. If you operate multiple
+schools or locations, each requires a separate Classroom License.
+
+DISCLAIMER
+Synapse is provided "as is" without warranty of any kind. The author
+is not liable for any damages arising from the use of this software.
+
+Thank you for supporting independent development and education.
