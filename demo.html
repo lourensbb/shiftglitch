@@ -68,11 +68,11 @@
                         <button onclick="app.toggleToolsMenu()" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-xs font-semibold tracking-wide transition-colors uppercase flex items-center gap-1">Tools <svg class="w-3 h-3 transition-transform" id="tools-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></button>
                         <div id="tools-menu" class="hidden absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-[#FDFCF8] dark:bg-stone-800 rounded-xl shadow-lg border border-stone-200 dark:border-stone-700 py-2 z-50">
                             <button onclick="app.navTo('matrix')" class="nav-btn block w-full text-left px-4 py-2.5 text-xs font-semibold tracking-wide uppercase text-stone-500 dark:text-stone-400 hover:text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors">Matrix</button>
-                            <button onclick="app.lockedTool()" class="block w-full text-left px-4 py-2.5 text-xs font-semibold tracking-wide uppercase text-stone-400 dark:text-stone-500 transition-colors flex items-center gap-2">&#x1F512; Blurt</button>
-                            <button onclick="app.lockedTool()" class="block w-full text-left px-4 py-2.5 text-xs font-semibold tracking-wide uppercase text-stone-400 dark:text-stone-500 transition-colors flex items-center gap-2">&#x1F512; Quiz Arena</button>
-                            <button onclick="app.lockedTool()" class="block w-full text-left px-4 py-2.5 text-xs font-semibold tracking-wide uppercase text-stone-400 dark:text-stone-500 transition-colors flex items-center gap-2">&#x1F512; Babel Fish</button>
-                            <button onclick="app.lockedTool()" class="block w-full text-left px-4 py-2.5 text-xs font-semibold tracking-wide uppercase text-stone-400 dark:text-stone-500 transition-colors flex items-center gap-2">&#x1F512; Recalibrator</button>
-                            <button onclick="app.lockedTool()" class="block w-full text-left px-4 py-2.5 text-xs font-semibold tracking-wide uppercase text-stone-400 dark:text-stone-500 transition-colors flex items-center gap-2">&#x1F512; Nav Check</button>
+                            <button onclick="app.showToolPreview('blurt')" class="block w-full text-left px-4 py-2.5 text-xs font-semibold tracking-wide uppercase text-stone-500 dark:text-stone-400 hover:text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors flex items-center gap-2">&#x1F9E0; Blurt</button>
+                            <button onclick="app.showToolPreview('quiz')" class="block w-full text-left px-4 py-2.5 text-xs font-semibold tracking-wide uppercase text-stone-500 dark:text-stone-400 hover:text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors flex items-center gap-2">&#x1F3AF; Quiz Arena</button>
+                            <button onclick="app.showToolPreview('babel')" class="block w-full text-left px-4 py-2.5 text-xs font-semibold tracking-wide uppercase text-stone-500 dark:text-stone-400 hover:text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors flex items-center gap-2">&#x1F47E; Babel Fish</button>
+                            <button onclick="app.showToolPreview('recalibrator')" class="block w-full text-left px-4 py-2.5 text-xs font-semibold tracking-wide uppercase text-stone-500 dark:text-stone-400 hover:text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors flex items-center gap-2">&#x26A1; Recalibrator</button>
+                            <button onclick="app.showToolPreview('navcheck')" class="block w-full text-left px-4 py-2.5 text-xs font-semibold tracking-wide uppercase text-stone-500 dark:text-stone-400 hover:text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors flex items-center gap-2">&#x1F9ED; Nav Check</button>
                         </div>
                     </div>
                     <button onclick="app.navTo('rank')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-xs font-semibold tracking-wide transition-colors uppercase">Rank</button>
@@ -90,11 +90,11 @@
             <button onclick="app.navTo('decks')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Decks</button>
             <div class="px-4 pt-3 pb-1 text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-widest">Tools</div>
             <button onclick="app.navTo('matrix')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Matrix</button>
-            <button onclick="app.lockedTool()" class="block w-full text-left px-4 py-3 rounded-xl text-stone-400 dark:text-stone-500 font-bold uppercase text-xs tracking-widest">&#x1F512; Blurt</button>
-            <button onclick="app.lockedTool()" class="block w-full text-left px-4 py-3 rounded-xl text-stone-400 dark:text-stone-500 font-bold uppercase text-xs tracking-widest">&#x1F512; Quiz Arena</button>
-            <button onclick="app.lockedTool()" class="block w-full text-left px-4 py-3 rounded-xl text-stone-400 dark:text-stone-500 font-bold uppercase text-xs tracking-widest">&#x1F512; Babel Fish</button>
-            <button onclick="app.lockedTool()" class="block w-full text-left px-4 py-3 rounded-xl text-stone-400 dark:text-stone-500 font-bold uppercase text-xs tracking-widest">&#x1F512; Recalibrator</button>
-            <button onclick="app.lockedTool()" class="block w-full text-left px-4 py-3 rounded-xl text-stone-400 dark:text-stone-500 font-bold uppercase text-xs tracking-widest">&#x1F512; Nav Check</button>
+            <button onclick="app.showToolPreview('blurt')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest hover:text-orange-600">&#x1F9E0; Blurt</button>
+            <button onclick="app.showToolPreview('quiz')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest hover:text-orange-600">&#x1F3AF; Quiz Arena</button>
+            <button onclick="app.showToolPreview('babel')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest hover:text-orange-600">&#x1F47E; Babel Fish</button>
+            <button onclick="app.showToolPreview('recalibrator')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest hover:text-orange-600">&#x26A1; Recalibrator</button>
+            <button onclick="app.showToolPreview('navcheck')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest hover:text-orange-600">&#x1F9ED; Nav Check</button>
             <div class="border-t border-stone-200 dark:border-stone-700 my-2"></div>
             <button onclick="app.navTo('rank')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Rank</button>
             <button onclick="app.navTo('stats')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Stats</button>
@@ -621,8 +621,108 @@
                 setTimeout(() => { const m = document.getElementById('reflection-module'); if (m) m.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
             },
 
-            lockedTool: () => {
-                app.showNotification('This tool is available in the full version of Synapse');
+            showToolPreview: (toolKey) => {
+                state.view = 'preview_' + toolKey;
+                window.scrollTo(0, 0);
+                const menu = document.getElementById('mobile-menu');
+                if (menu) menu.classList.add('hidden');
+                app.closeToolsMenu();
+                app.render();
+            },
+
+            getToolPreviewHTML: (key) => {
+                const t = toolPreviews[key];
+                if (!t) return '';
+                let exampleHTML = '';
+
+                if (key === 'blurt') {
+                    exampleHTML =
+                        '<div class="mt-8">' +
+                            '<h4 class="text-sm font-bold uppercase tracking-widest text-orange-600 mb-4">How it works \u2014 4 Phases</h4>' +
+                            '<div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">' +
+                                t.phases.map(p => '<div class="bg-orange-50 dark:bg-orange-900/20 rounded-2xl p-4 text-center border border-orange-100 dark:border-orange-800"><div class="text-2xl font-bold text-orange-600 mb-1">' + p.num + '</div><p class="text-sm font-bold text-stone-800 dark:text-stone-100 mb-1">' + esc(p.name) + '</p><p class="text-xs text-stone-500 dark:text-stone-400">' + esc(p.detail) + '</p></div>').join('') +
+                            '</div>' +
+                            '<h4 class="text-sm font-bold uppercase tracking-widest text-orange-600 mb-3">Mini Example: ' + esc(t.example.topic) + '</h4>' +
+                            '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">' +
+                                '<div class="rounded-2xl p-5 border-2 border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20"><p class="text-xs font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400 mb-2">What the student blurted</p><p class="text-sm text-stone-700 dark:text-stone-200 leading-relaxed italic">"' + esc(t.example.blurted) + '"</p></div>' +
+                                '<div class="rounded-2xl p-5 border-2 border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20"><p class="text-xs font-bold uppercase tracking-widest text-red-600 dark:text-red-400 mb-2">What they missed (blind spots found!)</p><p class="text-sm text-stone-700 dark:text-stone-200 leading-relaxed">' + esc(t.example.missed) + '</p></div>' +
+                            '</div>' +
+                        '</div>';
+                } else if (key === 'quiz') {
+                    const ex = t.example;
+                    exampleHTML =
+                        '<div class="mt-8">' +
+                            '<h4 class="text-sm font-bold uppercase tracking-widest text-orange-600 mb-3">Categories Available</h4>' +
+                            '<div class="flex flex-wrap gap-2 mb-6">' + t.categories.map(c => '<span class="bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-300 text-xs font-semibold px-3 py-1.5 rounded-full">' + esc(c) + '</span>').join('') + '</div>' +
+                            '<h4 class="text-sm font-bold uppercase tracking-widest text-orange-600 mb-3">Sample Question</h4>' +
+                            '<div class="bg-stone-50 dark:bg-stone-800 rounded-2xl p-6 border border-stone-200 dark:border-stone-700">' +
+                                '<p class="text-base font-semibold text-stone-800 dark:text-stone-100 mb-4">' + esc(ex.question) + '</p>' +
+                                '<div class="grid grid-cols-2 gap-3">' + ex.options.map((o, i) => '<div class="rounded-xl p-3 text-sm font-medium text-center ' + (i === ex.correct ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-2 border-green-300 dark:border-green-700' : 'bg-white dark:bg-stone-700 text-stone-600 dark:text-stone-300 border border-stone-200 dark:border-stone-600') + '">' + esc(o) + (i === ex.correct ? ' \u2713' : '') + '</div>').join('') + '</div>' +
+                                '<p class="text-xs text-stone-500 dark:text-stone-400 mt-4 italic">' + esc(ex.explanation) + '</p>' +
+                            '</div>' +
+                        '</div>';
+                } else if (key === 'babel') {
+                    const ex = t.example;
+                    exampleHTML =
+                        '<div class="mt-8">' +
+                            '<h4 class="text-sm font-bold uppercase tracking-widest text-orange-600 mb-3">Mini Example: Explain "' + esc(ex.concept) + '"</h4>' +
+                            '<div class="bg-stone-50 dark:bg-stone-800 rounded-2xl p-6 border border-stone-200 dark:border-stone-700 mb-4">' +
+                                '<p class="text-xs font-bold uppercase tracking-widest text-purple-600 dark:text-purple-400 mb-2">\uD83D\uDC7E Alien-friendly explanation</p>' +
+                                '<p class="text-sm text-stone-700 dark:text-stone-200 leading-relaxed italic">"' + esc(ex.simpleExplanation) + '"</p>' +
+                            '</div>' +
+                            '<div class="bg-yellow-50 dark:bg-yellow-900/20 rounded-2xl p-5 border border-yellow-200 dark:border-yellow-800">' +
+                                '<p class="text-xs font-bold uppercase tracking-widest text-yellow-700 dark:text-yellow-400 mb-2">\uD83C\uDFA8 Stupid Doodle (memory hook)</p>' +
+                                '<p class="text-sm text-stone-600 dark:text-stone-300">' + esc(ex.doodleDescription) + '</p>' +
+                            '</div>' +
+                        '</div>';
+                } else if (key === 'recalibrator') {
+                    const ex = t.example;
+                    exampleHTML =
+                        '<div class="mt-8">' +
+                            '<h4 class="text-sm font-bold uppercase tracking-widest text-orange-600 mb-4">Your Two Weapons</h4>' +
+                            '<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">' +
+                                t.tools.map(tool => '<div class="bg-stone-50 dark:bg-stone-800 rounded-2xl p-5 border border-stone-200 dark:border-stone-700"><div class="text-3xl mb-2">' + tool.icon + '</div><p class="text-sm font-bold text-stone-800 dark:text-stone-100 mb-2">' + esc(tool.name) + '</p><p class="text-xs text-stone-600 dark:text-stone-300 leading-relaxed">' + esc(tool.detail) + '</p></div>').join('') +
+                            '</div>' +
+                            '<h4 class="text-sm font-bold uppercase tracking-widest text-orange-600 mb-3">Real-World Scenario</h4>' +
+                            '<div class="bg-stone-50 dark:bg-stone-800 rounded-2xl p-6 border border-stone-200 dark:border-stone-700">' +
+                                '<p class="text-sm font-semibold text-stone-800 dark:text-stone-100 mb-3">' + esc(ex.scenario) + '</p>' +
+                                '<p class="text-sm text-stone-600 dark:text-stone-300 leading-relaxed">' + esc(ex.steps) + '</p>' +
+                            '</div>' +
+                        '</div>';
+                } else if (key === 'navcheck') {
+                    const ex = t.example;
+                    exampleHTML =
+                        '<div class="mt-8">' +
+                            '<h4 class="text-sm font-bold uppercase tracking-widest text-orange-600 mb-4">The Three Zones</h4>' +
+                            '<div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">' +
+                                t.zones.map(z => '<div class="bg-stone-50 dark:bg-stone-800 rounded-2xl p-4 border border-stone-200 dark:border-stone-700"><p class="text-sm font-bold text-stone-800 dark:text-stone-100 mb-1">' + esc(z.name) + '</p><p class="text-xs text-stone-500 dark:text-stone-400">' + esc(z.detail) + '</p></div>').join('') +
+                            '</div>' +
+                            '<h4 class="text-sm font-bold uppercase tracking-widest text-orange-600 mb-3">Mini Example: Tides</h4>' +
+                            '<div class="grid grid-cols-1 md:grid-cols-3 gap-0 border border-stone-300 dark:border-stone-600 rounded-2xl overflow-hidden">' +
+                                '<div class="bg-amber-50 dark:bg-amber-900/20 p-5 border-b md:border-b-0 md:border-r border-stone-300 dark:border-stone-600"><p class="text-xs font-bold uppercase tracking-widest text-amber-700 dark:text-amber-400 mb-2">Cue Column</p><p class="text-sm text-stone-700 dark:text-stone-200 whitespace-pre-line">' + esc(ex.cues) + '</p></div>' +
+                                '<div class="bg-white dark:bg-stone-800 p-5 border-b md:border-b-0 md:border-r border-stone-300 dark:border-stone-600 md:col-span-1"><p class="text-xs font-bold uppercase tracking-widest text-stone-500 dark:text-stone-400 mb-2">Notes</p><p class="text-sm text-stone-700 dark:text-stone-200">' + esc(ex.notes) + '</p></div>' +
+                                '<div class="bg-green-50 dark:bg-green-900/20 p-5"><p class="text-xs font-bold uppercase tracking-widest text-green-700 dark:text-green-400 mb-2">Summary</p><p class="text-sm text-stone-700 dark:text-stone-200">' + esc(ex.summary) + '</p></div>' +
+                            '</div>' +
+                        '</div>';
+                }
+
+                return '<div class="animate-fade-in max-w-3xl mx-auto space-y-8">' +
+                    '<button onclick="app.navTo(\'dashboard\')" class="text-sm text-stone-500 hover:text-orange-600 transition-colors">\u2190 Back to Mission</button>' +
+                    '<div class="text-center">' +
+                        '<div class="text-5xl mb-4">' + t.icon + '</div>' +
+                        '<h1 class="text-3xl md:text-4xl font-serif font-bold mb-3 text-stone-900 dark:text-stone-50">' + esc(t.title) + '</h1>' +
+                        '<p class="text-lg font-serif italic text-orange-600 mb-4">' + esc(t.tagline) + '</p>' +
+                        '<p class="text-sm text-stone-600 dark:text-stone-300 max-w-xl mx-auto leading-relaxed">' + esc(t.description) + '</p>' +
+                    '</div>' +
+                    '<div class="bg-white dark:bg-[#292524] rounded-[2rem] p-6 md:p-8 border border-stone-200 dark:border-stone-700 shadow-sm">' +
+                        exampleHTML +
+                    '</div>' +
+                    '<div class="bg-gradient-to-br from-orange-600 to-orange-700 rounded-[2rem] p-8 text-center text-white shadow-xl">' +
+                        '<p class="text-lg font-serif font-bold mb-2">Want this in your study toolkit?</p>' +
+                        '<p class="text-sm text-orange-100 mb-5 max-w-md mx-auto">The full version of Synapse includes ' + esc(t.title) + ' and all other study tools \u2014 ready to use for any subject, any time.</p>' +
+                        '<a href="' + GUMROAD_URL + '" target="_blank" rel="noopener noreferrer" class="inline-block bg-white text-orange-600 px-8 py-3 rounded-2xl font-bold uppercase tracking-widest text-sm hover:bg-orange-50 transition-colors">Get Synapse \u2192</a>' +
+                    '</div>' +
+                '</div>';
             },
 
             navTo: (tabId) => {
@@ -842,6 +942,9 @@
                     } else if (state.view === 'stats') {
                         container.innerHTML = app.getStatsHTML();
                         app.renderStatsCharts();
+                    } else if (state.view.startsWith('preview_')) {
+                        const key = state.view.replace('preview_', '');
+                        container.innerHTML = app.getToolPreviewHTML(key);
                     }
                     rankEngine.updateNavRank();
                 } catch (err) {
