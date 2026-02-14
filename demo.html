@@ -214,6 +214,80 @@
 
         let studyPlanDemo = { selected: null, typing: false, displayedText: '' };
 
+        const toolPreviews = {
+            blurt: {
+                icon: '\uD83E\uDDE0',
+                title: 'The Blurting Method',
+                tagline: 'The most powerful active recall technique you\'ve never tried.',
+                description: 'Blurting is a 4-phase study technique backed by cognitive science. You read a topic, close your notes, then write down everything you can remember. Finally, you compare what you wrote with the original to find your blind spots. It\'s simple, fast, and devastatingly effective.',
+                phases: [
+                    { num: '1', name: 'List', detail: 'Choose your topic and write down what you already know.' },
+                    { num: '2', name: 'Read', detail: 'Study the material for a set time. Really absorb it.' },
+                    { num: '3', name: 'Blurt', detail: 'Close everything. Write down everything you remember.' },
+                    { num: '4', name: 'Compare', detail: 'Open your notes again. Find the gaps. Those are your targets.' },
+                ],
+                example: {
+                    topic: 'Photosynthesis',
+                    blurted: 'Plants use sunlight to make food. Chlorophyll is green. CO2 comes in through stomata. Water comes from roots. Glucose is produced. Oxygen is released...',
+                    missed: 'Light-dependent vs light-independent reactions, the role of ATP and NADPH, the Calvin cycle, exact equation: 6CO\u2082 + 6H\u2082O \u2192 C\u2086H\u2081\u2082O\u2086 + 6O\u2082'
+                }
+            },
+            quiz: {
+                icon: '\uD83C\uDFAF',
+                title: 'Quiz Arena',
+                tagline: 'A trivia arena with 10,000+ questions \u2014 just for fun.',
+                description: 'The Quiz Arena pulls from a massive database of trivia questions across every subject imaginable. It\'s not connected to your rank progression \u2014 it\'s a standalone brain workout. Pick a category, choose your difficulty, and test yourself.',
+                categories: ['General Knowledge', 'Science', 'History', 'Geography', 'Literature', 'Mathematics', 'Art', 'Music'],
+                example: {
+                    question: 'What is the chemical symbol for gold?',
+                    options: ['Go', 'Gd', 'Au', 'Ag'],
+                    correct: 2,
+                    explanation: 'Au comes from the Latin word "aurum," meaning gold. This is why knowing etymology helps with science!'
+                }
+            },
+            babel: {
+                icon: '\uD83D\uDC7E',
+                title: 'Babel Fish Metaphor Lab',
+                tagline: 'Explain it so simply that an alien child could understand.',
+                description: 'Inspired by the Feynman Technique (and Douglas Adams\' Babel Fish), this tool challenges you to explain complex concepts in the simplest possible language. If you can explain something to a 5-year-old alien, you truly understand it. You can even add a "stupid doodle" as a memory hook.',
+                example: {
+                    concept: 'Gravity',
+                    simpleExplanation: 'Imagine everything in the universe is a little bit sticky. Big things are stickier than small things. The Earth is VERY big, so it\'s VERY sticky \u2014 that\'s why you stick to it and don\'t float away. The Moon is sticky too, but less sticky, so it just pulls on our oceans a bit (that\'s tides!).',
+                    doodleDescription: '\uD83C\uDF0D A round Earth with little stick figures being gently pulled toward it, with hearts between them (because they\'re attracted to each other)'
+                }
+            },
+            recalibrator: {
+                icon: '\u26A1',
+                title: 'Dopamine Recalibrator',
+                tagline: 'Outsmart your procrastination brain.',
+                description: 'Your brain is wired to seek easy dopamine \u2014 scrolling, gaming, snacking. The Recalibrator fights back with two weapons: Stealth Mode (15 minutes of deliberate boredom to reset your baseline) and Entry Rocket (a tiny 2-minute commitment that tricks your brain into starting).',
+                tools: [
+                    { name: 'Stealth Mode', icon: '\uD83E\uDD77', detail: '15 minutes of doing absolutely nothing. No phone, no music, no stimulation. Your brain gets so bored that studying starts to feel exciting by comparison.' },
+                    { name: 'Entry Rocket', icon: '\uD83D\uDE80', detail: 'Commit to just 2 minutes of work. That\'s it. The secret? Once you start, momentum usually carries you for 20-30 minutes. Action creates motivation, not the other way around.' },
+                ],
+                example: {
+                    scenario: 'It\'s 3pm. You need to study Biology but your brain is screaming for TikTok.',
+                    steps: '1. Put phone in another room \u2192 2. Set Stealth Mode for 15 min \u2192 3. Sit with the boredom \u2192 4. Launch Entry Rocket (2 min of Biology notes) \u2192 5. Realise 20 minutes have passed and you\'re actually studying.'
+                }
+            },
+            navcheck: {
+                icon: '\uD83E\uDDED',
+                title: 'Navigation Check (Cornell Notes)',
+                tagline: 'The note-taking system used at top universities worldwide.',
+                description: 'Cornell Notes divide your page into three zones: a narrow left column for cue questions, a wide right column for your actual notes, and a bottom summary section. This structure forces you to process information actively instead of just copying it down. After class, you cover the right column and test yourself using only the cue questions.',
+                zones: [
+                    { name: 'Cue Column (left)', detail: 'Write questions or keywords that trigger recall of the notes beside them.' },
+                    { name: 'Note-Taking Area (right)', detail: 'Your main notes \u2014 ideas, facts, diagrams. Keep them concise.' },
+                    { name: 'Summary (bottom)', detail: 'After the session, write a 2-3 sentence summary of the entire page.' },
+                ],
+                example: {
+                    cues: 'What causes tides?\nHow often do tides occur?\nSpring vs neap?',
+                    notes: 'Tides caused by gravitational pull of Moon (mainly) and Sun. Two high tides and two low tides per day. Spring tides = Sun + Moon aligned (stronger). Neap tides = Sun + Moon at right angles (weaker).',
+                    summary: 'Tides are caused by the Moon\'s gravity pulling on Earth\'s water. Their strength depends on the alignment of the Sun and Moon.'
+                }
+            }
+        };
+
         function demoMd(text) {
             return text
                 .replace(/^### (.+)$/gm, '<h4 class="text-base font-serif font-bold text-stone-800 dark:text-stone-100 mt-5 mb-2">$1</h4>')
