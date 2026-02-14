@@ -191,6 +191,40 @@
 
         let reflectionState = { currentIndex: 0, userAnswer: '', revealed: false, score: { attempted: 0, total: reflectionQuestions.length } };
 
+        const demoStudyPlans = [
+            {
+                label: "Circle Geometry (Grade 11)",
+                icon: "\uD83D\uDCD0",
+                subject: "Circle Geometry for Grade/Year 11",
+                plan: "## Study Plan: Circle Geometry (Grade 11)\n\n### Step 1 \u2014 Build the Foundation (30 min)\nStart by reviewing the **key definitions**: radius, diameter, chord, arc, tangent, secant, and sector. Draw each one in a blank circle diagram. Then learn the **5 core theorems**:\n- Angle at centre = 2 \u00D7 angle at circumference\n- Angles in the same segment are equal\n- Angle in a semicircle = 90\u00B0\n- Opposite angles of a cyclic quadrilateral = 180\u00B0\n- Tangent is perpendicular to the radius at the point of contact\n\n**Active recall check:** Close your notes, draw a circle, and label all 5 theorems from memory.\n\n### Step 2 \u2014 Work Through Proof Patterns (45 min)\nTake 6 practice problems of increasing difficulty. For each one:\n1. Identify which theorem applies\n2. Write the logical chain of reasoning\n3. State your final answer with reasons\n\nFocus on problems that combine multiple theorems \u2014 these are what exams test. Use the **Leitner flashcard system** to create cards for each theorem with a diagram on the front and the rule + proof on the back.\n\n### Step 3 \u2014 Exam Simulation & Gaps (30 min)\nDo a timed mini-test: 5 mixed problems in 20 minutes. Then:\n- Mark your work honestly\n- Identify which theorem you missed or applied incorrectly\n- Re-study only those specific gaps\n- Use the **Blurting Method**: write everything you know about circle geometry from memory, then compare with your notes to find blind spots\n\n**Spaced repetition schedule:** Review your flashcards tomorrow, then Day 3, then Day 7."
+            },
+            {
+                label: "Entrepreneurship (Grade 10)",
+                icon: "\uD83D\uDCBC",
+                subject: "Entrepreneurship for Grade 10 Business Studies",
+                plan: "## Study Plan: Entrepreneurship (Grade 10 Business Studies)\n\n### Step 1 \u2014 Master the Core Concepts (30 min)\nBuild a clear mental model of these **key areas**:\n- **Definition of entrepreneurship** vs. being an employee\n- **Characteristics** of successful entrepreneurs (risk-taking, creativity, opportunity recognition, perseverance)\n- **Types of businesses**: sole trader, partnership, close corporation, company\n- **Factors of production**: land, labour, capital, entrepreneurship\n\n**Active recall check:** Without looking at notes, list 6 characteristics of a successful entrepreneur and give a real-world example for each.\n\n### Step 2 \u2014 Connect Theory to Real Businesses (45 min)\nChoose 3 South African entrepreneurs (e.g., Elon Musk\u2019s early days, Mmabatho Montsho, Adrian Gore). For each one:\n1. Identify which entrepreneurial characteristics they demonstrated\n2. What problem did they solve?\n3. What risks did they take?\n4. How did they create value for their community?\n\nUse the **Eisenhower Matrix** to sort your study topics by urgency (exam date) and importance (mark weighting). Business environments and forms of ownership usually carry the most marks.\n\n### Step 3 \u2014 Practice Exam Answers (30 min)\nBusiness Studies exams reward **structure**. Practice writing answers using:\n- A clear definition\n- 2-3 explained points (not just bullet points)\n- A real-world example to support your argument\n\nDo 3 past-paper essay questions under timed conditions. Then use the **Blurting Method**: write everything you know about entrepreneurship from memory, compare with the textbook, and fill the gaps.\n\n**Spaced repetition schedule:** Create flashcards for definitions and entrepreneur profiles. Review tomorrow, Day 3, Day 7."
+            },
+            {
+                label: "Post-Modernism (Visual Arts)",
+                icon: "\uD83C\uDFA8",
+                subject: "Post-Modernism for Visual Arts",
+                plan: "## Study Plan: Post-Modernism (Visual Arts)\n\n### Step 1 \u2014 Understand the Context (30 min)\nPost-modernism is a **reaction against modernism**. Start by understanding the contrast:\n- **Modernism**: originality, purity, \"high art,\" universal truths, serious\n- **Post-modernism**: appropriation, mixing, \"high + low art,\" multiple perspectives, playful/ironic\n\nKey concepts to master:\n- **Appropriation** \u2014 borrowing/remixing existing images\n- **Pastiche** \u2014 imitating other styles\n- **Irony & parody** \u2014 humour and critique through imitation\n- **Deconstruction** \u2014 breaking apart assumed meanings\n- **Pluralism** \u2014 many voices, no single \"correct\" style\n\n**Active recall check:** Close your notes and explain the difference between modernism and post-modernism in your own words, as if explaining to a friend.\n\n### Step 2 \u2014 Study Key Artists & Works (45 min)\nFocus on 4-5 post-modern artists. For each one, know:\n1. **Name and dates**\n2. **One key artwork** (title, date, medium)\n3. **What makes it post-modern** (which concepts does it use?)\n4. **Your personal response** (what do you notice/feel?)\n\nSuggested artists: Andy Warhol, Barbara Kruger, Cindy Sherman, Jeff Koons, Banksy, William Kentridge.\n\nUse the **Feynman Technique**: try to explain each artist\u2019s approach in 2 simple sentences. If you can\u2019t, you need to study that artist more.\n\n### Step 3 \u2014 Practice Visual Analysis (30 min)\nExam success in Visual Arts comes from **structured analysis**. Practice this framework:\n- **Describe**: What do you literally see?\n- **Analyse**: How are the elements of art used (line, colour, space, texture)?\n- **Interpret**: What is the meaning/message? What post-modern strategies are used?\n- **Evaluate**: Is it effective? Why?\n\nDo 2 timed analyses (10 min each) on artworks you haven\u2019t studied before. Use the **Blurting Method** for theory: write everything you know about post-modernism, then compare with your notes.\n\n**Spaced repetition schedule:** Create flashcards with artwork images on the front and artist + post-modern strategies on the back. Review tomorrow, Day 3, Day 7."
+            }
+        ];
+
+        let studyPlanDemo = { selected: null, typing: false, displayedText: '' };
+
+        function demoMd(text) {
+            return text
+                .replace(/^### (.+)$/gm, '<h4 class="text-base font-serif font-bold text-stone-800 dark:text-stone-100 mt-5 mb-2">$1</h4>')
+                .replace(/^## (.+)$/gm, '<h3 class="text-lg font-serif font-bold text-orange-700 dark:text-orange-400 mb-3">$1</h3>')
+                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                .replace(/^- (.+)$/gm, '<li class="ml-4 text-sm text-stone-700 dark:text-stone-300 leading-relaxed list-disc">$1</li>')
+                .replace(/^(\d+)\. (.+)$/gm, '<li class="ml-4 text-sm text-stone-700 dark:text-stone-300 leading-relaxed list-decimal">$1. $2</li>')
+                .replace(/\n\n/g, '<br><br>')
+                .replace(/\n/g, '\n');
+        }
+
         const deckStore = {
             load() { try { state.fcDecks = JSON.parse(localStorage.getItem('demo_decks') || '[]'); } catch(e) { state.fcDecks = []; } },
             save() { localStorage.setItem('demo_decks', JSON.stringify(state.fcDecks)); },
@@ -462,6 +496,33 @@
                 if (chevron) chevron.style.transform = '';
             },
 
+            showStudyPlan: (index) => {
+                if (studyPlanDemo.typing) return;
+                studyPlanDemo.selected = index;
+                studyPlanDemo.displayedText = '';
+                studyPlanDemo.typing = true;
+                app.render();
+                setTimeout(() => { const el = document.getElementById('study-plan-demo'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
+                const fullText = demoStudyPlans[index].plan;
+                let charIndex = 0;
+                const speed = 5;
+                function typeNext() {
+                    const output = document.getElementById('study-plan-output');
+                    if (!output) return;
+                    if (charIndex < fullText.length) {
+                        const chunk = Math.min(4, fullText.length - charIndex);
+                        studyPlanDemo.displayedText = fullText.substring(0, charIndex + chunk);
+                        charIndex += chunk;
+                        output.innerHTML = demoMd(studyPlanDemo.displayedText) + '<span class="inline-block w-2 h-5 bg-orange-500 animate-pulse ml-1"></span>';
+                        setTimeout(typeNext, speed);
+                    } else {
+                        studyPlanDemo.typing = false;
+                        app.render();
+                    }
+                }
+                setTimeout(typeNext, 400);
+            },
+
             reflectionReveal: () => {
                 const input = document.getElementById('reflection-input');
                 reflectionState.userAnswer = input ? input.value.trim() : '';
@@ -730,6 +791,32 @@
                             '<div class="bg-white dark:bg-stone-800 rounded-2xl p-5 border border-orange-100 dark:border-stone-700 text-center"><div class="text-3xl mb-2">2\uFE0F\u20E3</div><p class="text-sm font-semibold text-stone-700 dark:text-stone-200 mb-1">Use the tools</p><p class="text-xs text-stone-500 dark:text-stone-400">Start a focus timer, make flashcards, or sort your tasks.</p></div>' +
                             '<div class="bg-white dark:bg-stone-800 rounded-2xl p-5 border border-orange-100 dark:border-stone-700 text-center"><div class="text-3xl mb-2">3\uFE0F\u20E3</div><p class="text-sm font-semibold text-stone-700 dark:text-stone-200 mb-1">Level up your rank</p><p class="text-xs text-stone-500 dark:text-stone-400">Keep studying consistently and you\'ll earn your next rank!</p></div>' +
                         '</div>' +
+                    '</section>' +
+                    '<section id="study-plan-demo" class="bg-gradient-to-br from-stone-900 to-stone-800 rounded-[2.5rem] p-8 md:p-10 text-white shadow-2xl">' +
+                        '<div class="text-center mb-6">' +
+                            '<div class="text-4xl mb-3">\uD83E\uDD16</div>' +
+                            '<h2 class="text-2xl font-serif font-bold text-white mb-2">AI Study Plan Generator</h2>' +
+                            '<p class="text-sm text-stone-300 max-w-lg mx-auto">In the full version, you type <em>any</em> subject and get an instant, personalised study plan. Try one of these examples to see it in action:</p>' +
+                        '</div>' +
+                        '<div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">' +
+                            demoStudyPlans.map((p, i) =>
+                                '<button onclick="app.showStudyPlan(' + i + ')" class="' + (studyPlanDemo.selected === i ? 'ring-2 ring-orange-400 bg-orange-600/20' : 'bg-white/10 hover:bg-white/20') + ' rounded-2xl p-4 text-center transition-all">' +
+                                    '<div class="text-3xl mb-2">' + p.icon + '</div>' +
+                                    '<p class="text-sm font-bold text-white">' + esc(p.label) + '</p>' +
+                                '</button>'
+                            ).join('') +
+                        '</div>' +
+                        (studyPlanDemo.selected !== null ?
+                            '<div class="bg-white dark:bg-[#292524] rounded-2xl p-6 md:p-8 text-stone-800 dark:text-stone-200 shadow-inner">' +
+                                '<div class="flex items-center gap-2 mb-4 text-xs font-bold uppercase tracking-widest text-orange-600"><span class="inline-block w-2 h-2 bg-orange-500 rounded-full animate-pulse"></span> AI-Generated Study Plan</div>' +
+                                '<div id="study-plan-output" class="prose-sm leading-relaxed">' + demoMd(studyPlanDemo.displayedText) + (studyPlanDemo.typing ? '<span class="inline-block w-2 h-5 bg-orange-500 animate-pulse ml-1"></span>' : '') + '</div>' +
+                                (!studyPlanDemo.typing ? '<div class="mt-6 pt-4 border-t border-stone-200 dark:border-stone-700 text-center"><p class="text-xs text-stone-500 dark:text-stone-400 mb-3">In the full version, this works for <strong>any topic you type</strong> \u2014 powered by Google Gemini AI.</p><a href="' + GUMROAD_URL + '" target="_blank" rel="noopener noreferrer" class="inline-block bg-orange-600 hover:bg-orange-500 text-white px-6 py-2.5 rounded-xl font-bold text-xs uppercase tracking-widest transition-colors">Get Synapse \u2192</a></div>' : '') +
+                            '</div>'
+                        :
+                            '<div class="text-center py-6 bg-white/5 rounded-2xl border border-dashed border-white/20">' +
+                                '<p class="text-stone-400 text-sm">\u2191 Pick a subject above to see a sample study plan</p>' +
+                            '</div>'
+                        ) +
                     '</section>' +
                     '<section id="reflection-module" class="bg-white dark:bg-[#292524] rounded-[2rem] p-8 border-2 border-orange-300 dark:border-orange-700 shadow-lg">' +
                         '<div class="flex items-center justify-between mb-6">' +
