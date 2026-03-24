@@ -9,7 +9,7 @@
 //  it. Firebase adds cloud sync so data persists across devices.
 // ============================================================
 
-const SYNAPSE_FIREBASE_CONFIG = {
+var SYNAPSE_FIREBASE_CONFIG = {
     apiKey:            "YOUR_API_KEY_HERE",
     authDomain:        "YOUR_PROJECT_ID.firebaseapp.com",
     projectId:         "YOUR_PROJECT_ID_HERE",
