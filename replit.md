@@ -23,7 +23,7 @@ The application is a single-page application (SPA) with client-side routing. Sty
 An Express.js v5 server provides minimal static file serving and acts as an API proxy for the Gemini API to protect the API key. All responses utilize `no-cache` headers.
 
 ### Data Storage
-Primary data storage is `localStorage` for offline functionality, persisting flashcards, pomodoro logs, blurt sessions, Cornell notes, rank progress, Eisenhower Matrix tasks, dopamine recalibrator sessions, Babel Fish exercises, Growth Shield moments, and MCQ diagnostic data. Optional cloud persistence for notes and progress checkboxes is available through Firebase Firestore, with graceful degradation if unavailable. A JSON export/import feature allows for backup and restoration of all localStorage data.
+Primary data storage is `localStorage` for offline functionality, persisting flashcards, pomodoro logs, blurt sessions, Cornell notes, rank progress, Eisenhower Matrix tasks, dopamine recalibrator sessions, Babel Fish exercises, Growth Shield moments, MCQ diagnostic data, exam countdowns (`synapse_exams`), and "What I Learned" session log (`synapse_wil`). Theme preference is saved under `synapse_theme`. Optional cloud persistence for notes and progress checkboxes is available through Firebase Firestore, with graceful degradation if unavailable. A JSON export/import feature allows for backup and restoration of all localStorage data.
 
 ### Key Features
 - **Mission Architect (AI):** Gemini-powered study plan generation. Uses BYOK (Bring Your Own Key) model — users enter their own Google Gemini API key in Settings, stored in localStorage only.
@@ -43,6 +43,15 @@ Primary data storage is `localStorage` for offline functionality, persisting fla
 - **Teacher Dashboard:** (`teacher.html`) Classroom-only feature. Import student JSON exports, view class overview with rank distribution, activity charts, student roster, and "students needing attention" alerts.
 - **Printable Progress Reports:** Generate clean, printer-friendly student summaries with rank evidence bars, activity stats, and metrics. Accessible from Teacher Dashboard.
 - **XSS Protection:** `esc()` utility for user-rendered content.
+- **Dark Mode Default:** App defaults to dark mode on first load; preference saved in `synapse_theme` localStorage key.
+- **Exam Countdown Widget:** Dashboard sidebar widget to add upcoming exams by name and date; shows days remaining, red when ≤7 days away.
+- **Subject Tagging:** Pomodoro timer panel has a subject dropdown (Maths, English, Science, etc.) to tag each focus session.
+- **"What I Learned?" Modal:** After every Pomodoro session completes, a modal prompts the user to write one thing they just learned; saved to `synapse_wil` log.
+- **Phone-Lock Nudge:** A friendly "put your phone face-down" notification fires when starting a Pomodoro session.
+- **Lofi Music Link:** Small "🎵 Study Music" link in the timer panel opens a YouTube lofi music search.
+- **"Not Yet 🛡️" Flashcard Button:** Third button (alongside Again/Got It) on flashcard study — triggers the YET Growth Shield mindset frame without penalising more than "Again".
+- **Study Buddy System:** Rank page lets users copy a base64 buddy code (rank + stats), paste a friend's code to see a side-by-side comparison.
+- **Shareable Progress Report:** Rank page button generates a URL with encoded stats; when opened, displays an orange banner with the student's rank and evidence (for parents/teachers).
 
 ### Key Design Decisions
 - **CDN-based dependencies:** No build system; libraries like Tailwind, Chart.js, and Firebase are loaded via CDNs.

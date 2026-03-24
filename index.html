@@ -143,6 +143,20 @@
         <div id="modal-content" class="bg-white dark:bg-[#1c1917] w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-[2.5rem] shadow-2xl transform scale-95 transition-transform duration-300 border border-stone-200 dark:border-stone-800"></div>
     </div>
 
+    <!-- What I Learned Modal (Feature 4) -->
+    <div id="wil-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[200] hidden flex items-center justify-center p-4">
+        <div class="bg-[#FDFCF8] dark:bg-stone-900 rounded-[2rem] p-8 max-w-md w-full shadow-2xl animate-fade-in">
+            <div class="text-3xl mb-3 text-center">💡</div>
+            <h3 class="text-xl font-serif font-bold text-center mb-1 text-stone-900 dark:text-stone-50">Focus Session Complete!</h3>
+            <p class="text-sm text-stone-500 dark:text-stone-400 text-center mb-5">Write one thing you just learned. Just one. This takes 10 seconds and doubles your retention.</p>
+            <textarea id="wil-input" rows="3" placeholder="I just learned that..." class="w-full bg-stone-50 dark:bg-stone-800 px-4 py-3 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none mb-4"></textarea>
+            <div class="flex gap-3">
+                <button onclick="app.saveWhatILearned()" class="flex-1 bg-orange-600 hover:bg-orange-500 text-white py-3 rounded-xl font-bold text-sm uppercase tracking-widest transition-colors">Save It 🧠</button>
+                <button onclick="app.dismissWIL()" class="bg-stone-200 dark:bg-stone-700 text-stone-600 dark:text-stone-300 px-4 py-3 rounded-xl font-bold text-sm transition-colors">Skip</button>
+            </div>
+        </div>
+    </div>
+
     <div id="notification-box" class="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-stone-900 text-white px-6 py-4 rounded-2xl shadow-2xl z-[100] hidden flex items-center gap-4">
         <span id="notification-msg" class="font-medium">Session Complete!</span>
         <button onclick="app.hideNotification()" class="bg-white/20 hover:bg-white/30 px-3 py-1 rounded-lg text-xs font-bold uppercase">Close</button>
@@ -570,6 +584,19 @@
             add(concept) { state.yetMoments.push({ concept, date: new Date().toISOString() }); this.save(); },
         };
 
+        const examStore = {
+            load() { try { state.examCountdowns = JSON.parse(localStorage.getItem('synapse_exams') || '[]'); } catch(e) { state.examCountdowns = []; } },
+            save() { localStorage.setItem('synapse_exams', JSON.stringify(state.examCountdowns)); },
+            add(label, date) { state.examCountdowns.push({ id: Date.now().toString(), label, date }); state.examCountdowns.sort((a, b) => a.date.localeCompare(b.date)); this.save(); },
+            remove(id) { state.examCountdowns = state.examCountdowns.filter(e => e.id !== id); this.save(); },
+        };
+
+        const learningStore = {
+            load() { try { state.wilLog = JSON.parse(localStorage.getItem('synapse_wil') || '[]'); } catch(e) { state.wilLog = []; } },
+            save() { localStorage.setItem('synapse_wil', JSON.stringify(state.wilLog)); },
+            add(entry, subject) { state.wilLog.push({ entry, subject, date: new Date().toISOString() }); this.save(); },
+        };
+
         const RANKS = ['Space Cadet', 'Second Officer', 'Flight Commander'];
         const RANK_REQUIREMENTS = {
             'Second Officer': {
@@ -721,6 +748,7 @@
             recalMode: 'menu', recalTimer: 0, recalTimerRunning: false, recalTimerInterval: null,
             babelSessions: [], babelPhase: 'list',
             yetMoments: [], showYetShield: false, yetConcept: '',
+            examCountdowns: [], wilLog: [], timerSubject: '', buddyData: null,
         };
 
         const app = {
@@ -728,13 +756,22 @@
 
             init: async () => {
                 const toggle = document.getElementById('theme-toggle');
+                const savedTheme = localStorage.getItem('synapse_theme');
+                if (!savedTheme || savedTheme === 'dark') {
+                    document.body.classList.add('dark');
+                    toggle.textContent = '\u2600\uFE0F';
+                } else {
+                    toggle.textContent = '\uD83C\uDF19';
+                }
                 toggle.addEventListener('click', () => {
                     document.body.classList.toggle('dark');
-                    toggle.textContent = document.body.classList.contains('dark') ? '\u2600\uFE0F' : '\uD83C\uDF19';
+                    const isDark = document.body.classList.contains('dark');
+                    toggle.textContent = isDark ? '\u2600\uFE0F' : '\uD83C\uDF19';
+                    localStorage.setItem('synapse_theme', isDark ? 'dark' : 'light');
                     if (state.view === 'dashboard') app.renderCharts();
                 });
 
-                deckStore.load(); cardStore.load(); pomodoroStore.load(); blurtStore.load(); eisenhowerStore.load(); todoStore.load(); mcqStore.load(); recalStore.load(); babelStore.load(); yetStore.load();
+                deckStore.load(); cardStore.load(); pomodoroStore.load(); blurtStore.load(); eisenhowerStore.load(); todoStore.load(); mcqStore.load(); recalStore.load(); babelStore.load(); yetStore.load(); examStore.load(); learningStore.load();
                 rankEngine.load(); rankEngine.trackActiveDay(); rankEngine.updateNavRank();
 
                 const djTodoText = 'Complete the Diagnostics Journey';
@@ -755,6 +792,20 @@
                 }
 
                 app.navTo('dashboard');
+
+                const urlParams = new URLSearchParams(window.location.search);
+                const reportParam = urlParams.get('report');
+                if (reportParam) {
+                    try {
+                        const r = JSON.parse(atob(reportParam));
+                        const rankIcons3 = {'Space Cadet': '🚀', 'Second Officer': '⭐', 'Flight Commander': '👑'};
+                        const banner = document.createElement('div');
+                        banner.className = 'fixed top-0 inset-x-0 z-[300] bg-orange-600 text-white text-center px-4 py-3 text-sm font-bold shadow-lg';
+                        banner.innerHTML = `📋 Student Progress Report &mdash; Rank: ${rankIcons3[r.rank] || '🚀'} ${esc(r.rank || '')} | Focus: ${r.pomodoros || 0} | Blurts: ${r.blurts || 0} | Cards: ${r.cards || 0} | Streak: ${r.streak || 0} days | YETs: ${r.yets || 0} | Active Days: ${r.activeDays || 0} | Generated: ${r.date || ''} <button onclick="this.parentElement.remove()" class="ml-4 underline text-white/80">Dismiss</button>`;
+                        document.body.prepend(banner);
+                    } catch(e) {}
+                }
+
                 window.addEventListener('resize', app.handleResize);
                 document.addEventListener('click', (e) => { if (!e.target.closest('#tools-dropdown')) app.closeToolsMenu(); });
                 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') app.closeToolsMenu(); });
@@ -801,8 +852,11 @@
                     const labelEl = document.getElementById('timer-task-label');
                     if (labelEl) state.timerTaskLabel = labelEl.value;
                     if (!state.timerTaskLabel.trim()) { app.showNotification('Enter what you are working on first.'); return; }
+                    const subjectEl = document.getElementById('timer-subject-select');
+                    if (subjectEl) state.timerSubject = subjectEl.value;
                     const streak = pomodoroStore.consecutiveCount(state.timerTaskLabel);
                     if (streak >= 4) { state.governorBlocked = true; app.render(); return; }
+                    app.showNotification('📵 Phone face-down. You\'ve got this! Timer starting…');
                 }
                 state.timerIsRunning = true;
                 state.timerInterval = setInterval(() => {
@@ -814,12 +868,15 @@
                             pomodoroStore.log(state.timerTaskLabel);
                             const newStreak = pomodoroStore.consecutiveCount(state.timerTaskLabel);
                             rankEngine.recordPomodoro();
-                            app.showNotification(`Focus complete! Streak: ${newStreak}/4`);
                             if (newStreak >= 4) { state.governorBlocked = true; }
+                            app.render();
+                            const modal = document.getElementById('wil-modal');
+                            const inp = document.getElementById('wil-input');
+                            if (modal) { modal.classList.remove('hidden'); if (inp) inp.value = ''; inp && inp.focus(); }
                         } else {
-                            app.showNotification("Break over!");
+                            app.showNotification("Break over! Time to focus again.");
+                            app.render();
                         }
-                        app.render();
                     }
                 }, 1000);
                 app.updateTimerUI();
@@ -1068,6 +1125,8 @@
                     recal: { sessions: state.recalSessions, stealthCount: state.recalStealthCount, rocketCount: state.recalRocketCount },
                     babel: state.babelSessions,
                     yetMoments: state.yetMoments,
+                    examCountdowns: state.examCountdowns,
+                    wilLog: state.wilLog,
                     exportedAt: new Date().toISOString()
                 };
                 const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -1117,6 +1176,8 @@
                         if (data.recal) { state.recalSessions = data.recal.sessions || []; state.recalStealthCount = data.recal.stealthCount || 0; state.recalRocketCount = data.recal.rocketCount || 0; recalStore.save(); }
                         if (data.babel) { state.babelSessions = data.babel; babelStore.save(); }
                         if (data.yetMoments) { state.yetMoments = data.yetMoments; yetStore.save(); }
+                        if (data.examCountdowns) { state.examCountdowns = data.examCountdowns; examStore.save(); }
+                        if (data.wilLog) { state.wilLog = data.wilLog; learningStore.save(); }
                         app.showNotification('Data imported successfully!');
                         app.render();
                     } catch (err) { app.showNotification('Import failed. Invalid file.'); }
@@ -1237,6 +1298,27 @@
                                 </ul>
                             </div>
                             <div class="bg-white dark:bg-[#292524] p-6 rounded-[2rem] border border-stone-100 dark:border-stone-800 shadow-sm">
+                                <h3 class="text-lg font-serif font-bold text-stone-900 dark:text-stone-50 mb-3">📅 Exam Countdowns</h3>
+                                <div class="flex flex-col gap-1 mb-3">
+                                    <input id="exam-label-input" type="text" placeholder="Exam name (e.g. Biology)" class="bg-stone-50 dark:bg-stone-800 px-3 py-2 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+                                    <div class="flex gap-2">
+                                        <input id="exam-date-input" type="date" class="flex-grow bg-stone-50 dark:bg-stone-800 px-3 py-2 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+                                        <button onclick="app.addExamCountdown()" class="bg-orange-600 hover:bg-orange-500 text-white px-3 py-2 rounded-xl text-sm font-bold transition-colors">+</button>
+                                    </div>
+                                </div>
+                                ${state.examCountdowns.length === 0 ? '<p class="text-xs text-stone-400 italic text-center py-1">No exams added yet.</p>' : '<div class="space-y-2">' + state.examCountdowns.map(ex => {
+                                    const today = new Date(); today.setHours(0,0,0,0);
+                                    const examDate = new Date(ex.date + 'T00:00:00');
+                                    const days = Math.round((examDate - today) / 86400000);
+                                    const urgent = days <= 7;
+                                    const over = days < 0;
+                                    return '<div class="flex items-center justify-between gap-2 ' + (urgent && !over ? 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800' : 'bg-stone-50 dark:bg-stone-800') + ' rounded-xl px-3 py-2">' +
+                                        '<div><div class="text-sm font-semibold text-stone-800 dark:text-stone-100">' + esc(ex.label) + '</div>' +
+                                        '<div class="text-[10px] font-bold ' + (over ? 'text-stone-400' : urgent ? 'text-red-600' : 'text-orange-600') + '">' + (over ? 'Exam passed' : days === 0 ? 'TODAY!' : days + ' day' + (days !== 1 ? 's' : '') + ' left') + '</div></div>' +
+                                        '<button onclick="app.removeExamCountdown(\'' + ex.id + '\')" class="text-stone-300 hover:text-red-500 text-xs font-bold transition-colors">✕</button></div>';
+                                }).join('') + '</div>'}
+                            </div>
+                            <div class="bg-white dark:bg-[#292524] p-6 rounded-[2rem] border border-stone-100 dark:border-stone-800 shadow-sm">
                                 <h3 class="text-lg font-serif font-bold text-stone-900 dark:text-stone-50 mb-3">Study Streak</h3>
                                 ${(() => {
                                     const streak = rankEngine.getStreak();
@@ -1314,7 +1396,18 @@
                                 </svg>
                                 <div id="timer-display" class="absolute inset-0 flex items-center justify-center text-3xl font-bold font-sans">25:00</div>
                             </div>
-                            <input id="timer-task-label" type="text" value="${esc(state.timerTaskLabel)}" placeholder="What are you working on?" class="w-full bg-stone-50 dark:bg-stone-800 px-4 py-2.5 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 mb-3 ${state.timerIsRunning ? 'opacity-50 pointer-events-none' : ''}" ${state.timerIsRunning ? 'disabled' : ''}>
+                            <input id="timer-task-label" type="text" value="${esc(state.timerTaskLabel)}" placeholder="What are you working on?" class="w-full bg-stone-50 dark:bg-stone-800 px-4 py-2.5 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 mb-2 ${state.timerIsRunning ? 'opacity-50 pointer-events-none' : ''}" ${state.timerIsRunning ? 'disabled' : ''}>
+                            <select id="timer-subject-select" class="w-full bg-stone-50 dark:bg-stone-800 px-4 py-2.5 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 mb-3 ${state.timerIsRunning ? 'opacity-50 pointer-events-none' : ''}" ${state.timerIsRunning ? 'disabled' : ''}>
+                                <option value="">Subject (optional)</option>
+                                <option value="Maths" ${state.timerSubject==='Maths'?'selected':''}>Maths</option>
+                                <option value="English" ${state.timerSubject==='English'?'selected':''}>English</option>
+                                <option value="Science" ${state.timerSubject==='Science'?'selected':''}>Science</option>
+                                <option value="History" ${state.timerSubject==='History'?'selected':''}>History</option>
+                                <option value="Geography" ${state.timerSubject==='Geography'?'selected':''}>Geography</option>
+                                <option value="Languages" ${state.timerSubject==='Languages'?'selected':''}>Languages</option>
+                                <option value="Art" ${state.timerSubject==='Art'?'selected':''}>Art</option>
+                                <option value="Other" ${state.timerSubject==='Other'?'selected':''}>Other</option>
+                            </select>
                             <div class="flex items-center justify-center gap-2 mb-3">
                                 <div class="flex gap-1">
                                     ${[1,2,3,4].map(i => '<div class="w-2.5 h-2.5 rounded-full ' + (pomodoroStore.consecutiveCount(state.timerTaskLabel) >= i ? 'bg-orange-600' : 'bg-stone-200 dark:bg-stone-700') + '"></div>').join('')}
@@ -1325,10 +1418,11 @@
                                 <button id="timer-toggle-btn" onclick="state.timerIsRunning ? app.pauseTimer() : app.startTimer()" class="flex-grow bg-stone-900 dark:bg-stone-50 text-white dark:text-stone-900 py-3 rounded-2xl font-bold uppercase tracking-widest text-xs">Start</button>
                                 <button onclick="app.resetTimer()" class="bg-stone-200 dark:bg-stone-700 text-stone-600 dark:text-stone-300 px-4 py-3 rounded-2xl font-bold uppercase tracking-widest text-xs">Reset</button>
                             </div>
-                            <div class="flex gap-2 w-full">
+                            <div class="flex gap-2 w-full mb-3">
                                 <button onclick="app.switchTimerMode('work')" class="flex-1 py-2 rounded-xl text-xs font-bold uppercase tracking-widest ${state.timerMode === 'work' ? 'bg-orange-600 text-white' : 'bg-stone-100 dark:bg-stone-800 text-stone-500'}">Focus</button>
                                 <button onclick="app.switchTimerMode('break')" class="flex-1 py-2 rounded-xl text-xs font-bold uppercase tracking-widest ${state.timerMode === 'break' ? 'bg-stone-600 text-white' : 'bg-stone-100 dark:bg-stone-800 text-stone-500'}">Break</button>
                             </div>
+                            <a href="https://www.youtube.com/results?search_query=lofi+hip+hop+study" target="_blank" rel="noopener" class="text-[10px] font-bold uppercase tracking-widest text-stone-400 hover:text-orange-600 transition-colors">🎵 Study Music</a>
                         </div>
                     </div>
                     <div class="text-left max-w-4xl mx-auto mb-12">
@@ -1516,7 +1610,7 @@
                         <p class="text-xs text-stone-500 mb-3">You're a Galactic Explorer in Training. This card will come back — and next time, you'll nail it.</p>
                         <button onclick="app.yetDismiss()" class="bg-purple-600 hover:bg-purple-500 text-white px-5 py-2 rounded-xl font-bold text-xs uppercase tracking-widest transition-colors">I'll learn this — continue</button>
                     </div>` : ''}
-                    ${state.fcFlipped ? `<div class="flex gap-4"><button onclick="app.studyRate(false)" class="flex-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 py-4 rounded-2xl font-bold uppercase tracking-widest text-sm">Again</button><button onclick="app.studyRate(true)" class="flex-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 py-4 rounded-2xl font-bold uppercase tracking-widest text-sm">Got It</button></div>` : '<p class="text-center text-stone-400 text-sm">Tap card to reveal answer</p>'}
+                    ${state.fcFlipped ? `<div class="flex gap-3"><button onclick="app.studyRate(false)" class="flex-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 py-4 rounded-2xl font-bold uppercase tracking-widest text-sm">Again</button><button onclick="app.studyYet()" class="flex-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 py-4 rounded-2xl font-bold uppercase tracking-widest text-sm">Not Yet 🛡️</button><button onclick="app.studyRate(true)" class="flex-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 py-4 rounded-2xl font-bold uppercase tracking-widest text-sm">Got It</button></div>` : '<p class="text-center text-stone-400 text-sm">Tap card to reveal answer</p>'}
                 </div>`;
             },
 
@@ -2104,6 +2198,46 @@
                             <div class="text-center p-4 bg-purple-50 dark:bg-purple-900/20 rounded-2xl"><div class="text-2xl font-serif font-bold text-purple-600">${state.yetMoments.length}</div><div class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mt-1">YET Moments</div></div>
                         </div>
                     </div>
+                    <div class="bg-white dark:bg-[#292524] rounded-[2.5rem] p-10 border border-stone-100 dark:border-stone-800 shadow-sm">
+                        <h3 class="text-lg font-serif font-bold mb-2">👫 Study Buddy</h3>
+                        <p class="text-sm text-stone-500 dark:text-stone-400 mb-5">Share your buddy code with a friend to compare progress side-by-side.</p>
+                        <div class="space-y-4">
+                            <div>
+                                <p class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mb-2">Your Buddy Code</p>
+                                <div class="flex gap-2">
+                                    <div id="buddy-code-display" class="flex-grow bg-stone-50 dark:bg-stone-800 px-4 py-2.5 rounded-xl border border-stone-200 dark:border-stone-700 text-xs text-stone-500 font-mono break-all">(click to generate)</div>
+                                    <button onclick="app.copyBuddyCode()" class="bg-orange-600 hover:bg-orange-500 text-white px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest transition-colors flex-shrink-0">Copy</button>
+                                </div>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mb-2">Enter a Buddy's Code</p>
+                                <div class="flex gap-2">
+                                    <input id="buddy-code-input" type="text" placeholder="Paste buddy code here..." class="flex-grow bg-stone-50 dark:bg-stone-800 px-4 py-2.5 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+                                    <button onclick="app.loadBuddyCode()" class="bg-stone-700 dark:bg-stone-200 text-white dark:text-stone-900 px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest transition-colors flex-shrink-0">Load</button>
+                                </div>
+                            </div>
+                            ${state.buddyData ? (() => {
+                                const rankIcons2 = {'Space Cadet': '🚀', 'Second Officer': '⭐', 'Flight Commander': '👑'};
+                                const b = state.buddyData;
+                                const me = { rank: state.rank, pomodoros: state.rankEvidence.pomodorosCompleted, blurts: state.rankEvidence.blurtsCompleted, cards: state.rankEvidence.cardsAdvanced, streak: rankEngine.getStreak(), yets: state.yetMoments.length };
+                                const row = (label, myVal, theirVal) => {
+                                    const meBetter = myVal >= theirVal;
+                                    return '<div class="flex items-center gap-2 text-sm"><span class="flex-1 text-right font-bold ' + (meBetter ? 'text-orange-600' : 'text-stone-500') + '">' + myVal + '</span><span class="text-[10px] uppercase tracking-widest text-stone-400 w-24 text-center">' + label + '</span><span class="flex-1 text-left font-bold ' + (!meBetter ? 'text-orange-600' : 'text-stone-500') + '">' + theirVal + '</span></div>';
+                                };
+                                return '<div class="bg-stone-50 dark:bg-stone-800 rounded-2xl p-5 border border-stone-200 dark:border-stone-700">' +
+                                    '<div class="flex justify-between text-center mb-4"><div><div class="text-2xl">' + (rankIcons2[me.rank] || '🚀') + '</div><div class="text-xs font-bold text-orange-600">' + esc(me.rank) + '</div><div class="text-[10px] text-stone-400">You</div></div>' +
+                                    '<div class="text-sm font-bold text-stone-400 self-center">VS</div>' +
+                                    '<div><div class="text-2xl">' + (rankIcons2[b.rank] || '🚀') + '</div><div class="text-xs font-bold text-orange-600">' + esc(b.rank) + '</div><div class="text-[10px] text-stone-400">Buddy</div></div></div>' +
+                                    '<div class="space-y-1.5">' + row('Focus', me.pomodoros, b.pomodoros) + row('Blurts', me.blurts, b.blurts) + row('Cards', me.cards, b.cards) + row('Streak', me.streak, b.streak) + row('YETs', me.yets, b.yets) + '</div></div>';
+                            })() : ''}
+                        </div>
+                    </div>
+                    <div class="bg-orange-50 dark:bg-orange-900/20 rounded-[2.5rem] p-10 border border-orange-200 dark:border-orange-800 shadow-sm text-center">
+                        <div class="text-3xl mb-3">📋</div>
+                        <h3 class="text-lg font-serif font-bold mb-2 text-stone-900 dark:text-stone-50">Share Your Progress</h3>
+                        <p class="text-sm text-stone-500 dark:text-stone-400 mb-5">Generate a shareable link for a parent or teacher — shows your rank, stats, and learning evidence. No account needed.</p>
+                        <button onclick="app.shareProgressReport()" class="bg-orange-600 hover:bg-orange-500 text-white px-8 py-3 rounded-2xl font-bold text-sm uppercase tracking-widest transition-colors">📤 Copy Report Link</button>
+                    </div>
                 </div>`;
             },
 
@@ -2612,6 +2746,93 @@
                 state.showYetShield = false;
                 yetStore.add(state.yetConcept);
                 app.render();
+            },
+
+            studyYet() {
+                const card = state.fcStudyQueue[state.fcStudyIndex];
+                if (!card) return;
+                cardStore.demote(card);
+                state.fcStudyQueue.push(card);
+                state.showYetShield = true;
+                state.yetConcept = card.front;
+                rankEngine.recordCardStudy();
+                state.fcStudyIndex++;
+                state.fcFlipped = false;
+                app.render();
+            },
+
+            saveWhatILearned() {
+                const inp = document.getElementById('wil-input');
+                const entry = inp ? inp.value.trim() : '';
+                if (entry) learningStore.add(entry, state.timerSubject || 'General');
+                const modal = document.getElementById('wil-modal');
+                if (modal) modal.classList.add('hidden');
+                app.showNotification(`Focus complete! Session saved. Streak: ${pomodoroStore.consecutiveCount(state.timerTaskLabel)}/4`);
+            },
+
+            dismissWIL() {
+                const modal = document.getElementById('wil-modal');
+                if (modal) modal.classList.add('hidden');
+                app.showNotification(`Focus complete! Streak: ${pomodoroStore.consecutiveCount(state.timerTaskLabel)}/4`);
+            },
+
+            addExamCountdown() {
+                const label = document.getElementById('exam-label-input');
+                const date = document.getElementById('exam-date-input');
+                if (!label || !date || !label.value.trim() || !date.value) { app.showNotification('Enter exam name and date.'); return; }
+                examStore.add(label.value.trim(), date.value);
+                app.render();
+            },
+
+            removeExamCountdown(id) {
+                examStore.remove(id);
+                app.render();
+            },
+
+            generateBuddyCode() {
+                const data = {
+                    rank: state.rank,
+                    pomodoros: state.rankEvidence.pomodorosCompleted,
+                    blurts: state.rankEvidence.blurtsCompleted,
+                    cards: state.rankEvidence.cardsAdvanced,
+                    streak: rankEngine.getStreak(),
+                    yets: state.yetMoments.length,
+                };
+                return btoa(JSON.stringify(data));
+            },
+
+            copyBuddyCode() {
+                const code = app.generateBuddyCode();
+                navigator.clipboard.writeText(code).then(() => app.showNotification('Buddy code copied! Share it with a friend.')).catch(() => app.showNotification('Code: ' + code));
+                const el = document.getElementById('buddy-code-display');
+                if (el) el.textContent = code;
+            },
+
+            loadBuddyCode() {
+                const inp = document.getElementById('buddy-code-input');
+                if (!inp || !inp.value.trim()) { app.showNotification('Paste your buddy\'s code first.'); return; }
+                try {
+                    const data = JSON.parse(atob(inp.value.trim()));
+                    state.buddyData = data;
+                    app.render();
+                } catch(e) { app.showNotification('Invalid buddy code — ask them to copy it again.'); }
+            },
+
+            shareProgressReport() {
+                const data = {
+                    rank: state.rank,
+                    pomodoros: state.rankEvidence.pomodorosCompleted,
+                    blurts: state.rankEvidence.blurtsCompleted,
+                    cards: state.rankEvidence.cardsAdvanced,
+                    streak: rankEngine.getStreak(),
+                    activeDays: state.rankEvidence.activeDays,
+                    yets: state.yetMoments.length,
+                    diagnostics: state.rankEvidence.diagnosticsCompleted || 0,
+                    date: new Date().toLocaleDateString(),
+                };
+                const code = btoa(JSON.stringify(data));
+                const url = window.location.href.split('?')[0] + '?report=' + code;
+                navigator.clipboard.writeText(url).then(() => app.showNotification('Report link copied! Send it to a parent or teacher.')).catch(() => app.showNotification('Copy this: ' + url));
             },
 
             showAbout: () => alert("Synapse OS v7.0 - Interactive Learning OS with Rank System")
