@@ -2,7 +2,7 @@
 
 *Definitive reference document covering the current state of the app, a complete module and data inventory, and a full step-by-step user guide.*
 
-*Last updated: March 2025*
+*Last updated: March 28, 2026 — verified against index.html and server.js source*
 
 ---
 
@@ -30,7 +30,7 @@
 | **App name** | Synapse — Interactive Learning OS |
 | **Version** | Current build (March 2025) |
 | **Status** | Live and deployed on Replit |
-| **Primary URL** | The Replit deployment URL for this project (visible in Replit dashboard under "Deployments") |
+| **Primary URL** | Development: `https://b5334299-5744-414f-a9ca-149ecb28cf53-00-24j1nsrxtgbcv.picard.replit.dev` — Production deployment URL is set at publish time via Replit Deployments |
 | **Demo URL** | `/demo` — limited feature preview |
 | **Teacher Dashboard** | `/teacher` — separate page for classroom use |
 | **Tech stack** | Express.js v5, Tailwind CSS, Chart.js, Firebase v11.6.1 (optional), Google Gemini API |
