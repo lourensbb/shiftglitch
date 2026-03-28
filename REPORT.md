@@ -137,11 +137,11 @@ The navigation bar has four primary destinations (Mission, Vault, Decks, Rank, S
 |-------|--------|
 | **Navigation label** | Timer (within Mission / Dashboard) |
 | **Route** | Accessible from the dashboard |
-| **What it does** | A Pomodoro-style focus timer. Learner sets a duration (typically 25 minutes), selects a subject tag, and starts the session. A circular progress ring counts down. Phone-lock nudge fires on start. A "What I Learned?" modal appears at session end. |
+| **What it does** | A Pomodoro-style focus timer. Duration is fixed at 25 minutes (work) / 5 minutes (break) — there is no custom duration input. The learner selects a subject tag and starts the session. A circular progress ring counts down. Phone-lock nudge fires on start. A "What I Learned?" modal appears at session end. After 4 consecutive sessions on the same task, the Governor blocks further sessions and requires the learner to break down the task or switch. |
 | **Data stored** | Completed sessions appended to `synapse_pomodoro_log`. WIL entries saved to `synapse_wil`. |
-| **Rank contribution** | Yes — each completed session counts as one `pomodorosCompleted`. Each deliberate break taken counts as one `governorBreakdowns`. |
+| **Rank contribution** | Yes — each completed session counts as one `pomodorosCompleted`. Each deliberate governor breakdown counts as one `governorBreakdowns`. |
 
-**Subject tags available:** Maths, English, Science, History, Life Sciences, Accounting, Business Studies, Geography, Technology, Arts, Physical Education, Other.
+**Subject tags available:** Maths, English, Science, History, Geography, Languages, Art, Other.
 
 **Features during a session:**
 - 🎵 Study Music link (opens YouTube lofi playlist in new tab)
@@ -302,7 +302,7 @@ All data is stored in the browser's localStorage. Clearing browser data or using
 | `synapse_mcq` | MCQ Diagnostics | JSON object: `{ attempts: { [missionIdx]: [{ answers, correct, total, date }] }, gaps: string[], reflections: { [missionIdx]: string } }` — `missionIdx` is 0-based (0–4) | On mission submit; when a gap concept is identified; when a reflection is saved | Diagnostic page renders; rank evidence calculated | Yes |
 | `synapse_exams` | Exam Countdown | JSON array: `{ id, label, date }` — `label` = exam name; `date` = ISO date string (sorted ascending) | Adding or removing an exam | Dashboard sidebar widget renders | Yes |
 | `synapse_wil` | Learning Governor | JSON array: `{ entry, subject, date }` — `entry` = the one-sentence learning; `subject` = subject tag from the timer; `date` = ISO timestamp | Saving a "What I Learned?" modal entry | Stats → WIL log section renders | Yes |
-| `synapse_theme` | App-wide | String: `"dark"` or `"light"` | Toggling the moon/sun icon in the nav bar | Every page load — applied to `<html>` immediately at page boot before DOM renders, preventing flash | Yes |
+| `synapse_theme` | App-wide | String: `"dark"` or `"light"` | Toggling the moon/sun icon in the nav bar | On app init — `dark` class toggled on `document.body` during app startup | Yes |
 | `synapse_gemini_key` | Settings | String: plain API key text | Saving the key in Settings | Before every Gemini API call (checked first; if present, bypasses server proxy) | **No — excluded for security** |
 | `cornellNotes` | Dashboard (Cornell) | HTML string: serialised `innerHTML` of the Cornell Notes `contenteditable` div | Auto-saved as the user types in the notes panel | Dashboard renders; Cornell Notes panel content populated | Yes |
 
@@ -358,11 +358,11 @@ The Nav Check (MCQ Diagnostics) consists of five missions, each containing 20 mu
 | 4 | Avoid the Black Holes | Systems & Tactics | Procrastination, backward planning, focus zones, the External Device Rule, weekly review, ABCDE prioritisation, mock testing, shutdown rules, batching, MoSCoW method | 20 |
 | 5 | Life Support & Hero State | Wellbeing & Mastery | Sleep and memory consolidation, box breathing, anxiety reappraisal, nutrition for cognitive performance, growth mindset, exercise and learning, identity-based success, the Yet Game | 20 |
 
-**Access:** Missions are shown in order. Completing Mission 1 unlocks Mission 2, and so on (access-gated).
+**Access:** All missions are visible and accessible at any time — there is no sequential lock. Missions are presented in order, but the learner can attempt any mission.
 
-**Scoring:** Each attempt is recorded with the score and individual answers. Knowledge gaps (topics with repeated incorrect answers) are saved and highlighted.
+**Scoring:** Each attempt is recorded with the score and individual answers. Knowledge gaps (topics with incorrect answers) are saved and highlighted. Missions can be retried.
 
-**Rank contribution:** Each completed mission counts as one `diagnosticsCompleted` toward rank promotion. All 5 missions completed is required for Flight Commander.
+**Rank contribution:** `diagnosticsCompleted` is incremented once per mission submission (including retries). The counter tracks the total number of mission completions, not unique missions passed. Second Officer requires `diagnosticsCompleted ≥ 2`; Flight Commander requires `diagnosticsCompleted ≥ 5`.
 
 ---
 
@@ -480,8 +480,8 @@ On a phone, tap the hamburger menu (☰) to open the navigation.
 The focus timer is the core of Synapse. Here is how to use it.
 
 1. From the **Mission** page, look for the **Learning Governor** timer section.
-2. Choose your **subject** from the dropdown (Maths, English, Science, etc.).
-3. Set your focus duration — 25 minutes is the standard Pomodoro interval. You can adjust this.
+2. Choose your **subject** from the dropdown: Maths, English, Science, History, Geography, Languages, Art, or Other.
+3. The timer is fixed at **25 minutes** for a focus session (and 5 minutes for a break). There is no custom duration input.
 4. Click **Start**.
 5. A notification will appear: **"Put your phone face-down."** This is a reminder to reduce distractions. Do it.
 6. The circular timer begins counting down.
