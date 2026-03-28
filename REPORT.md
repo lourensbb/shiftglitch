@@ -30,7 +30,7 @@
 | **App name** | Synapse — Interactive Learning OS |
 | **Version** | Current build (March 2025) |
 | **Status** | Live and deployed on Replit |
-| **Primary URL** | The Replit deployment URL for this project |
+| **Primary URL** | The Replit deployment URL for this project (visible in Replit dashboard under "Deployments") |
 | **Demo URL** | `/demo` — limited feature preview |
 | **Teacher Dashboard** | `/teacher` — separate page for classroom use |
 | **Tech stack** | Express.js v5, Tailwind CSS, Chart.js, Firebase v11.6.1 (optional), Google Gemini API |
@@ -287,30 +287,31 @@ All data is stored in the browser's localStorage. Clearing browser data or using
 
 **Total keys:** 16 (15 using the `synapse_` prefix + 1 legacy key)
 
-| Key | Owner module | Format | Written when | Read when | Exported? |
-|-----|-------------|--------|-------------|-----------|-----------|
-| `synapse_decks` | Flashcard Decks | JSON array `{ id, name, createdAt }` | Creating or deleting a deck | Decks page loads; stats render | Yes |
-| `synapse_cards` | Flashcard Decks | JSON array `{ id, deckId, front, back, box, lastReviewed }` | Creating, editing, or deleting a card; after each flashcard review (box updated) | Deck opened; study session starts | Yes |
-| `synapse_pomodoro_log` | Learning Governor | JSON array `{ task, duration, completedAt, subject }` | Pomodoro session completes; break taken (task = `'__breakdown__'`) | Stats page renders; rank evidence calculated on app load | Yes |
-| `synapse_blurt` | Blurting Method | JSON array `{ topic, phase1, phase3, gaps, createdAt }` | Blurt session marked complete (phase 4) | Blurt history renders; rank evidence calculated on app load | Yes |
-| `synapse_todos` | Dashboard (Cornell) | JSON array `{ id, text, done }` | Adding, checking, or deleting a mission task | Dashboard renders | Yes |
-| `synapse_eisenhower` | Eisenhower Matrix | JSON array `{ id, text, quadrant, createdAt }` | Adding a task; moving a task between quadrants; deleting a task | Matrix page renders | Yes |
-| `synapse_recal` | Dopamine Recalibrator | JSON object `{ stealthCount, rocketCount, sessions[] }` | Using Stealth Mode or Entry Rocket | Recalibrator page renders | Yes |
-| `synapse_babel` | Babel Fish | JSON array `{ concept, explanation, doodle, createdAt }` | Saving a Babel Fish exercise | Babel Fish page renders; history section loads | Yes |
-| `synapse_yet` | YET Growth Shield | JSON array `{ topic, createdAt }` | Logging a YET moment (from flashcard "Not Yet" button or YET page) | YET page renders | Yes |
-| `synapse_rank` | Rank System | JSON object `{ rank, rankEvidence: { pomodorosCompleted, blurtsCompleted, governorBreakdowns, cardsAdvanced, activeDays, diagnosticsCompleted } }` | Any rank-contributing action (session complete, blurt complete, card advanced, diagnostic completed); on promotion | App boot; Rank page renders; nav bar rank badge updates | Yes |
-| `synapse_mcq` | MCQ Diagnostics | JSON object `{ attempts: { missionId: { score, answers[] } }, gaps: string[] }` | On mission submit (score saved); when a gap topic is identified | Diagnostic page renders; rank evidence calculated | Yes |
-| `synapse_exams` | Exam Countdown | JSON array `{ name, date }` | Adding or removing an exam | Dashboard sidebar widget renders | Yes |
-| `synapse_wil` | Learning Governor | JSON array `{ text, date, subject }` | Saving a "What I Learned?" modal entry after a Pomodoro session | Stats → WIL log renders | Yes |
-| `synapse_theme` | App-wide | String `"dark"` or `"light"` | Toggling the moon/sun icon in the nav bar | On every page load (before render — applied to `<html>` immediately) | Yes |
-| `synapse_gemini_key` | Settings | String (plain API key) | Saving the key in Settings | On every Gemini API call (read before each request) | **No — excluded for security** |
-| `cornellNotes` | Dashboard (Cornell) | HTML string | Auto-saved as user types in the Cornell Notes panel | Dashboard renders; Cornell Notes panel populates | Yes |
+| Key | Owner module | Exact schema | Written when | Read when | Exported? |
+|-----|-------------|-------------|-------------|-----------|-----------|
+| `synapse_decks` | Flashcard Decks | JSON array: `{ id, title, createdAt }` | On deck create or delete | Decks page loads; stats render | Yes |
+| `synapse_cards` | Flashcard Decks | JSON array: `{ id, deckId, front, back, box, nextReview, createdAt }` | On card create, edit, delete, or review (box/nextReview updated) | Deck opened for browsing or study | Yes |
+| `synapse_pomodoro_log` | Learning Governor | JSON array: `{ task, completedAt, duration }` — `task` is the normalised subject label; breakdown entries use `task: '__breakdown__'` with no `duration` | On session complete; on governor breakdown | Stats render; rank evidence calculated on app load | Yes |
+| `synapse_blurt` | Blurting Method | JSON array: `{ id, title, source, recall, gaps, reviewCount, createdAt, updatedAt }` — `title` = topic; `source` = notes (phase 2); `recall` = second blurt (phase 3); `gaps` = identified gaps (phase 4) | On each phase save and on session complete | Blurt history renders; rank evidence calculated | Yes |
+| `synapse_todos` | Dashboard (Cornell) | JSON array: `{ id, text, done }` | Adding, toggling, or deleting a mission task | Dashboard renders | Yes |
+| `synapse_eisenhower` | Eisenhower Matrix | JSON object: `{ tasks: [{ id, text, quadrant, createdAt, completed?, completedAt? }], reflections: [{ text, createdAt }] }` — quadrant 0 = unsorted, 1–4 = the four matrix quadrants | Adding/moving/completing/deleting tasks; adding a reflection | Matrix page renders | Yes |
+| `synapse_recal` | Dopamine Recalibrator | JSON object: `{ sessions: [{ type, date }], stealthCount, rocketCount }` — `type` is `'stealth'` or `'rocket'` | On each Stealth Mode or Entry Rocket activation | Recalibrator page renders | Yes |
+| `synapse_babel` | Babel Fish | JSON array: `{ id, concept, explanation, doodle, createdAt, hasBadge }` | Saving a completed Feynman exercise | Babel Fish history section loads | Yes |
+| `synapse_yet` | YET Growth Shield | JSON array: `{ concept, date }` | Logging a YET moment (via "Not Yet 🛡️" button or direct YET page) | YET page renders | Yes |
+| `synapse_rank` | Rank System | JSON object: `{ rank, rankEvidence: { blurtsCompleted, governorBreakdowns, cardsAdvanced, activeDays, pomodorosCompleted, diagnosticsCompleted, lastActiveDate, activeDateLog } }` | Any rank-contributing action; active day logged; promotion occurs | App boot; Rank page renders; nav bar rank badge updates | Yes |
+| `synapse_mcq` | MCQ Diagnostics | JSON object: `{ attempts: { [missionIdx]: [{ answers, correct, total, date }] }, gaps: string[], reflections: { [missionIdx]: string } }` — `missionIdx` is 0-based (0–4) | On mission submit; when a gap concept is identified; when a reflection is saved | Diagnostic page renders; rank evidence calculated | Yes |
+| `synapse_exams` | Exam Countdown | JSON array: `{ id, label, date }` — `label` = exam name; `date` = ISO date string (sorted ascending) | Adding or removing an exam | Dashboard sidebar widget renders | Yes |
+| `synapse_wil` | Learning Governor | JSON array: `{ entry, subject, date }` — `entry` = the one-sentence learning; `subject` = subject tag from the timer; `date` = ISO timestamp | Saving a "What I Learned?" modal entry | Stats → WIL log section renders | Yes |
+| `synapse_theme` | App-wide | String: `"dark"` or `"light"` | Toggling the moon/sun icon in the nav bar | Every page load — applied to `<html>` immediately at page boot before DOM renders, preventing flash | Yes |
+| `synapse_gemini_key` | Settings | String: plain API key text | Saving the key in Settings | Before every Gemini API call (checked first; if present, bypasses server proxy) | **No — excluded for security** |
+| `cornellNotes` | Dashboard (Cornell) | HTML string: serialised `innerHTML` of the Cornell Notes `contenteditable` div | Auto-saved as the user types in the notes panel | Dashboard renders; Cornell Notes panel content populated | Yes |
 
 **Notes:**
-- `synapse_gemini_key` is excluded from all exports. It must be re-entered if moved to a new browser or device.
-- `cornellNotes` has no prefix — this is a legacy key retained intentionally to avoid data loss for existing users.
-- `synapse_pomodoro_log` entries with `task === '__breakdown__'` are deliberate break events (governor breakdowns counted toward rank), not study sessions.
-- `synapse_theme` is read at the very first line of the page `<script>` block and applied to `<html>` before the rest of the DOM renders, preventing a light-mode flash on dark-mode preference.
+- `synapse_gemini_key` is excluded from all exports. It must be re-entered on any new browser or device.
+- `cornellNotes` has no `synapse_` prefix — this is a legacy key retained intentionally to avoid wiping existing user notes.
+- `synapse_pomodoro_log` entries where `task === '__breakdown__'` are deliberate break events (counted toward rank as `governorBreakdowns`), not study sessions. These entries have no `duration` field.
+- `synapse_rank.rankEvidence.activeDateLog` is an array of ISO date strings (`YYYY-MM-DD`) representing every unique day the user has been active. `activeDays` is the length of this array.
+- `synapse_eisenhower` quadrant values: 0 = unsorted, 1 = Urgent & Important (Do), 2 = Important Not Urgent (Schedule), 3 = Urgent Not Important (Delegate), 4 = Not Urgent Not Important (Eliminate).
 
 ---
 
