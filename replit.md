@@ -160,4 +160,5 @@ New handler functions added in March 2025 build:
 | `README.md` | Setup and deployment guide |
 | `PRO-INSTRUCTIONS.md` | Full teacher/classroom usage guide |
 | `JOURNAL.md` | Design philosophy and product story (marketing/promotional) |
+| `REPORT.md` | Full app report, module inventory, and user guide |
 | `revamp_vision.md` | Future evolution vision document |

@@ -66,6 +66,7 @@ var SYNAPSE_FIREBASE_CONFIG = {
 | `PRO-INSTRUCTIONS.md` | Teacher setup guide |
 | `README.md` | This file — setup and reference guide |
 | `JOURNAL.md` | Design philosophy and product story (marketing/promotional) |
+| `REPORT.md` | Full app report, module inventory, and user guide |
 | `revamp_vision.md` | Future evolution vision document |
 
 ---
