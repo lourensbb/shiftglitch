@@ -159,4 +159,5 @@ New handler functions added in March 2025 build:
 | `config.example.js` | Blank template for Firebase config |
 | `README.md` | Setup and deployment guide |
 | `PRO-INSTRUCTIONS.md` | Full teacher/classroom usage guide |
+| `JOURNAL.md` | Design philosophy and product story (marketing/promotional) |
 | `revamp_vision.md` | Future evolution vision document |

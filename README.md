@@ -65,6 +65,7 @@ var SYNAPSE_FIREBASE_CONFIG = {
 | `package.json` | Node.js dependencies |
 | `PRO-INSTRUCTIONS.md` | Teacher setup guide |
 | `README.md` | This file — setup and reference guide |
+| `JOURNAL.md` | Design philosophy and product story (marketing/promotional) |
 | `revamp_vision.md` | Future evolution vision document |
 
 ---
