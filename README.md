@@ -1,6 +1,6 @@
 # Synapse — Interactive Learning OS
 
-A study-methods operating system that turns evidence-based learning techniques into an interactive, progression-driven experience.
+A study-methods operating system that turns evidence-based learning techniques into an interactive, progression-driven experience. Currently deployed as the **complete free version for Hoërskool Roodepoort**.
 
 ---
 
@@ -13,7 +13,7 @@ npm install
 node server.js
 ```
 
-Open `http://localhost:5000` in your browser. That's it — Synapse works immediately in offline mode.
+Open your Replit URL or `http://localhost:5000` in your browser. Synapse works immediately in offline mode — no accounts or sign-up required.
 
 ### 2. Set Up AI Study Planning (Optional)
 
@@ -36,7 +36,7 @@ Firebase lets users sync their data across devices. Synapse works fully offline 
 4. Open `config.js` and replace the placeholder values:
 
 ```javascript
-const SYNAPSE_FIREBASE_CONFIG = {
+var SYNAPSE_FIREBASE_CONFIG = {
     apiKey:            "your-actual-api-key",
     authDomain:        "your-project.firebaseapp.com",
     projectId:         "your-project-id",
@@ -57,139 +57,109 @@ const SYNAPSE_FIREBASE_CONFIG = {
 | File | Purpose |
 |------|---------|
 | `index.html` | Full version of Synapse (all features) |
-| `demo.html` | Limited demo version (for marketing — links to your Gumroad) |
-| `teacher.html` | Teacher Dashboard (Classroom License only) |
-| `config.js` | Your Firebase credentials (edit this file) |
+| `demo.html` | Limited demo version |
+| `teacher.html` | Teacher Dashboard |
+| `config.js` | Firebase credentials (edit this file) |
 | `config.example.js` | Blank template for reference |
-| `server.js` | Simple Express server for local hosting |
+| `server.js` | Simple Express server for hosting |
 | `package.json` | Node.js dependencies |
-| `LICENSE-PERSONAL.txt` | Personal use license |
-| `LICENSE-CLASSROOM.txt` | Classroom use license (Classroom License only) |
-| `PRO-INSTRUCTIONS.md` | Teacher setup guide (Classroom License only) |
-
-### Full Version Features
-- Mission Architect (AI study planning via Gemini)
-- Learning Governor (Pomodoro timer with streak tracking)
-- Flashcard Decks (Leitner 5-box spaced repetition)
-- Blurting Method (4-phase active recall)
-- Eisenhower Matrix (priority management)
-- Quiz Arena (trivia via Open Trivia Database)
-- Babel Fish Metaphor Lab (Feynman Technique)
-- Dopamine Recalibrator (anti-procrastination tools)
-- Yet Growth Shield (growth mindset reframing)
-- MCQ Diagnostics (100-question knowledge assessment)
-- Cornell Notes
-- Rank Progression System (Space Cadet → Second Officer → Flight Commander)
-- Session Statistics & Charts
-- Data Export/Import (JSON backup)
-- Export for Teacher (named exports for classroom use)
-- Dark Mode
-
-### Demo Version Features (Limited)
-- Dashboard, Pomodoro, Flashcards, Matrix, Rank, Stats
-- Locked tools show "Available in full version" with upgrade link
-- Uses separate `demo_` localStorage keys (no data conflicts)
+| `PRO-INSTRUCTIONS.md` | Teacher setup guide |
+| `README.md` | This file — setup and reference guide |
+| `JOURNAL.md` | Design philosophy and product story |
+| `REPORT.md` | Complete feature inventory and user guide |
+| `revamp_vision.md` | Future evolution vision document |
 
 ---
 
-## Classroom Edition (Classroom License Only)
+## Full Feature List
 
-The Classroom License includes the **Teacher Dashboard** and **Printable
-Progress Reports**. See `PRO-INSTRUCTIONS.md` for the full teacher guide.
+### Core Study Tools
+- **Mission Architect (AI)** — Gemini-powered personalised study plan generation
+- **Learning Governor** — Pomodoro timer with streak tracking, subject tagging, and break enforcement
+- **Flashcard Decks** — Full CRUD with Leitner 5-box spaced repetition and orbit stability indicators
+- **Blurting Method** — 4-phase active recall technique (list, read, blurt, compare)
+- **Babel Fish Metaphor Lab** — Feynman Technique tool for explaining concepts in plain language
+- **Dopamine Recalibrator** — Anti-procrastination tools: Stealth Mode and Entry Rocket
+- **Yet Growth Shield** — Growth mindset reframing: "I don't understand X YET"
+- **Eisenhower Matrix** — Interactive task prioritisation across four urgency/importance quadrants
+- **Cornell Notes** — Dotted-grid note-taking panel with cloud sync support
+- **Quiz Arena** — Standalone trivia game via Open Trivia Database (isolated from rank progression)
+- **MCQ Diagnostics** — 100-question multiple-choice assessment across 5 missions
 
-### Teacher Dashboard (`/teacher`)
-- Import student JSON export files
-- View class-wide summary (ranks, sessions, focus time)
-- Student roster with sortable columns
-- Rank distribution and activity charts
-- "Students Needing Attention" alerts
-- Click into individual student profiles
+### Progression System
+- **Rank System** — Space Cadet → Second Officer → Flight Commander, earned through evidence of real study behaviours — not XP or points
+- **Session Statistics & Charts** — Focus time scatter plots, activity bar charts, technique doughnut chart
 
-### Printable Progress Reports
-- Professional, printer-friendly student summaries
-- Rank evidence progress bars
-- Activity statistics and metrics
-- Print from the roster or individual student views
-- Perfect for parent-teacher conferences
+### Teen-Focused Features (Added March 2025)
+- **Dark Mode Default** — App launches in dark mode on first load; preference saved permanently
+- **Phone-Lock Nudge** — Friendly reminder to put the phone face-down when a Pomodoro session starts
+- **Subject Tagging** — Tag each Pomodoro session with a subject (Maths, English, Science, etc.)
+- **"What I Learned?" Modal** — After every focus session, a prompt to write one thing learned; saved to a learning log
+- **Exam Countdown Widget** — Dashboard sidebar tool to track upcoming exams by name and date; turns red within 7 days
+- **Lofi Music Link** — One-tap link to YouTube lofi study music from within the timer panel
+- **"Not Yet 🛡️" Button** — Third flashcard response option that triggers growth mindset reframing without penalising more than "Again"
+- **Study Buddy System** — Copy a base64 buddy code (rank + stats), paste a friend's code for side-by-side comparison
+- **Shareable Progress Report** — Generate a URL with encoded stats; opens with a banner showing rank and evidence for parents/teachers
+
+### Data Management
+- **JSON Export/Import** — Full backup and restoration of all user data
+- **Export for Teacher** — Named JSON export for classroom data collection
+- **XSS Protection** — `esc()` utility on all user-rendered content
+
+---
+
+## Teacher Dashboard
 
 ### How It Works
 1. Students study using Synapse as normal
 2. Students click **"Export for Teacher"** in Stats → Data Management
-3. Teacher collects the `.json` files
-4. Teacher opens `/teacher` and drops in all files
-5. Instant class overview with charts and reports
+3. Students type their name when prompted and send the `.json` file to the teacher
+4. Teacher opens `/teacher` (or `teacher.html`) and drops in all files
+5. Instant class overview appears with charts and reports
+
+### What Teachers Can See
+- **Class summary** — total students, average sessions, average focus time, highest rank achieved
+- **Student roster** — sortable table with rank, sessions, focus time, flashcards, blurts, and active days
+- **Rank distribution chart** — doughnut chart showing how many students are at each rank
+- **Activity chart** — bar chart comparing sessions across the class
+- **Students needing attention** — automatic flag for students with fewer than 5 sessions or zero blurts
+- **Individual student profiles** — full rank evidence bars and activity breakdown
+
+### Printable Progress Reports
+- Professional, printer-friendly student summaries
+- Rank evidence progress bars showing exactly what a student needs to work on
+- Print from the roster or from individual student views
+- Ideal for parent-teacher conferences
 
 ---
 
-## Packaging for Sale
+## Hosting Options
 
-### What to include in your download:
+### Option A: Replit (Recommended)
+The app is already configured and running. Share the Replit URL with students.
 
-**Standard License:**
-```
-synapse/
-├── index.html              (full version)
-├── demo.html               (demo for marketing)
-├── config.js               (Firebase config — buyers edit this)
-├── config.example.js       (blank backup template)
-├── server.js               (Express server)
-├── package.json            (dependencies)
-├── LICENSE-PERSONAL.txt    (personal use license)
-└── README.md               (setup instructions)
-```
-
-**Classroom License (all of the above, plus):**
-```
-├── teacher.html            (Teacher Dashboard)
-├── LICENSE-CLASSROOM.txt   (classroom use license)
-└── PRO-INSTRUCTIONS.md     (teacher setup guide)
-```
-
-**Do NOT include:**
-- `node_modules/` (buyers run `npm install` themselves)
-- `.git/` folder
-- Any `.env` files or personal API keys
-
-**Note:** `config.js` ships with placeholder values (same as `config.example.js`). Buyers edit `config.js` directly with their own Firebase credentials. If they delete `config.js`, the app still works — it simply runs in offline mode.
-
-### Before packaging:
-
-1. Make sure `config.example.js` has only placeholder values (no real keys)
-2. Update the Gumroad link in `demo.html` if needed (search for `gumroad.com`)
-3. Zip the folder and upload to Gumroad
-
----
-
-## Hosting Options for Your Buyers
-
-### Option A: Run locally
+### Option B: Run Locally
 ```bash
 npm install
 node server.js
 ```
 Open `http://localhost:5000`
 
-### Option B: Host on Replit
-1. Create a new Replit project
-2. Upload all files
-3. Run `npm install` and start with `node server.js`
-4. The app will be available at your Replit URL
+### Option C: Host on Any Static Server
+Synapse is mostly a client-side app — host the HTML files on Netlify, Vercel, GitHub Pages, or any web server. The Express server is only needed for the server-side Gemini API proxy fallback.
 
-### Option C: Host on any static server
-Since Synapse is mostly a client-side app, buyers can host the HTML files on any web server (Netlify, Vercel, GitHub Pages, etc.). The Express server is only needed if they want the server-side Gemini proxy fallback.
-
-### Option D: Open index.html directly
-For the simplest offline use, buyers can just open `index.html` in their browser. AI features require the Gemini API key in Settings. Firebase cloud sync requires the server.
+### Option D: Open index.html Directly
+For offline-only use, open `index.html` directly in any browser. AI features require the Gemini API key in Settings.
 
 ---
 
 ## Customisation
 
-You can easily customise Synapse to make it your own:
-- **Branding**: Search for "Synapse" in `index.html` to rename
-- **Colors**: Change `orange-600` references for a different accent color
+- **Branding**: Search for "Synapse" in `index.html` to rename the app
+- **Accent Color**: Change `orange-600` references throughout `index.html`
 - **Quotes**: Edit the `STUDY_QUOTES` array near the top of `index.html`
-- **AI Model**: Change `AI_MODEL` variable to use a different Gemini model
+- **AI Model**: Change the `AI_MODEL` variable to switch Gemini model versions
+- **School Banner**: The "Completely free — FULL version for Hoërskool Roodepoort" header is in the `<nav>` section of `index.html`
 
 ---
 
@@ -197,13 +167,14 @@ You can easily customise Synapse to make it your own:
 
 - **No build system needed** — all dependencies load via CDN
 - **Works offline** — localStorage handles all data persistence
-- **Firebase is optional** — only for cross-device sync
-- **Gemini API is BYOK** — each user brings their own free API key
+- **Firebase is optional** — only needed for cross-device sync
+- **Gemini API is BYOK** — each user brings their own free API key (or server proxy is used as fallback)
 - **XSS protected** — all user input is escaped via the `esc()` utility function
-- **Express v5** — minimal server for static files and optional API proxy
+- **Express v5** — minimal server for static files and optional Gemini API proxy
+- **Dark mode default** — `synapse_theme` localStorage key persists the user's theme choice
 
 ---
 
 ## Support
 
-For questions about setup or customisation, contact the seller through their Gumroad page.
+For questions or setup help, contact the developer directly.
