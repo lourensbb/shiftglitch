@@ -1,0 +1,32 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "6e9IBhRV0Vi8FX2LWLsCn"
+uri = "file://revamp_vision.md"
+type = "text"
+title = "Revamp Vision — product direction & commercial pivot"
+
+[[outputs]]
+id = "EHLpAaFJdDMAOPUXXnxrg"
+uri = "file://JOURNAL.md"
+type = "text"
+title = "JOURNAL.md — marketing & promotional narrative"
+
+[[outputs]]
+id = "VM-DCextN4jeyoAtiqPb1"
+uri = "file://REPORT.md"
+type = "text"
+title = "REPORT.md — full app report, module inventory & user guide"
+
+[[outputs]]
+id = "eTwsA_FZd9eONnNHr0H-m"
+uri = "file://README.md"
+type = "text"
+title = "README.md — updated setup & deployment guide"
+
+[[outputs]]
+id = "INh4lxRSzvBqJTKc4kjLA"
+uri = "file://replit.md"
+type = "text"
+title = "replit.md — architecture reference & project memory"
