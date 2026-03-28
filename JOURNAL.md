@@ -150,6 +150,21 @@ Designing for teenagers is different from designing for adults. Several realitie
 
 **Dark mode is not optional for teenagers.** An app that launches in blinding white light at 10pm is an app that gets closed immediately. Synapse defaults to dark mode on first load and saves the preference permanently. This is a deliberate, researched UX decision — not an aesthetic one.
 
+### The 10 Teen-Focused Improvements at a Glance
+
+In one focused build session, ten improvements were made specifically to address the realities of teenage learners. They are:
+
+1. **Dark Mode Default** — The app launches in dark mode on first load, with no configuration required from the learner.
+2. **Theme Persistence** — The chosen light or dark theme is saved permanently to the browser so the preference is never lost between sessions.
+3. **Phone-Lock Nudge** — A prompt fires at the start of every Pomodoro session encouraging the learner to put their phone face-down for the duration.
+4. **Subject Tagging** — Each Pomodoro session can be tagged with a subject: Maths, English, Science, History, and more. This builds a picture of study distribution over time.
+5. **"What I Learned?" Modal** — A lightweight prompt appears at the end of every focus session asking for one thing learned. Entries are saved to a personal log, reinforcing memory consolidation.
+6. **Exam Countdown Widget** — A dashboard sidebar tool that lets learners track upcoming exams by name and date, with a visual urgency indicator that turns red within seven days.
+7. **Lofi Music Link** — A one-tap shortcut to YouTube lofi study music, embedded naturally in the timer panel for sessions where ambient sound helps concentration.
+8. **"Not Yet 🛡️" Flashcard Button** — A third option on every flashcard alongside "Again" and "Got It." Pressing it acknowledges difficulty, triggers a growth mindset reframe, and does not penalise beyond what "Again" would.
+9. **Study Buddy System** — A shareable buddy code (rank + stats, encoded as base64) that learners can exchange with friends for a side-by-side progress comparison.
+10. **Shareable Progress Report** — A generated URL that, when opened, displays the learner's current rank and evidence summary — designed for sharing with parents and teachers without requiring them to open the app.
+
 ---
 
 ## The Rank System in Detail
