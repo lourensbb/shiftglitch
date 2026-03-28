@@ -43,7 +43,7 @@ It also generates content from your own material. Point your camera at a textboo
 - **1v1 Study Battles** — Challenge a friend or match with a random opponent. Same questions, 90-second timer, live score ticker. Both players see each other's answers in real time. Winner gets a cosmetic badge.
 - **Study Rooms** — Open a shared room where you and your friends can see each other's focus timers running. No chat, no distraction. Just the knowledge that someone else is working too. Accountability without pressure.
 - **Shared Streaks** — Link streaks with a friend. If you both study daily, the streak grows. If one person breaks it, you both feel it. The social cost of skipping is real.
-- **School-Wide Challenges** — Entire schools compete in weekly focus-hour challenges. Hoërskool Roodepoort vs. other schools in a leaderboard. Class vs. class within the school.
+- **School-Wide Challenges** — Entire schools compete in weekly focus-hour challenges. School vs. school on a national leaderboard. Class vs. class within a school.
 
 **Why teenagers will care:** Studying becomes something you do *together*. Competition and social belonging are the most powerful motivators at this age.
 

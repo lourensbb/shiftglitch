@@ -5,9 +5,7 @@ Synapse is a single-page web application designed as a study-methods operating s
 
 ## Current Deployment
 - **Status:** Live and deployed on Replit
-- **Edition:** Completely free — Full version for Hoërskool Roodepoort
-- **Branding:** Orange header banner reads "Completely free — FULL version for Hoërskool Roodepoort"
-- **App name:** Synapse (under review — potential rename in future revamp)
+- **App name:** Synapse (under review — a new brand name will be chosen as part of the upcoming major revamp)
 - **localStorage prefix:** `synapse_` — must NOT be renamed as it would wipe existing user data
 
 ## User Preferences
@@ -20,7 +18,7 @@ Preferred communication style: Simple, everyday language.
 - Ranks are permanent and irreversible (earned once, never revoked)
 - Progression is evidence-based, not XP-based — quality and consistency over volume
 - No monetisation should affect rank or provide learning advantages
-- The app is currently free for all students at Hoërskool Roodepoort
+- The app is heading toward a major commercial revamp — see `revamp_vision.md`
 
 ## System Architecture
 
@@ -31,7 +29,7 @@ The application is a single-page application (SPA) with client-side routing. Sty
 An Express.js v5 server provides minimal static file serving and acts as an API proxy for the Gemini API to protect the API key. All responses utilise `no-cache` headers.
 
 ### Data Storage
-Primary data storage is `localStorage` for offline functionality. All keys use the `synapse_` prefix. Complete list of localStorage keys:
+Primary data storage is `localStorage` for offline functionality. Most keys use the `synapse_` prefix; the Cornell Notes key (`cornellNotes`) is an exception. Complete list of localStorage keys:
 
 | Key | Purpose |
 |-----|---------|
@@ -39,7 +37,7 @@ Primary data storage is `localStorage` for offline functionality. All keys use t
 | `synapse_cards` | All flashcard content and Leitner box positions |
 | `synapse_pomodoro_log` | Pomodoro session history (duration, date, subject tag) |
 | `synapse_blurt` | Blurting method session data |
-| `synapse_todos` | Cornell notes / to-do items |
+| `synapse_todos` | Cornell notes to-do items (mission tasks) |
 | `synapse_eisenhower` | Eisenhower Matrix task data |
 | `synapse_recal` | Dopamine Recalibrator session logs |
 | `synapse_babel` | Babel Fish (Feynman) exercise records |
@@ -50,6 +48,7 @@ Primary data storage is `localStorage` for offline functionality. All keys use t
 | `synapse_wil` | "What I Learned?" session log entries |
 | `synapse_theme` | Theme preference ("dark" or "light") |
 | `synapse_gemini_key` | User's Gemini API key (BYOK, never exported) |
+| `cornellNotes` | Cornell Notes panel HTML content (non-prefixed; legacy key) |
 
 Optional cloud persistence for Cornell notes and progress checkboxes is available through Firebase Firestore, with graceful degradation if unavailable. A JSON export/import feature allows backup and restoration of all localStorage data (excluding the Gemini key for security).
 
@@ -160,6 +159,4 @@ New handler functions added in March 2025 build:
 | `config.example.js` | Blank template for Firebase config |
 | `README.md` | Setup and deployment guide |
 | `PRO-INSTRUCTIONS.md` | Full teacher/classroom usage guide |
-| `JOURNAL.md` | Design philosophy and product story (marketing) |
-| `REPORT.md` | Complete feature inventory and user guide |
 | `revamp_vision.md` | Future evolution vision document |

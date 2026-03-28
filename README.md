@@ -1,6 +1,6 @@
 # Synapse — Interactive Learning OS
 
-A study-methods operating system that turns evidence-based learning techniques into an interactive, progression-driven experience. Currently deployed as the **complete free version for Hoërskool Roodepoort**.
+A study-methods operating system that turns evidence-based learning techniques into an interactive, progression-driven experience — built for teenagers who want to study smarter, not harder.
 
 ---
 
@@ -65,8 +65,6 @@ var SYNAPSE_FIREBASE_CONFIG = {
 | `package.json` | Node.js dependencies |
 | `PRO-INSTRUCTIONS.md` | Teacher setup guide |
 | `README.md` | This file — setup and reference guide |
-| `JOURNAL.md` | Design philosophy and product story |
-| `REPORT.md` | Complete feature inventory and user guide |
 | `revamp_vision.md` | Future evolution vision document |
 
 ---
@@ -156,10 +154,9 @@ For offline-only use, open `index.html` directly in any browser. AI features req
 ## Customisation
 
 - **Branding**: Search for "Synapse" in `index.html` to rename the app
-- **Accent Color**: Change `orange-600` references throughout `index.html`
+- **Accent Color**: Change `orange-600` references throughout `index.html` for a different accent
 - **Quotes**: Edit the `STUDY_QUOTES` array near the top of `index.html`
 - **AI Model**: Change the `AI_MODEL` variable to switch Gemini model versions
-- **School Banner**: The "Completely free — FULL version for Hoërskool Roodepoort" header is in the `<nav>` section of `index.html`
 
 ---
 
