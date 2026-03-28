@@ -96,11 +96,11 @@ Optional cloud persistence for Cornell notes and progress checkboxes is availabl
 
 | Mission | Subtitle | Topic Area |
 |---------|----------|------------|
-| Mission 1: The Launchpad | Crisis & Brain Science | Neuroplasticity, memory, forgetting curve, stress |
-| Mission 2: Navigation Systems | Study Methods | Pomodoro, Cornell Notes, Feynman, Leitner, interleaving |
-| Mission 3: Deep Space Ops | Advanced Techniques | Elaborative interrogation, dual coding, retrieval practice |
-| Mission 4: Command Decisions | Mindset & Motivation | Growth mindset, procrastination, self-regulation |
-| Mission 5: Flight Commander Brief | Integration | Cross-topic synthesis and application |
+| Mission 1: The Launchpad | Crisis & Brain Science | Neuroplasticity, memory, forgetting curve, stress, focused/diffuse modes |
+| Mission 2: Navigation Systems | Study Methods | Pomodoro, Cornell Notes, Feynman, Leitner, interleaving, dual coding |
+| Mission 3: Galactic Engineers | Thinkers & Habits | Deep Work, habit stacking, cognitive load, GTD, identity-based habits |
+| Mission 4: Avoid the Black Holes | Systems & Tactics | Procrastination, backward planning, focus systems, mock testing |
+| Mission 5: Life Support & Hero State | Wellbeing & Mastery | Sleep, nutrition, growth mindset, anxiety reappraisal, the Yet Game |
 
 ### State & Handler Reference
 

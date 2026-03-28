@@ -38,7 +38,14 @@
 
 ### Current Customisation
 
-The app is configured as a generic, brand-neutral product. No school-specific customisation is active. The app name "Synapse" is used throughout; a rebrand is planned as part of an upcoming major commercial revamp.
+| Field | Value |
+|-------|-------|
+| **Prior customisation** | Hoërskool Roodepoort free edition (school-specific branding and Gumroad links) |
+| **Current state** | All school-specific customisation has been removed. The app is now brand-neutral. |
+| **App name** | Synapse — in use throughout; a full rebrand is planned as part of the upcoming commercial revamp |
+| **Gumroad** | References removed; `GUMROAD_URL` set to `#` placeholder in `demo.html` |
+
+The Hoërskool Roodepoort customisation was the first commercial deployment of the app. It has been stripped to prepare the product for a global commercial release.
 
 ### Browser Requirements
 
@@ -280,29 +287,30 @@ All data is stored in the browser's localStorage. Clearing browser data or using
 
 **Total keys:** 16 (15 using the `synapse_` prefix + 1 legacy key)
 
-| Key | Owner module | Format | What it stores | Exported? |
-|-----|-------------|--------|----------------|-----------|
-| `synapse_decks` | Flashcard Decks | JSON array | Array of deck objects: `{ id, name, createdAt }` | Yes |
-| `synapse_cards` | Flashcard Decks | JSON array | Array of card objects: `{ id, deckId, front, back, box, lastReviewed }` | Yes |
-| `synapse_pomodoro_log` | Learning Governor | JSON array | Array of session objects: `{ task, duration, completedAt, subject }` | Yes |
-| `synapse_blurt` | Blurting Method | JSON array | Array of blurt session objects: `{ topic, phase1, phase3, gaps, createdAt }` | Yes |
-| `synapse_todos` | Dashboard (Cornell) | JSON array | Array of task objects: `{ id, text, done }` | Yes |
-| `synapse_eisenhower` | Eisenhower Matrix | JSON array | Array of task objects: `{ id, text, quadrant, createdAt }` | Yes |
-| `synapse_recal` | Dopamine Recalibrator | JSON object | `{ stealthCount, rocketCount, sessions[] }` | Yes |
-| `synapse_babel` | Babel Fish | JSON array | Array of exercise objects: `{ concept, explanation, doodle, createdAt }` | Yes |
-| `synapse_yet` | YET Growth Shield | JSON array | Array of moment objects: `{ topic, createdAt }` | Yes |
-| `synapse_rank` | Rank System | JSON object | `{ rank, rankEvidence: { pomodorosCompleted, blurtsCompleted, governorBreakdowns, cardsAdvanced, activeDays, diagnosticsCompleted } }` | Yes |
-| `synapse_mcq` | MCQ Diagnostics | JSON object | `{ attempts: { missionId: { score, answers[] } }, gaps: string[] }` | Yes |
-| `synapse_exams` | Exam Countdown | JSON array | Array of exam objects: `{ name, date }` | Yes |
-| `synapse_wil` | Learning Governor | JSON array | Array of WIL entries: `{ text, date, subject }` | Yes |
-| `synapse_theme` | App-wide | String | `"dark"` or `"light"` | Yes |
-| `synapse_gemini_key` | Settings | String | The user's Gemini API key (plain string) | **No — intentionally excluded** |
-| `cornellNotes` | Dashboard (Cornell) | HTML string | The full HTML content of the Cornell Notes panel | Yes |
+| Key | Owner module | Format | Written when | Read when | Exported? |
+|-----|-------------|--------|-------------|-----------|-----------|
+| `synapse_decks` | Flashcard Decks | JSON array `{ id, name, createdAt }` | Creating or deleting a deck | Decks page loads; stats render | Yes |
+| `synapse_cards` | Flashcard Decks | JSON array `{ id, deckId, front, back, box, lastReviewed }` | Creating, editing, or deleting a card; after each flashcard review (box updated) | Deck opened; study session starts | Yes |
+| `synapse_pomodoro_log` | Learning Governor | JSON array `{ task, duration, completedAt, subject }` | Pomodoro session completes; break taken (task = `'__breakdown__'`) | Stats page renders; rank evidence calculated on app load | Yes |
+| `synapse_blurt` | Blurting Method | JSON array `{ topic, phase1, phase3, gaps, createdAt }` | Blurt session marked complete (phase 4) | Blurt history renders; rank evidence calculated on app load | Yes |
+| `synapse_todos` | Dashboard (Cornell) | JSON array `{ id, text, done }` | Adding, checking, or deleting a mission task | Dashboard renders | Yes |
+| `synapse_eisenhower` | Eisenhower Matrix | JSON array `{ id, text, quadrant, createdAt }` | Adding a task; moving a task between quadrants; deleting a task | Matrix page renders | Yes |
+| `synapse_recal` | Dopamine Recalibrator | JSON object `{ stealthCount, rocketCount, sessions[] }` | Using Stealth Mode or Entry Rocket | Recalibrator page renders | Yes |
+| `synapse_babel` | Babel Fish | JSON array `{ concept, explanation, doodle, createdAt }` | Saving a Babel Fish exercise | Babel Fish page renders; history section loads | Yes |
+| `synapse_yet` | YET Growth Shield | JSON array `{ topic, createdAt }` | Logging a YET moment (from flashcard "Not Yet" button or YET page) | YET page renders | Yes |
+| `synapse_rank` | Rank System | JSON object `{ rank, rankEvidence: { pomodorosCompleted, blurtsCompleted, governorBreakdowns, cardsAdvanced, activeDays, diagnosticsCompleted } }` | Any rank-contributing action (session complete, blurt complete, card advanced, diagnostic completed); on promotion | App boot; Rank page renders; nav bar rank badge updates | Yes |
+| `synapse_mcq` | MCQ Diagnostics | JSON object `{ attempts: { missionId: { score, answers[] } }, gaps: string[] }` | On mission submit (score saved); when a gap topic is identified | Diagnostic page renders; rank evidence calculated | Yes |
+| `synapse_exams` | Exam Countdown | JSON array `{ name, date }` | Adding or removing an exam | Dashboard sidebar widget renders | Yes |
+| `synapse_wil` | Learning Governor | JSON array `{ text, date, subject }` | Saving a "What I Learned?" modal entry after a Pomodoro session | Stats → WIL log renders | Yes |
+| `synapse_theme` | App-wide | String `"dark"` or `"light"` | Toggling the moon/sun icon in the nav bar | On every page load (before render — applied to `<html>` immediately) | Yes |
+| `synapse_gemini_key` | Settings | String (plain API key) | Saving the key in Settings | On every Gemini API call (read before each request) | **No — excluded for security** |
+| `cornellNotes` | Dashboard (Cornell) | HTML string | Auto-saved as user types in the Cornell Notes panel | Dashboard renders; Cornell Notes panel populates | Yes |
 
 **Notes:**
-- `synapse_gemini_key` is excluded from all exports for security. It is never sent anywhere and must be re-entered if lost.
-- `cornellNotes` uses no prefix — this is a legacy key retained to avoid data loss for existing users.
-- `synapse_pomodoro_log` entries with `task === '__breakdown__'` represent deliberate break events (governor breakdowns), not study sessions.
+- `synapse_gemini_key` is excluded from all exports. It must be re-entered if moved to a new browser or device.
+- `cornellNotes` has no prefix — this is a legacy key retained intentionally to avoid data loss for existing users.
+- `synapse_pomodoro_log` entries with `task === '__breakdown__'` are deliberate break events (governor breakdowns counted toward rank), not study sessions.
+- `synapse_theme` is read at the very first line of the page `<script>` block and applied to `<html>` before the rest of the DOM renders, preventing a light-mode flash on dark-mode preference.
 
 ---
 
@@ -343,11 +351,11 @@ The Nav Check (MCQ Diagnostics) consists of five missions, each containing 20 mu
 
 | Mission | Name | Subtitle | Topic Area | Questions |
 |---------|------|----------|-----------|-----------|
-| 1 | The Launchpad | Crisis & Brain Science | Neuroplasticity, memory formation, the forgetting curve, stress and learning | 20 |
-| 2 | Navigation Systems | Study Methods | Pomodoro Technique, Cornell Notes, Feynman Method, Leitner spaced repetition, interleaving | 20 |
-| 3 | Deep Space Ops | Advanced Techniques | Elaborative interrogation, dual coding, retrieval practice, desirable difficulty | 20 |
-| 4 | Command Decisions | Mindset & Motivation | Growth mindset, procrastination science, self-regulation, fixed vs. growth orientation | 20 |
-| 5 | Flight Commander Brief | Integration | Cross-topic synthesis, application of multiple techniques together | 20 |
+| 1 | The Launchpad | Crisis & Brain Science | Neuroplasticity, memory formation, the forgetting curve, cortisol and stress, focused/diffuse thinking modes, active recall vs. passive rereading | 20 |
+| 2 | Navigation Systems | Study Methods | Pomodoro Technique, Cornell Notes, Feynman Method, Leitner spaced repetition, interleaving, dual coding, SQ3R, THIEVES, elaborative interrogation, mind mapping | 20 |
+| 3 | Galactic Engineers | Thinkers & Habits | Deep Work (Cal Newport), habit stacking (James Clear), cognitive load theory, Eisenhower Matrix, Pareto Principle, GTD system, identity-based habits, Zeigarnik Effect | 20 |
+| 4 | Avoid the Black Holes | Systems & Tactics | Procrastination, backward planning, focus zones, the External Device Rule, weekly review, ABCDE prioritisation, mock testing, shutdown rules, batching, MoSCoW method | 20 |
+| 5 | Life Support & Hero State | Wellbeing & Mastery | Sleep and memory consolidation, box breathing, anxiety reappraisal, nutrition for cognitive performance, growth mindset, exercise and learning, identity-based success, the Yet Game | 20 |
 
 **Access:** Missions are shown in order. Completing Mission 1 unlocks Mission 2, and so on (access-gated).
 
