@@ -146,7 +146,7 @@ Sessions are saved with the topic title, recall attempt text, and identified gap
 
 The Mission Architect uses Google's Gemini AI model to generate personalised, structured study plans. The student inputs their subject, exam date, available study time, and any specific concerns. The AI returns a multi-week plan with specific daily tasks, technique recommendations, and topic priorities.
 
-The AI key is **Bring Your Own Key (BYOK)** — each user enters their own free Google Gemini API key in Settings. The key is stored in their browser only and never sent to any external server. If no user key is set, the app falls back to a server-side proxy using the operator's key.
+The AI key is **Bring Your Own Key (BYOK)** — each user enters their own Google Gemini API key in Settings. The key is stored in their browser only and never sent to any external server. If no user key is set, the app falls back to a server-side proxy using the operator's key.
 
 ---
 
@@ -338,10 +338,10 @@ The Mission Architect sends this to the Gemini API and returns a structured week
 
 ### API Key Setup (BYOK)
 
-Synapse uses a Bring Your Own Key (BYOK) model. Each user sets up their own free Google API key:
+Synapse uses a Bring Your Own Key (BYOK) model. Each user sets up their own Google API key:
 
 1. Go to [Google AI Studio](https://aistudio.google.com/apikey)
-2. Sign in with any Google account (free)
+2. Sign in with your Google account
 3. Click **"Create API Key"**
 4. In Synapse, click the settings gear icon and paste the key into the API Key field
 5. Click Save — the key is stored in the browser only and never leaves the device
@@ -530,7 +530,7 @@ Rank requirements are defined in the `RANK_REQUIREMENTS` object in `index.html`.
 
 **Monolithic frontend.** `index.html` is approximately 2,800 lines. This is an intentional trade-off for simplicity of deployment and modification. There is no component system, no module bundler, and no framework overhead.
 
-**BYOK AI model.** The Gemini API key model protects the operator from unexpected API costs while keeping the AI feature genuinely useful. Students who want full AI access set up a free key in under two minutes.
+**BYOK AI model.** The Gemini API key model protects the operator from unexpected API costs while keeping the AI feature genuinely useful. Students who want full AI access set up their own key via Google AI Studio.
 
 **Firebase as a progressive enhancement.** Firebase is not initialised unless `config.js` contains real credentials. The app detects placeholder values at startup and silently falls back to offline mode. No Firebase SDK calls are made in offline mode.
 

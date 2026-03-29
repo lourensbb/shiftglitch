@@ -40,12 +40,12 @@
 
 | Field | Value |
 |-------|-------|
-| **Prior customisation** | Hoërskool Roodepoort free edition (school-specific branding and Gumroad links) |
+| **Prior customisation** | School-specific edition (institution-specific branding and Gumroad links) — since removed |
 | **Current state** | All school-specific customisation has been removed. The app is now brand-neutral. |
 | **App name** | Synapse — in use throughout; a full rebrand is planned as part of the upcoming commercial revamp |
 | **Gumroad** | References removed; `GUMROAD_URL` set to `#` placeholder in `demo.html` |
 
-The Hoërskool Roodepoort customisation was the first commercial deployment of the app. It has been stripped to prepare the product for a global commercial release.
+The initial deployment was an institution-specific edition. That customisation has been fully stripped to prepare the product for a global commercial release.
 
 ### Browser Requirements
 
@@ -375,7 +375,7 @@ The Mission Architect uses Google's Gemini AI. The key is stored in your browser
 **To set up your key:**
 1. Go to [aistudio.google.com/apikey](https://aistudio.google.com/apikey)
 2. Sign in with any Google account
-3. Click "Create API Key" — it is free
+3. Click "Create API Key"
 4. Open Synapse, click the gear icon (⚙️) in the navigation bar
 5. Paste your key into the API key field and click Save
 
