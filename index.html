@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Synapse - Interactive Learning OS</title>
+    <title>ShiftGlitch — Exploit Your Grades</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <script>
         if (typeof SYNAPSE_FIREBASE_CONFIG === 'undefined') var SYNAPSE_FIREBASE_CONFIG = null;
@@ -38,95 +38,184 @@
             darkMode: 'class',
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'], serif: ['Lora', 'serif'] },
-                    colors: { stone: { 850: '#1f1c1a' } }
+                    fontFamily: {
+                        sans: ['Space Grotesk', 'sans-serif'],
+                        serif: ['VT323', 'monospace'],
+                        mono: ['Share Tech Mono', 'monospace']
+                    },
+                    colors: { stone: { 850: '#0d0d0d' } }
                 }
             }
         }
     </script>
 
     <style>
-        :root { --bg-color: #FDFCF8; --text-color: #2D2A26; }
-        .dark { background-color: #1c1917; color: #e7e5e4; --bg-color: #1c1917; --text-color: #e7e5e4; }
-        .dark .bg-white { background-color: #292524 !important; }
-        .dark .text-stone-900 { color: #f5f5f4 !important; }
-        .dark h1, .dark h2, .dark h3, .dark h4 { color: #f5f5f4 !important; }
-        .dark .bg-stone-50 { background-color: #1c1917 !important; }
-        .dark .border-stone-100, .dark .border-stone-200, .dark .border-stone-800 { border-color: #44403c !important; }
-        .dark .text-stone-500, .dark .text-stone-600 { color: #a8a29e !important; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-color); transition: background-color 0.3s ease, color 0.3s ease; line-height: 1.6; }
-        h1, h2, h3, h4 { font-family: 'Lora', serif; letter-spacing: -0.02em; }
+        /* === SHIFTGLITCH BASE === */
+        :root { --sg-green: #39FF14; --sg-magenta: #FF00FF; --sg-purple: #8A2BE2; }
+        html, html.dark { background-color: #000 !important; }
+        body { font-family: 'Space Grotesk', sans-serif; background-color: #000 !important; color: #d1fae5; line-height: 1.6; }
+
+        /* Typography */
+        h1, h2, h3, h4 { font-family: 'VT323', monospace !important; letter-spacing: 0.05em; text-transform: uppercase; color: #fff !important; line-height: 1.15; }
+
+        /* === PALETTE OVERRIDES === */
+        [class~="bg-white"] { background-color: #0a0a0a !important; }
+        [class~="dark:bg-[#292524]"] { background-color: #0a0a0a !important; }
+        [class~="dark:bg-[#1c1917]"] { background-color: #000 !important; }
+        [class~="bg-[#FDFCF8]"] { background-color: #000 !important; }
+        [class~="dark:bg-[#1c1917]/90"] { background-color: rgba(0,0,0,0.97) !important; }
+        [class~="bg-[#FDFCF8]/90"] { background-color: rgba(0,0,0,0.97) !important; }
+        [class~="bg-stone-50"], [class~="dark:bg-stone-50"] { background-color: #0d0d0d !important; }
+        [class~="bg-stone-100"], [class~="dark:bg-stone-100"] { background-color: #0f0f0f !important; }
+        [class~="bg-stone-200"], [class~="dark:bg-stone-200"] { background-color: #161616 !important; }
+        [class~="dark:bg-stone-700"] { background-color: #161616 !important; }
+        [class~="dark:bg-stone-800"] { background-color: #111 !important; }
+        [class~="dark:bg-stone-800/50"] { background-color: rgba(17,17,17,0.5) !important; }
+        [class~="dark:bg-stone-900/50"] { background-color: rgba(0,0,0,0.5) !important; }
+        [class~="bg-stone-900"] { background-color: #000 !important; }
+        [class~="dark:bg-stone-600"] { background-color: #222 !important; }
+        [class~="bg-stone-800"] { background-color: #111 !important; }
+
+        /* Orange → Neon Green */
+        [class~="bg-orange-600"] { background-color: #39FF14 !important; color: #000 !important; }
+        [class~="hover:bg-orange-500"]:hover { background-color: #2ddd12 !important; color: #000 !important; }
+        [class~="hover:bg-orange-600"]:hover { background-color: #39FF14 !important; color: #000 !important; }
+        [class~="text-orange-600"] { color: #39FF14 !important; }
+        [class~="text-orange-400"] { color: #39FF14 !important; }
+        [class~="dark:text-orange-400"] { color: #39FF14 !important; }
+        [class~="dark:text-orange-300"] { color: #a0ffb3 !important; }
+        [class~="text-orange-700"] { color: #39FF14 !important; }
+        [class~="hover:text-orange-600"]:hover { color: #39FF14 !important; }
+        [class~="bg-orange-50"], [class~="dark:bg-orange-50"] { background-color: rgba(57,255,20,0.07) !important; }
+        [class~="hover:bg-orange-50"]:hover { background-color: rgba(57,255,20,0.07) !important; }
+        [class~="dark:bg-orange-900\/10"] { background-color: rgba(57,255,20,0.05) !important; }
+        [class~="dark:bg-orange-900\/20"] { background-color: rgba(57,255,20,0.08) !important; }
+        [class~="dark:bg-orange-900\/30"] { background-color: rgba(57,255,20,0.1) !important; }
+        [class~="dark:hover:bg-orange-900\/20"]:hover { background-color: rgba(57,255,20,0.08) !important; }
+        [class~="border-orange-600"] { border-color: #39FF14 !important; }
+        [class~="border-orange-500"] { border-color: #39FF14 !important; }
+        [class~="border-orange-200"] { border-color: rgba(57,255,20,0.3) !important; }
+        [class~="border-orange-100"] { border-color: rgba(57,255,20,0.15) !important; }
+        [class~="dark:border-orange-800"] { border-color: rgba(57,255,20,0.2) !important; }
+        [class~="dark:border-orange-700"] { border-color: rgba(57,255,20,0.2) !important; }
+        [class~="hover:border-orange-500"]:hover { border-color: #39FF14 !important; }
+        [class~="focus:ring-orange-500"]:focus { --tw-ring-color: #39FF14 !important; }
+
+        /* Stone text */
+        [class~="text-stone-900"], [class~="dark:text-stone-900"] { color: #f0f0f0 !important; }
+        [class~="dark:text-stone-50"], [class~="dark:text-stone-100"] { color: #eeeeee !important; }
+        [class~="dark:text-stone-200"] { color: #cccccc !important; }
+        [class~="dark:text-stone-300"] { color: #aaaaaa !important; }
+        [class~="dark:text-stone-400"] { color: #777777 !important; }
+        [class~="text-stone-700"] { color: #cccccc !important; }
+        [class~="text-stone-600"] { color: #aaaaaa !important; }
+        [class~="text-stone-500"] { color: #888888 !important; }
+        [class~="text-stone-400"] { color: #666666 !important; }
+
+        /* Stone borders */
+        [class~="border-stone-100"] { border-color: #1a1a1a !important; }
+        [class~="border-stone-200"] { border-color: #222 !important; }
+        [class~="dark:border-stone-800"] { border-color: #1a1a1a !important; }
+        [class~="dark:border-stone-700"] { border-color: #222 !important; }
+        [class~="border-stone-300"] { border-color: #2a2a2a !important; }
+        [class~="dark:border-stone-600"] { border-color: #333 !important; }
+
+        /* Card flip */
         .perspective-1000 { perspective: 1000px; }
         .transform-style-3d { transform-style: preserve-3d; }
         .backface-hidden { backface-visibility: hidden; }
         .rotate-y-180 { transform: rotateY(180deg); }
         .card-inner { transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
         .flipped { transform: rotateY(180deg); }
-        .cornell-notes { min-height: 400px; background-image: radial-gradient(#e5e7eb 1px, transparent 1px); background-size: 24px 24px; padding: 2.5rem; line-height: 2; outline: none; border-radius: 1.5rem; box-shadow: inset 0 2px 4px 0 rgba(0,0,0,0.05); font-family: 'Inter', sans-serif; font-size: 1.1rem; }
-        .dark .cornell-notes { background-image: radial-gradient(#3f3a36 1px, transparent 1px); background-color: #292524; }
+
+        /* Cornell Notes */
+        .cornell-notes { min-height: 400px; background-image: radial-gradient(rgba(57,255,20,0.12) 1px, transparent 1px); background-size: 24px 24px; background-color: #0a0a0a; padding: 2.5rem; line-height: 2; outline: none; border-radius: 1.5rem; box-shadow: inset 0 0 20px rgba(57,255,20,0.03); font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; color: #d1fae5; }
+
+        /* Chart container */
         .chart-container { position: relative; width: 100%; max-width: 600px; margin: 0 auto; height: 300px; }
-        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); }
+
+        /* Card hover glow */
+        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 10px 25px -5px rgba(57,255,20,0.15), 0 0 15px rgba(57,255,20,0.06); }
+
+        /* Fade in */
         .animate-fade-in { animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .ai-loader { border: 2px solid #f3f3f3; border-top: 2px solid #ea580c; border-radius: 50%; width: 16px; height: 16px; animation: spin 1s linear infinite; display: inline-block; }
+
+        /* AI loader */
+        .ai-loader { border: 2px solid #111; border-top: 2px solid #39FF14; border-radius: 50%; width: 16px; height: 16px; animation: spin 1s linear infinite; display: inline-block; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        input[type="checkbox"] { accent-color: #ea580c; width: 1.1rem; height: 1.1rem; cursor: pointer; }
+
+        /* Inputs */
+        input[type="checkbox"] { accent-color: #39FF14; width: 1.1rem; height: 1.1rem; cursor: pointer; }
         .timer-circle { transition: stroke-dashoffset 1s linear; }
         .quiz-timer-ring { transition: stroke-dashoffset 1s linear; }
+
+        /* Drop zone */
+        .drop-zone { border: 2px dashed #1a1a1a; transition: all 0.2s ease; }
+        .drop-zone.drag-over { border-color: #39FF14; background-color: rgba(57,255,20,0.03); }
+
+        /* Glitch effects */
+        @keyframes neonPulse { 0%, 100% { text-shadow: 0 0 5px #39FF14, 0 0 10px #39FF14; } 50% { text-shadow: 0 0 10px #39FF14, 0 0 20px #39FF14, 0 0 30px rgba(57,255,20,0.5); } }
+        .sg-logo { animation: neonPulse 3s ease-in-out infinite; color: #39FF14; }
+
+        /* Selection */
+        ::selection { background-color: rgba(57,255,20,0.25); color: #fff; }
+
+        /* Nav active */
+        .nav-active { color: #39FF14 !important; font-weight: 700; }
+
+        /* Print */
+        @media print { .no-print { display: none !important; } body { background: white; color: black; } .print-break { page-break-before: always; } }
     </style>
 </head>
-<body class="antialiased selection:bg-orange-100 dark:selection:bg-orange-900 selection:text-orange-900 dark:selection:text-orange-100 font-sans">
+<body class="antialiased font-sans dark">
 
-    <nav class="sticky top-0 z-50 bg-[#FDFCF8]/90 dark:bg-[#1c1917]/90 backdrop-blur-md border-b border-stone-200 dark:border-stone-800 transition-colors">
+    <nav class="sticky top-0 z-50 bg-black backdrop-blur-md border-b border-[#39FF14]/20">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16 items-center">
-                <div class="flex items-center gap-4">
-                    <div class="flex items-center gap-3 cursor-pointer" onclick="app.navTo('dashboard')">
-                        <div class="w-8 h-8 bg-stone-800 dark:bg-orange-600 rounded-full flex items-center justify-center text-[#FDFCF8] font-serif font-bold text-lg">S</div>
-                        <span class="font-serif text-xl font-bold tracking-tight text-stone-900 dark:text-stone-50">Synapse</span>
-                    </div>
-                    <button id="theme-toggle" class="text-2xl hover:scale-110 transition-transform focus:outline-none">&#x1F319;</button>
+                <div class="flex items-center gap-3 cursor-pointer" onclick="app.navTo('dashboard')">
+                    <span class="font-mono font-bold text-lg tracking-widest uppercase sg-logo">SHIFTGLITCH</span>
                 </div>
                 <div class="hidden md:flex items-center gap-4" id="desktop-nav">
-                    <button onclick="app.navTo('dashboard')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-xs font-semibold tracking-wide transition-colors uppercase">Mission</button>
-                    <button onclick="app.navTo('explore')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-xs font-semibold tracking-wide transition-colors uppercase">Vault</button>
-                    <button onclick="app.navTo('decks')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-xs font-semibold tracking-wide transition-colors uppercase">Decks</button>
+                    <button onclick="app.navTo('dashboard')" class="nav-btn text-[#39FF14]/50 hover:text-[#39FF14] text-xs font-bold tracking-widest transition-colors uppercase">Mission</button>
+                    <button onclick="app.navTo('explore')" class="nav-btn text-[#39FF14]/50 hover:text-[#39FF14] text-xs font-bold tracking-widest transition-colors uppercase">Vault</button>
+                    <button onclick="app.navTo('decks')" class="nav-btn text-[#39FF14]/50 hover:text-[#39FF14] text-xs font-bold tracking-widest transition-colors uppercase">Data Shards</button>
                     <div class="relative" id="tools-dropdown">
-                        <button onclick="app.toggleToolsMenu()" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-xs font-semibold tracking-wide transition-colors uppercase flex items-center gap-1">Tools <svg class="w-3 h-3 transition-transform" id="tools-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></button>
-                        <div id="tools-menu" class="hidden absolute top-full left-1/2 -translate-x-1/2 mt-2 w-44 bg-[#FDFCF8] dark:bg-stone-800 rounded-xl shadow-lg border border-stone-200 dark:border-stone-700 py-2 z-50">
-                            <button onclick="app.navTo('blurt')" class="nav-btn block w-full text-left px-4 py-2.5 text-xs font-semibold tracking-wide uppercase text-stone-500 dark:text-stone-400 hover:text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors">Blurt</button>
-                            <button onclick="app.navTo('babel')" class="nav-btn block w-full text-left px-4 py-2.5 text-xs font-semibold tracking-wide uppercase text-stone-500 dark:text-stone-400 hover:text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors">Babel Fish</button>
-                            <button onclick="app.navTo('quiz')" class="nav-btn block w-full text-left px-4 py-2.5 text-xs font-semibold tracking-wide uppercase text-stone-500 dark:text-stone-400 hover:text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors">Quiz Arena</button>
-                            <button onclick="app.navTo('matrix')" class="nav-btn block w-full text-left px-4 py-2.5 text-xs font-semibold tracking-wide uppercase text-stone-500 dark:text-stone-400 hover:text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors">Matrix</button>
-                            <button onclick="app.navTo('recal')" class="nav-btn block w-full text-left px-4 py-2.5 text-xs font-semibold tracking-wide uppercase text-stone-500 dark:text-stone-400 hover:text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors">Recalibrator</button>
-                            <button onclick="app.navTo('diagnostic')" class="nav-btn block w-full text-left px-4 py-2.5 text-xs font-semibold tracking-wide uppercase text-stone-500 dark:text-stone-400 hover:text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors">Nav Check</button>
+                        <button onclick="app.toggleToolsMenu()" class="nav-btn text-[#39FF14]/50 hover:text-[#39FF14] text-xs font-bold tracking-widest transition-colors uppercase flex items-center gap-1">Tools <svg class="w-3 h-3 transition-transform" id="tools-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></button>
+                        <div id="tools-menu" class="hidden absolute top-full left-1/2 -translate-x-1/2 mt-2 w-52 bg-black rounded-lg shadow-lg border border-[#39FF14]/20 py-2 z-50">
+                            <button onclick="app.navTo('blurt')" class="nav-btn block w-full text-left px-4 py-2.5 text-xs font-bold tracking-widest uppercase text-[#39FF14]/50 hover:text-[#39FF14] hover:bg-[#39FF14]/5 transition-colors">BrainDump.exe</button>
+                            <button onclick="app.navTo('babel')" class="nav-btn block w-full text-left px-4 py-2.5 text-xs font-bold tracking-widest uppercase text-[#39FF14]/50 hover:text-[#39FF14] hover:bg-[#39FF14]/5 transition-colors">Jargon Decoder</button>
+                            <button onclick="app.navTo('quiz')" class="nav-btn block w-full text-left px-4 py-2.5 text-xs font-bold tracking-widest uppercase text-[#39FF14]/50 hover:text-[#39FF14] hover:bg-[#39FF14]/5 transition-colors">Boss Fight</button>
+                            <button onclick="app.navTo('matrix')" class="nav-btn block w-full text-left px-4 py-2.5 text-xs font-bold tracking-widest uppercase text-[#39FF14]/50 hover:text-[#39FF14] hover:bg-[#39FF14]/5 transition-colors">Priority Grid</button>
+                            <button onclick="app.navTo('recal')" class="nav-btn block w-full text-left px-4 py-2.5 text-xs font-bold tracking-widest uppercase text-[#39FF14]/50 hover:text-[#39FF14] hover:bg-[#39FF14]/5 transition-colors">Anti-Lag</button>
+                            <button onclick="app.navTo('diagnostic')" class="nav-btn block w-full text-left px-4 py-2.5 text-xs font-bold tracking-widest uppercase text-[#39FF14]/50 hover:text-[#39FF14] hover:bg-[#39FF14]/5 transition-colors">Exploit Missions</button>
                         </div>
                     </div>
-                    <button onclick="app.navTo('rank')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-xs font-semibold tracking-wide transition-colors uppercase">Rank</button>
-                    <button onclick="app.navTo('stats')" class="nav-btn text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white text-xs font-semibold tracking-wide transition-colors uppercase">Stats</button>
-                    <button onclick="app.navTo('settings')" class="nav-btn text-stone-400 dark:text-stone-500 hover:text-stone-900 dark:hover:text-white transition-colors" title="Settings"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></button>
-                    <span id="nav-rank" class="text-xs font-bold text-orange-600 ml-2 bg-orange-50 dark:bg-orange-900/30 px-3 py-1 rounded-lg uppercase tracking-widest cursor-pointer" onclick="app.navTo('rank')">Space Cadet</span>
+                    <button onclick="app.navTo('rank')" class="nav-btn text-[#39FF14]/50 hover:text-[#39FF14] text-xs font-bold tracking-widest transition-colors uppercase">Rank</button>
+                    <button onclick="app.navTo('stats')" class="nav-btn text-[#39FF14]/50 hover:text-[#39FF14] text-xs font-bold tracking-widest transition-colors uppercase">Stats</button>
+                    <button onclick="app.navTo('settings')" class="nav-btn text-[#39FF14]/40 hover:text-[#39FF14] transition-colors" title="Settings"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></button>
+                    <span id="nav-rank" class="text-xs font-bold text-black ml-2 bg-[#39FF14] px-3 py-1 rounded uppercase tracking-widest cursor-pointer" onclick="app.navTo('rank')">NPC</span>
                 </div>
                 <div class="md:hidden flex items-center">
-                    <button onclick="app.toggleMobileMenu()" class="text-stone-600 dark:text-stone-400 p-2 text-2xl"><span id="menu-icon">&#x2630;</span></button>
+                    <button onclick="app.toggleMobileMenu()" class="text-[#39FF14]/60 p-2 text-2xl"><span id="menu-icon">&#x2630;</span></button>
                 </div>
             </div>
         </div>
-        <div id="mobile-menu" class="hidden md:hidden bg-[#FDFCF8] dark:bg-[#1c1917] border-b border-stone-200 dark:border-stone-800 px-4 pt-2 pb-6 space-y-1">
-            <button onclick="app.navTo('dashboard')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Mission</button>
-            <button onclick="app.navTo('explore')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Vault</button>
-            <button onclick="app.navTo('decks')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Decks</button>
-            <div class="px-4 pt-3 pb-1 text-[10px] font-bold text-stone-400 dark:text-stone-500 uppercase tracking-widest">Tools</div>
-            <button onclick="app.navTo('blurt')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Blurt</button>
-            <button onclick="app.navTo('babel')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Babel Fish</button>
-            <button onclick="app.navTo('quiz')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Quiz Arena</button>
-            <button onclick="app.navTo('matrix')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Matrix</button>
-            <button onclick="app.navTo('recal')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Recalibrator</button>
-            <button onclick="app.navTo('diagnostic')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Nav Check</button>
-            <div class="border-t border-stone-200 dark:border-stone-700 my-2"></div>
-            <button onclick="app.navTo('rank')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Rank</button>
-            <button onclick="app.navTo('stats')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Stats</button>
-            <button onclick="app.navTo('settings')" class="block w-full text-left px-4 py-3 rounded-xl text-stone-600 dark:text-stone-400 font-bold uppercase text-xs tracking-widest">Settings</button>
+        <div id="mobile-menu" class="hidden md:hidden bg-black border-b border-[#39FF14]/20 px-4 pt-2 pb-6 space-y-1">
+            <button onclick="app.navTo('dashboard')" class="block w-full text-left px-4 py-3 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Mission</button>
+            <button onclick="app.navTo('explore')" class="block w-full text-left px-4 py-3 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Vault</button>
+            <button onclick="app.navTo('decks')" class="block w-full text-left px-4 py-3 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Data Shards</button>
+            <div class="px-4 pt-3 pb-1 text-[10px] font-bold text-[#39FF14]/30 uppercase tracking-widest">Tools</div>
+            <button onclick="app.navTo('blurt')" class="block w-full text-left px-4 py-3 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">BrainDump.exe</button>
+            <button onclick="app.navTo('babel')" class="block w-full text-left px-4 py-3 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Jargon Decoder</button>
+            <button onclick="app.navTo('quiz')" class="block w-full text-left px-4 py-3 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Boss Fight</button>
+            <button onclick="app.navTo('matrix')" class="block w-full text-left px-4 py-3 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Priority Grid</button>
+            <button onclick="app.navTo('recal')" class="block w-full text-left px-4 py-3 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Anti-Lag</button>
+            <button onclick="app.navTo('diagnostic')" class="block w-full text-left px-4 py-3 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Exploit Missions</button>
+            <div class="border-t border-[#39FF14]/10 my-2"></div>
+            <button onclick="app.navTo('rank')" class="block w-full text-left px-4 py-3 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Rank</button>
+            <button onclick="app.navTo('stats')" class="block w-full text-left px-4 py-3 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Stats</button>
+            <button onclick="app.navTo('settings')" class="block w-full text-left px-4 py-3 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Settings</button>
         </div>
     </nav>
 
@@ -181,26 +270,26 @@
         }
 
         const STUDY_QUOTES = [
-            { text: "The more that you read, the more things you will know. The more that you learn, the more places you'll go.", author: "Dr. Seuss" },
-            { text: "Education is not the filling of a pail, but the lighting of a fire.", author: "W.B. Yeats" },
-            { text: "The beautiful thing about learning is that nobody can take it away from you.", author: "B.B. King" },
-            { text: "Learning is not attained by chance, it must be sought for with ardour and attended to with diligence.", author: "Abigail Adams" },
-            { text: "Tell me and I forget. Teach me and I remember. Involve me and I learn.", author: "Benjamin Franklin" },
-            { text: "The expert in anything was once a beginner.", author: "Helen Hayes" },
-            { text: "It does not matter how slowly you go as long as you do not stop.", author: "Confucius" },
-            { text: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
-            { text: "Study without desire spoils the memory, and it retains nothing that it takes in.", author: "Leonardo da Vinci" },
-            { text: "The mind is not a vessel to be filled, but a fire to be kindled.", author: "Plutarch" },
-            { text: "Live as if you were to die tomorrow. Learn as if you were to live forever.", author: "Mahatma Gandhi" },
-            { text: "The roots of education are bitter, but the fruit is sweet.", author: "Aristotle" },
-            { text: "An investment in knowledge pays the best interest.", author: "Benjamin Franklin" },
-            { text: "You don't have to be great to start, but you have to start to be great.", author: "Zig Ziglar" },
-            { text: "Success is the sum of small efforts, repeated day in and day out.", author: "Robert Collier" },
-            { text: "The capacity to learn is a gift; the ability to learn is a skill; the willingness to learn is a choice.", author: "Brian Herbert" },
-            { text: "What we learn with pleasure we never forget.", author: "Alfred Mercier" },
-            { text: "Knowledge is power. Information is liberating.", author: "Kofi Annan" },
-            { text: "The more I learn, the more I realise how much I don't know.", author: "Albert Einstein" },
-            { text: "Discipline is the bridge between goals and accomplishment.", author: "Jim Rohn" },
+            { text: "Your brain is the most powerful processor on the planet. Stop running it on low power mode." },
+            { text: "Cramming is a buffer overflow. Spaced repetition is clean, efficient memory allocation." },
+            { text: "Every Pomodoro session is a commit to your future self's repository." },
+            { text: "Confusion is not a bug. It's a feature. It means new neural pathways are being compiled." },
+            { text: "Sleep is not wasted time. It's when your brain defragments everything you learned today." },
+            { text: "The best hackers in history were obsessive learners first. Be that." },
+            { text: "Blurting what you know is the fastest way to find what you don't. Run the diagnostic." },
+            { text: "Your grades are the output. Your study habits are the source code. Fix the code." },
+            { text: "Difficulty is just your brain spinning up a new process it's never run before." },
+            { text: "Active recall is the cheat code your textbook doesn't want you to know about." },
+            { text: "Consistency compounds. One focused session today beats five chaotic ones later." },
+            { text: "Don't just read the material. Cross-examine it. Break it. Rebuild it in your own words." },
+            { text: "Distraction is the exploit. Focus is the patch. Deploy the patch." },
+            { text: "Your mistakes are not failures. They are error logs. Read them carefully." },
+            { text: "Understanding the 'why' is root access. Memorising the 'what' is just user-level." },
+            { text: "The Feynman Technique is simple: if you can't explain it simply, you don't understand it yet." },
+            { text: "Data Shards don't level up by sitting in your bag. Review them." },
+            { text: "A study streak is a signal. Break it once and the signal noise doubles. Hold the line." },
+            { text: "Most students study to pass. A few study to understand. The second group runs the world." },
+            { text: "Growth is uncomfortable. Comfort is stagnation. Pick your hard." },
         ];
 
         const AI_MODEL = "gemini-2.0-flash";
@@ -590,9 +679,17 @@
             add(entry, subject) { state.wilLog.push({ entry, subject, date: new Date().toISOString() }); this.save(); },
         };
 
-        const RANKS = ['Space Cadet', 'Second Officer', 'Flight Commander'];
+        const RANKS = ['NPC', 'Script Kiddie', 'Glitch Tech', 'Netrunner', 'System Admin'];
         const RANK_REQUIREMENTS = {
-            'Second Officer': {
+            'Script Kiddie': {
+                blurtsCompleted: 5,
+                governorBreakdowns: 5,
+                cardsAdvanced: 20,
+                activeDays: 3,
+                pomodorosCompleted: 7,
+                diagnosticsCompleted: 1,
+            },
+            'Glitch Tech': {
                 blurtsCompleted: 10,
                 governorBreakdowns: 10,
                 cardsAdvanced: 50,
@@ -600,7 +697,15 @@
                 pomodorosCompleted: 15,
                 diagnosticsCompleted: 2,
             },
-            'Flight Commander': {
+            'Netrunner': {
+                blurtsCompleted: 20,
+                governorBreakdowns: 20,
+                cardsAdvanced: 100,
+                activeDays: 14,
+                pomodorosCompleted: 30,
+                diagnosticsCompleted: 3,
+            },
+            'System Admin': {
                 blurtsCompleted: 30,
                 governorBreakdowns: 30,
                 cardsAdvanced: 150,
@@ -614,11 +719,11 @@
             load() {
                 try {
                     const d = JSON.parse(localStorage.getItem('synapse_rank') || '{}');
-                    state.rank = d.rank || 'Space Cadet';
+                    state.rank = d.rank || 'NPC';
                     state.rankEvidence = d.rankEvidence || { blurtsCompleted: 0, governorBreakdowns: 0, cardsAdvanced: 0, activeDays: 0, pomodorosCompleted: 0, diagnosticsCompleted: 0, lastActiveDate: '', activeDateLog: [] };
                     if (!state.rankEvidence.activeDateLog) state.rankEvidence.activeDateLog = [];
                     if (state.rankEvidence.diagnosticsCompleted === undefined) state.rankEvidence.diagnosticsCompleted = 0;
-                } catch(e) { state.rank = 'Space Cadet'; state.rankEvidence = { blurtsCompleted: 0, governorBreakdowns: 0, cardsAdvanced: 0, activeDays: 0, pomodorosCompleted: 0, diagnosticsCompleted: 0, lastActiveDate: '', activeDateLog: [] }; }
+                } catch(e) { state.rank = 'NPC'; state.rankEvidence = { blurtsCompleted: 0, governorBreakdowns: 0, cardsAdvanced: 0, activeDays: 0, pomodorosCompleted: 0, diagnosticsCompleted: 0, lastActiveDate: '', activeDateLog: [] }; }
             },
             save() {
                 localStorage.setItem('synapse_rank', JSON.stringify({ rank: state.rank, rankEvidence: state.rankEvidence }));
@@ -733,7 +838,7 @@
             blurtSessions: [], blurtCurrentId: null, blurtPhase: 'list',
             eisenhowerTasks: [], eisenhowerReflections: [], missionTodos: [],
             mcqAttempts: {}, mcqGaps: [], mcqReflections: {}, mcqView: 'list', mcqMissionIdx: 0, mcqQuestionIdx: 0, mcqAnswers: {}, mcqShowResults: false,
-            rank: 'Space Cadet', rankEvidence: { blurtsCompleted: 0, governorBreakdowns: 0, cardsAdvanced: 0, activeDays: 0, pomodorosCompleted: 0, diagnosticsCompleted: 0, lastActiveDate: '', activeDateLog: [] },
+            rank: 'NPC', rankEvidence: { blurtsCompleted: 0, governorBreakdowns: 0, cardsAdvanced: 0, activeDays: 0, pomodorosCompleted: 0, diagnosticsCompleted: 0, lastActiveDate: '', activeDateLog: [] },
             quizCategory: '', quizDifficulty: 'medium', quizQuestions: [], quizIndex: 0, quizScore: 0,
             quizStreak: 0, quizAnswered: false, quizSelectedAnswer: null, quizTimer: 15, quizTimerInterval: null,
             quizPhase: 'setup', quizSessionCorrect: 0, quizSessionTotal: 0,
@@ -748,21 +853,8 @@
             charts: { scatter: null, doughnut: null },
 
             init: async () => {
-                const toggle = document.getElementById('theme-toggle');
-                const savedTheme = localStorage.getItem('synapse_theme');
-                if (!savedTheme || savedTheme === 'dark') {
-                    document.body.classList.add('dark');
-                    toggle.textContent = '\u2600\uFE0F';
-                } else {
-                    toggle.textContent = '\uD83C\uDF19';
-                }
-                toggle.addEventListener('click', () => {
-                    document.body.classList.toggle('dark');
-                    const isDark = document.body.classList.contains('dark');
-                    toggle.textContent = isDark ? '\u2600\uFE0F' : '\uD83C\uDF19';
-                    localStorage.setItem('synapse_theme', isDark ? 'dark' : 'light');
-                    if (state.view === 'dashboard') app.renderCharts();
-                });
+                document.documentElement.classList.add('dark');
+                document.body.classList.add('dark');
 
                 deckStore.load(); cardStore.load(); pomodoroStore.load(); blurtStore.load(); eisenhowerStore.load(); todoStore.load(); mcqStore.load(); recalStore.load(); babelStore.load(); yetStore.load(); examStore.load(); learningStore.load();
                 rankEngine.load(); rankEngine.trackActiveDay(); rankEngine.updateNavRank();
@@ -791,9 +883,9 @@
                 if (reportParam) {
                     try {
                         const r = JSON.parse(atob(reportParam));
-                        const rankIcons3 = {'Space Cadet': '🚀', 'Second Officer': '⭐', 'Flight Commander': '👑'};
+                        const rankIcons3 = {'NPC': '👾', 'Script Kiddie': '💾', 'Glitch Tech': '⚡', 'Netrunner': '🔌', 'System Admin': '💀'};
                         const banner = document.createElement('div');
-                        banner.className = 'fixed top-0 inset-x-0 z-[300] bg-orange-600 text-white text-center px-4 py-3 text-sm font-bold shadow-lg';
+                        banner.className = 'fixed top-0 inset-x-0 z-[300] bg-[#39FF14] text-black text-center px-4 py-3 text-sm font-bold shadow-lg';
                         banner.innerHTML = `📋 Student Progress Report &mdash; Rank: ${rankIcons3[r.rank] || '🚀'} ${esc(r.rank || '')} | Focus: ${r.pomodoros || 0} | Blurts: ${r.blurts || 0} | Cards: ${r.cards || 0} | Streak: ${r.streak || 0} days | YETs: ${r.yets || 0} | Active Days: ${r.activeDays || 0} | Generated: ${r.date || ''} <button onclick="this.parentElement.remove()" class="ml-4 underline text-white/80">Dismiss</button>`;
                         document.body.prepend(banner);
                     } catch(e) {}
@@ -827,14 +919,14 @@
                 app.closeToolsMenu();
                 document.querySelectorAll('.nav-btn').forEach(btn => {
                     btn.classList.remove('text-orange-600', 'font-bold');
-                    const map = { dashboard: 'Mission', explore: 'Vault', decks: 'Decks', quiz: 'Quiz Arena', blurt: 'Blurt', babel: 'Babel Fish', matrix: 'Matrix', recal: 'Recalibrator', diagnostic: 'Nav Check', rank: 'Rank', stats: 'Stats', settings: 'Settings' };
+                    const map = { dashboard: 'Mission', explore: 'Vault', decks: 'Data Shards', quiz: 'Boss Fight', blurt: 'BrainDump.exe', babel: 'Jargon Decoder', matrix: 'Priority Grid', recal: 'Anti-Lag', diagnostic: 'Exploit Missions', rank: 'Rank', stats: 'Stats', settings: 'Settings' };
                     if (btn.textContent.trim().toUpperCase() === (map[tabId] || '').toUpperCase()) btn.classList.add('text-orange-600', 'font-bold');
                 });
                 const toolsViews = ['blurt','babel','quiz','matrix','recal','diagnostic'];
                 const toolsBtn = document.querySelector('#tools-dropdown > button');
                 if (toolsBtn) {
-                    if (toolsViews.includes(tabId)) { toolsBtn.classList.add('text-orange-600','font-bold'); toolsBtn.classList.remove('text-stone-500','dark:text-stone-400'); }
-                    else { toolsBtn.classList.remove('text-orange-600','font-bold'); toolsBtn.classList.add('text-stone-500','dark:text-stone-400'); }
+                    if (toolsViews.includes(tabId)) { toolsBtn.classList.add('text-orange-600','font-bold'); }
+                    else { toolsBtn.classList.remove('text-orange-600','font-bold'); }
                 }
                 app.render();
             },
@@ -1162,7 +1254,7 @@
                         if (data.blurtSessions) { state.blurtSessions = data.blurtSessions; blurtStore.save(); }
                         if (data.pomodoroLog) { state.pomodoroLog = data.pomodoroLog; pomodoroStore.save(); }
                         if (data.notes) localStorage.setItem('cornellNotes', data.notes);
-                        if (data.rank) { state.rank = data.rank.rank || 'Space Cadet'; state.rankEvidence = data.rank.rankEvidence || state.rankEvidence; rankEngine.save(); }
+                        if (data.rank) { state.rank = data.rank.rank || 'NPC'; state.rankEvidence = data.rank.rankEvidence || state.rankEvidence; rankEngine.save(); }
                         if (data.eisenhower) { state.eisenhowerTasks = data.eisenhower.tasks || []; state.eisenhowerReflections = data.eisenhower.reflections || []; eisenhowerStore.save(); }
                         if (data.todos) { state.missionTodos = data.todos; todoStore.save(); }
                         if (data.mcq) { state.mcqAttempts = data.mcq.attempts || {}; state.mcqGaps = data.mcq.gaps || []; state.mcqReflections = data.mcq.reflections || {}; mcqStore.save(); }
@@ -1228,15 +1320,14 @@
                 return `
                 <div class="animate-fade-in space-y-12">
                     <section class="text-center">
-                        <h1 class="text-5xl md:text-7xl font-serif font-bold mb-4">Your Mission</h1>
-                        <p class="text-stone-500 dark:text-stone-400 max-w-xl mx-auto font-medium mb-6">Your study home base. Everything starts here.</p>
+                        <h1 class="text-5xl md:text-7xl font-serif font-bold mb-4">Exploit HQ</h1>
+                        <p class="text-[#39FF14]/60 max-w-xl mx-auto font-medium mb-6">Your study base. Every session is an exploit. Run them all.</p>
                         <blockquote class="max-w-2xl mx-auto px-6">
-                            <p class="text-base md:text-lg font-serif italic text-stone-600 dark:text-stone-300 leading-relaxed">"${esc(q.text)}"</p>
-                            <footer class="mt-2 text-xs font-bold uppercase tracking-widest text-orange-600">— ${esc(q.author)}</footer>
+                            <p class="text-base md:text-lg font-mono italic text-[#39FF14]/80 leading-relaxed">"${esc(q.text)}"</p>
                         </blockquote>
                     </section>
                     <section class="bg-orange-50 dark:bg-orange-900/20 rounded-[2rem] p-8 border border-orange-200 dark:border-orange-800">
-                        <h3 class="text-lg font-serif font-bold text-orange-700 dark:text-orange-400 mb-4">📋 How to Use Synapse</h3>
+                        <h3 class="text-lg font-serif font-bold text-orange-700 dark:text-orange-400 mb-4">// HOW TO RUN SHIFTGLITCH</h3>
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                             <div class="bg-white dark:bg-stone-800 rounded-2xl p-5 border border-orange-100 dark:border-stone-700 text-center">
                                 <div class="text-3xl mb-2">1️⃣</div>
@@ -1380,7 +1471,7 @@
                     <h1 class="text-6xl font-serif font-bold mb-8">The Vault</h1>
                     <div class="max-w-sm mx-auto mb-12">
                         <div class="bg-white dark:bg-[#292524] p-6 rounded-[2rem] border border-stone-100 dark:border-stone-800 shadow-sm flex flex-col items-center">
-                            <h3 class="text-xs font-bold uppercase tracking-widest text-stone-400 mb-4">Learning Governor</h3>
+                            <h3 class="text-xs font-bold uppercase tracking-widest text-stone-400 mb-4">Focus Governor</h3>
                             ${state.governorBlocked ? '<div class="w-full mb-4 p-4 bg-red-50 dark:bg-red-900/20 rounded-2xl border border-red-200 dark:border-red-800 text-center"><p class="text-xs font-bold uppercase tracking-widest text-red-600 dark:text-red-400 mb-1">Governor: Blocked</p><p class="text-xs text-stone-500 dark:text-stone-400 mb-3">4 consecutive sessions on same task. Break it down or switch.</p><div class="flex gap-2"><button onclick="app.governorBreakdown()" class="flex-1 bg-orange-600 text-white py-2 rounded-xl text-xs font-bold uppercase tracking-widest">I\'ve Broken It Down</button><button onclick="app.governorSwitch()" class="flex-1 bg-stone-200 dark:bg-stone-700 text-stone-700 dark:text-stone-200 py-2 rounded-xl text-xs font-bold uppercase tracking-widest">Switch Task</button></div></div>' : ''}
                             <div class="relative w-40 h-40 mb-4">
                                 <svg class="w-full h-full transform -rotate-90">
@@ -1528,7 +1619,7 @@
                 }
                 return `<div class="animate-fade-in max-w-4xl mx-auto space-y-8">
                     <div class="text-center mb-8">
-                        <h1 class="text-5xl font-serif font-bold mb-4">Flashcard Decks</h1>
+                        <h1 class="text-5xl font-serif font-bold mb-4">Data Shards</h1>
                         <p class="text-stone-500 dark:text-stone-400 italic">Leitner System: 5-box spaced repetition</p>
                     </div>
                     <div class="bg-orange-50 dark:bg-orange-900/20 rounded-[2rem] p-6 border border-orange-200 dark:border-orange-800">
@@ -1649,7 +1740,7 @@
                 }
                 return `<div class="animate-fade-in max-w-3xl mx-auto space-y-8">
                     <div class="text-center mb-8">
-                        <h1 class="text-5xl font-serif font-bold mb-4">The Blurting Method</h1>
+                        <h1 class="text-5xl font-serif font-bold mb-4">BrainDump.exe</h1>
                         <p class="text-stone-500 dark:text-stone-400 italic">Read. Hide. Blurt. Compare. Fill gaps.</p>
                     </div>
                     <div class="bg-white dark:bg-[#292524] rounded-[2rem] p-8 border border-stone-100 dark:border-stone-800">
@@ -1692,7 +1783,7 @@
                 return `<div class="animate-fade-in max-w-2xl mx-auto space-y-8">
                     <div class="text-center mb-8">
                         <h1 class="text-5xl font-serif font-bold mb-4">Settings</h1>
-                        <p class="text-stone-500 dark:text-stone-400 italic">Configure your Synapse experience</p>
+                        <p class="text-stone-500 dark:text-stone-400 italic">Configure your ShiftGlitch loadout</p>
                     </div>
                     <div class="bg-white dark:bg-stone-800 rounded-2xl border border-stone-200 dark:border-stone-700 p-8 space-y-6">
                         <div>
@@ -1741,7 +1832,7 @@
                                 <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/></svg>
                                 Cloud Sync (Firebase)
                             </h2>
-                            <p class="text-sm text-stone-500 dark:text-stone-400 mb-1">Optional — Synapse works fully offline without Firebase. Cloud sync lets you access your data across multiple devices.</p>
+                            <p class="text-sm text-stone-500 dark:text-stone-400 mb-1">Optional — ShiftGlitch works fully offline without Firebase. Cloud sync lets you access your data across multiple devices.</p>
                             <p class="text-xs font-semibold ${window.fb ? 'text-green-600' : 'text-stone-400'}">${window.fb ? 'Connected' : 'Not configured — running in offline mode'}</p>
                         </div>
                         <div class="border-t border-stone-200 dark:border-stone-700 pt-4 space-y-3">
@@ -1754,7 +1845,7 @@
                                 <li>Open the file <code class="bg-stone-100 dark:bg-stone-900 px-1.5 py-0.5 rounded text-xs font-mono">config.js</code> and paste your values in place of the placeholders</li>
                                 <li>In the Firebase Console sidebar, go to <strong>Authentication</strong> and enable <strong>Anonymous</strong> sign-in</li>
                                 <li>Go to <strong>Firestore Database</strong> and click <strong>Create database</strong> (start in test mode)</li>
-                                <li>Refresh Synapse — you should see "Connected" above</li>
+                                <li>Refresh ShiftGlitch — you should see "Connected" above</li>
                             </ol>
                             <p class="text-xs text-stone-400 dark:text-stone-500 italic mt-2">Firebase is a Google service. Refer to Firebase pricing for your usage tier.</p>
                         </div>
@@ -1961,12 +2052,12 @@
 
                 return `<div class="animate-fade-in max-w-5xl mx-auto space-y-8">
                     <div class="text-center mb-4">
-                        <h1 class="text-5xl font-serif font-bold mb-3">Eisenhower Matrix</h1>
+                        <h1 class="text-5xl font-serif font-bold mb-3">Priority Grid</h1>
                         <p class="text-stone-500 dark:text-stone-400 italic max-w-xl mx-auto">Stop being busy. Start being smart. Sort tasks by what actually matters.</p>
                     </div>
 
                     <div class="bg-orange-50 dark:bg-orange-900/20 rounded-[2rem] p-6 border border-orange-200 dark:border-orange-800">
-                        <h3 class="text-base font-serif font-bold text-orange-700 dark:text-orange-400 mb-3">📋 How to use the Eisenhower Matrix</h3>
+                        <h3 class="text-base font-serif font-bold text-orange-700 dark:text-orange-400 mb-3">📋 How to use Priority Grid</h3>
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <div class="bg-white dark:bg-stone-800 rounded-xl p-4 border border-orange-100 dark:border-stone-700 text-center">
                                 <div class="text-2xl mb-1">1️⃣</div>
@@ -2093,7 +2184,7 @@
                 }
                 return `<div class="animate-fade-in max-w-2xl mx-auto space-y-8">
                     <div class="text-center mb-8">
-                        <h1 class="text-5xl font-serif font-bold mb-4">Quiz Arena</h1>
+                        <h1 class="text-5xl font-serif font-bold mb-4">Boss Fight</h1>
                         <p class="text-stone-500 dark:text-stone-400 italic">Test your general knowledge across categories.</p>
                     </div>
                     <div class="bg-white dark:bg-[#292524] rounded-[2.5rem] p-10 border border-stone-100 dark:border-stone-800 shadow-sm space-y-6">
@@ -2123,15 +2214,15 @@
 
             getRankHTML: () => {
                 const rankIdx = RANKS.indexOf(state.rank);
-                const rankIcons = {'Space Cadet': '\u{1F680}', 'Second Officer': '\u{2B50}', 'Flight Commander': '\u{1F451}'};
+                const rankIcons = {'NPC': '👾', 'Script Kiddie': '💾', 'Glitch Tech': '⚡', 'Netrunner': '🔌', 'System Admin': '💀'};
                 const progress = rankEngine.getProgress();
                 return `<div class="animate-fade-in max-w-3xl mx-auto space-y-8">
                     <div class="text-center mb-8">
                         <h1 class="text-5xl font-serif font-bold mb-4">Your Rank</h1>
-                        <p class="text-stone-500 dark:text-stone-400 italic">Progression through evidence-based learning</p>
+                        <p class="text-[#39FF14]/60 italic">Level up through evidence. Not grinding. Not luck. Proof.</p>
                     </div>
                     <div class="bg-white dark:bg-[#292524] rounded-[2.5rem] p-10 border border-stone-100 dark:border-stone-800 shadow-sm text-center">
-                        <div class="text-6xl mb-4">${rankIcons[state.rank] || '\u{1F680}'}</div>
+                        <div class="text-6xl mb-4">${rankIcons[state.rank] || '👾'}</div>
                         <h2 class="text-4xl font-serif font-bold text-orange-600 mb-2">${esc(state.rank)}</h2>
                         <p class="text-stone-500 text-sm">Rank ${rankIdx + 1} of ${RANKS.length}</p>
                         <div class="flex justify-center gap-4 mt-6">${RANKS.map((r, i) => {
@@ -2210,7 +2301,7 @@
                                 </div>
                             </div>
                             ${state.buddyData ? (() => {
-                                const rankIcons2 = {'Space Cadet': '🚀', 'Second Officer': '⭐', 'Flight Commander': '👑'};
+                                const rankIcons2 = {'NPC': '👾', 'Script Kiddie': '💾', 'Glitch Tech': '⚡', 'Netrunner': '🔌', 'System Admin': '💀'};
                                 const b = state.buddyData;
                                 const me = { rank: state.rank, pomodoros: state.rankEvidence.pomodorosCompleted, blurts: state.rankEvidence.blurtsCompleted, cards: state.rankEvidence.cardsAdvanced, streak: rankEngine.getStreak(), yets: state.yetMoments.length };
                                 const row = (label, myVal, theirVal) => {
@@ -2320,7 +2411,7 @@
                 const journeyComplete = completedMissions >= mcqBank.length;
                 return `<div class="animate-fade-in max-w-4xl mx-auto space-y-8">
                     <div class="text-center mb-8">
-                        <h1 class="text-5xl font-serif font-bold mb-4">Navigation Check</h1>
+                        <h1 class="text-5xl font-serif font-bold mb-4">Exploit Missions</h1>
                         <p class="text-stone-500 dark:text-stone-400 italic">Systems diagnostic — confirm what you've learned, reveal what needs practice.</p>
                     </div>
                     <div class="bg-white dark:bg-[#292524] rounded-[2rem] p-6 border border-stone-100 dark:border-stone-800 shadow-sm">
@@ -2398,7 +2489,7 @@
                             <div class="flex items-start gap-3"><span class="text-lg">⏳</span><p class="text-sm text-stone-600 dark:text-stone-300"><strong>No time limit</strong> — take as long as you need.</p></div>
                             <div class="flex items-start gap-3"><span class="text-lg">🔍</span><p class="text-sm text-stone-600 dark:text-stone-300"><strong>Not a test</strong> — this is a diagnostic to find gaps, not judge you.</p></div>
                         </div>
-                        <button onclick="app.mcqBeginQuestions()" class="w-full bg-orange-600 hover:bg-orange-500 text-white py-4 rounded-2xl font-bold text-sm uppercase tracking-widest transition-all">Begin Navigation Check</button>
+                        <button onclick="app.mcqBeginQuestions()" class="w-full bg-orange-600 hover:bg-orange-500 text-white py-4 rounded-2xl font-bold text-sm uppercase tracking-widest transition-all">Begin Exploit Mission</button>
                     </div>
                 </div>`;
             },
@@ -2589,7 +2680,7 @@
                 }
                 return `<div class="animate-fade-in max-w-4xl mx-auto space-y-8">
                     <div class="text-center mb-4">
-                        <h1 class="text-5xl font-serif font-bold mb-3">Dopamine Recalibrator</h1>
+                        <h1 class="text-5xl font-serif font-bold mb-3">Anti-Lag Protocol</h1>
                         <p class="text-stone-500 dark:text-stone-400 italic max-w-xl mx-auto">Reset your brain. Reclaim your focus.</p>
                     </div>
                     <div class="bg-orange-50 dark:bg-orange-900/20 rounded-[2rem] p-6 border border-orange-200 dark:border-orange-800">
@@ -2691,11 +2782,11 @@
                 }
                 return `<div class="animate-fade-in max-w-4xl mx-auto space-y-8">
                     <div class="text-center mb-4">
-                        <h1 class="text-5xl font-serif font-bold mb-3">Babel Fish Metaphor Lab</h1>
+                        <h1 class="text-5xl font-serif font-bold mb-3">Jargon Decoder</h1>
                         <p class="text-stone-500 dark:text-stone-400 italic max-w-xl mx-auto">Translate complex ideas for a 5-year-old alien from Andromeda</p>
                     </div>
                     <div class="bg-orange-50 dark:bg-orange-900/20 rounded-[2rem] p-6 border border-orange-200 dark:border-orange-800">
-                        <h3 class="text-base font-serif font-bold text-orange-700 dark:text-orange-400 mb-3">📋 How to use the Babel Fish Method</h3>
+                        <h3 class="text-base font-serif font-bold text-orange-700 dark:text-orange-400 mb-3">📋 How to use the Jargon Decoder</h3>
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <div class="bg-white dark:bg-stone-800 rounded-xl p-4 border border-orange-100 dark:border-stone-700 text-center">
                                 <div class="text-2xl mb-1">1️⃣</div>
@@ -2828,7 +2919,7 @@
                 navigator.clipboard.writeText(url).then(() => app.showNotification('Report link copied! Send it to a parent or teacher.')).catch(() => app.showNotification('Copy this: ' + url));
             },
 
-            showAbout: () => alert("Synapse OS v7.0 - Interactive Learning OS with Rank System")
+            showAbout: () => alert("ShiftGlitch v1.0 - Cyberpunk Study OS // Exploit Your Grades")
         };
 
         document.addEventListener('DOMContentLoaded', app.init);

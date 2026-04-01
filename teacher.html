@@ -1,52 +1,80 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Synapse — Teacher Dashboard</title>
+    <title>ShiftGlitch — Instructor Panel</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'], serif: ['Lora', 'serif'] },
-                    colors: { stone: { 850: '#1f1c1a' } }
+                    fontFamily: {
+                        sans: ['Space Grotesk', 'sans-serif'],
+                        serif: ['VT323', 'monospace'],
+                        mono: ['Share Tech Mono', 'monospace']
+                    },
+                    colors: { stone: { 850: '#0d0d0d' } }
                 }
             }
         }
     </script>
     <style>
-        :root { --bg-color: #FDFCF8; --text-color: #2D2A26; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-color); line-height: 1.6; }
-        h1, h2, h3, h4 { font-family: 'Lora', serif; letter-spacing: -0.02em; }
+        html, body { background-color: #000 !important; color: #d1fae5; }
+        h1, h2, h3, h4 { font-family: 'VT323', monospace !important; letter-spacing: 0.05em; text-transform: uppercase; color: #fff !important; line-height: 1.15; }
+        body { font-family: 'Space Grotesk', sans-serif; line-height: 1.6; }
         .animate-fade-in { animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .drop-zone { border: 3px dashed #d6d3d1; transition: all 0.2s ease; }
-        .drop-zone.drag-over { border-color: #ea580c; background-color: #fff7ed; }
+        .drop-zone { border: 2px dashed #1a3a1a; transition: all 0.2s ease; background-color: #000; }
+        .drop-zone.drag-over { border-color: #39FF14; background-color: rgba(57,255,20,0.03); }
         .chart-container { position: relative; width: 100%; max-width: 500px; margin: 0 auto; height: 280px; }
+        [class~="bg-white"] { background-color: #0a0a0a !important; }
+        [class~="border-stone-100"] { border-color: #1a1a1a !important; }
+        [class~="border-stone-200"] { border-color: #222 !important; }
+        [class~="text-stone-900"] { color: #f0f0f0 !important; }
+        [class~="text-stone-700"] { color: #ccc !important; }
+        [class~="text-stone-600"] { color: #aaa !important; }
+        [class~="text-stone-500"] { color: #888 !important; }
+        [class~="text-stone-400"] { color: #666 !important; }
+        [class~="bg-stone-50"] { background-color: #0d0d0d !important; }
+        [class~="bg-stone-100"] { background-color: #0f0f0f !important; }
+        [class~="bg-stone-200"] { background-color: #161616 !important; }
+        [class~="hover:bg-stone-50"]:hover { background-color: rgba(57,255,20,0.03) !important; }
+        [class~="text-orange-600"] { color: #39FF14 !important; }
+        [class~="hover:text-orange-700"]:hover { color: #2ddd12 !important; }
+        [class~="text-green-600"] { color: #39FF14 !important; }
+        [class~="border-stone-100"] { border-color: #1a1a1a !important; }
+        [class~="bg-green-50"] { background-color: rgba(57,255,20,0.05) !important; }
+        [class~="border-green-200"] { border-color: rgba(57,255,20,0.2) !important; }
+        [class~="text-green-800"] { color: #39FF14 !important; }
+        [class~="text-green-700"] { color: #39FF14 !important; }
+        [class~="text-red-500"] { color: #FF00FF !important; }
+        @keyframes neonPulse { 0%, 100% { text-shadow: 0 0 5px #39FF14, 0 0 10px #39FF14; } 50% { text-shadow: 0 0 10px #39FF14, 0 0 20px #39FF14, 0 0 30px rgba(57,255,20,0.5); } }
+        .sg-logo { animation: neonPulse 3s ease-in-out infinite; color: #39FF14; }
+        ::selection { background-color: rgba(57,255,20,0.25); color: #fff; }
         @media print {
             .no-print { display: none !important; }
-            body { background: white; }
+            body { background: white !important; color: black !important; }
+            h1, h2, h3, h4 { color: black !important; }
             .print-break { page-break-before: always; }
         }
     </style>
 </head>
-<body class="antialiased selection:bg-orange-100 selection:text-orange-900 font-sans">
+<body class="antialiased font-sans dark">
 
-    <nav class="sticky top-0 z-50 bg-[#FDFCF8]/90 backdrop-blur-md border-b border-stone-200 no-print">
+    <nav class="sticky top-0 z-50 bg-black backdrop-blur-md border-b border-[#39FF14]/20 no-print">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16 items-center">
                 <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 bg-stone-800 rounded-full flex items-center justify-center text-[#FDFCF8] font-serif font-bold text-lg">S</div>
-                    <span class="font-serif text-xl font-bold tracking-tight text-stone-900">Synapse</span>
-                    <span class="bg-orange-100 text-orange-700 text-xs font-bold px-3 py-1 rounded-lg uppercase tracking-widest">Teacher Dashboard</span>
+                    <span class="font-mono font-bold text-lg tracking-widest uppercase sg-logo">SHIFTGLITCH</span>
+                    <span class="bg-[#39FF14] text-black text-xs font-bold px-3 py-1 rounded uppercase tracking-widest">Instructor Panel</span>
                 </div>
                 <div class="flex items-center gap-3">
-                    <button onclick="exportClassReport()" class="bg-stone-900 text-white px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-stone-700 transition-colors">Print Class Report</button>
-                    <button onclick="clearAll()" class="bg-stone-200 text-stone-700 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-stone-300 transition-colors">Clear All</button>
+                    <button onclick="exportClassReport()" class="bg-[#39FF14] text-black px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-[#2ddd12] transition-colors">Print Class Report</button>
+                    <button onclick="clearAll()" class="border border-[#39FF14]/30 text-[#39FF14]/60 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest hover:border-[#39FF14] hover:text-[#39FF14] transition-colors">Clear All</button>
                 </div>
             </div>
         </div>
@@ -63,7 +91,7 @@
                 <input type="file" id="file-input" accept=".json" multiple class="hidden" onchange="handleFiles(this.files)">
                 <div class="text-5xl mb-4">&#128230;</div>
                 <h3 class="text-xl font-serif font-bold text-stone-700 mb-2">Drop Student Files Here</h3>
-                <p class="text-stone-400 text-sm">Or click to browse. Accept <code>.json</code> files exported from Synapse.</p>
+                <p class="text-stone-400 text-sm">Or click to browse. Accept <code>.json</code> files exported from ShiftGlitch.</p>
                 <p class="text-stone-400 text-xs mt-2">Students click <strong>Export for Teacher</strong> in Stats &rarr; Data Management</p>
             </div>
 
@@ -90,7 +118,7 @@
                                 <th class="pb-3 text-xs font-bold uppercase tracking-widest text-stone-400">Focus Sessions</th>
                                 <th class="pb-3 text-xs font-bold uppercase tracking-widest text-stone-400">Focus Time</th>
                                 <th class="pb-3 text-xs font-bold uppercase tracking-widest text-stone-400">Flashcards</th>
-                                <th class="pb-3 text-xs font-bold uppercase tracking-widest text-stone-400">Blurt Sessions</th>
+                                <th class="pb-3 text-xs font-bold uppercase tracking-widest text-stone-400">BrainDumps</th>
                                 <th class="pb-3 text-xs font-bold uppercase tracking-widest text-stone-400">Active Days</th>
                                 <th class="pb-3 text-xs font-bold uppercase tracking-widest text-stone-400 no-print">Actions</th>
                             </tr>
@@ -178,7 +206,7 @@
             const decks = data.decks || [];
             const cards = data.cards || [];
 
-            const rank = data.rank ? (data.rank.rank || 'Space Cadet') : 'Space Cadet';
+            const rank = data.rank ? (data.rank.rank || 'NPC') : 'NPC';
             const evidence = data.rank ? (data.rank.rankEvidence || {}) : {};
 
             const activeDays = new Set();
@@ -243,9 +271,10 @@
             const totalStudents = analyzed.length;
             const avgSessions = totalStudents > 0 ? Math.round(analyzed.reduce((s, a) => s + a.totalSessions, 0) / totalStudents) : 0;
             const avgFocusHrs = totalStudents > 0 ? (analyzed.reduce((s, a) => s + parseFloat(a.totalFocusHours), 0) / totalStudents).toFixed(1) : '0';
-            const rankCounts = { 'Space Cadet': 0, 'Second Officer': 0, 'Flight Commander': 0 };
+            const rankCounts = { 'NPC': 0, 'Script Kiddie': 0, 'Glitch Tech': 0, 'Netrunner': 0, 'System Admin': 0 };
             analyzed.forEach(a => { rankCounts[a.rank] = (rankCounts[a.rank] || 0) + 1; });
-            const highestRank = rankCounts['Flight Commander'] > 0 ? 'Flight Commander' : rankCounts['Second Officer'] > 0 ? 'Second Officer' : 'Space Cadet';
+            const allRanks = ['NPC', 'Script Kiddie', 'Glitch Tech', 'Netrunner', 'System Admin'];
+            const highestRank = [...allRanks].reverse().find(r => rankCounts[r] > 0) || 'NPC';
 
             document.getElementById('summary-cards').innerHTML = `
                 <div class="bg-white rounded-2xl p-6 border border-stone-100 text-center">
@@ -266,7 +295,7 @@
                 </div>
             `;
 
-            const rankColors = { 'Space Cadet': '#d6d3d1', 'Second Officer': '#f59e0b', 'Flight Commander': '#ea580c' };
+            const rankColors = { 'NPC': '#333333', 'Script Kiddie': '#8A2BE2', 'Glitch Tech': '#39FF14', 'Netrunner': '#00BFFF', 'System Admin': '#FF00FF' };
 
             const tbody = document.getElementById('roster-body');
             tbody.innerHTML = analyzed.sort((a, b) => b.totalSessions - a.totalSessions).map((s, i) => `
@@ -314,7 +343,7 @@
                         labels: Object.keys(rankCounts),
                         datasets: [{
                             data: Object.values(rankCounts),
-                            backgroundColor: ['#d6d3d1', '#f59e0b', '#ea580c']
+                            backgroundColor: ['#333333', '#8A2BE2', '#39FF14', '#00BFFF', '#FF00FF']
                         }]
                     },
                     options: {
@@ -337,7 +366,7 @@
                         datasets: [{
                             label: 'Focus Sessions',
                             data: sorted.map(s => s.totalSessions),
-                            backgroundColor: '#ea580c',
+                            backgroundColor: '#39FF14',
                             borderRadius: 8
                         }]
                     },
@@ -361,9 +390,13 @@
             document.getElementById('student-detail').classList.remove('hidden');
 
             const evidence = s.evidence;
-            const secondOfficerReqs = { blurtsCompleted: 10, governorBreakdowns: 10, cardsAdvanced: 50, activeDays: 7, pomodorosCompleted: 15, diagnosticsCompleted: 2 };
-            const flightCommanderReqs = { blurtsCompleted: 30, governorBreakdowns: 30, cardsAdvanced: 150, activeDays: 21, pomodorosCompleted: 50, diagnosticsCompleted: 5 };
-            const nextRankReqs = s.rank === 'Space Cadet' ? secondOfficerReqs : s.rank === 'Second Officer' ? flightCommanderReqs : null;
+            const rankReqsMap = {
+                'NPC': { blurtsCompleted: 5, governorBreakdowns: 5, cardsAdvanced: 20, activeDays: 3, pomodorosCompleted: 7, diagnosticsCompleted: 1 },
+                'Script Kiddie': { blurtsCompleted: 10, governorBreakdowns: 10, cardsAdvanced: 50, activeDays: 7, pomodorosCompleted: 15, diagnosticsCompleted: 2 },
+                'Glitch Tech': { blurtsCompleted: 20, governorBreakdowns: 20, cardsAdvanced: 100, activeDays: 14, pomodorosCompleted: 30, diagnosticsCompleted: 3 },
+                'Netrunner': { blurtsCompleted: 30, governorBreakdowns: 30, cardsAdvanced: 150, activeDays: 21, pomodorosCompleted: 50, diagnosticsCompleted: 5 }
+            };
+            const nextRankReqs = rankReqsMap[s.rank] || null;
 
             document.getElementById('detail-content').innerHTML = `
                 <div class="flex items-center justify-between mb-8">
@@ -385,7 +418,7 @@
                     </div>
                     <div class="bg-white rounded-2xl p-5 border border-stone-100 text-center">
                         <div class="text-2xl font-bold text-stone-900">${s.blurtCount}</div>
-                        <div class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mt-1">Blurt Sessions</div>
+                        <div class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mt-1">BrainDumps</div>
                     </div>
                     <div class="bg-white rounded-2xl p-5 border border-stone-100 text-center">
                         <div class="text-2xl font-bold text-stone-900">${s.activeDays}</div>
@@ -404,7 +437,7 @@
                     </div>
                     <div class="bg-white rounded-2xl p-5 border border-stone-100 text-center">
                         <div class="text-2xl font-bold text-stone-900">${s.babelCount}</div>
-                        <div class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mt-1">Babel Fish</div>
+                        <div class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mt-1">Jargon Decodes</div>
                     </div>
                     <div class="bg-white rounded-2xl p-5 border border-stone-100 text-center">
                         <div class="text-2xl font-bold text-stone-900">${s.yetCount}</div>
@@ -416,8 +449,8 @@
                     <div class="bg-white rounded-[2rem] p-8 border border-stone-100">
                         <h3 class="text-lg font-serif font-bold mb-4">Rank Evidence</h3>
                         <div class="space-y-3">
-                            ${renderEvidenceBar('Blurts Completed', evidence.blurtsCompleted || 0, nextRankReqs ? nextRankReqs.blurtsCompleted : s.evidence.blurtsCompleted || 1)}
-                            ${renderEvidenceBar('Governor Breakdowns', evidence.governorBreakdowns || 0, nextRankReqs ? nextRankReqs.governorBreakdowns : evidence.governorBreakdowns || 1)}
+                            ${renderEvidenceBar('BrainDumps', evidence.blurtsCompleted || 0, nextRankReqs ? nextRankReqs.blurtsCompleted : s.evidence.blurtsCompleted || 1)}
+                            ${renderEvidenceBar('Focus Breakdowns', evidence.governorBreakdowns || 0, nextRankReqs ? nextRankReqs.governorBreakdowns : evidence.governorBreakdowns || 1)}
                             ${renderEvidenceBar('Cards Advanced', evidence.cardsAdvanced || 0, nextRankReqs ? nextRankReqs.cardsAdvanced : evidence.cardsAdvanced || 1)}
                             ${renderEvidenceBar('Active Days', evidence.activeDays || 0, nextRankReqs ? nextRankReqs.activeDays : evidence.activeDays || 1)}
                             ${renderEvidenceBar('Pomodoros', evidence.pomodorosCompleted || 0, nextRankReqs ? nextRankReqs.pomodorosCompleted : evidence.pomodorosCompleted || 1)}
@@ -451,11 +484,11 @@
                     </div>
                 </div>
 
-                ${s.rank === 'Flight Commander' ? `
-                <div class="bg-orange-50 border border-orange-200 rounded-2xl p-6 text-center">
-                    <div class="text-3xl mb-2">&#127942;</div>
-                    <h3 class="font-serif font-bold text-orange-800 text-lg">Flight Commander</h3>
-                    <p class="text-orange-600 text-sm">This student has achieved the highest rank!</p>
+                ${s.rank === 'System Admin' ? `
+                <div class="bg-[#FF00FF]/10 border border-[#FF00FF]/30 rounded-2xl p-6 text-center">
+                    <div class="text-3xl mb-2">💀</div>
+                    <h3 class="font-serif font-bold text-[#FF00FF] text-lg">System Admin</h3>
+                    <p class="text-[#39FF14] text-sm">This student has achieved the highest rank!</p>
                 </div>` : ''}
             `;
         }
@@ -488,37 +521,38 @@
             const date = new Date().toLocaleDateString('en', { year: 'numeric', month: 'long', day: 'numeric' });
 
             const printWin = window.open('', '_blank');
+            const printRankReqs = { 'NPC': { b:5,g:5,c:20,a:3,p:7,d:1 }, 'Script Kiddie': { b:10,g:10,c:50,a:7,p:15,d:2 }, 'Glitch Tech': { b:20,g:20,c:100,a:14,p:30,d:3 }, 'Netrunner': { b:30,g:30,c:150,a:21,p:50,d:5 } };
+            const pr = printRankReqs[s.rank] || printRankReqs['Netrunner'];
             printWin.document.write(`<!DOCTYPE html><html><head><title>Progress Report — ${esc(s.name)}</title>
-            <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;0,700&display=swap" rel="stylesheet">
+            <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
             <style>
                 * { margin: 0; padding: 0; box-sizing: border-box; }
-                body { font-family: 'Inter', sans-serif; color: #2D2A26; padding: 40px; max-width: 800px; margin: 0 auto; }
-                h1, h2, h3 { font-family: 'Lora', serif; }
-                .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #ea580c; padding-bottom: 20px; margin-bottom: 30px; }
-                .logo { display: flex; align-items: center; gap: 10px; }
-                .logo-circle { width: 32px; height: 32px; background: #292524; border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-family: 'Lora', serif; font-weight: bold; font-size: 16px; }
-                .rank-badge { background: #fff7ed; color: #ea580c; padding: 4px 14px; border-radius: 8px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; }
+                body { font-family: 'Space Grotesk', sans-serif; color: #1a1a1a; padding: 40px; max-width: 800px; margin: 0 auto; background: white; }
+                h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; text-transform: uppercase; letter-spacing: 0.05em; }
+                .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #39FF14; padding-bottom: 20px; margin-bottom: 30px; }
+                .logo { font-size: 20px; font-weight: 700; letter-spacing: 0.1em; color: #000; }
+                .rank-badge { background: #f0fff0; color: #1a5c0a; padding: 4px 14px; border-radius: 8px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; border: 1px solid #39FF14; }
                 .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 30px; }
-                .stat-card { background: #fafaf9; border: 1px solid #e7e5e4; border-radius: 12px; padding: 16px; text-align: center; }
-                .stat-value { font-size: 24px; font-weight: 700; color: #292524; }
-                .stat-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #a8a29e; margin-top: 4px; }
+                .stat-card { background: #f9f9f9; border: 1px solid #e0e0e0; border-radius: 12px; padding: 16px; text-align: center; }
+                .stat-value { font-size: 24px; font-weight: 700; color: #1a1a1a; }
+                .stat-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #888; margin-top: 4px; }
                 .section { margin-bottom: 24px; }
-                .section h3 { font-size: 16px; margin-bottom: 12px; color: #292524; }
-                .evidence-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f5f5f4; }
-                .evidence-label { font-size: 13px; color: #78716c; }
+                .section h3 { font-size: 14px; margin-bottom: 12px; color: #1a1a1a; }
+                .evidence-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
+                .evidence-label { font-size: 13px; color: #555; }
                 .evidence-value { font-size: 13px; font-weight: 700; font-family: monospace; }
-                .bar-bg { height: 6px; background: #e7e5e4; border-radius: 3px; flex: 1; margin: 0 12px; }
+                .bar-bg { height: 6px; background: #e0e0e0; border-radius: 3px; flex: 1; margin: 0 12px; }
                 .bar-fill { height: 100%; border-radius: 3px; }
-                .bar-fill.complete { background: #22c55e; }
-                .bar-fill.incomplete { background: #ea580c; }
-                .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #e7e5e4; text-align: center; font-size: 11px; color: #a8a29e; }
+                .bar-fill.complete { background: #39FF14; }
+                .bar-fill.incomplete { background: #8A2BE2; }
+                .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #e0e0e0; text-align: center; font-size: 11px; color: #aaa; }
                 @media print { body { padding: 20px; } }
             </style></head><body>
             <div class="header">
                 <div>
-                    <div class="logo"><div class="logo-circle">S</div><span style="font-family: Lora, serif; font-size: 20px; font-weight: 700;">Synapse</span></div>
+                    <div class="logo">SHIFTGLITCH</div>
                     <h1 style="font-size: 28px; margin-top: 12px;">${esc(s.name)}</h1>
-                    <p style="font-size: 13px; color: #78716c; margin-top: 4px;">Progress Report — ${date}</p>
+                    <p style="font-size: 13px; color: #666; margin-top: 4px;">Progress Report — ${date}</p>
                 </div>
                 <div style="text-align: right;">
                     <span class="rank-badge">${esc(s.rank)}</span>
@@ -527,33 +561,33 @@
             <div class="stats-grid">
                 <div class="stat-card"><div class="stat-value">${s.totalSessions}</div><div class="stat-label">Focus Sessions</div></div>
                 <div class="stat-card"><div class="stat-value">${s.totalFocusHours}h</div><div class="stat-label">Focus Time</div></div>
-                <div class="stat-card"><div class="stat-value">${s.blurtCount}</div><div class="stat-label">Blurt Sessions</div></div>
+                <div class="stat-card"><div class="stat-value">${s.blurtCount}</div><div class="stat-label">BrainDumps</div></div>
                 <div class="stat-card"><div class="stat-value">${s.activeDays}</div><div class="stat-label">Active Days</div></div>
             </div>
             <div class="stats-grid">
-                <div class="stat-card"><div class="stat-value">${s.cardCount}</div><div class="stat-label">Flashcards</div></div>
+                <div class="stat-card"><div class="stat-value">${s.cardCount}</div><div class="stat-label">Data Shards</div></div>
                 <div class="stat-card"><div class="stat-value">${s.deckCount}</div><div class="stat-label">Decks</div></div>
                 <div class="stat-card"><div class="stat-value">${s.babelCount}</div><div class="stat-label">Explanations</div></div>
                 <div class="stat-card"><div class="stat-value">${s.yetCount}</div><div class="stat-label">Growth Moments</div></div>
             </div>
             <div class="section">
                 <h3>Rank Evidence Progress</h3>
-                ${printEvidenceRow('Blurts Completed', s.evidence.blurtsCompleted || 0, s.rank === 'Space Cadet' ? 10 : 30)}
-                ${printEvidenceRow('Governor Breakdowns', s.evidence.governorBreakdowns || 0, s.rank === 'Space Cadet' ? 10 : 30)}
-                ${printEvidenceRow('Cards Advanced', s.evidence.cardsAdvanced || 0, s.rank === 'Space Cadet' ? 50 : 150)}
-                ${printEvidenceRow('Active Days', s.evidence.activeDays || 0, s.rank === 'Space Cadet' ? 7 : 21)}
-                ${printEvidenceRow('Pomodoros', s.evidence.pomodorosCompleted || 0, s.rank === 'Space Cadet' ? 15 : 50)}
-                ${printEvidenceRow('Diagnostics', s.evidence.diagnosticsCompleted || 0, s.rank === 'Space Cadet' ? 2 : 5)}
+                ${printEvidenceRow('BrainDumps', s.evidence.blurtsCompleted || 0, pr.b)}
+                ${printEvidenceRow('Focus Breakdowns', s.evidence.governorBreakdowns || 0, pr.g)}
+                ${printEvidenceRow('Cards Studied', s.evidence.cardsAdvanced || 0, pr.c)}
+                ${printEvidenceRow('Active Days', s.evidence.activeDays || 0, pr.a)}
+                ${printEvidenceRow('Pomodoros', s.evidence.pomodorosCompleted || 0, pr.p)}
+                ${printEvidenceRow('Exploit Missions', s.evidence.diagnosticsCompleted || 0, pr.d)}
             </div>
             <div class="section">
                 <h3>Additional Activity</h3>
-                <div class="evidence-row"><span class="evidence-label">MCQ Diagnostics Attempted</span><span class="evidence-value">${s.mcqAttempts}</span></div>
+                <div class="evidence-row"><span class="evidence-label">Exploit Missions Attempted</span><span class="evidence-value">${s.mcqAttempts}</span></div>
                 <div class="evidence-row"><span class="evidence-label">Knowledge Gaps Found</span><span class="evidence-value">${s.mcqGaps}</span></div>
-                <div class="evidence-row"><span class="evidence-label">Dopamine Recalibrator Uses</span><span class="evidence-value">${s.stealthCount + s.rocketCount}</span></div>
+                <div class="evidence-row"><span class="evidence-label">Anti-Lag Protocol Uses</span><span class="evidence-value">${s.stealthCount + s.rocketCount}</span></div>
                 <div class="evidence-row"><span class="evidence-label">Tasks Completed</span><span class="evidence-value">${s.todosDone} / ${s.todosTotal}</span></div>
             </div>
             <div class="footer">
-                <p>Generated by Synapse — Interactive Learning OS</p>
+                <p>Generated by ShiftGlitch — Cyberpunk Study OS</p>
                 <p style="margin-top: 4px;">This report reflects the student's learning activity and rank progress as of ${date}.</p>
             </div>
             <script>window.onload = function() { window.print(); }<\/script>
