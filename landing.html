@@ -143,31 +143,6 @@
             transform: translateY(0);
         }
 
-        /* ── Corner badge ─────────────────────────────────── */
-        .corner-badge {
-            position: fixed;
-            top: 1.25rem;
-            left: 1.25rem;
-            z-index: 20;
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 10px;
-            color: var(--green);
-            opacity: 0.35;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-        }
-        .corner-version {
-            position: fixed;
-            top: 1.25rem;
-            right: 1.25rem;
-            z-index: 20;
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 10px;
-            color: var(--green);
-            opacity: 0.25;
-            letter-spacing: 0.1em;
-        }
-
         /* ── Glitch wordmark ──────────────────────────────── */
         .wordmark-wrap {
             position: relative;
@@ -314,15 +289,6 @@
             50% { box-shadow: 0 0 32px rgba(255,0,255,0.38), inset 0 0 24px rgba(255,0,255,0.07); }
         }
 
-        /* ── Footer note ─────────────────────────────────── */
-        .footer-note {
-            margin-top: 3rem;
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 10px;
-            color: rgba(57,255,20,0.18);
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-        }
     </style>
 </head>
 <body>
@@ -331,10 +297,6 @@
     <div class="orb orb-green"></div>
     <div class="orb orb-magenta"></div>
     <div class="orb orb-purple"></div>
-
-    <!-- Corner markers -->
-    <div class="corner-badge">ShiftGlitch // sys</div>
-    <div class="corner-version">v2.1.0</div>
 
     <!-- Boot screen -->
     <div id="boot-screen">
@@ -356,10 +318,9 @@
         </div>
 
         <div class="cta-wrap">
-            <a href="/app" class="cta-btn">[ Run Exploit.exe ]</a>
+            <a href="/app" class="cta-btn">Run Exploit.exe</a>
         </div>
 
-        <div class="footer-note">// study_os for humans who hate studying</div>
     </div>
 
     <script>
