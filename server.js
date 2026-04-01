@@ -65,6 +65,8 @@ app.get('/teacher', (req, res) => {
   res.sendFile(path.join(__dirname, 'teacher.html'));
 });
 
+const ALLOWED_RANK_TIERS = new Set(['NPC', 'Script Kiddie', 'Glitch Tech', 'Netrunner', 'System Admin']);
+
 app.post('/api/leaderboard/sync', requireAuth, async (req, res) => {
   try {
     const userId = req.session.userId;
@@ -73,9 +75,14 @@ app.post('/api/leaderboard/sync', requireAuth, async (req, res) => {
     const bl = Math.max(0, parseInt(blurts, 10) || 0);
     const cards = Math.max(0, parseInt(cardsMastered, 10) || 0);
     const str = Math.max(0, parseInt(streak, 10) || 0);
+    const tier = ALLOWED_RANK_TIERS.has(rankTier) ? rankTier : 'NPC';
     const focusScore = (pom * 10) + (str * 25) + (cards * 2) + (bl * 15);
+    const existing = await getMyLeaderboardEntry(userId);
+    if (existing && focusScore < existing.focus_score) {
+      return res.json({ ok: true, focusScore: existing.focus_score, skipped: true });
+    }
     const gamertag = await getUserGamertag(userId);
-    await upsertLeaderboard({ userId, gamertag, focusScore, rankTier: rankTier || 'NPC', streak: str, pomodoros: pom, cardsMastered: cards, blurts: bl });
+    await upsertLeaderboard({ userId, gamertag, focusScore, rankTier: tier, streak: str, pomodoros: pom, cardsMastered: cards, blurts: bl });
     res.json({ ok: true, focusScore });
   } catch (err) {
     console.error('/api/leaderboard/sync error:', err);

@@ -235,16 +235,19 @@ async function getUserGamertag(userId) {
   const u = rows[0];
   if (!u) return null;
   if (u.gamertag) return u.gamertag;
+  let derived = null;
   if (u.first_name) {
     const tag = (u.last_name ? `${u.first_name}${u.last_name.slice(0,1)}` : u.first_name)
       .replace(/[^a-zA-Z0-9_\-\.]/g, '').slice(0, 20);
-    if (tag) return tag;
+    if (tag) derived = tag;
   }
-  if (u.email) {
+  if (!derived && u.email) {
     const tag = u.email.split('@')[0].replace(/[^a-zA-Z0-9_\-\.]/g, '').slice(0, 20);
-    if (tag) return tag;
+    if (tag) derived = tag;
   }
-  return 'OPERATIVE';
+  if (!derived) derived = 'OPERATIVE';
+  await pool.query('UPDATE users SET gamertag = $1 WHERE id = $2 AND gamertag IS NULL', [derived, userId]);
+  return derived;
 }
 
 async function upsertLeaderboard({ userId, gamertag, focusScore, rankTier, streak, pomodoros, cardsMastered, blurts }) {
