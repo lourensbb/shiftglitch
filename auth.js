@@ -100,8 +100,9 @@ function setupAuthRoutes(app) {
       const config = await getOidcConfig();
       const host = req.hostname;
       const callbackUrl = `https://${host}/api/callback`;
-      const state = Math.random().toString(36).slice(2);
-      const nonce = Math.random().toString(36).slice(2);
+      const crypto = require('crypto');
+      const state = crypto.randomBytes(16).toString('hex');
+      const nonce = crypto.randomBytes(16).toString('hex');
       req.session.oauthState = state;
       req.session.oauthNonce = nonce;
       req.session.oauthCallback = callbackUrl;
@@ -126,7 +127,7 @@ function setupAuthRoutes(app) {
       req.session.destroy(() => {});
       const logoutUrl = oidc.buildEndSessionUrl(config, {
         client_id: process.env.REPL_ID,
-        post_logout_redirect_uri: `https://${req.hostname}`
+        post_logout_redirect_uri: `https://${req.hostname}/login`
       });
       res.redirect(logoutUrl.href);
     } catch (err) {
