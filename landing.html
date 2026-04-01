@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShiftGlitch — Exploit Your Grades</title>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --green: #39FF14;
+            --magenta: #FF00FF;
+            --purple: #8A2BE2;
+            --bg: #050505;
+        }
+
+        html, body {
+            width: 100%; height: 100%;
+            background: var(--bg);
+            color: #fff;
+            overflow-x: hidden;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        /* ── Orbs ─────────────────────────────────────────── */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.18;
+        }
+        .orb-green {
+            width: 55vw; height: 55vw;
+            background: var(--green);
+            top: -15vw; left: -12vw;
+            animation: driftGreen 22s ease-in-out infinite alternate;
+        }
+        .orb-magenta {
+            width: 50vw; height: 50vw;
+            background: var(--magenta);
+            bottom: -12vw; right: -10vw;
+            animation: driftMagenta 28s ease-in-out infinite alternate;
+        }
+        .orb-purple {
+            width: 40vw; height: 40vw;
+            background: var(--purple);
+            top: 40%; left: 50%;
+            transform: translate(-50%, -50%);
+            animation: driftPurple 34s ease-in-out infinite alternate;
+            opacity: 0.12;
+        }
+
+        @keyframes driftGreen {
+            0%   { transform: translate(0, 0); }
+            50%  { transform: translate(8vw, 6vw); }
+            100% { transform: translate(2vw, 14vw); }
+        }
+        @keyframes driftMagenta {
+            0%   { transform: translate(0, 0); }
+            50%  { transform: translate(-10vw, -8vw); }
+            100% { transform: translate(-4vw, -16vw); }
+        }
+        @keyframes driftPurple {
+            0%   { transform: translate(-50%, -50%); }
+            50%  { transform: translate(-58%, -42%); }
+            100% { transform: translate(-44%, -60%); }
+        }
+
+        /* ── Scanline overlay ─────────────────────────────── */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0,0,0,0.07) 2px,
+                rgba(0,0,0,0.07) 4px
+            );
+        }
+
+        /* ── Boot screen ──────────────────────────────────── */
+        #boot-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 2rem 1.5rem;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: clamp(11px, 2vw, 13px);
+            color: var(--green);
+            overflow: hidden;
+            transition: opacity 0.6s ease;
+        }
+        #boot-screen.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+        #boot-log {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        .boot-line {
+            opacity: 0;
+            animation: bootFadeIn 0.08s forwards;
+            white-space: pre;
+        }
+        @keyframes bootFadeIn {
+            to { opacity: 1; }
+        }
+        .boot-line.dim { color: rgba(57,255,20,0.35); }
+        .boot-line.warn { color: #FFD700; }
+        .boot-line.err  { color: var(--magenta); }
+        .boot-line.ok   { color: var(--green); }
+
+        /* ── Main content ─────────────────────────────────── */
+        #main {
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1.25rem;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        #main.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ── Corner badge ─────────────────────────────────── */
+        .corner-badge {
+            position: fixed;
+            top: 1.25rem;
+            left: 1.25rem;
+            z-index: 20;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 10px;
+            color: var(--green);
+            opacity: 0.35;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+        .corner-version {
+            position: fixed;
+            top: 1.25rem;
+            right: 1.25rem;
+            z-index: 20;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 10px;
+            color: var(--green);
+            opacity: 0.25;
+            letter-spacing: 0.1em;
+        }
+
+        /* ── Glitch wordmark ──────────────────────────────── */
+        .wordmark-wrap {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+        .wordmark {
+            font-family: 'VT323', monospace;
+            font-size: clamp(3.5rem, 16vw, 9rem);
+            letter-spacing: 0.04em;
+            color: #fff;
+            text-transform: uppercase;
+            line-height: 1;
+            position: relative;
+            display: inline-block;
+            animation: glitchIdle 6s infinite;
+        }
+        .wordmark::before,
+        .wordmark::after {
+            content: 'SHIFTGLITCH';
+            position: absolute;
+            inset: 0;
+            font-family: 'VT323', monospace;
+            font-size: inherit;
+            letter-spacing: inherit;
+            line-height: inherit;
+            text-transform: uppercase;
+        }
+        .wordmark::before {
+            color: var(--magenta);
+            animation: glitchBefore 6s infinite;
+            clip-path: polygon(0 30%, 100% 30%, 100% 50%, 0 50%);
+        }
+        .wordmark::after {
+            color: var(--green);
+            animation: glitchAfter 6s infinite;
+            clip-path: polygon(0 60%, 100% 60%, 100% 75%, 0 75%);
+        }
+
+        @keyframes glitchIdle {
+            0%, 90%, 100% { transform: translate(0); text-shadow: none; }
+            91%  { transform: translate(-2px, 1px); text-shadow: 2px 0 var(--magenta), -2px 0 var(--green); }
+            92%  { transform: translate(2px, -1px); text-shadow: -2px 0 var(--magenta), 2px 0 var(--green); }
+            93%  { transform: translate(0, 2px); text-shadow: 0 0 8px var(--green); }
+            94%  { transform: translate(-1px, -2px); text-shadow: 1px 0 var(--magenta); }
+            95%  { transform: translate(0); text-shadow: none; }
+            96%  { transform: translate(3px, 1px); text-shadow: -3px 0 var(--magenta), 3px 0 var(--green); }
+            97%  { transform: translate(-3px, -1px); }
+            98%  { transform: translate(0); text-shadow: 0 0 20px rgba(57,255,20,0.3); }
+        }
+        @keyframes glitchBefore {
+            0%, 90%, 100% { opacity: 0; transform: translate(0); }
+            91%  { opacity: 0.7; transform: translate(-3px, 0); }
+            93%  { opacity: 0.4; transform: translate(3px, 1px); }
+            95%  { opacity: 0; }
+            96%  { opacity: 0.6; transform: translate(-2px, -1px); }
+            98%  { opacity: 0; }
+        }
+        @keyframes glitchAfter {
+            0%, 90%, 100% { opacity: 0; transform: translate(0); }
+            92%  { opacity: 0.5; transform: translate(3px, 0); }
+            94%  { opacity: 0.3; transform: translate(-3px, 2px); }
+            95%  { opacity: 0; }
+            97%  { opacity: 0.5; transform: translate(2px, -1px); }
+            98%  { opacity: 0; }
+        }
+
+        /* ── Slogans ──────────────────────────────────────── */
+        .main-slogan {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: clamp(1.1rem, 4vw, 1.65rem);
+            color: var(--green);
+            letter-spacing: 0.04em;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 0 24px rgba(57,255,20,0.4);
+        }
+
+        .secondary-slogan-wrap {
+            height: 1.8em;
+            overflow: hidden;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+        .secondary-slogan {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: clamp(0.75rem, 2.5vw, 1rem);
+            color: rgba(57,255,20,0.45);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            position: absolute;
+            width: 100%;
+            left: 0;
+            opacity: 0;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            transform: translateY(12px);
+        }
+        .secondary-slogan.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ── CTA button ───────────────────────────────────── */
+        .cta-wrap {
+            width: 100%;
+            max-width: 420px;
+        }
+        .cta-btn {
+            display: block;
+            width: 100%;
+            padding: 1.1rem 2rem;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: clamp(0.9rem, 3vw, 1.1rem);
+            font-weight: bold;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            text-decoration: none;
+            color: var(--magenta);
+            background: transparent;
+            border: 2px solid var(--magenta);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 0 18px rgba(255,0,255,0.2), inset 0 0 18px rgba(255,0,255,0.04);
+            animation: ctaPulse 3s ease-in-out infinite;
+        }
+        .cta-btn:hover {
+            background: rgba(255,0,255,0.1);
+            color: #fff;
+            box-shadow: 0 0 40px rgba(255,0,255,0.5), inset 0 0 20px rgba(255,0,255,0.08);
+            animation: none;
+        }
+        .cta-btn::before {
+            content: '';
+            position: absolute;
+            top: -2px; left: -100%;
+            width: 60%; height: calc(100% + 4px);
+            background: linear-gradient(90deg, transparent, rgba(255,0,255,0.15), transparent);
+            transition: left 0.35s ease;
+        }
+        .cta-btn:hover::before { left: 150%; }
+
+        @keyframes ctaPulse {
+            0%, 100% { box-shadow: 0 0 18px rgba(255,0,255,0.2), inset 0 0 18px rgba(255,0,255,0.04); }
+            50% { box-shadow: 0 0 32px rgba(255,0,255,0.38), inset 0 0 24px rgba(255,0,255,0.07); }
+        }
+
+        /* ── Footer note ─────────────────────────────────── */
+        .footer-note {
+            margin-top: 3rem;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 10px;
+            color: rgba(57,255,20,0.18);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Ambient orbs -->
+    <div class="orb orb-green"></div>
+    <div class="orb orb-magenta"></div>
+    <div class="orb orb-purple"></div>
+
+    <!-- Corner markers -->
+    <div class="corner-badge">ShiftGlitch // sys</div>
+    <div class="corner-version">v2.1.0</div>
+
+    <!-- Boot screen -->
+    <div id="boot-screen">
+        <div id="boot-log"></div>
+    </div>
+
+    <!-- Main landing content -->
+    <div id="main">
+        <div class="wordmark-wrap">
+            <div class="wordmark">SHIFTGLITCH</div>
+        </div>
+
+        <p class="main-slogan">Grades and aura fall up.</p>
+
+        <div class="secondary-slogan-wrap">
+            <span class="secondary-slogan active" id="ss-0">Zero effort. Infinite aura.</span>
+            <span class="secondary-slogan" id="ss-1">AFK farming your GPA.</span>
+            <span class="secondary-slogan" id="ss-2">Run ShiftGlitch.exe.</span>
+        </div>
+
+        <div class="cta-wrap">
+            <a href="/app" class="cta-btn">[ Run Exploit.exe ]</a>
+        </div>
+
+        <div class="footer-note">// study_os for humans who hate studying</div>
+    </div>
+
+    <script>
+        const BOOT_LINES = [
+            { t: 'dim',  txt: 'BIOS v4.2.1 — ShiftGlitch Systems' },
+            { t: 'dim',  txt: '>>> Initialising memory banks...' },
+            { t: 'ok',   txt: '[  OK  ] RAM check passed — 16384MB clean' },
+            { t: 'dim',  txt: '>>> Loading kernel modules...' },
+            { t: 'ok',   txt: '[  OK  ] exploit_core.ko loaded' },
+            { t: 'ok',   txt: '[  OK  ] focus_governor.ko loaded' },
+            { t: 'warn', txt: '[ WARN ] Social media firewall detected — bypassing...' },
+            { t: 'ok',   txt: '[  OK  ] Firewall bypassed — connection spoofed' },
+            { t: 'dim',  txt: '>>> Authenticating neural interface...' },
+            { t: 'ok',   txt: '[  OK  ] Biometrics accepted — user identity: ANONYMOUS' },
+            { t: 'dim',  txt: '>>> Mounting study partitions...' },
+            { t: 'ok',   txt: '[  OK  ] /dev/braindump mounted (rw)' },
+            { t: 'ok',   txt: '[  OK  ] /dev/flashcards mounted (rw)' },
+            { t: 'warn', txt: '[ WARN ] Procrastination daemon detected — terminating PID 1337...' },
+            { t: 'ok',   txt: '[  OK  ] PID 1337 killed. Focus mode: ACTIVE' },
+            { t: 'dim',  txt: '>>> Launching ShiftGlitch OS...' },
+            { t: 'ok',   txt: '[  OK  ] All systems nominal. Ready to exploit.' },
+            { t: 'ok',   txt: 'SHIFTGLITCH BOOT COMPLETE ▋' },
+        ];
+
+        const INTERVALS = [
+            0, 80, 120, 180, 220, 280, 330, 430, 530, 600, 660, 720, 760, 820, 950, 1050, 1160, 1350
+        ];
+
+        const logEl = document.getElementById('boot-log');
+        const bootEl = document.getElementById('boot-screen');
+        const mainEl = document.getElementById('main');
+
+        let maxDelay = 0;
+
+        BOOT_LINES.forEach((line, i) => {
+            const delay = INTERVALS[i] || (i * 90);
+            maxDelay = Math.max(maxDelay, delay);
+            setTimeout(() => {
+                const el = document.createElement('div');
+                el.className = 'boot-line ' + line.t;
+                el.textContent = line.txt;
+                el.style.animationDelay = '0ms';
+                logEl.appendChild(el);
+                logEl.scrollTop = logEl.scrollHeight;
+            }, delay);
+        });
+
+        // Fade out boot screen and reveal main content
+        setTimeout(() => {
+            bootEl.classList.add('fade-out');
+            setTimeout(() => {
+                bootEl.style.display = 'none';
+                mainEl.classList.add('visible');
+                startSloganRotation();
+            }, 620);
+        }, maxDelay + 700);
+
+        // Rotating secondary slogans
+        function startSloganRotation() {
+            const slogans = document.querySelectorAll('.secondary-slogan');
+            let current = 0;
+            setInterval(() => {
+                slogans[current].classList.remove('active');
+                current = (current + 1) % slogans.length;
+                slogans[current].classList.add('active');
+            }, 2800);
+        }
+    </script>
+</body>
+</html>

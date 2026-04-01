@@ -154,14 +154,25 @@ New handler functions added in March 2025 build:
 - **Open Trivia Database:** For the Quiz Arena.
 - **Google Fonts:** Inter and Lora typefaces.
 
+## URL Routing
+
+| Route | File Served | Notes |
+|-------|-------------|-------|
+| `/` | `landing.html` | Marketing landing page with boot sequence animation |
+| `/app` | `index.html` | Full ShiftGlitch study app (SPA) |
+| `/demo` | `demo.html` | Limited demo version |
+| `/teacher` | `teacher.html` | Teacher Dashboard |
+| `/api/gemini` | — | Gemini API proxy (POST) |
+
 ## Files Reference
 
 | File | Description |
 |------|-------------|
-| `index.html` | Full SPA — all student-facing features (~2842 lines) |
+| `landing.html` | Marketing landing page — boot animation, glitch wordmark, CTA to `/app` |
+| `index.html` | Full SPA — all student-facing features (~3500 lines) |
 | `demo.html` | Limited demo version (~2000 lines) |
 | `teacher.html` | Teacher Dashboard for classroom use |
-| `server.js` | Express v5 server: static files + Gemini API proxy |
+| `server.js` | Express v5 server: routes landing/app/demo/teacher + Gemini API proxy |
 | `config.js` | Firebase config (var SYNAPSE_FIREBASE_CONFIG) |
 | `config.example.js` | Blank template for Firebase config |
 | `README.md` | Setup and deployment guide |

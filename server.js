@@ -36,7 +36,13 @@ app.post('/api/gemini', async (req, res) => {
   }
 });
 
-app.use(express.static(path.join(__dirname)));
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'landing.html'));
+});
+
+app.get('/app', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
 
 app.get('/demo', (req, res) => {
   res.sendFile(path.join(__dirname, 'demo.html'));
@@ -45,6 +51,8 @@ app.get('/demo', (req, res) => {
 app.get('/teacher', (req, res) => {
   res.sendFile(path.join(__dirname, 'teacher.html'));
 });
+
+app.use(express.static(path.join(__dirname)));
 
 app.get('/{*splat}', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
