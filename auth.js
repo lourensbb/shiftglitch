@@ -77,12 +77,13 @@ async function ensureSchema() {
       );
       CREATE TABLE IF NOT EXISTS squad_members (
         squad_id VARCHAR(8) NOT NULL REFERENCES squads(id) ON DELETE CASCADE,
-        user_id VARCHAR NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        user_id VARCHAR NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
         joined_at TIMESTAMP DEFAULT NOW(),
         last_active TIMESTAMP DEFAULT NOW(),
         PRIMARY KEY (squad_id, user_id)
       );
       ALTER TABLE squad_members ADD COLUMN IF NOT EXISTS last_active TIMESTAMP DEFAULT NOW();
+      CREATE UNIQUE INDEX IF NOT EXISTS squad_members_user_unique ON squad_members(user_id);
     `);
     console.log('[auth] DB schema ready');
   } catch (err) {
@@ -328,16 +329,23 @@ function generateCode(len) {
 async function createSquad(userId, name) {
   const squadId = generateCode(8);
   const inviteCode = generateCode(6);
-  const existing = await getUserSquad(userId);
-  if (existing) throw new Error('ALREADY_IN_SQUAD');
-  await pool.query(
-    'INSERT INTO squads (id, name, invite_code) VALUES ($1, $2, $3)',
-    [squadId, name.trim().slice(0, 40), inviteCode]
-  );
-  await pool.query(
-    'INSERT INTO squad_members (squad_id, user_id, last_active) VALUES ($1, $2, NOW())',
-    [squadId, userId]
-  );
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const existingCheck = await client.query(
+      'SELECT 1 FROM squad_members WHERE user_id = $1 FOR UPDATE', [userId]
+    );
+    if (existingCheck.rows.length) { await client.query('ROLLBACK'); throw new Error('ALREADY_IN_SQUAD'); }
+    await client.query('INSERT INTO squads (id, name, invite_code) VALUES ($1, $2, $3)', [squadId, name.trim().slice(0, 40), inviteCode]);
+    await client.query('INSERT INTO squad_members (squad_id, user_id, last_active) VALUES ($1, $2, NOW())', [squadId, userId]);
+    await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    if (err.code === '23505') throw new Error('ALREADY_IN_SQUAD');
+    throw err;
+  } finally {
+    client.release();
+  }
   return { squadId, inviteCode };
 }
 
@@ -345,16 +353,24 @@ async function joinSquad(userId, inviteCode) {
   const { rows } = await pool.query('SELECT id, name FROM squads WHERE invite_code = $1', [inviteCode.toUpperCase()]);
   if (!rows.length) throw new Error('INVALID_CODE');
   const squad = rows[0];
-  const memberCount = await pool.query('SELECT COUNT(*) FROM squad_members WHERE squad_id = $1', [squad.id]);
-  if (parseInt(memberCount.rows[0].count, 10) >= 4) throw new Error('SQUAD_FULL');
-  const existing = await getUserSquad(userId);
-  if (existing) throw new Error('ALREADY_IN_SQUAD');
-  const alreadyMember = await pool.query('SELECT 1 FROM squad_members WHERE squad_id = $1 AND user_id = $2', [squad.id, userId]);
-  if (alreadyMember.rows.length) throw new Error('ALREADY_MEMBER');
-  await pool.query(
-    'INSERT INTO squad_members (squad_id, user_id, last_active) VALUES ($1, $2, NOW())',
-    [squad.id, userId]
-  );
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const memberCount = await client.query(
+      'SELECT COUNT(*) FROM squad_members WHERE squad_id = $1 FOR UPDATE', [squad.id]
+    );
+    if (parseInt(memberCount.rows[0].count, 10) >= 4) { await client.query('ROLLBACK'); throw new Error('SQUAD_FULL'); }
+    const existingCheck = await client.query('SELECT 1 FROM squad_members WHERE user_id = $1', [userId]);
+    if (existingCheck.rows.length) { await client.query('ROLLBACK'); throw new Error('ALREADY_IN_SQUAD'); }
+    await client.query('INSERT INTO squad_members (squad_id, user_id, last_active) VALUES ($1, $2, NOW())', [squad.id, userId]);
+    await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    if (err.code === '23505') throw new Error('ALREADY_IN_SQUAD');
+    throw err;
+  } finally {
+    client.release();
+  }
   return squad;
 }
 

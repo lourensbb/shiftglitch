@@ -2041,11 +2041,17 @@
                             const nameColor = m.isMe ? 'text-[#8A2BE2]' : m.isAfk ? 'text-[#FF00FF]/70' : 'text-[#39FF14]';
                             const afkBadge = m.isAfk ? \` <span class="text-[10px] text-[#FF00FF]/60 font-mono">[AFK \${m.hoursInactive}h]</span>\` : '';
                             const meBadge = m.isMe ? \` <span class="text-[10px] text-[#8A2BE2]/60 font-mono">[you]</span>\` : '';
+                            const lastActiveStr = m.lastActive
+                                ? new Date(m.lastActive).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+                                : 'never';
                             return \`<div class="flex items-center gap-3 border \${border} rounded-xl px-4 py-3 font-mono">
                                 <span class="text-lg">\${rankIcons[m.rankTier] || '👾'}</span>
-                                <span class="flex-1 text-sm font-bold \${nameColor} uppercase tracking-wide truncate">\${esc(m.gamertag)}\${meBadge}\${afkBadge}</span>
-                                <span class="text-xs text-[#39FF14]/50 hidden sm:block">\${m.rankTier}</span>
-                                <span class="text-sm font-bold text-[#39FF14]/70 tabular-nums">🔥 \${m.streak}</span>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-sm font-bold \${nameColor} uppercase tracking-wide truncate">\${esc(m.gamertag)}\${meBadge}\${afkBadge}</div>
+                                    <div class="text-[10px] text-[#39FF14]/30 truncate">last active: \${lastActiveStr}</div>
+                                </div>
+                                <span class="text-xs text-[#39FF14]/50 hidden sm:block flex-shrink-0">\${m.rankTier}</span>
+                                <span class="text-sm font-bold text-[#39FF14]/70 tabular-nums flex-shrink-0">🔥 \${m.streak}</span>
                             </div>\`;
                         }).join('');
                         content.innerHTML = \`
