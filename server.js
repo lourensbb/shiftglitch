@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-const { getSessionMiddleware, setupAuthRoutes, requireAuth, getUserGamertag, updateGamertag, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive } = require('./auth');
+const { getSessionMiddleware, setupAuthRoutes, requireAuth, getUserGamertag, updateGamertag, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead } = require('./auth');
 
 const app = express();
 
@@ -44,6 +44,30 @@ app.post('/api/gemini', async (req, res) => {
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'landing.html'));
+});
+
+app.get('/waitlist', (req, res) => {
+  res.sendFile(path.join(__dirname, 'waitlist.html'));
+});
+
+app.post('/api/waitlist', async (req, res) => {
+  try {
+    const { gamertag, email } = req.body;
+    if (!gamertag || typeof gamertag !== 'string' || !gamertag.trim()) {
+      return res.status(400).json({ error: 'Gamertag required' });
+    }
+    if (!email || typeof email !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      return res.status(400).json({ error: 'Valid email required' });
+    }
+    const cleanTag = gamertag.trim().slice(0, 30);
+    const cleanEmail = email.trim().toLowerCase().slice(0, 254);
+    await saveWaitlistLead(cleanTag, cleanEmail);
+    res.json({ ok: true });
+  } catch (err) {
+    if (err.code === 'DUPLICATE') return res.status(409).json({ error: 'DUPLICATE' });
+    console.error('/api/waitlist error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
 });
 
 app.get('/login', (req, res) => {

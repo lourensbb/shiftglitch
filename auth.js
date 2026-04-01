@@ -86,6 +86,12 @@ async function ensureSchema() {
       );
       ALTER TABLE squad_members ADD COLUMN IF NOT EXISTS last_active TIMESTAMP DEFAULT NOW();
       CREATE UNIQUE INDEX IF NOT EXISTS squad_members_user_unique ON squad_members(user_id);
+      CREATE TABLE IF NOT EXISTS waitlist_leads (
+        id SERIAL PRIMARY KEY,
+        gamertag VARCHAR(30) NOT NULL,
+        email VARCHAR(254) UNIQUE NOT NULL,
+        created_at TIMESTAMP DEFAULT NOW()
+      );
     `);
     console.log('[auth] DB schema ready');
   } catch (err) {
@@ -453,4 +459,14 @@ async function updateSquadLastActive(userId) {
   }
 }
 
-module.exports = { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, updateGamertag, getUserGamertag, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive };
+async function saveWaitlistLead(gamertag, email) {
+  const res = await pool.query(
+    `INSERT INTO waitlist_leads (gamertag, email) VALUES ($1, $2)
+     ON CONFLICT (email) DO NOTHING RETURNING id`,
+    [gamertag, email]
+  );
+  if (res.rows.length === 0) throw Object.assign(new Error('DUPLICATE'), { code: 'DUPLICATE' });
+  return res.rows[0];
+}
+
+module.exports = { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, updateGamertag, getUserGamertag, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead };

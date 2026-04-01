@@ -1,0 +1,48 @@
+REPLIT DIRECTIVE: THE RESTRICTED ACCESS SQUEEZE PAGE (COPY BELOW)
+SYSTEM DIRECTIVE: INITIALIZE SECURE FORM ENTRY
+Role: Senior Front-End Glitch-Core Engineer.
+Context: The user has just clicked "Run Exploit.exe" on the landing page. They must now hit a "Restricted Access" wall. This is a lead-generation waitlist form, but it must be disguised as a hacker's clearance request.
+
+1. GLOBAL AESTHETIC CONT'D
+
+Maintain the true #000000 AMOLED Black background.
+
+Keep the toxic neon green (#39FF14) and corrupted magenta/purple accents.
+
+Typography remains monospaced (terminal font) for headers, and a sharp sans-serif for body text.
+
+2. THE UI LAYOUT & COPY (EXACT TEXT REPLACEMENT)
+
+Top Header (Blinking Red or Toxic Green Terminal Text):
+> WARNING: UNREGISTERED USER DETECTED.
+> FIREWALL STATUS: ACTIVE.
+
+Main H1 Headline:
+SYSTEM LOCKED.
+
+Subtext / The Pitch (Use a muted, ash-gray text):
+"You just stumbled onto the most cracked study exploit on the grid. To keep the admins from patching this out, server access is currently restricted. We are only letting in a few new Netrunners at a time.
+
+Want to AFK farm your GPA? Drop your comm-link below. We’ll ping you when a slot opens in the mainframe."
+
+3. THE FORM FIELDS (GLITCH-CORE STYLING)
+
+Do not use standard white input boxes. Use transparent boxes with a 1px solid toxic green border. The text typed inside should be terminal green.
+
+Input 1 Placeholder Text: [ENTER ALIAS / GAMERTAG]
+
+Input 2 Placeholder Text: [ENTER COMM-LINK (EMAIL)]
+
+4. THE CALL TO ACTION BUTTON
+
+Button Text: [REQUEST SYSTEM OVERRIDE]
+
+Button Styling: Full width, glowing magenta or green border. On hover, it should have a slight CSS jitter or glitch animation.
+
+5. THE FOOTER (MICRO-COPY)
+
+Centered at the very bottom in tiny, dark gray font:
+End-to-end encrypted. We don't leak your data to the feds (or your teachers).
+
+EXECUTION COMMAND:
+Build this secure form layout. Acknowledge the copy and the brutalist form styling. Do not make it look like a corporate newsletter signup. Output the code.
