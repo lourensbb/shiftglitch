@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Synapse Demo</title>
+    <title>ShiftGlitch Demo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
@@ -55,7 +55,7 @@
                 <div class="flex items-center gap-4">
                     <div class="flex items-center gap-3 cursor-pointer" onclick="app.navTo('dashboard')">
                         <div class="w-8 h-8 bg-stone-800 dark:bg-orange-600 rounded-full flex items-center justify-center text-[#FDFCF8] font-serif font-bold text-lg">S</div>
-                        <span class="font-serif text-xl font-bold tracking-tight text-stone-900 dark:text-stone-50">Synapse</span>
+                        <span class="font-serif text-xl font-bold tracking-tight text-stone-900 dark:text-stone-50">ShiftGlitch</span>
                         <span class="text-[9px] font-bold uppercase tracking-widest bg-orange-100 dark:bg-orange-900/30 text-orange-600 px-2 py-0.5 rounded-lg">Demo</span>
                     </div>
                     <button id="theme-toggle" class="text-2xl hover:scale-110 transition-transform focus:outline-none">&#x1F319;</button>
@@ -711,8 +711,8 @@
                     '</div>' +
                     '<div class="bg-gradient-to-br from-orange-600 to-orange-700 rounded-[2rem] p-8 text-center text-white shadow-xl">' +
                         '<p class="text-lg font-serif font-bold mb-2">Want this in your study toolkit?</p>' +
-                        '<p class="text-sm text-orange-100 mb-5 max-w-md mx-auto">The full version of Synapse includes ' + esc(t.title) + ' and all other study tools \u2014 ready to use for any subject, any time.</p>' +
-                        '<a href="' + GUMROAD_URL + '" target="_blank" rel="noopener noreferrer" class="inline-block bg-white text-orange-600 px-8 py-3 rounded-2xl font-bold uppercase tracking-widest text-sm hover:bg-orange-50 transition-colors">Get Synapse \u2192</a>' +
+                        '<p class="text-sm text-orange-100 mb-5 max-w-md mx-auto">The full version of ShiftGlitch includes ' + esc(t.title) + ' and all other study tools \u2014 ready to use for any subject, any time.</p>' +
+                        '<a href="' + GUMROAD_URL + '" target="_blank" rel="noopener noreferrer" class="inline-block bg-white text-orange-600 px-8 py-3 rounded-2xl font-bold uppercase tracking-widest text-sm hover:bg-orange-50 transition-colors">Get ShiftGlitch \u2192</a>' +
                     '</div>' +
                 '</div>';
             },
@@ -954,7 +954,7 @@
                         '<blockquote class="max-w-2xl mx-auto px-6"><p class="text-base md:text-lg font-serif italic text-stone-600 dark:text-stone-300 leading-relaxed">"' + esc(q.text) + '"</p><footer class="mt-2 text-xs font-bold uppercase tracking-widest text-orange-600">\u2014 ' + esc(q.author) + '</footer></blockquote>' +
                     '</section>' +
                     '<section class="bg-orange-50 dark:bg-orange-900/20 rounded-[2rem] p-8 border border-orange-200 dark:border-orange-800">' +
-                        '<h3 class="text-lg font-serif font-bold text-orange-700 dark:text-orange-400 mb-4">\uD83D\uDCCB How to Use Synapse</h3>' +
+                        '<h3 class="text-lg font-serif font-bold text-orange-700 dark:text-orange-400 mb-4">\uD83D\uDCCB How to Use ShiftGlitch</h3>' +
                         '<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">' +
                             '<div class="bg-white dark:bg-stone-800 rounded-2xl p-5 border border-orange-100 dark:border-stone-700 text-center"><div class="text-3xl mb-2">1\uFE0F\u20E3</div><p class="text-sm font-semibold text-stone-700 dark:text-stone-200 mb-1">Pick a topic</p><p class="text-xs text-stone-500 dark:text-stone-400">Use the tools in the menu to study any subject.</p></div>' +
                             '<div class="bg-white dark:bg-stone-800 rounded-2xl p-5 border border-orange-100 dark:border-stone-700 text-center"><div class="text-3xl mb-2">2\uFE0F\u20E3</div><p class="text-sm font-semibold text-stone-700 dark:text-stone-200 mb-1">Use the tools</p><p class="text-xs text-stone-500 dark:text-stone-400">Start a focus timer, make flashcards, or sort your tasks.</p></div>' +
@@ -979,7 +979,7 @@
                             '<div class="bg-white dark:bg-[#292524] rounded-2xl p-6 md:p-8 text-stone-800 dark:text-stone-200 shadow-inner">' +
                                 '<div class="flex items-center gap-2 mb-4 text-xs font-bold uppercase tracking-widest text-orange-600"><span class="inline-block w-2 h-2 bg-orange-500 rounded-full animate-pulse"></span> AI-Generated Study Plan</div>' +
                                 '<div id="study-plan-output" class="prose-sm leading-relaxed">' + demoMd(studyPlanDemo.displayedText) + (studyPlanDemo.typing ? '<span class="inline-block w-2 h-5 bg-orange-500 animate-pulse ml-1"></span>' : '') + '</div>' +
-                                (!studyPlanDemo.typing ? '<div class="mt-6 pt-4 border-t border-stone-200 dark:border-stone-700 text-center"><p class="text-xs text-stone-500 dark:text-stone-400 mb-3">In the full version, this works for <strong>any topic you type</strong> \u2014 powered by Google Gemini AI.</p><a href="' + GUMROAD_URL + '" target="_blank" rel="noopener noreferrer" class="inline-block bg-orange-600 hover:bg-orange-500 text-white px-6 py-2.5 rounded-xl font-bold text-xs uppercase tracking-widest transition-colors">Get Synapse \u2192</a></div>' : '') +
+                                (!studyPlanDemo.typing ? '<div class="mt-6 pt-4 border-t border-stone-200 dark:border-stone-700 text-center"><p class="text-xs text-stone-500 dark:text-stone-400 mb-3">In the full version, this works for <strong>any topic you type</strong> \u2014 powered by Google Gemini AI.</p><a href="' + GUMROAD_URL + '" target="_blank" rel="noopener noreferrer" class="inline-block bg-orange-600 hover:bg-orange-500 text-white px-6 py-2.5 rounded-xl font-bold text-xs uppercase tracking-widest transition-colors">Get ShiftGlitch \u2192</a></div>' : '') +
                             '</div>'
                         :
                             '<div class="text-center py-6 bg-white/5 rounded-2xl border border-dashed border-white/20">' +
@@ -1021,7 +1021,7 @@
                     '<section class="bg-gradient-to-br from-orange-600 to-orange-700 rounded-[2.5rem] p-8 md:p-10 text-white shadow-2xl relative overflow-hidden">' +
                         '<div class="relative z-10 flex flex-col gap-5 text-center">' +
                             '<div class="text-4xl">\uD83D\uDE80</div>' +
-                            '<h2 class="text-2xl font-serif font-bold text-white">Unlock the Full Synapse Experience</h2>' +
+                            '<h2 class="text-2xl font-serif font-bold text-white">Unlock the Full ShiftGlitch Experience</h2>' +
                             '<p class="text-sm text-orange-100 max-w-lg mx-auto">This demo includes the core study tools. The full version gives you everything you need to master any subject.</p>' +
                             '<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-xl mx-auto text-left">' +
                                 '<div class="flex items-start gap-2"><span class="text-orange-200">\u2713</span><span class="text-sm text-orange-50">AI Study Plan Generator</span></div>' +
