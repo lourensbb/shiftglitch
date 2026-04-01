@@ -68,7 +68,6 @@ async function ensureSchema() {
       console.log('[auth] Migrated leaderboard data into users table');
       await client.query(`DROP TABLE IF EXISTS leaderboard CASCADE;`);
     }
-    await client.query(`DROP TABLE IF EXISTS sessions CASCADE;`);
     await client.query(`
       CREATE TABLE IF NOT EXISTS squads (
         id VARCHAR(8) PRIMARY KEY,
@@ -222,6 +221,7 @@ function setupAuthRoutes(app) {
       delete req.session.oauthState;
       delete req.session.oauthNonce;
       delete req.session.oauthCallback;
+      delete req.session.oauthCodeVerifier;
       await new Promise((resolve, reject) => req.session.save(e => e ? reject(e) : resolve()));
       res.redirect('/app');
     } catch (err) {
