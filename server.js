@@ -77,10 +77,6 @@ app.post('/api/leaderboard/sync', requireAuth, async (req, res) => {
     const str = Math.max(0, parseInt(streak, 10) || 0);
     const tier = ALLOWED_RANK_TIERS.has(rankTier) ? rankTier : 'NPC';
     const focusScore = (pom * 10) + (str * 25) + (cards * 2) + (bl * 15);
-    const existing = await getMyLeaderboardEntry(userId);
-    if (existing && focusScore < existing.focus_score) {
-      return res.json({ ok: true, focusScore: existing.focus_score, skipped: true });
-    }
     const gamertag = await getUserGamertag(userId);
     await upsertLeaderboard({ userId, gamertag, focusScore, rankTier: tier, streak: str, pomodoros: pom, cardsMastered: cards, blurts: bl });
     res.json({ ok: true, focusScore });
