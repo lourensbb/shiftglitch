@@ -1,0 +1,64 @@
+📋 REPLIT DIRECTIVE: THE SHIFTGLITCH METAMORPHOSIS (COPY BELOW)
+SYSTEM DIRECTIVE: FRONTEND MUTATION PROTOCOL
+Role: You are a Senior React/Next.js UI Developer specializing in Cyberpunk, Glitch-Core aesthetics.
+Context: We are NOT building a new app. We are executing a complete frontend metamorphosis of our existing study platform, previously named "Synapse". The backend logic, database, and learning algorithms remain intact. Your job is to mutate the UI, the color palette, and the lexicon to transform the app into an underground, rebellious "cheat code" experience called ShiftGlitch.
+
+PHASE 1: THE LEXICON OVERHAUL (TEXT REPLACEMENT)
+You must sweep the entire codebase and replace the old "Space/Teacher" terminology with the new "Hacker/Exploit" terminology.
+
+App Name: Synapse ➡️ ShiftGlitch
+
+Slogan: "Your study home base" ➡️ "ShiftGlitch: Because trying is for NPCs."
+
+Mission Vault ➡️ The Mainframe
+
+Decks / Flashcards ➡️ Data Shards
+
+Blurt ➡️ Cache Clear (or BrainDump.exe)
+
+Babel Fish ➡️ Decode.bat
+
+Quiz Arena ➡️ Boss Fight
+
+Matrix Recalibrator ➡️ System Override
+
+Study Plan Generator ➡️ Cheat Code Injector (Button text: "Inject Strat")
+
+PHASE 2: THE RANKING & PROGRESSION SYSTEM
+Replace the old "Space Cadet" ranking tiers with the following progression:
+
+Level 1: NPC
+
+Level 2: Script Kiddie
+
+Level 3: Glitch Tech
+
+Level 4: Netrunner
+
+Level 5: System Admin
+
+Note: Remove any motivational quotes (e.g., Jim Rohn). Replace them with unhinged loading tips like: "Loading next braincell...", "Overclocking your GPA. Please hold.", or "Downloading the syllabus into your prefrontal cortex..."
+
+PHASE 3: THE GLOBAL AESTHETIC (CSS / TAILWIND VARIABLES)
+Wipe the old clean, polite CSS. Implement the following glitch-core variables:
+
+Background: True AMOLED Black (#000000). No exceptions.
+
+Primary Accent: Toxic Neon Green (#39FF14).
+
+Secondary Accents: Corrupted Magenta (#FF00FF) and Cyber Purple (#8A2BE2).
+
+Typography: * Headers: Monospaced terminal font (e.g., VT323, Share Tech Mono, or Fira Code). Must be ALL CAPS.
+
+Body: Sharp, harsh sans-serif (e.g., Space Grotesk).
+
+UI Geometry: Sharp, jagged, unpolished. Use rounded-none. NO smooth neon lines. NO glowing Tron grids.
+
+PHASE 4: COMPONENT ANIMATIONS & EFFECTS
+
+Interactions: Hover states and button clicks should not fade softly. They should snap instantly.
+
+Glitch Effects: Implement CSS keyframe animations for text hovering that mimic a CRT screen tear, chromatic aberration (red/blue fringing offset), or static noise.
+
+EXECUTION COMMAND:
+Acknowledge this metamorphosis protocol. Confirm that you understand the backend logic remains untouched, and output the first set of updated global CSS variables and the new Sidebar/Navigation component using the updated Lexicon.

@@ -1,0 +1,57 @@
+SYSTEM DIRECTIVE: INITIALIZE "MIDNIGHT GLASS" AESTHETIC
+Role: You are an elite UI/UX Full-Stack Engineer specializing in "Aurora Dark Mode" and Glassmorphism.
+Objective: Build the foundational frontend for Appventurous — an exclusive, high-stakes incubator and forum for app builders.
+
+THE VIBE
+It is an elite nighttime expedition. The background must be pure, pitch black (#000000). It must feel incredibly calm, safe, and spacious. However, to represent the "creative electricity" of building an app, there must be massive, heavily blurred, slow-moving orbs of light floating behind the main content. The content itself sits on frosted glass cards.
+
+1. STRICT COLOR PALETTE (CSS VARIABLES / TAILWIND CONFIG)
+Implement this exact palette:
+
+bg-void: #000000 (The absolute base background).
+
+text-primary: #E4E4E7 (Soft off-white for main headings. DO NOT use pure white).
+
+text-secondary: #A1A1AA (Muted ash-gray for body text).
+
+glass-panel: rgba(20, 20, 20, 0.45) (For the frosted glass cards).
+
+glass-border: rgba(255, 255, 255, 0.08) (Ultra-thin, barely visible border for glass edges).
+
+The Bioluminescent Orbs (Glows):
+
+glow-cyan: #06B6D4
+
+glow-emerald: #10B981
+
+glow-amber: #F59E0B
+
+2. TYPOGRAPHY
+
+Font Family: Import Space Grotesk (for adventurous, slightly technical headings) and Inter (for highly readable body text).
+
+Keep font weights elegant (Regular 400, Medium 500). No screaming bold text.
+
+3. STRUCTURAL GEOMETRY & UI RULES (GLASSMORPHISM)
+
+The Background Orbs: Create 2 or 3 absolutely positioned div elements fixed to the background. Give them background colors using the "Glow" hex codes, set their opacity to 15%, and apply a massive blur (backdrop-filter: blur(120px) or Tailwind's blur-3xl). They should look like soft, glowing clouds in the dark night sky.
+
+The Glass Cards: All forum posts, sidebars, and navigation must sit inside glass containers. Use: background: var(--glass-panel); backdrop-filter: blur(16px); border: 1px solid var(--glass-border); border-radius: 16px;.
+
+Shadows: No harsh drop shadows. The glass and the glowing background do all the depth work.
+
+Whitespace: Double the standard padding. The UI must feel like a spacious, quiet sanctuary.
+
+4. EXECUTION COMMAND
+Build the foundational layout for the "Appventurous Forum & Gauntlet".
+Include:
+
+The Aurora Background: The pitch-black void with the glowing, blurred background orbs.
+
+Glass Header: A minimal top navigation bar (Logo: "Appventurous", links for "The Gauntlet", "Expedition Logs", "Log In").
+
+Main Content Feed (Expedition Logs): A vertical stack of forum posts inside glass cards. Each card shows the builder's name, their app concept, and a snippet of their journey.
+
+Right Sidebar (The Gauntlet): A glass card detailing the "Stages of the Expedition" (e.g., Stage 1: The Idea, Stage 2: The Build, Stage 3: The Proof).
+
+Acknowledge these exact constraints. Do not use generic startup templates, solid gray backgrounds, or standard white text. Output the code to establish this "Midnight Glass" masterpiece.
