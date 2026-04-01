@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-const { getSessionMiddleware, setupAuthRoutes, requireAuth } = require('./auth');
+const { getSessionMiddleware, setupAuthRoutes, requireAuth, getUserGamertag, updateGamertag, upsertLeaderboard, getLeaderboard } = require('./auth');
 
 const app = express();
 
@@ -63,6 +63,72 @@ app.get('/demo', (req, res) => {
 
 app.get('/teacher', (req, res) => {
   res.sendFile(path.join(__dirname, 'teacher.html'));
+});
+
+app.post('/api/leaderboard/sync', requireAuth, async (req, res) => {
+  try {
+    const userId = req.session.userId;
+    const { pomodoros, blurts, cardsMastered, streak, rankTier } = req.body;
+    const pom = parseInt(pomodoros, 10) || 0;
+    const bl = parseInt(blurts, 10) || 0;
+    const cards = parseInt(cardsMastered, 10) || 0;
+    const str = parseInt(streak, 10) || 0;
+    const focusScore = (pom * 10) + (str * 25) + (cards * 2) + (bl * 15);
+    const gamertag = await getUserGamertag(userId);
+    await upsertLeaderboard({ userId, gamertag, focusScore, rankTier: rankTier || 'NPC', streak: str, pomodoros: pom, cardsMastered: cards, blurts: bl });
+    res.json({ ok: true, focusScore });
+  } catch (err) {
+    console.error('/api/leaderboard/sync error:', err);
+    res.status(500).json({ error: 'Sync failed' });
+  }
+});
+
+app.get('/api/leaderboard', requireAuth, async (req, res) => {
+  try {
+    const rows = await getLeaderboard(50);
+    const userId = req.session.userId;
+    const ranked = rows.map((r, i) => ({
+      rank: i + 1,
+      userId: r.user_id,
+      gamertag: r.gamertag,
+      focusScore: r.focus_score,
+      rankTier: r.rank_tier,
+      streak: r.streak,
+      pomodoros: r.pomodoros,
+      cardsMastered: r.cards_mastered,
+      blurts: r.blurts,
+      isMe: r.user_id === userId
+    }));
+    const myEntry = ranked.find(r => r.isMe);
+    res.json({ leaderboard: ranked, myEntry: myEntry || null });
+  } catch (err) {
+    console.error('/api/leaderboard error:', err);
+    res.status(500).json({ error: 'Failed to load leaderboard' });
+  }
+});
+
+app.post('/api/settings/gamertag', requireAuth, async (req, res) => {
+  try {
+    const { gamertag } = req.body;
+    if (!gamertag || typeof gamertag !== 'string') return res.status(400).json({ error: 'Invalid gamertag' });
+    const clean = gamertag.trim().slice(0, 20).replace(/[^a-zA-Z0-9_\-\.]/g, '');
+    if (!clean) return res.status(400).json({ error: 'Gamertag must contain letters or numbers' });
+    await updateGamertag(req.session.userId, clean);
+    if (req.session.userProfile) req.session.userProfile.gamertag = clean;
+    res.json({ ok: true, gamertag: clean });
+  } catch (err) {
+    console.error('/api/settings/gamertag error:', err);
+    res.status(500).json({ error: 'Failed to update gamertag' });
+  }
+});
+
+app.get('/api/settings/gamertag', requireAuth, async (req, res) => {
+  try {
+    const gamertag = await getUserGamertag(req.session.userId);
+    res.json({ gamertag });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch gamertag' });
+  }
 });
 
 app.use(express.static(path.join(__dirname)));

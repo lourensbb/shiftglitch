@@ -35,8 +35,23 @@ async function ensureSchema() {
         first_name VARCHAR,
         last_name VARCHAR,
         profile_image_url VARCHAR,
+        gamertag VARCHAR,
         created_at TIMESTAMP DEFAULT NOW(),
         updated_at TIMESTAMP DEFAULT NOW()
+      );
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS gamertag VARCHAR;
+    `);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS leaderboard (
+        user_id VARCHAR PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+        gamertag VARCHAR NOT NULL,
+        focus_score INTEGER NOT NULL DEFAULT 0,
+        rank_tier VARCHAR NOT NULL DEFAULT 'NPC',
+        streak INTEGER NOT NULL DEFAULT 0,
+        pomodoros INTEGER NOT NULL DEFAULT 0,
+        cards_mastered INTEGER NOT NULL DEFAULT 0,
+        blurts INTEGER NOT NULL DEFAULT 0,
+        last_updated TIMESTAMP DEFAULT NOW()
       );
     `);
     console.log('[auth] DB schema ready');
@@ -208,4 +223,43 @@ function requireAuth(req, res, next) {
   res.redirect('/login');
 }
 
-module.exports = { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser };
+async function updateGamertag(userId, gamertag) {
+  await pool.query(
+    'UPDATE users SET gamertag = $1, updated_at = NOW() WHERE id = $2',
+    [gamertag, userId]
+  );
+}
+
+async function getUserGamertag(userId) {
+  const { rows } = await pool.query('SELECT gamertag, first_name, email FROM users WHERE id = $1', [userId]);
+  const u = rows[0];
+  if (!u) return null;
+  return u.gamertag || u.first_name || (u.email ? u.email.split('@')[0] : null) || 'OPERATIVE';
+}
+
+async function upsertLeaderboard({ userId, gamertag, focusScore, rankTier, streak, pomodoros, cardsMastered, blurts }) {
+  await pool.query(
+    `INSERT INTO leaderboard (user_id, gamertag, focus_score, rank_tier, streak, pomodoros, cards_mastered, blurts, last_updated)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())
+     ON CONFLICT (user_id) DO UPDATE SET
+       gamertag = EXCLUDED.gamertag,
+       focus_score = EXCLUDED.focus_score,
+       rank_tier = EXCLUDED.rank_tier,
+       streak = EXCLUDED.streak,
+       pomodoros = EXCLUDED.pomodoros,
+       cards_mastered = EXCLUDED.cards_mastered,
+       blurts = EXCLUDED.blurts,
+       last_updated = NOW()`,
+    [userId, gamertag, focusScore, rankTier, streak, pomodoros, cardsMastered, blurts]
+  );
+}
+
+async function getLeaderboard(limit = 50) {
+  const { rows } = await pool.query(
+    'SELECT user_id, gamertag, focus_score, rank_tier, streak, pomodoros, cards_mastered, blurts, last_updated FROM leaderboard ORDER BY focus_score DESC LIMIT $1',
+    [limit]
+  );
+  return rows;
+}
+
+module.exports = { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, updateGamertag, getUserGamertag, upsertLeaderboard, getLeaderboard };

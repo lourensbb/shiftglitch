@@ -240,6 +240,7 @@
                         </div>
                     </div>
                     <button onclick="app.navTo('rank')" class="nav-btn text-[#39FF14]/50 hover:text-[#39FF14] text-xs font-bold tracking-widest transition-colors uppercase">Rank</button>
+                    <button onclick="app.navTo('leaderboard')" class="nav-btn text-[#FF00FF]/50 hover:text-[#FF00FF] text-xs font-bold tracking-widest transition-colors uppercase">Board</button>
                     <button onclick="app.navTo('stats')" class="nav-btn text-[#39FF14]/50 hover:text-[#39FF14] text-xs font-bold tracking-widest transition-colors uppercase">Stats</button>
                     <button onclick="app.navTo('settings')" class="nav-btn text-[#39FF14]/40 hover:text-[#39FF14] transition-colors" title="Settings"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></button>
                     <span id="nav-rank" class="text-xs font-bold text-black ml-2 bg-[#39FF14] px-3 py-1 rounded uppercase tracking-widest cursor-pointer" onclick="app.navTo('rank')">NPC</span>
@@ -267,6 +268,7 @@
             <button onclick="app.navTo('diagnostic')" class="block w-full text-left px-4 py-3 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Exploit Missions</button>
             <div class="border-t border-[#39FF14]/10 my-2"></div>
             <button onclick="app.navTo('rank')" class="block w-full text-left px-4 py-3 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Rank</button>
+            <button onclick="app.navTo('leaderboard')" class="block w-full text-left px-4 py-3 rounded text-[#FF00FF]/70 font-bold uppercase text-xs tracking-widest">Leaderboard</button>
             <button onclick="app.navTo('stats')" class="block w-full text-left px-4 py-3 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Stats</button>
             <button onclick="app.navTo('settings')" class="block w-full text-left px-4 py-3 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Settings</button>
             <div id="mobile-user" class="hidden border-t border-[#39FF14]/10 mt-2 pt-3">
@@ -1096,7 +1098,7 @@
                 app.closeToolsMenu();
                 document.querySelectorAll('.nav-btn').forEach(btn => {
                     btn.classList.remove('text-orange-600', 'font-bold');
-                    const map = { dashboard: 'Mission', explore: 'Vault', decks: 'Data Shards', quiz: 'Boss Fight', blurt: 'BrainDump.exe', babel: 'Jargon Decoder', matrix: 'Priority Grid', recal: 'Anti-Lag', diagnostic: 'Exploit Missions', rank: 'Rank', stats: 'Stats', settings: 'Settings' };
+                    const map = { dashboard: 'Mission', explore: 'Vault', decks: 'Data Shards', quiz: 'Boss Fight', blurt: 'BrainDump.exe', babel: 'Jargon Decoder', matrix: 'Priority Grid', recal: 'Anti-Lag', diagnostic: 'Exploit Missions', rank: 'Rank', leaderboard: 'Board', stats: 'Stats', settings: 'Settings' };
                     if (btn.textContent.trim().toUpperCase() === (map[tabId] || '').toUpperCase()) btn.classList.add('text-orange-600', 'font-bold');
                 });
                 const toolsViews = ['blurt','babel','quiz','matrix','recal','diagnostic'];
@@ -1490,8 +1492,12 @@
                     } else if (state.view === 'stats') {
                         container.innerHTML = app.getStatsHTML();
                         app.renderStatsCharts();
+                    } else if (state.view === 'leaderboard') {
+                        container.innerHTML = app.getLeaderboardHTML();
+                        app.loadLeaderboard();
                     } else if (state.view === 'settings') {
                         container.innerHTML = app.getSettingsHTML();
+                        app.loadGamertag();
                     }
                     rankEngine.updateNavRank();
                 } catch (err) {
@@ -1976,6 +1982,112 @@
                 app.showNotification('API key removed.');
                 app.render();
             },
+            getLeaderboardHTML: () => `
+                <div class="animate-fade-in max-w-4xl mx-auto space-y-8">
+                    <div class="text-center mb-8">
+                        <h1 class="text-5xl font-serif font-bold mb-2" style="color:#FF00FF;text-shadow:0 0 20px rgba(255,0,255,0.4);">LEADERBOARD</h1>
+                        <p class="text-[#39FF14]/50 font-mono text-sm">// global focus score rankings</p>
+                    </div>
+                    <div class="bg-black border border-[#FF00FF]/20 rounded-2xl p-5 mb-2">
+                        <p class="text-xs font-bold text-[#FF00FF]/70 uppercase tracking-widest mb-2">FOCUS SCORE FORMULA</p>
+                        <p class="font-mono text-[#39FF14] text-sm">(Pomodoros × 10) + (Active Days × 25) + (Cards Mastered × 2) + (Blurts × 15)</p>
+                        <p class="text-xs text-[#39FF14]/40 mt-1 font-mono">// syncs after every focus session</p>
+                    </div>
+                    <div id="leaderboard-loading" class="text-center py-16">
+                        <p class="font-mono text-[#39FF14]/40 text-sm animate-pulse">// loading signal...</p>
+                    </div>
+                    <div id="leaderboard-content" class="hidden space-y-2"></div>
+                    <div id="leaderboard-my-row" class="hidden"></div>
+                    <div id="leaderboard-empty" class="hidden text-center py-16">
+                        <p class="font-mono text-[#39FF14]/30 text-sm">// no operatives on the board yet</p>
+                        <p class="font-mono text-[#39FF14]/20 text-xs mt-2">// complete a focus session to appear</p>
+                    </div>
+                </div>`,
+
+            loadLeaderboard: async () => {
+                try {
+                    const res = await fetch('/api/leaderboard', { credentials: 'same-origin' });
+                    const data = await res.json();
+                    const loading = document.getElementById('leaderboard-loading');
+                    const content = document.getElementById('leaderboard-content');
+                    const myRowEl = document.getElementById('leaderboard-my-row');
+                    const empty = document.getElementById('leaderboard-empty');
+                    if (loading) loading.classList.add('hidden');
+
+                    const rankIcons = { 'NPC': '👾', 'Script Kiddie': '💾', 'Glitch Tech': '⚡', 'Netrunner': '🔌', 'System Admin': '💀' };
+                    const medalFor = (pos) => pos === 1 ? '🥇' : pos === 2 ? '🥈' : pos === 3 ? '🥉' : `#${pos}`;
+
+                    if (!data.leaderboard || data.leaderboard.length === 0) {
+                        if (empty) empty.classList.remove('hidden');
+                        return;
+                    }
+
+                    const rowHTML = (entry, inTable) => {
+                        const isMe = entry.isMe;
+                        const border = isMe ? 'border-[#FF00FF]/50 bg-[#FF00FF]/5' : 'border-[#39FF14]/10 bg-black/40';
+                        const nameColor = isMe ? 'text-[#FF00FF]' : 'text-[#39FF14]';
+                        const scoreColor = isMe ? 'text-[#FF00FF]' : 'text-[#39FF14]/80';
+                        return \`<div class="flex items-center gap-3 border \${border} rounded-xl px-4 py-3 font-mono transition-all \${isMe ? 'ring-1 ring-[#FF00FF]/30' : ''}">
+                            <span class="w-10 text-center text-sm font-bold text-[#39FF14]/40">\${medalFor(entry.rank)}</span>
+                            <span class="text-lg flex-shrink-0">\${rankIcons[entry.rankTier] || '👾'}</span>
+                            <span class="flex-1 text-sm font-bold \${nameColor} uppercase tracking-wide truncate">\${esc(entry.gamertag)}\${isMe ? ' <span class="text-[10px] text-[#FF00FF]/60 normal-case">[you]</span>' : ''}</span>
+                            <span class="text-xs text-[#39FF14]/40 hidden sm:block">🍅 \${entry.pomodoros}</span>
+                            <span class="text-xs text-[#39FF14]/40 hidden sm:block">📚 \${entry.cardsMastered}</span>
+                            <span class="text-xs text-[#39FF14]/40 hidden sm:block">🧠 \${entry.blurts}</span>
+                            <span class="text-sm font-bold \${scoreColor} ml-2 tabular-nums">\${entry.focusScore.toLocaleString()}</span>
+                        </div>\`;
+                    };
+
+                    if (content) {
+                        content.innerHTML = data.leaderboard.map(e => rowHTML(e, true)).join('');
+                        content.classList.remove('hidden');
+                    }
+
+                    if (data.myEntry && data.myEntry.rank > data.leaderboard.length && myRowEl) {
+                        myRowEl.innerHTML = \`<div class="border-t border-[#FF00FF]/20 pt-4 mt-4">
+                            <p class="text-[10px] text-[#FF00FF]/40 font-mono mb-2 uppercase tracking-widest">// your position</p>
+                            \${rowHTML(data.myEntry, false)}
+                        </div>\`;
+                        myRowEl.classList.remove('hidden');
+                    }
+                } catch (e) {
+                    const loading = document.getElementById('leaderboard-loading');
+                    if (loading) loading.innerHTML = '<p class="font-mono text-red-500/60 text-sm">// failed to load signal</p>';
+                }
+            },
+
+            loadGamertag: async () => {
+                try {
+                    const res = await fetch('/api/settings/gamertag', { credentials: 'same-origin' });
+                    const data = await res.json();
+                    const el = document.getElementById('gamertag-input');
+                    if (el && data.gamertag) el.value = data.gamertag;
+                } catch (e) {}
+            },
+
+            saveGamertag: async () => {
+                const el = document.getElementById('gamertag-input');
+                const tag = el ? el.value.trim() : '';
+                if (!tag) { app.showNotification('Enter a gamertag first.'); return; }
+                try {
+                    const res = await fetch('/api/settings/gamertag', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'same-origin',
+                        body: JSON.stringify({ gamertag: tag })
+                    });
+                    const data = await res.json();
+                    if (data.ok) {
+                        app.showNotification(\`Gamertag set: \${data.gamertag}\`);
+                        if (el) el.value = data.gamertag;
+                    } else {
+                        app.showNotification(data.error || 'Failed to save gamertag.');
+                    }
+                } catch (e) {
+                    app.showNotification('Network error. Try again.');
+                }
+            },
+
             getSettingsHTML: () => {
                 const hasKey = aiService.hasApiKey();
                 const maskedKey = hasKey ? '****' + aiService.getApiKey().slice(-4) : '';
@@ -2048,6 +2160,19 @@
                             </ol>
                             <p class="text-xs text-stone-400 dark:text-stone-500 italic mt-2">Firebase is a Google service. Refer to Firebase pricing for your usage tier.</p>
                         </div>
+                    </div>
+                    <div class="bg-black border border-[#FF00FF]/20 rounded-2xl p-8 space-y-5">
+                        <div>
+                            <h2 class="text-xl font-bold mb-2 flex items-center gap-2 font-mono uppercase tracking-widest" style="color:#FF00FF;">
+                                // Leaderboard Identity
+                            </h2>
+                            <p class="text-sm text-[#39FF14]/50 font-mono mb-1">Your handle on the global leaderboard. Max 20 chars — letters, numbers, _ - . only.</p>
+                        </div>
+                        <div class="flex gap-3">
+                            <input type="text" id="gamertag-input" maxlength="20" placeholder="e.g. gl1tch_k1d" class="flex-1 px-4 py-3 rounded-xl border border-[#FF00FF]/30 bg-black text-[#39FF14] font-mono text-sm focus:outline-none focus:ring-2 focus:ring-[#FF00FF]/40 placeholder-[#39FF14]/20" />
+                            <button onclick="app.saveGamertag()" class="px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest text-black transition-all" style="background:#FF00FF;">SAVE</button>
+                        </div>
+                        <p class="text-xs text-[#39FF14]/30 font-mono">// syncs to board after your next focus session</p>
                     </div>
                 </div>`;
             },
@@ -3072,12 +3197,31 @@
                 const modal = document.getElementById('wil-modal');
                 if (modal) modal.classList.add('hidden');
                 app.showNotification(`Focus complete! Session saved. Streak: ${pomodoroStore.consecutiveCount(state.timerTaskLabel)}/4`);
+                app.syncLeaderboard();
             },
 
             dismissWIL() {
                 const modal = document.getElementById('wil-modal');
                 if (modal) modal.classList.add('hidden');
                 app.showNotification(`Focus complete! Streak: ${pomodoroStore.consecutiveCount(state.timerTaskLabel)}/4`);
+                app.syncLeaderboard();
+            },
+
+            syncLeaderboard() {
+                const ev = state.rankEvidence;
+                const payload = {
+                    pomodoros: ev.pomodorosCompleted || 0,
+                    blurts: ev.blurtsCompleted || 0,
+                    cardsMastered: ev.cardsAdvanced || 0,
+                    streak: ev.activeDays || 0,
+                    rankTier: state.rank || 'NPC'
+                };
+                fetch('/api/leaderboard/sync', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'same-origin',
+                    body: JSON.stringify(payload)
+                }).catch(() => {});
             },
 
             addExamCountdown() {
