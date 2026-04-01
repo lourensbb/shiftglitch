@@ -155,8 +155,23 @@
         .drop-zone.drag-over { border-color: #39FF14; background-color: rgba(57,255,20,0.03); }
 
         /* Glitch effects */
-        @keyframes neonPulse { 0%, 100% { text-shadow: 0 0 5px #39FF14, 0 0 10px #39FF14; } 50% { text-shadow: 0 0 10px #39FF14, 0 0 20px #39FF14, 0 0 30px rgba(57,255,20,0.5); } }
-        .sg-logo { animation: neonPulse 3s ease-in-out infinite; color: #39FF14; }
+        .sg-wordmark { position: relative; color: #39FF14; display: inline-block; }
+        .sg-wordmark::before, .sg-wordmark::after { content: attr(data-text); position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
+        .sg-wordmark::before { color: #FF00FF; animation: sg-glitch-a 5s infinite linear; opacity: 0; }
+        .sg-wordmark::after { color: #00FFFF; animation: sg-glitch-b 5s infinite linear; opacity: 0; }
+        @keyframes sg-glitch-a {
+            0%, 88%, 100% { clip-path: none; transform: none; opacity: 0; }
+            89% { clip-path: polygon(0 20%, 100% 20%, 100% 40%, 0 40%); transform: translateX(-4px); opacity: 1; }
+            90% { clip-path: polygon(0 65%, 100% 65%, 100% 80%, 0 80%); transform: translateX(4px); opacity: 1; }
+            91% { clip-path: polygon(0 5%, 100% 5%, 100% 18%, 0 18%); transform: translateX(-2px); opacity: 1; }
+            92% { clip-path: none; opacity: 0; }
+        }
+        @keyframes sg-glitch-b {
+            0%, 82%, 100% { clip-path: none; transform: none; opacity: 0; }
+            83% { clip-path: polygon(0 55%, 100% 55%, 100% 72%, 0 72%); transform: translateX(3px); opacity: 1; }
+            84% { clip-path: polygon(0 30%, 100% 30%, 100% 48%, 0 48%); transform: translateX(-3px); opacity: 1; }
+            85% { clip-path: none; opacity: 0; }
+        }
 
         /* Selection */
         ::selection { background-color: rgba(57,255,20,0.25); color: #fff; }
@@ -174,7 +189,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16 items-center">
                 <div class="flex items-center gap-3 cursor-pointer" onclick="app.navTo('dashboard')">
-                    <span class="font-mono font-bold text-lg tracking-widest uppercase sg-logo">SHIFTGLITCH</span>
+                    <span class="font-mono font-bold text-lg tracking-widest uppercase sg-wordmark" data-text="SHIFTGLITCH">SHIFTGLITCH</span>
                 </div>
                 <div class="hidden md:flex items-center gap-4" id="desktop-nav">
                     <button onclick="app.navTo('dashboard')" class="nav-btn text-[#39FF14]/50 hover:text-[#39FF14] text-xs font-bold tracking-widest transition-colors uppercase">Mission</button>
@@ -225,16 +240,17 @@
         <div id="modal-content" class="bg-white dark:bg-[#1c1917] w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-[2.5rem] shadow-2xl transform scale-95 transition-transform duration-300 border border-stone-200 dark:border-stone-800"></div>
     </div>
 
-    <!-- What I Learned Modal (Feature 4) -->
-    <div id="wil-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[200] hidden flex items-center justify-center p-4">
-        <div class="bg-[#FDFCF8] dark:bg-stone-900 rounded-[2rem] p-8 max-w-md w-full shadow-2xl animate-fade-in">
-            <div class="text-3xl mb-3 text-center">💡</div>
-            <h3 class="text-xl font-serif font-bold text-center mb-1 text-stone-900 dark:text-stone-50">Focus Session Complete!</h3>
-            <p class="text-sm text-stone-500 dark:text-stone-400 text-center mb-5">Write one thing you just learned. Just one. This takes 10 seconds and doubles your retention.</p>
-            <textarea id="wil-input" rows="3" placeholder="I just learned that..." class="w-full bg-stone-50 dark:bg-stone-800 px-4 py-3 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none mb-4"></textarea>
+    <!-- What I Learned Modal — Terminal Debrief -->
+    <div id="wil-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-[200] hidden flex items-center justify-center p-4">
+        <div class="bg-black border border-[#39FF14]/50 p-8 max-w-md w-full shadow-[0_0_40px_rgba(57,255,20,0.15)] animate-fade-in" style="font-family:'Share Tech Mono',monospace;">
+            <div class="text-[#39FF14]/50 text-xs mb-4 uppercase tracking-widest">// SESSION_COMPLETE — DEBRIEF_TERMINAL ACTIVE</div>
+            <h3 class="text-[#39FF14] font-mono font-bold text-xl mb-1 uppercase tracking-widest">► memory.commit()</h3>
+            <p class="text-[#39FF14]/60 text-xs mb-5 leading-relaxed">One output only. Logging this doubles retention. Skipping voids the session data.</p>
+            <div class="text-[#39FF14]/40 text-xs mb-1">$ capture --session</div>
+            <textarea id="wil-input" rows="3" placeholder="> I just learned that..." class="w-full bg-black border border-[#39FF14]/30 px-4 py-3 text-[#39FF14] placeholder-[#39FF14]/25 font-mono text-sm focus:outline-none focus:border-[#39FF14] resize-none mb-4"></textarea>
             <div class="flex gap-3">
-                <button onclick="app.saveWhatILearned()" class="flex-1 bg-orange-600 hover:bg-orange-500 text-white py-3 rounded-xl font-bold text-sm uppercase tracking-widest transition-colors">Save It 🧠</button>
-                <button onclick="app.dismissWIL()" class="bg-stone-200 dark:bg-stone-700 text-stone-600 dark:text-stone-300 px-4 py-3 rounded-xl font-bold text-sm transition-colors">Skip</button>
+                <button onclick="app.saveWhatILearned()" class="flex-1 bg-[#39FF14] hover:bg-[#2ddd12] text-black py-3 font-bold text-xs uppercase tracking-widest font-mono transition-colors">[ COMMIT ]</button>
+                <button onclick="app.dismissWIL()" class="border border-[#39FF14]/25 text-[#39FF14]/40 hover:text-[#39FF14] hover:border-[#39FF14]/60 px-4 py-3 font-bold text-xs font-mono uppercase tracking-widest transition-colors">[ skip ]</button>
             </div>
         </div>
     </div>
@@ -1348,16 +1364,16 @@
                     </section>
                     <section class="bg-stone-900 dark:bg-stone-800 rounded-[2.5rem] p-8 md:p-10 text-white shadow-2xl relative overflow-hidden">
                         <div class="relative z-10 flex flex-col gap-5">
-                            <h2 class="text-2xl font-serif font-semibold text-white">🤖 Study Plan Generator</h2>
-                            <p class="text-sm text-stone-300">Type any topic and get a simple 3-step study plan from AI.</p>
+                            <h2 class="text-2xl font-serif font-semibold text-white">🤖 Cheat Code Injector</h2>
+                            <p class="text-sm text-stone-300">Drop a topic. Get a 3-step exploit strat. AI-generated. Zero fluff.</p>
                             <div class="flex flex-col sm:flex-row gap-3">
                                 <input id="subjectInput" type="text" placeholder="e.g. Photosynthesis, World War 2, Algebra..." class="flex-grow bg-white/10 px-6 py-4 rounded-2xl border border-white/20 text-white font-sans focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all" onkeydown="if(event.key==='Enter')app.generateMissionPlan()">
                                 <button onclick="app.generateMissionPlan()" class="bg-orange-600 px-8 py-4 rounded-2xl font-bold tracking-wide hover:bg-orange-500 transition-all">
-                                    ${state.isAiLoading ? '<span class="ai-loader"></span>' : 'Go!'}
+                                    ${state.isAiLoading ? '<span class="ai-loader"></span>' : 'Inject Strat'}
                                 </button>
                             </div>
                             <div class="bg-white/5 p-6 rounded-2xl border border-white/10 text-stone-300 leading-relaxed font-sans text-sm md:text-base">
-                                ${state.aiOutput ? mdToHtml(state.aiOutput) : 'Type a topic above and hit Go! to get your study plan ✨'}
+                                ${state.aiOutput ? mdToHtml(state.aiOutput) : '// Type a topic above and hit Inject Strat to receive your exploit.'}
                             </div>
                         </div>
                     </section>
@@ -1791,7 +1807,7 @@
                                 <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
                                 Google Gemini API Key
                             </h2>
-                            <p class="text-sm text-stone-500 dark:text-stone-400 mb-4">Required for the AI Mission Architect and study planning features. Your key is stored <strong>only on your device</strong> — it never leaves your browser.</p>
+                            <p class="text-sm text-stone-500 dark:text-stone-400 mb-4">Required for the Cheat Code Injector. Your key is stored <strong>only on your device</strong> — it never leaves your browser.</p>
                         </div>
                         ${hasKey ? `
                             <div class="flex items-center gap-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl p-4">
