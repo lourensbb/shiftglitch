@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-const { getSessionMiddleware, setupAuthRoutes, requireAuth, getUserGamertag, updateGamertag, upsertLeaderboard, getLeaderboard } = require('./auth');
+const { getSessionMiddleware, setupAuthRoutes, requireAuth, getUserGamertag, updateGamertag, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry } = require('./auth');
 
 const app = express();
 
@@ -85,8 +85,11 @@ app.post('/api/leaderboard/sync', requireAuth, async (req, res) => {
 
 app.get('/api/leaderboard', requireAuth, async (req, res) => {
   try {
-    const rows = await getLeaderboard(50);
     const userId = req.session.userId;
+    const [rows, myRow] = await Promise.all([
+      getLeaderboard(50),
+      getMyLeaderboardEntry(userId)
+    ]);
     const ranked = rows.map((r, i) => ({
       rank: i + 1,
       userId: r.user_id,
@@ -99,8 +102,23 @@ app.get('/api/leaderboard', requireAuth, async (req, res) => {
       blurts: r.blurts,
       isMe: r.user_id === userId
     }));
-    const myEntry = ranked.find(r => r.isMe);
-    res.json({ leaderboard: ranked, myEntry: myEntry || null });
+    let myEntry = null;
+    if (myRow) {
+      myEntry = {
+        rank: myRow.global_rank,
+        userId: myRow.user_id,
+        gamertag: myRow.gamertag,
+        focusScore: myRow.focus_score,
+        rankTier: myRow.rank_tier,
+        streak: myRow.streak,
+        pomodoros: myRow.pomodoros,
+        cardsMastered: myRow.cards_mastered,
+        blurts: myRow.blurts,
+        isMe: true
+      };
+    }
+    const myEntryInTop = ranked.some(r => r.isMe);
+    res.json({ leaderboard: ranked, myEntry, myEntryInTop });
   } catch (err) {
     console.error('/api/leaderboard error:', err);
     res.status(500).json({ error: 'Failed to load leaderboard' });

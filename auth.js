@@ -256,10 +256,23 @@ async function upsertLeaderboard({ userId, gamertag, focusScore, rankTier, strea
 
 async function getLeaderboard(limit = 50) {
   const { rows } = await pool.query(
-    'SELECT user_id, gamertag, focus_score, rank_tier, streak, pomodoros, cards_mastered, blurts, last_updated FROM leaderboard ORDER BY focus_score DESC LIMIT $1',
+    'SELECT user_id, gamertag, focus_score, rank_tier, streak, pomodoros, cards_mastered, blurts, last_updated FROM leaderboard ORDER BY focus_score DESC, last_updated ASC, user_id ASC LIMIT $1',
     [limit]
   );
   return rows;
 }
 
-module.exports = { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, updateGamertag, getUserGamertag, upsertLeaderboard, getLeaderboard };
+async function getMyLeaderboardEntry(userId) {
+  const { rows } = await pool.query(
+    `SELECT l.user_id, l.gamertag, l.focus_score, l.rank_tier, l.streak, l.pomodoros, l.cards_mastered, l.blurts,
+       (SELECT COUNT(*) + 1 FROM leaderboard WHERE focus_score > l.focus_score
+          OR (focus_score = l.focus_score AND last_updated < l.last_updated)
+          OR (focus_score = l.focus_score AND last_updated = l.last_updated AND user_id < l.user_id)
+       )::int AS global_rank
+     FROM leaderboard l WHERE l.user_id = $1`,
+    [userId]
+  );
+  return rows[0] || null;
+}
+
+module.exports = { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, updateGamertag, getUserGamertag, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry };

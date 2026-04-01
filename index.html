@@ -2043,7 +2043,7 @@
                         content.classList.remove('hidden');
                     }
 
-                    if (data.myEntry && data.myEntry.rank > data.leaderboard.length && myRowEl) {
+                    if (data.myEntry && !data.myEntryInTop && myRowEl) {
                         myRowEl.innerHTML = \`<div class="border-t border-[#FF00FF]/20 pt-4 mt-4">
                             <p class="text-[10px] text-[#FF00FF]/40 font-mono mb-2 uppercase tracking-widest">// your position</p>
                             \${rowHTML(data.myEntry, false)}
