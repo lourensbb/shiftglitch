@@ -17,6 +17,36 @@ async function getOidcConfig() {
   return oidcConfig;
 }
 
+async function ensureSchema() {
+  const client = await pool.connect();
+  try {
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS sessions (
+        sid VARCHAR NOT NULL PRIMARY KEY,
+        sess JSON NOT NULL,
+        expire TIMESTAMP(6) NOT NULL
+      );
+      CREATE INDEX IF NOT EXISTS IDX_session_expire ON sessions(expire);
+    `);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id VARCHAR PRIMARY KEY,
+        email VARCHAR UNIQUE,
+        first_name VARCHAR,
+        last_name VARCHAR,
+        profile_image_url VARCHAR,
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+      );
+    `);
+    console.log('[auth] DB schema ready');
+  } catch (err) {
+    console.error('[auth] Schema setup error:', err.message);
+  } finally {
+    client.release();
+  }
+}
+
 function getSessionMiddleware() {
   const PgStore = connectPg(session);
   const store = new PgStore({
@@ -63,7 +93,9 @@ async function getUser(id) {
 function setupAuthRoutes(app) {
   app.set('trust proxy', 1);
 
-  app.get('/api/login', async (req, res) => {
+  ensureSchema();
+
+  async function handleLogin(req, res) {
     try {
       const config = await getOidcConfig();
       const host = req.hostname;
@@ -86,14 +118,34 @@ function setupAuthRoutes(app) {
       console.error('Login error:', err);
       res.redirect('/');
     }
-  });
+  }
+
+  async function handleLogout(req, res) {
+    try {
+      const config = await getOidcConfig();
+      req.session.destroy(() => {});
+      const logoutUrl = oidc.buildEndSessionUrl(config, {
+        client_id: process.env.REPL_ID,
+        post_logout_redirect_uri: `https://${req.hostname}`
+      });
+      res.redirect(logoutUrl.href);
+    } catch (err) {
+      req.session.destroy(() => {});
+      res.redirect('/');
+    }
+  }
+
+  app.get('/api/login', handleLogin);
+  app.get('/api/auth/login', handleLogin);
+
+  app.get('/api/logout', handleLogout);
+  app.get('/api/auth/logout', handleLogout);
 
   app.get('/api/callback', async (req, res) => {
     try {
       const config = await getOidcConfig();
       const callbackUrl = req.session.oauthCallback || `https://${req.hostname}/api/callback`;
       const tokens = await oidc.authorizationCodeGrant(config, new URL(req.url, `https://${req.hostname}`), {
-        pkceCodeVerifier: req.session.pkceVerifier,
         expectedState: req.session.oauthState,
         expectedNonce: req.session.oauthNonce,
         redirectUri: callbackUrl
@@ -119,21 +171,6 @@ function setupAuthRoutes(app) {
     } catch (err) {
       console.error('Callback error:', err);
       res.redirect('/api/login');
-    }
-  });
-
-  app.get('/api/logout', async (req, res) => {
-    try {
-      const config = await getOidcConfig();
-      req.session.destroy(() => {});
-      const logoutUrl = oidc.buildEndSessionUrl(config, {
-        client_id: process.env.REPL_ID,
-        post_logout_redirect_uri: `https://${req.hostname}`
-      });
-      res.redirect(logoutUrl.href);
-    } catch (err) {
-      req.session.destroy(() => {});
-      res.redirect('/');
     }
   });
 

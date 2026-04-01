@@ -67,7 +67,7 @@ app.get('/teacher', (req, res) => {
 
 app.use(express.static(path.join(__dirname)));
 
-app.get('/{*splat}', (req, res) => {
+app.get('/{*splat}', requireAuth, (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
