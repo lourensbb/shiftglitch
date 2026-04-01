@@ -93,23 +93,27 @@ app.get('/api/leaderboard', requireAuth, async (req, res) => {
       getLeaderboard(50),
       getMyLeaderboardEntry(userId)
     ]);
-    const ranked = rows.map((r, i) => ({
-      rank: i + 1,
-      userId: r.user_id,
-      gamertag: r.gamertag,
-      focusScore: r.focus_score,
-      rankTier: r.rank_tier,
-      streak: r.streak,
-      pomodoros: r.pomodoros,
-      cardsMastered: r.cards_mastered,
-      blurts: r.blurts,
-      isMe: r.user_id === userId
-    }));
+    const ranked = rows.map((r, i) => {
+      const isMe = r.user_id === userId;
+      const entry = {
+        rank: i + 1,
+        gamertag: r.gamertag,
+        focusScore: r.focus_score,
+        rankTier: r.rank_tier,
+        streak: r.streak,
+        pomodoros: r.pomodoros,
+        cardsMastered: r.cards_mastered,
+        blurts: r.blurts,
+        isMe
+      };
+      if (isMe) entry.userId = userId;
+      return entry;
+    });
     let myEntry = null;
     if (myRow) {
       myEntry = {
         rank: myRow.global_rank,
-        userId: myRow.user_id,
+        userId,
         gamertag: myRow.gamertag,
         focusScore: myRow.focus_score,
         rankTier: myRow.rank_tier,
