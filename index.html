@@ -9,21 +9,39 @@
     <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <script>
-        if (typeof SYNAPSE_FIREBASE_CONFIG === 'undefined') var SYNAPSE_FIREBASE_CONFIG = null;
+        if (typeof SG_FIREBASE_CONFIG === 'undefined') var SG_FIREBASE_CONFIG = null;
     </script>
     <script src="config.js" onerror=""></script>
+    <script>
+        // One-time migration: move any data stored under old 'synapse_' keys to new 'sg_' keys
+        (function migrateSynapseKeys() {
+            const keys = [
+                'gemini_key','mcq','decks','cards','pomodoro_log','blurt',
+                'todos','eisenhower','recal','babel','yet','exams','wil','rank','burned'
+            ];
+            keys.forEach(function(k) {
+                var oldKey = 'synapse_' + k;
+                var newKey = 'sg_' + k;
+                var existing = localStorage.getItem(oldKey);
+                if (existing !== null && localStorage.getItem(newKey) === null) {
+                    localStorage.setItem(newKey, existing);
+                }
+                localStorage.removeItem(oldKey);
+            });
+        })();
+    </script>
     <script type="module">
         try {
-            if (!SYNAPSE_FIREBASE_CONFIG || SYNAPSE_FIREBASE_CONFIG.apiKey === 'YOUR_API_KEY_HERE') {
+            if (!SG_FIREBASE_CONFIG || SG_FIREBASE_CONFIG.apiKey === 'YOUR_API_KEY_HERE') {
                 throw new Error("Firebase not configured — edit config.js to enable cloud sync");
             }
             const { initializeApp } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js");
             const { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js");
             const { getFirestore, doc, getDoc, setDoc, collection, addDoc, updateDoc, getDocs, deleteDoc } = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
-            const app_fb = initializeApp(SYNAPSE_FIREBASE_CONFIG);
+            const app_fb = initializeApp(SG_FIREBASE_CONFIG);
             window.fb = {
                 auth: getAuth(app_fb), db: getFirestore(app_fb),
-                appId: 'synapse-app',
+                appId: 'shiftglitch-app',
                 doc, getDoc, setDoc, collection, addDoc, updateDoc, getDocs, deleteDoc,
                 signInAnonymously, signInWithCustomToken, onAuthStateChanged
             };
@@ -451,7 +469,7 @@
 
         const aiService = {
             getApiKey() {
-                return localStorage.getItem('synapse_gemini_key') || '';
+                return localStorage.getItem('sg_gemini_key') || '';
             },
             hasApiKey() {
                 return !!this.getApiKey().trim();
@@ -641,14 +659,14 @@
         const mcqStore = {
             load() {
                 try {
-                    const d = JSON.parse(localStorage.getItem('synapse_mcq') || '{}');
+                    const d = JSON.parse(localStorage.getItem('sg_mcq') || '{}');
                     state.mcqAttempts = d.attempts || {};
                     state.mcqGaps = d.gaps || [];
                     state.mcqReflections = d.reflections || {};
                 } catch(e) { state.mcqAttempts = {}; state.mcqGaps = []; state.mcqReflections = {}; }
             },
             save() {
-                localStorage.setItem('synapse_mcq', JSON.stringify({
+                localStorage.setItem('sg_mcq', JSON.stringify({
                     attempts: state.mcqAttempts,
                     gaps: state.mcqGaps,
                     reflections: state.mcqReflections
@@ -682,15 +700,15 @@
         };
 
         const deckStore = {
-            load() { try { state.fcDecks = JSON.parse(localStorage.getItem('synapse_decks') || '[]'); } catch(e) { state.fcDecks = []; } },
-            save() { localStorage.setItem('synapse_decks', JSON.stringify(state.fcDecks)); },
+            load() { try { state.fcDecks = JSON.parse(localStorage.getItem('sg_decks') || '[]'); } catch(e) { state.fcDecks = []; } },
+            save() { localStorage.setItem('sg_decks', JSON.stringify(state.fcDecks)); },
             add(title) { const d = { id: Date.now().toString(), title, createdAt: Date.now() }; state.fcDecks.push(d); this.save(); return d; },
             remove(id) { state.fcDecks = state.fcDecks.filter(d => d.id !== id); cardStore.removeByDeck(id); this.save(); },
         };
 
         const cardStore = {
-            load() { try { state.fcCards = JSON.parse(localStorage.getItem('synapse_cards') || '[]'); } catch(e) { state.fcCards = []; } },
-            save() { localStorage.setItem('synapse_cards', JSON.stringify(state.fcCards)); },
+            load() { try { state.fcCards = JSON.parse(localStorage.getItem('sg_cards') || '[]'); } catch(e) { state.fcCards = []; } },
+            save() { localStorage.setItem('sg_cards', JSON.stringify(state.fcCards)); },
             add(deckId, front, back) {
                 const c = { id: Date.now().toString(), deckId, front, back, box: 1, nextReview: Date.now(), createdAt: Date.now() };
                 state.fcCards.push(c); this.save(); return c;
@@ -709,8 +727,8 @@
         };
 
         const pomodoroStore = {
-            load() { try { state.pomodoroLog = JSON.parse(localStorage.getItem('synapse_pomodoro_log') || '[]'); } catch(e) { state.pomodoroLog = []; } },
-            save() { localStorage.setItem('synapse_pomodoro_log', JSON.stringify(state.pomodoroLog)); },
+            load() { try { state.pomodoroLog = JSON.parse(localStorage.getItem('sg_pomodoro_log') || '[]'); } catch(e) { state.pomodoroLog = []; } },
+            save() { localStorage.setItem('sg_pomodoro_log', JSON.stringify(state.pomodoroLog)); },
             normalize(label) { return label.trim().replace(/\s+/g, ' ').toLowerCase(); },
             log(taskLabel) { state.pomodoroLog.push({ task: this.normalize(taskLabel), completedAt: Date.now(), duration: state.timerInitialSeconds }); this.save(); },
             consecutiveCount(taskLabel) {
@@ -740,8 +758,8 @@
         };
 
         const blurtStore = {
-            load() { try { state.blurtSessions = JSON.parse(localStorage.getItem('synapse_blurt') || '[]'); } catch(e) { state.blurtSessions = []; } },
-            save() { localStorage.setItem('synapse_blurt', JSON.stringify(state.blurtSessions)); },
+            load() { try { state.blurtSessions = JSON.parse(localStorage.getItem('sg_blurt') || '[]'); } catch(e) { state.blurtSessions = []; } },
+            save() { localStorage.setItem('sg_blurt', JSON.stringify(state.blurtSessions)); },
             add(title, source) { const s = { id: Date.now().toString(), title, source, recall: '', gaps: '', reviewCount: 0, createdAt: Date.now(), updatedAt: Date.now() }; state.blurtSessions.push(s); this.save(); return s; },
             update(id, data) { const s = state.blurtSessions.find(x => x.id === id); if (s) { Object.assign(s, data, { updatedAt: Date.now() }); this.save(); } },
             remove(id) { state.blurtSessions = state.blurtSessions.filter(s => s.id !== id); this.save(); },
@@ -749,8 +767,8 @@
         };
 
         const todoStore = {
-            load() { try { state.missionTodos = JSON.parse(localStorage.getItem('synapse_todos') || '[]'); } catch(e) { state.missionTodos = []; } },
-            save() { localStorage.setItem('synapse_todos', JSON.stringify(state.missionTodos)); },
+            load() { try { state.missionTodos = JSON.parse(localStorage.getItem('sg_todos') || '[]'); } catch(e) { state.missionTodos = []; } },
+            save() { localStorage.setItem('sg_todos', JSON.stringify(state.missionTodos)); },
             add(text) { state.missionTodos.push({ id: Date.now().toString(), text, done: false }); this.save(); },
             toggle(id) { const t = state.missionTodos.find(x => x.id === id); if (t) { t.done = !t.done; this.save(); } },
             remove(id) { state.missionTodos = state.missionTodos.filter(x => x.id !== id); this.save(); },
@@ -759,13 +777,13 @@
         const eisenhowerStore = {
             load() {
                 try {
-                    const d = JSON.parse(localStorage.getItem('synapse_eisenhower') || '{}');
+                    const d = JSON.parse(localStorage.getItem('sg_eisenhower') || '{}');
                     state.eisenhowerTasks = d.tasks || [];
                     state.eisenhowerReflections = d.reflections || [];
                 } catch(e) { state.eisenhowerTasks = []; state.eisenhowerReflections = []; }
             },
             save() {
-                localStorage.setItem('synapse_eisenhower', JSON.stringify({
+                localStorage.setItem('sg_eisenhower', JSON.stringify({
                     tasks: state.eisenhowerTasks,
                     reflections: state.eisenhowerReflections,
                 }));
@@ -802,35 +820,35 @@
         };
 
         const recalStore = {
-            load() { try { const d = JSON.parse(localStorage.getItem('synapse_recal') || '{}'); state.recalSessions = d.sessions || []; state.recalStealthCount = d.stealthCount || 0; state.recalRocketCount = d.rocketCount || 0; } catch(e) { state.recalSessions = []; state.recalStealthCount = 0; state.recalRocketCount = 0; } },
-            save() { localStorage.setItem('synapse_recal', JSON.stringify({ sessions: state.recalSessions, stealthCount: state.recalStealthCount, rocketCount: state.recalRocketCount })); },
+            load() { try { const d = JSON.parse(localStorage.getItem('sg_recal') || '{}'); state.recalSessions = d.sessions || []; state.recalStealthCount = d.stealthCount || 0; state.recalRocketCount = d.rocketCount || 0; } catch(e) { state.recalSessions = []; state.recalStealthCount = 0; state.recalRocketCount = 0; } },
+            save() { localStorage.setItem('sg_recal', JSON.stringify({ sessions: state.recalSessions, stealthCount: state.recalStealthCount, rocketCount: state.recalRocketCount })); },
             recordStealth() { state.recalStealthCount++; state.recalSessions.push({ type: 'stealth', date: new Date().toISOString() }); this.save(); },
             recordRocket() { state.recalRocketCount++; state.recalSessions.push({ type: 'rocket', date: new Date().toISOString() }); this.save(); },
         };
 
         const babelStore = {
-            load() { try { state.babelSessions = JSON.parse(localStorage.getItem('synapse_babel') || '[]'); } catch(e) { state.babelSessions = []; } },
-            save() { localStorage.setItem('synapse_babel', JSON.stringify(state.babelSessions)); },
+            load() { try { state.babelSessions = JSON.parse(localStorage.getItem('sg_babel') || '[]'); } catch(e) { state.babelSessions = []; } },
+            save() { localStorage.setItem('sg_babel', JSON.stringify(state.babelSessions)); },
             add(concept, explanation, doodle) { state.babelSessions.push({ id: Date.now().toString(), concept, explanation, doodle, createdAt: new Date().toISOString(), hasBadge: true }); this.save(); },
             remove(id) { state.babelSessions = state.babelSessions.filter(s => s.id !== id); this.save(); },
         };
 
         const yetStore = {
-            load() { try { state.yetMoments = JSON.parse(localStorage.getItem('synapse_yet') || '[]'); } catch(e) { state.yetMoments = []; } },
-            save() { localStorage.setItem('synapse_yet', JSON.stringify(state.yetMoments)); },
+            load() { try { state.yetMoments = JSON.parse(localStorage.getItem('sg_yet') || '[]'); } catch(e) { state.yetMoments = []; } },
+            save() { localStorage.setItem('sg_yet', JSON.stringify(state.yetMoments)); },
             add(concept) { state.yetMoments.push({ concept, date: new Date().toISOString() }); this.save(); },
         };
 
         const examStore = {
-            load() { try { state.examCountdowns = JSON.parse(localStorage.getItem('synapse_exams') || '[]'); } catch(e) { state.examCountdowns = []; } },
-            save() { localStorage.setItem('synapse_exams', JSON.stringify(state.examCountdowns)); },
+            load() { try { state.examCountdowns = JSON.parse(localStorage.getItem('sg_exams') || '[]'); } catch(e) { state.examCountdowns = []; } },
+            save() { localStorage.setItem('sg_exams', JSON.stringify(state.examCountdowns)); },
             add(label, date) { state.examCountdowns.push({ id: Date.now().toString(), label, date }); state.examCountdowns.sort((a, b) => a.date.localeCompare(b.date)); this.save(); },
             remove(id) { state.examCountdowns = state.examCountdowns.filter(e => e.id !== id); this.save(); },
         };
 
         const learningStore = {
-            load() { try { state.wilLog = JSON.parse(localStorage.getItem('synapse_wil') || '[]'); } catch(e) { state.wilLog = []; } },
-            save() { localStorage.setItem('synapse_wil', JSON.stringify(state.wilLog)); },
+            load() { try { state.wilLog = JSON.parse(localStorage.getItem('sg_wil') || '[]'); } catch(e) { state.wilLog = []; } },
+            save() { localStorage.setItem('sg_wil', JSON.stringify(state.wilLog)); },
             add(entry, subject) { state.wilLog.push({ entry, subject, date: new Date().toISOString() }); this.save(); },
         };
 
@@ -873,7 +891,7 @@
         const rankEngine = {
             load() {
                 try {
-                    const d = JSON.parse(localStorage.getItem('synapse_rank') || '{}');
+                    const d = JSON.parse(localStorage.getItem('sg_rank') || '{}');
                     state.rank = d.rank || 'NPC';
                     state.rankEvidence = d.rankEvidence || { blurtsCompleted: 0, governorBreakdowns: 0, cardsAdvanced: 0, activeDays: 0, pomodorosCompleted: 0, diagnosticsCompleted: 0, lastActiveDate: '', activeDateLog: [] };
                     if (!state.rankEvidence.activeDateLog) state.rankEvidence.activeDateLog = [];
@@ -881,7 +899,7 @@
                 } catch(e) { state.rank = 'NPC'; state.rankEvidence = { blurtsCompleted: 0, governorBreakdowns: 0, cardsAdvanced: 0, activeDays: 0, pomodorosCompleted: 0, diagnosticsCompleted: 0, lastActiveDate: '', activeDateLog: [] }; }
             },
             save() {
-                localStorage.setItem('synapse_rank', JSON.stringify({ rank: state.rank, rankEvidence: state.rankEvidence }));
+                localStorage.setItem('sg_rank', JSON.stringify({ rank: state.rank, rankEvidence: state.rankEvidence }));
             },
             trackActiveDay() {
                 const today = new Date().toISOString().slice(0, 10);
@@ -1036,7 +1054,7 @@
                 document.body.classList.add('dark');
 
                 deckStore.load(); cardStore.load(); pomodoroStore.load(); blurtStore.load(); eisenhowerStore.load(); todoStore.load(); mcqStore.load(); recalStore.load(); babelStore.load(); yetStore.load(); examStore.load(); learningStore.load();
-                state.burnedCount = parseInt(localStorage.getItem('synapse_burned') || '0', 10);
+                state.burnedCount = parseInt(localStorage.getItem('sg_burned') || '0', 10);
                 rankEngine.load(); rankEngine.trackActiveDay(); rankEngine.updateNavRank();
 
                 const djTodoText = 'Complete the Diagnostics Journey';
@@ -1405,7 +1423,7 @@
                 };
                 const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
                 const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-                a.download = `synapse-backup-${new Date().toISOString().slice(0, 10)}.json`;
+                a.download = `shiftglitch-backup-${new Date().toISOString().slice(0, 10)}.json`;
                 a.click(); URL.revokeObjectURL(a.href);
                 app.showNotification('Data exported successfully!');
             },
@@ -1428,7 +1446,7 @@
                 const safeName = studentName.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-');
                 const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
                 const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-                a.download = `synapse-${safeName}-${new Date().toISOString().slice(0, 10)}.json`;
+                a.download = `shiftglitch-${safeName}-${new Date().toISOString().slice(0, 10)}.json`;
                 a.click(); URL.revokeObjectURL(a.href);
                 app.showNotification('Report exported for your teacher!');
             },
@@ -1978,12 +1996,12 @@
                 if (!input) return;
                 const key = input.value.trim();
                 if (!key) { app.showNotification('Please enter an API key.'); return; }
-                localStorage.setItem('synapse_gemini_key', key);
+                localStorage.setItem('sg_gemini_key', key);
                 app.showNotification('API key saved securely to your device.');
                 app.render();
             },
             removeApiKey: () => {
-                localStorage.removeItem('synapse_gemini_key');
+                localStorage.removeItem('sg_gemini_key');
                 app.showNotification('API key removed.');
                 app.render();
             },
@@ -2309,7 +2327,7 @@
                             <h3 class="text-sm font-bold text-stone-600 dark:text-stone-400 uppercase tracking-widest">How to set up Firebase</h3>
                             <ol class="text-sm text-stone-600 dark:text-stone-400 space-y-2 list-decimal list-inside">
                                 <li>Go to <a href="https://console.firebase.google.com/" target="_blank" rel="noopener noreferrer" class="text-orange-600 dark:text-orange-400 underline underline-offset-2 hover:text-orange-700">Firebase Console</a> and click <strong>"Create a project"</strong></li>
-                                <li>Name your project (e.g. "my-synapse") and follow the prompts</li>
+                                <li>Name your project (e.g. "my-shiftglitch") and follow the prompts</li>
                                 <li>In Project Settings, scroll to "Your apps" and click the web icon <strong>&lt;/&gt;</strong></li>
                                 <li>Register an app name, then copy the <strong>firebaseConfig</strong> values shown</li>
                                 <li>Open the file <code class="bg-stone-100 dark:bg-stone-900 px-1.5 py-0.5 rounded text-xs font-mono">config.js</code> and paste your values in place of the placeholders</li>
@@ -3472,7 +3490,7 @@
                 setTimeout(() => {
                     cardStore.remove(card.id);
                     state.burnedCount++;
-                    localStorage.setItem('synapse_burned', String(state.burnedCount));
+                    localStorage.setItem('sg_burned', String(state.burnedCount));
                     state.burnCardPending = null;
                     const modal = document.getElementById('burn-modal');
                     if (modal) modal.classList.add('hidden');

@@ -1,16 +1,16 @@
 // ============================================================
-//  Synapse — Firebase Configuration
+//  ShiftGlitch — Firebase Configuration
 // ============================================================
 //  HOW TO USE:
 //  1. Copy this file and rename the copy to "config.js"
 //  2. Replace every "YOUR_..._HERE" value with your real
-//     Firebase project credentials (see README.md or the
-//     in-app Settings page for a step-by-step guide).
-//  3. Firebase is OPTIONAL — Synapse works fully offline
+//     Firebase project credentials (see the in-app Settings
+//     page for a step-by-step guide).
+//  3. Firebase is OPTIONAL — ShiftGlitch works fully offline
 //     without it. Firebase just adds cloud sync.
 // ============================================================
 
-var SYNAPSE_FIREBASE_CONFIG = {
+var SG_FIREBASE_CONFIG = {
     apiKey:            "YOUR_API_KEY_HERE",
     authDomain:        "YOUR_PROJECT_ID.firebaseapp.com",
     projectId:         "YOUR_PROJECT_ID_HERE",

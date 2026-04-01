@@ -191,7 +191,7 @@
                 try {
                     const text = await file.text();
                     const data = JSON.parse(text);
-                    const studentName = file.name.replace('synapse-backup-', '').replace('.json', '').replace(/-/g, ' ');
+                    const studentName = file.name.replace('shiftglitch-backup-', '').replace('shiftglitch-', '').replace('.json', '').replace(/-/g, ' ');
                     data._studentName = data._studentName || studentName;
                     data._fileName = file.name;
                     const existingIdx = students.findIndex(s => s._fileName === file.name);

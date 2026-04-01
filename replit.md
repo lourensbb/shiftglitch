@@ -25,7 +25,7 @@ An Express.js v5 server manages authentication, session handling, static file se
 
 **Authentication:** Replit Auth (OpenID Connect) is implemented using `openid-client` v6. Sessions are stored in a PostgreSQL database via `connect-pg-simple`. User data (id, email, names, profile image, timestamps) is `upserted` into a `users` table upon successful login.
 
-**Data Storage:** Primary data persistence is achieved through `localStorage` for offline access, using the `synapse_` prefix for most keys. Optional cloud persistence for Cornell notes and progress checkboxes is available via Firebase Firestore, designed for graceful degradation if unavailable. A JSON export/import feature supports local data backup and restoration (excluding the Gemini key for security).
+**Data Storage:** Primary data persistence is achieved through `localStorage` for offline access, using the `sg_` prefix for all keys. A one-time migration routine runs on load to automatically convert any data stored under the old `synapse_` prefix, preserving existing user data. Optional cloud persistence is available via Firebase Firestore, designed for graceful degradation if unavailable. A JSON export/import feature supports local data backup and restoration. Backup files are named `shiftglitch-backup-<date>.json`.
 
 ### Key Features
 - **AI Study Planning:** Gemini API-powered study plan generation using a BYOK (Bring Your Own Key) model for user-provided API keys stored client-side.
