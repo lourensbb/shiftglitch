@@ -69,10 +69,10 @@ app.post('/api/leaderboard/sync', requireAuth, async (req, res) => {
   try {
     const userId = req.session.userId;
     const { pomodoros, blurts, cardsMastered, streak, rankTier } = req.body;
-    const pom = parseInt(pomodoros, 10) || 0;
-    const bl = parseInt(blurts, 10) || 0;
-    const cards = parseInt(cardsMastered, 10) || 0;
-    const str = parseInt(streak, 10) || 0;
+    const pom = Math.max(0, parseInt(pomodoros, 10) || 0);
+    const bl = Math.max(0, parseInt(blurts, 10) || 0);
+    const cards = Math.max(0, parseInt(cardsMastered, 10) || 0);
+    const str = Math.max(0, parseInt(streak, 10) || 0);
     const focusScore = (pom * 10) + (str * 25) + (cards * 2) + (bl * 15);
     const gamertag = await getUserGamertag(userId);
     await upsertLeaderboard({ userId, gamertag, focusScore, rankTier: rankTier || 'NPC', streak: str, pomodoros: pom, cardsMastered: cards, blurts: bl });

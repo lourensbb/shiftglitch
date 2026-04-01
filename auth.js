@@ -231,10 +231,20 @@ async function updateGamertag(userId, gamertag) {
 }
 
 async function getUserGamertag(userId) {
-  const { rows } = await pool.query('SELECT gamertag, first_name, email FROM users WHERE id = $1', [userId]);
+  const { rows } = await pool.query('SELECT gamertag, first_name, last_name, email FROM users WHERE id = $1', [userId]);
   const u = rows[0];
   if (!u) return null;
-  return u.gamertag || u.first_name || (u.email ? u.email.split('@')[0] : null) || 'OPERATIVE';
+  if (u.gamertag) return u.gamertag;
+  if (u.first_name) {
+    const tag = (u.last_name ? `${u.first_name}${u.last_name.slice(0,1)}` : u.first_name)
+      .replace(/[^a-zA-Z0-9_\-\.]/g, '').slice(0, 20);
+    if (tag) return tag;
+  }
+  if (u.email) {
+    const tag = u.email.split('@')[0].replace(/[^a-zA-Z0-9_\-\.]/g, '').slice(0, 20);
+    if (tag) return tag;
+  }
+  return 'OPERATIVE';
 }
 
 async function upsertLeaderboard({ userId, gamertag, focusScore, rankTier, streak, pomodoros, cardsMastered, blurts }) {
