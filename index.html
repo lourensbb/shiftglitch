@@ -3213,7 +3213,7 @@
                     pomodoros: ev.pomodorosCompleted || 0,
                     blurts: ev.blurtsCompleted || 0,
                     cardsMastered: ev.cardsAdvanced || 0,
-                    streak: ev.activeDays || 0,
+                    streak: rankEngine.getStreak(),
                     rankTier: state.rank || 'NPC'
                 };
                 fetch('/api/leaderboard/sync', {

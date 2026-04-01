@@ -40,7 +40,7 @@ An Express.js v5 server manages authentication, session handling, static file se
 - **Exploit Missions (MCQ Diagnostics):** 100-question diagnostics across 5 missions, tracking knowledge gaps and contributing to rank.
 - **Charts & Statistics:** Visualizations and metrics for study activity.
 - **Data Management:** JSON export/import of user data (excluding Gemini key).
-- **Leaderboard:** Global Focus Score rankings backed by PostgreSQL. Users compete by gamertag (set in Settings). Score syncs after every Pomodoro session. Formula: (Pomodoros × 10) + (Active Days × 25) + (Cards Mastered × 2) + (Blurts × 15). Top 50 shown; caller's row highlighted even if outside top 50.
+- **Leaderboard:** Global Focus Score rankings backed by PostgreSQL. Users compete by gamertag (set in Settings). Score syncs after every Pomodoro session. Formula: (Pomodoros × 10) + (Streak × 25) + (Cards Mastered × 2) + (Blurts × 15). Top 50 shown; caller's row highlighted even if outside top 50.
 - **Teacher Dashboard:** A separate interface (`teacher.html`) for classroom management, allowing teachers to import student data, view progress, and generate reports.
 - **Teen-Focused Enhancements:** Includes a dark mode default, phone-lock nudges, "What I Learned?" prompts after Pomodoro sessions, an exam countdown widget, and a "Study Buddy System" for progress comparison.
 - **Security:** `esc()` utility for XSS protection in user-rendered content.
