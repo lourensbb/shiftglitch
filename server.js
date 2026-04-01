@@ -1,5 +1,7 @@
 const express = require('express');
 const path = require('path');
+const { getSessionMiddleware, setupAuthRoutes, requireAuth } = require('./auth');
+
 const app = express();
 
 app.use(express.json());
@@ -8,6 +10,10 @@ app.use((req, res, next) => {
   res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
   next();
 });
+
+app.use(getSessionMiddleware());
+
+setupAuthRoutes(app);
 
 app.post('/api/gemini', async (req, res) => {
   const apiKey = process.env.GEMINI_API_KEY;
@@ -40,7 +46,14 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'landing.html'));
 });
 
-app.get('/app', (req, res) => {
+app.get('/login', (req, res) => {
+  if (req.session && req.session.userId) {
+    return res.redirect('/app');
+  }
+  res.sendFile(path.join(__dirname, 'login.html'));
+});
+
+app.get('/app', requireAuth, (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 

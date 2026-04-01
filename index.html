@@ -243,6 +243,11 @@
                     <button onclick="app.navTo('stats')" class="nav-btn text-[#39FF14]/50 hover:text-[#39FF14] text-xs font-bold tracking-widest transition-colors uppercase">Stats</button>
                     <button onclick="app.navTo('settings')" class="nav-btn text-[#39FF14]/40 hover:text-[#39FF14] transition-colors" title="Settings"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></button>
                     <span id="nav-rank" class="text-xs font-bold text-black ml-2 bg-[#39FF14] px-3 py-1 rounded uppercase tracking-widest cursor-pointer" onclick="app.navTo('rank')">NPC</span>
+                    <div id="nav-user" class="hidden items-center gap-2 ml-2 pl-3 border-l border-[#39FF14]/20">
+                        <img id="nav-avatar" src="" alt="" class="w-7 h-7 rounded-full border border-[#39FF14]/40 object-cover hidden">
+                        <span id="nav-username" class="text-xs font-bold text-[#39FF14]/70 tracking-widest uppercase max-w-[90px] truncate hidden"></span>
+                        <a href="/api/logout" class="text-[10px] font-bold text-[#FF00FF]/60 hover:text-[#FF00FF] tracking-widest uppercase transition-colors" title="Log out">EXIT</a>
+                    </div>
                 </div>
                 <div class="md:hidden flex items-center">
                     <button onclick="app.toggleMobileMenu()" class="text-[#39FF14]/60 p-2 text-2xl"><span id="menu-icon">&#x2630;</span></button>
@@ -264,6 +269,15 @@
             <button onclick="app.navTo('rank')" class="block w-full text-left px-4 py-3 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Rank</button>
             <button onclick="app.navTo('stats')" class="block w-full text-left px-4 py-3 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Stats</button>
             <button onclick="app.navTo('settings')" class="block w-full text-left px-4 py-3 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Settings</button>
+            <div id="mobile-user" class="hidden border-t border-[#39FF14]/10 mt-2 pt-3">
+                <div class="flex items-center gap-3 px-4 py-2">
+                    <img id="mobile-avatar" src="" alt="" class="w-8 h-8 rounded-full border border-[#39FF14]/40 object-cover hidden">
+                    <div class="flex-1 min-w-0">
+                        <p id="mobile-username" class="text-xs font-bold text-[#39FF14]/70 tracking-widest uppercase truncate hidden"></p>
+                        <a href="/api/logout" class="text-[10px] font-bold text-[#FF00FF]/60 hover:text-[#FF00FF] tracking-widest uppercase transition-colors">EXIT SESSION</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </nav>
 
@@ -3526,6 +3540,51 @@
         };
 
         document.addEventListener('DOMContentLoaded', app.init);
+    </script>
+
+    <script>
+        (function initUserNav() {
+            fetch('/api/me', { credentials: 'same-origin' })
+                .then(r => r.ok ? r.json() : null)
+                .then(user => {
+                    if (!user) return;
+                    const navUser = document.getElementById('nav-user');
+                    const navAvatar = document.getElementById('nav-avatar');
+                    const navUsername = document.getElementById('nav-username');
+                    const mobileUser = document.getElementById('mobile-user');
+                    const mobileAvatar = document.getElementById('mobile-avatar');
+                    const mobileUsername = document.getElementById('mobile-username');
+
+                    const displayName = user.firstName || (user.email ? user.email.split('@')[0] : null) || 'OPERATIVE';
+
+                    if (navUser) {
+                        navUser.classList.remove('hidden');
+                        navUser.classList.add('flex');
+                    }
+                    if (navUsername) {
+                        navUsername.textContent = displayName;
+                        navUsername.classList.remove('hidden');
+                    }
+                    if (navAvatar && user.profileImageUrl) {
+                        navAvatar.src = user.profileImageUrl;
+                        navAvatar.alt = displayName;
+                        navAvatar.classList.remove('hidden');
+                    }
+                    if (mobileUser) {
+                        mobileUser.classList.remove('hidden');
+                    }
+                    if (mobileUsername) {
+                        mobileUsername.textContent = displayName;
+                        mobileUsername.classList.remove('hidden');
+                    }
+                    if (mobileAvatar && user.profileImageUrl) {
+                        mobileAvatar.src = user.profileImageUrl;
+                        mobileAvatar.alt = displayName;
+                        mobileAvatar.classList.remove('hidden');
+                    }
+                })
+                .catch(() => {});
+        })();
     </script>
 </body>
 </html>
