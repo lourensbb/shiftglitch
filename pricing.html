@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Pricing — ShiftGlitch | Free, Pro &amp; School Plans</title>
-    <meta name="description" content="ShiftGlitch is free for individual students. Pro plans unlock AI study planning and Squad Mode. School licenses give your entire institution full access from £399/year.">
+    <meta name="description" content="ShiftGlitch is free for individual students. Pro plans unlock AI study planning and Squad Mode. School licenses give your entire institution full access from $499/year.">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://shiftglitch.replit.app/pricing">
 
@@ -23,28 +23,28 @@
       "@type": "WebPage",
       "name": "ShiftGlitch Pricing",
       "url": "https://shiftglitch.replit.app/pricing",
-      "description": "Pricing plans for ShiftGlitch — the study OS for UK teenagers.",
+      "description": "Pricing plans for ShiftGlitch — the study OS for students.",
       "offers": [
         {
           "@type": "Offer",
           "name": "Free",
           "price": "0",
-          "priceCurrency": "GBP",
+          "priceCurrency": "USD",
           "description": "Core study tools — spaced repetition, Pomodoro, blurting, MCQ diagnostics. Free forever."
         },
         {
           "@type": "Offer",
           "name": "Netrunner Pro",
-          "price": "7.99",
-          "priceCurrency": "GBP",
+          "price": "9.99",
+          "priceCurrency": "USD",
           "billingIncrement": "month",
           "description": "Unlock AI study planning, Squad Mode, and priority access to new features."
         },
         {
           "@type": "Offer",
           "name": "School License",
-          "price": "399",
-          "priceCurrency": "GBP",
+          "price": "499",
+          "priceCurrency": "USD",
           "billingIncrement": "year",
           "description": "Full Pro access for all students plus Teacher Dashboard, class analytics, and CSV exports."
         }
@@ -420,7 +420,7 @@
                 <div class="plan-name">Free</div>
                 <div class="plan-tagline">// for individual students</div>
                 <div class="plan-price">
-                    <span class="price-currency">£</span>
+                    <span class="price-currency">$</span>
                     <span class="price-amount">0</span>
                     <span class="price-period">forever</span>
                 </div>
@@ -444,11 +444,11 @@
                 <div class="plan-name">Netrunner Pro</div>
                 <div class="plan-tagline">// for serious revision</div>
                 <div class="plan-price">
-                    <span class="price-currency">£</span>
-                    <span class="price-amount" id="pro-price">7.99</span>
+                    <span class="price-currency">$</span>
+                    <span class="price-amount" id="pro-price">9.99</span>
                     <span class="price-period" id="pro-period">/month</span>
                 </div>
-                <div class="price-annual" id="pro-annual">£59.99/year — billed once (save £35.89)</div>
+                <div class="price-annual" id="pro-annual">$74.99/year — billed once (save $44.89)</div>
                 <div class="price-note" id="pro-note">Billed monthly. Cancel any time.</div>
                 <ul class="features-list" aria-label="Pro plan features">
                     <li><span class="check">✓</span> Everything in Free</li>
@@ -467,8 +467,8 @@
                 <div class="plan-name">School License</div>
                 <div class="plan-tagline">// for institutions</div>
                 <div class="plan-price">
-                    <span class="price-currency">£</span>
-                    <span class="price-amount">399</span>
+                    <span class="price-currency">$</span>
+                    <span class="price-amount">499</span>
                     <span class="price-period">/year</span>
                 </div>
                 <div class="price-note">Covers your entire school. One invoice.</div>
@@ -533,7 +533,7 @@
             </div>
             <div class="faq-item">
                 <div class="faq-q">// Can I pay for Pro annually to save money?</div>
-                <div class="faq-a">Yes. Annual billing is £59.99/year — which works out to £5/month, saving you £35.89 compared to paying month-to-month. Toggle the billing switch above to see annual pricing.</div>
+                <div class="faq-a">Yes. Annual billing is $74.99/year — which works out to $6.25/month, saving you $44.89 compared to paying month-to-month. Toggle the billing switch above to see annual pricing.</div>
             </div>
             <div class="faq-item">
                 <div class="faq-q">// What does the School License cover exactly?</div>
@@ -571,12 +571,12 @@
             lblA.classList.toggle('active', v);
             lblA.classList.toggle('inactive', !v);
             if (v) {
-                proPrice.textContent  = '5.00';
+                proPrice.textContent  = '6.25';
                 proPeriod.textContent = '/month';
                 proAnnual.classList.add('visible');
-                proNote.textContent = 'Billed as £59.99/year. Cancel any time.';
+                proNote.textContent = 'Billed as $74.99/year. Cancel any time.';
             } else {
-                proPrice.textContent  = '7.99';
+                proPrice.textContent  = '9.99';
                 proPeriod.textContent = '/month';
                 proAnnual.classList.remove('visible');
                 proNote.textContent = 'Billed monthly. Cancel any time.';

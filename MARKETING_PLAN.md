@@ -33,30 +33,30 @@ Two static license files with no pricing page meant zero discoverability, no sel
 
 | Tier | Price | Who It's For |
 |------|-------|-------------|
-| **Free** | £0 forever | Individual students who want core tools |
-| **Netrunner Pro** | £7.99/month or £59.99/year | Students who want AI and Squad Mode |
-| **School License** | £399/year | Schools, tutoring centres, and academies |
+| **Free** | $0 forever | Individual students who want core tools |
+| **Netrunner Pro** | $9.99/month or $74.99/year | Students who want AI and Squad Mode |
+| **School License** | $499/year | Schools, tutoring centres, and academies |
 
 ### Why These Numbers Are Right
 
 **Free tier is genuinely generous.** Unlimited flashcard decks, full Pomodoro, blurting, MCQ diagnostics, and rank progression — all free. This is intentional. The free tier is your primary acquisition channel. Every student who uses it for free is a potential word-of-mouth referral and a potential Pro converter.
 
-**Pro at £7.99/month is positioned correctly.** For context: Quizlet is £3.99/month (but much less capable), Anki is free, Forest is £3.99 one-time. Your Pro tier is priced above commodity flashcard apps because it includes an AI study planner. That is the differentiator — position it as such.
+**Pro at $9.99/month is positioned correctly.** For context: Quizlet is $4.99/month (but much less capable), Anki is free, Forest is $4.99 one-time. Your Pro tier is priced above commodity flashcard apps because it includes an AI study planner. That is the differentiator — position it as such.
 
-**Annual Pro at £59.99/year (≈ £5/month) drives commitment.** Students who pay annually are far more likely to build genuine habits and see results. Results create testimonials. Testimonials create more students.
+**Annual Pro at $74.99/year (≈ $6.25/month) drives commitment.** Students who pay annually are far more likely to build genuine habits and see results. Results create testimonials. Testimonials create more students.
 
-**School License at £399/year is underpriced but strategically correct.** Schools regularly pay £500–5,000/year for EdTech software. £399 removes procurement friction — heads of department can often approve this without going to a full committee. Once you have 10 school licenses (£3,990/year) and 200 Pro subscribers (£11,988/year), you have a real business. Raise school pricing to £599 when you have 20 schools.
+**School License at $499/year is underpriced but strategically correct.** Schools regularly pay $600–6,000/year for EdTech software. $499 removes procurement friction — heads of department can often approve this without going to a full committee. Once you have 10 school licenses ($4,990/year) and 200 Pro subscribers ($11,988/year), you have a real business. Raise school pricing to $599 when you have 20 schools.
 
 ### Revenue Projection (Conservative)
 
 | Scenario | Revenue |
 |----------|---------|
-| 10 schools + 100 Pro subs | £3,990 + £7,188 = **£11,178/year** |
-| 25 schools + 500 Pro subs | £9,975 + £35,988 = **£45,963/year** |
-| 50 schools + 1,000 Pro subs | £19,950 + £71,976 = **£91,926/year** |
+| 10 schools + 100 Pro subs | $4,990 + $11,988 = **$16,978/year** |
+| 25 schools + 500 Pro subs | $12,475 + $59,940 = **$72,415/year** |
+| 50 schools + 1,000 Pro subs | $24,950 + $119,880 = **$144,830/year** |
 
 ### AI Cost Reality Check
-Google Gemini 2.0 Flash costs approximately $0.002 per study planning session (5,000 tokens). Even at 100 sessions/month per Pro user, AI costs ≈ $0.20/user/month. At £7.99/month revenue, your AI margin is excellent. The AI is not the cost problem — hosting and support are.
+Google Gemini 2.0 Flash costs approximately $0.002 per study planning session (5,000 tokens). Even at 100 sessions/month per Pro user, AI costs ≈ $0.20/user/month. At $9.99/month revenue, your AI margin is excellent. The AI is not the cost problem — hosting and support are.
 
 ---
 
@@ -288,7 +288,7 @@ Search Google for "UK GCSE teacher blog" and "A level revision blog." There are 
 - [ ] Follow up with first school batch
 - [ ] Ask first school to provide a testimonial
 - [ ] Use testimonial in school outreach emails
-- [ ] Raise school pricing to £499/year at 20 school milestone
+- [ ] Raise school pricing to $599/year at 20 school milestone
 
 ---
 
@@ -384,7 +384,7 @@ One committed teacher recommending ShiftGlitch to their class = 30 students over
 **Step 4:** When a teacher responds positively, offer a school license with a 30-day free trial. Remove all friction from the first commitment.
 
 **The School Pitch:**
-> "ShiftGlitch gives every student in your school access to evidence-based revision tools — the same techniques used by the highest-performing students at Oxbridge. The Teacher Dashboard gives you live visibility into study habits. £399 per year covers your entire school — that is less than the cost of two textbooks."
+> "ShiftGlitch gives every student in your school access to evidence-based revision tools — the same techniques used by the highest-performing students at Stanford, Harvard, or MIT. The Teacher Dashboard gives you live visibility into study habits. $499 per year covers your entire school — that is less than the cost of two textbooks."
 
 ---
 
