@@ -321,8 +321,10 @@
             <div id="swipe-box-badge" class="text-[10px] font-bold text-[#39FF14]/40 uppercase tracking-widest">Box 1</div>
         </div>
         <div class="flex-1 flex flex-col items-center justify-center px-6 py-4 relative overflow-hidden select-none">
-            <div id="swipe-hint-up" class="absolute top-8 text-[#39FF14]/20 text-xs font-mono uppercase tracking-widest">↑ Skip</div>
-            <div id="swipe-hint-down" class="absolute bottom-28 text-[#39FF14]/20 text-xs font-mono uppercase tracking-widest">↓ Got It</div>
+            <div class="absolute top-4 left-0 right-0 flex justify-center gap-8 text-[10px] font-mono text-[#39FF14]/20 uppercase tracking-widest pointer-events-none">
+                <span>↑ Next/Skip</span>
+                <span>↓ Previous</span>
+            </div>
             <div id="swipe-card-wrap" class="sg-swipe-wrap w-full max-w-sm cursor-pointer" ontouchstart="app.swipeTouchStart(event)" ontouchend="app.swipeTouchEnd(event)" onmousedown="app.swipeMouseDown(event)">
                 <div id="swipe-card-inner" class="bg-black border border-[#39FF14]/30 p-8 min-h-[280px] flex flex-col items-center justify-center text-center shadow-[0_0_30px_rgba(57,255,20,0.06)]" onclick="app.swipeFlip()">
                     <div id="swipe-card-face" class="text-white text-xl font-bold leading-relaxed"></div>
@@ -330,10 +332,16 @@
                 </div>
             </div>
         </div>
-        <div class="flex gap-3 px-6 pb-8 pt-3 border-t border-[#39FF14]/10">
-            <button onclick="app.swipeRate(false)" class="flex-1 border border-[#FF00FF]/40 text-[#FF00FF]/70 hover:text-[#FF00FF] hover:border-[#FF00FF] py-4 font-bold text-xs uppercase tracking-widest font-mono transition-colors">[ SKIP ]</button>
-            <button id="swipe-burn-btn" onclick="app.swipeBurn()" class="border border-[#FF6600]/40 text-[#FF6600]/70 hover:text-[#FF6600] hover:border-[#FF6600] px-5 py-4 font-bold text-xs uppercase tracking-widest font-mono transition-colors hidden">🔥</button>
-            <button onclick="app.swipeRate(true)" class="flex-1 border border-[#39FF14]/40 text-[#39FF14]/70 hover:text-[#39FF14] hover:border-[#39FF14] py-4 font-bold text-xs uppercase tracking-widest font-mono transition-colors">[ GOT IT ]</button>
+        <!-- Grading buttons — shown/hidden based on flip state -->
+        <div id="swipe-grade-btns" class="hidden flex gap-2 px-4 pb-2 pt-2">
+            <button onclick="app.swipeGrade('again')" class="flex-1 border border-[#FF00FF]/40 text-[#FF00FF]/70 hover:text-[#FF00FF] hover:border-[#FF00FF] py-3 font-bold text-[10px] uppercase tracking-widest font-mono transition-colors">[ AGAIN ]</button>
+            <button onclick="app.swipeGrade('yet')" class="flex-1 border border-[#8A2BE2]/40 text-[#8A2BE2]/70 hover:text-[#8A2BE2] hover:border-[#8A2BE2] py-3 font-bold text-[10px] uppercase tracking-widest font-mono transition-colors">[ NOT YET 🛡️ ]</button>
+            <button onclick="app.swipeGrade('got')" class="flex-1 border border-[#39FF14]/40 text-[#39FF14]/70 hover:text-[#39FF14] hover:border-[#39FF14] py-3 font-bold text-[10px] uppercase tracking-widest font-mono transition-colors">[ GOT IT ]</button>
+        </div>
+        <div class="flex gap-3 px-4 pb-6 pt-2 border-t border-[#39FF14]/10">
+            <button id="swipe-back-btn" onclick="app.swipeBack()" class="border border-[#39FF14]/20 text-[#39FF14]/30 hover:text-[#39FF14]/60 hover:border-[#39FF14]/40 px-5 py-3 font-bold text-[10px] uppercase tracking-widest font-mono transition-colors">← PREV</button>
+            <div class="flex-1 text-center text-[10px] font-mono text-[#39FF14]/20 uppercase tracking-widest self-center" id="swipe-flip-hint">Tap card to reveal answer</div>
+            <button id="swipe-burn-btn" onclick="app.swipeBurn()" class="border border-[#FF6600]/40 text-[#FF6600]/70 hover:text-[#FF6600] hover:border-[#FF6600] px-5 py-3 font-bold text-[10px] uppercase tracking-widest font-mono transition-colors hidden">🔥 BURN</button>
         </div>
     </div>
 
@@ -982,6 +990,7 @@
             swipeTouchStartY: 0,
             swipeMouseStartY: 0,
             swipeMouseDown: false,
+            swipeHistory: [],
             bossModeActive: false,
             bossDuration: 10 * 60,
             bossTimeLeft: 0,
@@ -3167,6 +3176,7 @@
                 hud.classList.remove('hidden');
                 hud.classList.add('flex');
                 state.swipeHUDFlipped = false;
+                state.swipeHistory = [];
                 app.swipeUpdateCard();
             },
             closeSwipeHUD() {
@@ -3183,13 +3193,19 @@
                 const face = document.getElementById('swipe-card-face');
                 const label = document.getElementById('swipe-card-label');
                 const burnBtn = document.getElementById('swipe-burn-btn');
+                const gradeRow = document.getElementById('swipe-grade-btns');
+                const flipHint = document.getElementById('swipe-flip-hint');
+                const backBtn = document.getElementById('swipe-back-btn');
                 if (!card) { app.closeSwipeHUD(); app.showNotification('Study session complete!'); state.view = 'decks'; app.render(); return; }
                 if (progressBar) progressBar.style.width = ((idx / total) * 100) + '%';
                 if (counter) counter.textContent = (idx + 1) + ' / ' + total;
                 if (boxBadge) boxBadge.textContent = 'Box ' + card.box;
                 if (face) face.textContent = state.swipeHUDFlipped ? card.back : card.front;
-                if (label) { label.textContent = state.swipeHUDFlipped ? 'BOX ' + card.box : 'TAP TO REVEAL'; label.style.color = state.swipeHUDFlipped ? '#39FF14' : ''; }
+                if (label) { label.textContent = state.swipeHUDFlipped ? '↑ to skip / use buttons below' : 'TAP TO REVEAL'; label.style.color = state.swipeHUDFlipped ? '#39FF14' : ''; }
+                if (gradeRow) { gradeRow.classList.toggle('hidden', !state.swipeHUDFlipped); }
+                if (flipHint) { flipHint.textContent = state.swipeHUDFlipped ? '' : 'Tap card to reveal'; }
                 if (burnBtn) { burnBtn.classList.toggle('hidden', card.box !== 5); }
+                if (backBtn) { backBtn.classList.toggle('opacity-30', state.swipeHistory.length === 0); backBtn.classList.toggle('pointer-events-none', state.swipeHistory.length === 0); }
                 const inner = document.getElementById('swipe-card-inner');
                 if (inner) inner.style.borderColor = state.swipeHUDFlipped ? 'rgba(57,255,20,0.4)' : 'rgba(57,255,20,0.15)';
             },
@@ -3197,16 +3213,59 @@
                 state.swipeHUDFlipped = !state.swipeHUDFlipped;
                 app.swipeUpdateCard();
             },
-            swipeRate(correct) {
+            // Navigate forward without grading (skip/next)
+            swipeNext() {
+                const card = state.fcStudyQueue[state.fcStudyIndex];
+                if (!card) return;
+                const wrap = document.getElementById('swipe-card-wrap');
+                if (wrap) wrap.classList.add('sg-swipe-exit-up');
+                setTimeout(() => {
+                    if (wrap) wrap.classList.remove('sg-swipe-exit-up');
+                    state.swipeHistory.push(state.fcStudyIndex);
+                    cardStore.demote(card);
+                    state.fcStudyQueue.push(card);
+                    state.fcStudyIndex++;
+                    state.swipeHUDFlipped = false;
+                    app.swipeUpdateCard();
+                    app.render();
+                }, 200);
+            },
+            // Navigate back to previous card (restore index from history)
+            swipeBack() {
+                if (state.swipeHistory.length === 0) return;
+                const wrap = document.getElementById('swipe-card-wrap');
+                if (wrap) wrap.classList.add('sg-swipe-exit-down');
+                setTimeout(() => {
+                    if (wrap) wrap.classList.remove('sg-swipe-exit-down');
+                    state.fcStudyIndex = state.swipeHistory.pop();
+                    state.swipeHUDFlipped = false;
+                    app.swipeUpdateCard();
+                    app.render();
+                }, 200);
+            },
+            // Grade the current card (again / yet / got)
+            swipeGrade(grade) {
                 const card = state.fcStudyQueue[state.fcStudyIndex];
                 if (!card) return;
                 const wasBox5 = card.box === 5;
                 const wrap = document.getElementById('swipe-card-wrap');
-                if (wrap) { wrap.classList.add(correct ? 'sg-swipe-exit-down' : 'sg-swipe-exit-up'); }
+                const correct = grade === 'got';
+                if (wrap) wrap.classList.add(correct ? 'sg-swipe-exit-down' : 'sg-swipe-exit-up');
                 setTimeout(() => {
                     if (wrap) wrap.classList.remove('sg-swipe-exit-up', 'sg-swipe-exit-down');
-                    if (correct) { cardStore.promote(card); } else { cardStore.demote(card); state.fcStudyQueue.push(card); }
+                    if (correct) {
+                        cardStore.promote(card);
+                    } else {
+                        cardStore.demote(card);
+                        state.fcStudyQueue.push(card);
+                    }
+                    if (grade === 'yet') {
+                        state.showYetShield = true;
+                        state.yetConcept = card.front;
+                        yetStore.add(card.front);
+                    }
                     rankEngine.recordCardStudy();
+                    state.swipeHistory.push(state.fcStudyIndex);
                     state.fcStudyIndex++;
                     state.swipeHUDFlipped = false;
                     app.swipeUpdateCard();
@@ -3236,10 +3295,9 @@
             },
             swipeTouchEnd(e) {
                 const dy = e.changedTouches[0].clientY - state.swipeTouchStartY;
-                if (Math.abs(dy) > 60) {
-                    if (!state.swipeHUDFlipped) { app.swipeFlip(); return; }
-                    app.swipeRate(dy < 0);
-                }
+                if (Math.abs(dy) < 50) { app.swipeFlip(); return; }
+                if (dy < 0) { app.swipeNext(); }
+                else { app.swipeBack(); }
             },
             swipeMouseDown(e) {
                 state.swipeMouseDown = true;
@@ -3248,10 +3306,9 @@
                     if (!state.swipeMouseDown) return;
                     state.swipeMouseDown = false;
                     const dy = ev.clientY - state.swipeMouseStartY;
-                    if (Math.abs(dy) > 60) {
-                        if (!state.swipeHUDFlipped) { app.swipeFlip(); }
-                        else { app.swipeRate(dy < 0); }
-                    }
+                    if (Math.abs(dy) < 20) { app.swipeFlip(); }
+                    else if (dy < 0) { app.swipeNext(); }
+                    else { app.swipeBack(); }
                     document.removeEventListener('mouseup', up);
                 };
                 document.addEventListener('mouseup', up);
