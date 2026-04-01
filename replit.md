@@ -40,6 +40,7 @@ An Express.js v5 server manages authentication, session handling, static file se
 - **Exploit Missions (MCQ Diagnostics):** 100-question diagnostics across 5 missions, tracking knowledge gaps and contributing to rank.
 - **Charts & Statistics:** Visualizations and metrics for study activity.
 - **Data Management:** JSON export/import of user data (excluding Gemini key).
+- **Squad Mode:** Async co-op groups of up to 4 users. Create or join with a 6-char invite code. Squad streak = minimum individual streak across all members — one weak link drops it. AFK roast message appears for members inactive 24+ hours. Members can leave; squad dissolves when all leave. Stats refresh on page open (no polling). Ping fires after every focus session.
 - **Leaderboard:** Global Focus Score rankings backed by PostgreSQL. Users compete by gamertag (set in Settings). Score syncs after every Pomodoro session. Formula: (Pomodoros × 10) + (Streak × 25) + (Cards Mastered × 2) + (Blurts × 15). Top 50 shown; caller's row highlighted even if outside top 50.
 - **Teacher Dashboard:** A separate interface (`teacher.html`) for classroom management, allowing teachers to import student data, view progress, and generate reports.
 - **Teen-Focused Enhancements:** Includes a dark mode default, phone-lock nudges, "What I Learned?" prompts after Pomodoro sessions, an exam countdown widget, and a "Study Buddy System" for progress comparison.

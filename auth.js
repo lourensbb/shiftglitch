@@ -68,6 +68,22 @@ async function ensureSchema() {
       await client.query(`DROP TABLE IF EXISTS leaderboard CASCADE;`);
     }
     await client.query(`DROP TABLE IF EXISTS sessions CASCADE;`);
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS squads (
+        id VARCHAR(8) PRIMARY KEY,
+        name VARCHAR(40) NOT NULL,
+        invite_code VARCHAR(8) UNIQUE NOT NULL,
+        created_at TIMESTAMP DEFAULT NOW()
+      );
+      CREATE TABLE IF NOT EXISTS squad_members (
+        squad_id VARCHAR(8) NOT NULL REFERENCES squads(id) ON DELETE CASCADE,
+        user_id VARCHAR NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        joined_at TIMESTAMP DEFAULT NOW(),
+        last_active TIMESTAMP DEFAULT NOW(),
+        PRIMARY KEY (squad_id, user_id)
+      );
+      ALTER TABLE squad_members ADD COLUMN IF NOT EXISTS last_active TIMESTAMP DEFAULT NOW();
+    `);
     console.log('[auth] DB schema ready');
   } catch (err) {
     console.error('[auth] Schema setup error:', err.message);
@@ -300,4 +316,85 @@ async function getMyLeaderboardEntry(userId) {
   return rows[0] || null;
 }
 
-module.exports = { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, updateGamertag, getUserGamertag, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry };
+function generateCode(len) {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const { randomBytes } = require('crypto');
+  let result = '';
+  const bytes = randomBytes(len * 2);
+  for (let i = 0; i < len; i++) result += chars[bytes[i] % chars.length];
+  return result;
+}
+
+async function createSquad(userId, name) {
+  const squadId = generateCode(8);
+  const inviteCode = generateCode(6);
+  const existing = await getUserSquad(userId);
+  if (existing) throw new Error('ALREADY_IN_SQUAD');
+  await pool.query(
+    'INSERT INTO squads (id, name, invite_code) VALUES ($1, $2, $3)',
+    [squadId, name.trim().slice(0, 40), inviteCode]
+  );
+  await pool.query(
+    'INSERT INTO squad_members (squad_id, user_id, last_active) VALUES ($1, $2, NOW())',
+    [squadId, userId]
+  );
+  return { squadId, inviteCode };
+}
+
+async function joinSquad(userId, inviteCode) {
+  const { rows } = await pool.query('SELECT id, name FROM squads WHERE invite_code = $1', [inviteCode.toUpperCase()]);
+  if (!rows.length) throw new Error('INVALID_CODE');
+  const squad = rows[0];
+  const memberCount = await pool.query('SELECT COUNT(*) FROM squad_members WHERE squad_id = $1', [squad.id]);
+  if (parseInt(memberCount.rows[0].count, 10) >= 4) throw new Error('SQUAD_FULL');
+  const existing = await getUserSquad(userId);
+  if (existing) throw new Error('ALREADY_IN_SQUAD');
+  const alreadyMember = await pool.query('SELECT 1 FROM squad_members WHERE squad_id = $1 AND user_id = $2', [squad.id, userId]);
+  if (alreadyMember.rows.length) throw new Error('ALREADY_MEMBER');
+  await pool.query(
+    'INSERT INTO squad_members (squad_id, user_id, last_active) VALUES ($1, $2, NOW())',
+    [squad.id, userId]
+  );
+  return squad;
+}
+
+async function leaveSquad(userId) {
+  const squad = await getUserSquad(userId);
+  if (!squad) throw new Error('NOT_IN_SQUAD');
+  await pool.query('DELETE FROM squad_members WHERE squad_id = $1 AND user_id = $2', [squad.id, userId]);
+  const remaining = await pool.query('SELECT COUNT(*) FROM squad_members WHERE squad_id = $1', [squad.id]);
+  if (parseInt(remaining.rows[0].count, 10) === 0) {
+    await pool.query('DELETE FROM squads WHERE id = $1', [squad.id]);
+  }
+}
+
+async function getUserSquad(userId) {
+  const { rows } = await pool.query(
+    `SELECT s.id, s.name, s.invite_code, sm.joined_at
+     FROM squads s JOIN squad_members sm ON s.id = sm.squad_id
+     WHERE sm.user_id = $1`,
+    [userId]
+  );
+  return rows[0] || null;
+}
+
+async function getSquadStats(squadId) {
+  const { rows } = await pool.query(
+    `SELECT u.id, u.gamertag, u.rank_tier, u.streak, u.last_updated, sm.last_active
+     FROM squad_members sm
+     JOIN users u ON u.id = sm.user_id
+     WHERE sm.squad_id = $1
+     ORDER BY sm.joined_at ASC`,
+    [squadId]
+  );
+  return rows;
+}
+
+async function updateSquadLastActive(userId) {
+  await pool.query(
+    'UPDATE squad_members SET last_active = NOW() WHERE user_id = $1',
+    [userId]
+  );
+}
+
+module.exports = { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, updateGamertag, getUserGamertag, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive };

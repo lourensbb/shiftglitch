@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-const { getSessionMiddleware, setupAuthRoutes, requireAuth, getUserGamertag, updateGamertag, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry } = require('./auth');
+const { getSessionMiddleware, setupAuthRoutes, requireAuth, getUserGamertag, updateGamertag, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive } = require('./auth');
 
 const app = express();
 
@@ -153,6 +153,91 @@ app.get('/api/settings/gamertag', requireAuth, async (req, res) => {
     res.json({ gamertag });
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch gamertag' });
+  }
+});
+
+app.post('/api/squad/create', requireAuth, async (req, res) => {
+  try {
+    const { name } = req.body;
+    if (!name || typeof name !== 'string' || !name.trim()) return res.status(400).json({ error: 'Squad name required' });
+    const result = await createSquad(req.session.userId, name);
+    res.json({ ok: true, ...result });
+  } catch (err) {
+    if (err.message === 'ALREADY_IN_SQUAD') return res.status(409).json({ error: 'You are already in a squad. Leave first.' });
+    console.error('/api/squad/create error:', err);
+    res.status(500).json({ error: 'Failed to create squad' });
+  }
+});
+
+app.post('/api/squad/join', requireAuth, async (req, res) => {
+  try {
+    const { inviteCode } = req.body;
+    if (!inviteCode || typeof inviteCode !== 'string') return res.status(400).json({ error: 'Invite code required' });
+    const squad = await joinSquad(req.session.userId, inviteCode.trim());
+    res.json({ ok: true, squadId: squad.id, name: squad.name });
+  } catch (err) {
+    if (err.message === 'INVALID_CODE') return res.status(404).json({ error: 'Invalid invite code.' });
+    if (err.message === 'SQUAD_FULL') return res.status(409).json({ error: 'Squad is full (max 4 members).' });
+    if (err.message === 'ALREADY_IN_SQUAD') return res.status(409).json({ error: 'You are already in a squad. Leave first.' });
+    if (err.message === 'ALREADY_MEMBER') return res.status(409).json({ error: 'Already a member of this squad.' });
+    console.error('/api/squad/join error:', err);
+    res.status(500).json({ error: 'Failed to join squad' });
+  }
+});
+
+app.post('/api/squad/leave', requireAuth, async (req, res) => {
+  try {
+    await leaveSquad(req.session.userId);
+    res.json({ ok: true });
+  } catch (err) {
+    if (err.message === 'NOT_IN_SQUAD') return res.status(404).json({ error: 'You are not in a squad.' });
+    console.error('/api/squad/leave error:', err);
+    res.status(500).json({ error: 'Failed to leave squad' });
+  }
+});
+
+app.get('/api/squad', requireAuth, async (req, res) => {
+  try {
+    const squad = await getUserSquad(req.session.userId);
+    if (!squad) return res.json({ squad: null });
+    const members = await getSquadStats(squad.id);
+    const now = Date.now();
+    const enriched = members.map(m => {
+      const lastActive = m.last_active ? new Date(m.last_active).getTime() : 0;
+      const hoursInactive = (now - lastActive) / 3600000;
+      const isMe = m.id === req.session.userId;
+      return {
+        gamertag: m.gamertag || 'OPERATIVE',
+        rankTier: m.rank_tier || 'NPC',
+        streak: m.streak || 0,
+        lastActive: m.last_active,
+        hoursInactive: Math.floor(hoursInactive),
+        isAfk: hoursInactive >= 24,
+        isMe
+      };
+    });
+    const minStreak = enriched.length > 0 ? Math.min(...enriched.map(m => m.streak)) : 0;
+    res.json({
+      squad: {
+        id: squad.id,
+        name: squad.name,
+        inviteCode: squad.invite_code,
+        squadStreak: minStreak,
+        members: enriched
+      }
+    });
+  } catch (err) {
+    console.error('/api/squad error:', err);
+    res.status(500).json({ error: 'Failed to load squad' });
+  }
+});
+
+app.post('/api/squad/ping', requireAuth, async (req, res) => {
+  try {
+    await updateSquadLastActive(req.session.userId);
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Ping failed' });
   }
 });
 
