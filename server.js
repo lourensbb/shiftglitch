@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-const { getSessionMiddleware, setupAuthRoutes, requireAuth, getUserGamertag, updateGamertag, updateLeaderboardGamertag, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry } = require('./auth');
+const { getSessionMiddleware, setupAuthRoutes, requireAuth, getUserGamertag, updateGamertag, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry } = require('./auth');
 
 const app = express();
 
@@ -140,7 +140,6 @@ app.post('/api/settings/gamertag', requireAuth, async (req, res) => {
     if (!clean) return res.status(400).json({ error: 'Gamertag must contain letters or numbers' });
     await updateGamertag(req.session.userId, clean);
     if (req.session.userProfile) req.session.userProfile.gamertag = clean;
-    await updateLeaderboardGamertag(req.session.userId, clean).catch(() => {});
     res.json({ ok: true, gamertag: clean });
   } catch (err) {
     console.error('/api/settings/gamertag error:', err);

@@ -10,11 +10,9 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@types/connect-pg-simple": "^7.0.3",
     "@types/express-session": "^1.18.2",
     "@types/memoizee": "^0.4.12",
     "@types/passport": "^1.0.17",
-    "connect-pg-simple": "^10.0.0",
     "express": "^5.2.1",
     "express-session": "^1.19.0",
     "memoizee": "^0.4.17",

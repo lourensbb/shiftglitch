@@ -1,6 +1,5 @@
 const oidc = require('openid-client');
 const session = require('express-session');
-const connectPg = require('connect-pg-simple');
 const { Pool } = require('pg');
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
@@ -21,14 +20,6 @@ async function ensureSchema() {
   const client = await pool.connect();
   try {
     await client.query(`
-      CREATE TABLE IF NOT EXISTS sessions (
-        sid VARCHAR NOT NULL PRIMARY KEY,
-        sess JSON NOT NULL,
-        expire TIMESTAMP(6) NOT NULL
-      );
-      CREATE INDEX IF NOT EXISTS IDX_session_expire ON sessions(expire);
-    `);
-    await client.query(`
       CREATE TABLE IF NOT EXISTS users (
         id VARCHAR PRIMARY KEY,
         email VARCHAR UNIQUE,
@@ -37,25 +28,46 @@ async function ensureSchema() {
         profile_image_url VARCHAR,
         replit_username VARCHAR,
         gamertag VARCHAR,
-        created_at TIMESTAMP DEFAULT NOW(),
-        updated_at TIMESTAMP DEFAULT NOW()
-      );
-      ALTER TABLE users ADD COLUMN IF NOT EXISTS gamertag VARCHAR;
-      ALTER TABLE users ADD COLUMN IF NOT EXISTS replit_username VARCHAR;
-    `);
-    await client.query(`
-      CREATE TABLE IF NOT EXISTS leaderboard (
-        user_id VARCHAR PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
-        gamertag VARCHAR NOT NULL,
         focus_score INTEGER NOT NULL DEFAULT 0,
         rank_tier VARCHAR NOT NULL DEFAULT 'NPC',
         streak INTEGER NOT NULL DEFAULT 0,
         pomodoros INTEGER NOT NULL DEFAULT 0,
         cards_mastered INTEGER NOT NULL DEFAULT 0,
         blurts INTEGER NOT NULL DEFAULT 0,
-        last_updated TIMESTAMP DEFAULT NOW()
+        last_updated TIMESTAMP DEFAULT NOW(),
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
       );
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS gamertag VARCHAR;
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS replit_username VARCHAR;
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS focus_score INTEGER NOT NULL DEFAULT 0;
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS rank_tier VARCHAR NOT NULL DEFAULT 'NPC';
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS streak INTEGER NOT NULL DEFAULT 0;
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS pomodoros INTEGER NOT NULL DEFAULT 0;
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS cards_mastered INTEGER NOT NULL DEFAULT 0;
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS blurts INTEGER NOT NULL DEFAULT 0;
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS last_updated TIMESTAMP DEFAULT NOW();
     `);
+    const { rows: lbExists } = await client.query(`
+      SELECT 1 FROM information_schema.tables WHERE table_name = 'leaderboard'
+    `);
+    if (lbExists.length > 0) {
+      await client.query(`
+        UPDATE users u SET
+          gamertag       = COALESCE(u.gamertag,       l.gamertag),
+          focus_score    = GREATEST(u.focus_score,    l.focus_score),
+          rank_tier      = COALESCE(NULLIF(u.rank_tier, 'NPC'), l.rank_tier, 'NPC'),
+          streak         = GREATEST(u.streak,         l.streak),
+          pomodoros      = GREATEST(u.pomodoros,      l.pomodoros),
+          cards_mastered = GREATEST(u.cards_mastered, l.cards_mastered),
+          blurts         = GREATEST(u.blurts,         l.blurts),
+          last_updated   = GREATEST(COALESCE(u.last_updated, NOW()), COALESCE(l.last_updated, NOW()))
+        FROM leaderboard l WHERE l.user_id = u.id
+      `);
+      console.log('[auth] Migrated leaderboard data into users table');
+      await client.query(`DROP TABLE IF EXISTS leaderboard CASCADE;`);
+    }
+    await client.query(`DROP TABLE IF EXISTS sessions CASCADE;`);
     console.log('[auth] DB schema ready');
   } catch (err) {
     console.error('[auth] Schema setup error:', err.message);
@@ -65,16 +77,8 @@ async function ensureSchema() {
 }
 
 function getSessionMiddleware() {
-  const PgStore = connectPg(session);
-  const store = new PgStore({
-    pool,
-    createTableIfMissing: false,
-    tableName: 'sessions',
-    ttl: 7 * 24 * 60 * 60
-  });
   return session({
     secret: process.env.SESSION_SECRET,
-    store,
     resave: false,
     saveUninitialized: false,
     cookie: {
@@ -249,15 +253,11 @@ async function getUserGamertag(userId) {
   return derived;
 }
 
-async function updateLeaderboardGamertag(userId, gamertag) {
-  await pool.query('UPDATE leaderboard SET gamertag = $1 WHERE user_id = $2', [gamertag, userId]);
-}
-
 async function upsertLeaderboard({ userId, gamertag, focusScore, rankTier, streak, pomodoros, cardsMastered, blurts }) {
   await pool.query(
-    `INSERT INTO leaderboard (user_id, gamertag, focus_score, rank_tier, streak, pomodoros, cards_mastered, blurts, last_updated)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())
-     ON CONFLICT (user_id) DO UPDATE SET
+    `INSERT INTO users (id, gamertag, focus_score, rank_tier, streak, pomodoros, cards_mastered, blurts, last_updated, updated_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW(), NOW())
+     ON CONFLICT (id) DO UPDATE SET
        gamertag = EXCLUDED.gamertag,
        focus_score = EXCLUDED.focus_score,
        rank_tier = EXCLUDED.rank_tier,
@@ -265,14 +265,19 @@ async function upsertLeaderboard({ userId, gamertag, focusScore, rankTier, strea
        pomodoros = EXCLUDED.pomodoros,
        cards_mastered = EXCLUDED.cards_mastered,
        blurts = EXCLUDED.blurts,
-       last_updated = NOW()`,
+       last_updated = NOW(),
+       updated_at = NOW()`,
     [userId, gamertag, focusScore, rankTier, streak, pomodoros, cardsMastered, blurts]
   );
 }
 
 async function getLeaderboard(limit = 50) {
   const { rows } = await pool.query(
-    'SELECT user_id, gamertag, focus_score, rank_tier, streak, pomodoros, cards_mastered, blurts, last_updated FROM leaderboard ORDER BY focus_score DESC, last_updated ASC, user_id ASC LIMIT $1',
+    `SELECT id AS user_id, gamertag, focus_score, rank_tier, streak, pomodoros, cards_mastered, blurts, last_updated
+     FROM users
+     WHERE focus_score > 0 OR pomodoros > 0 OR streak > 0 OR cards_mastered > 0 OR blurts > 0
+     ORDER BY focus_score DESC, last_updated ASC, id ASC
+     LIMIT $1`,
     [limit]
   );
   return rows;
@@ -280,15 +285,19 @@ async function getLeaderboard(limit = 50) {
 
 async function getMyLeaderboardEntry(userId) {
   const { rows } = await pool.query(
-    `SELECT l.user_id, l.gamertag, l.focus_score, l.rank_tier, l.streak, l.pomodoros, l.cards_mastered, l.blurts,
-       (SELECT COUNT(*) + 1 FROM leaderboard WHERE focus_score > l.focus_score
-          OR (focus_score = l.focus_score AND last_updated < l.last_updated)
-          OR (focus_score = l.focus_score AND last_updated = l.last_updated AND user_id < l.user_id)
+    `SELECT u.id AS user_id, u.gamertag, u.focus_score, u.rank_tier, u.streak, u.pomodoros, u.cards_mastered, u.blurts,
+       (SELECT COUNT(*) + 1 FROM users
+        WHERE (focus_score > 0 OR pomodoros > 0 OR streak > 0 OR cards_mastered > 0 OR blurts > 0)
+          AND (
+            focus_score > u.focus_score
+            OR (focus_score = u.focus_score AND last_updated < u.last_updated)
+            OR (focus_score = u.focus_score AND last_updated = u.last_updated AND id < u.id)
+          )
        )::int AS global_rank
-     FROM leaderboard l WHERE l.user_id = $1`,
+     FROM users u WHERE u.id = $1`,
     [userId]
   );
   return rows[0] || null;
 }
 
-module.exports = { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, updateGamertag, getUserGamertag, updateLeaderboardGamertag, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry };
+module.exports = { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, updateGamertag, getUserGamertag, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry };
