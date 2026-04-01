@@ -341,7 +341,7 @@
         <div class="flex gap-3 px-4 pb-6 pt-2 border-t border-[#39FF14]/10">
             <button id="swipe-back-btn" onclick="app.swipeBack()" class="border border-[#39FF14]/20 text-[#39FF14]/30 hover:text-[#39FF14]/60 hover:border-[#39FF14]/40 px-5 py-3 font-bold text-[10px] uppercase tracking-widest font-mono transition-colors">← PREV</button>
             <div class="flex-1 text-center text-[10px] font-mono text-[#39FF14]/20 uppercase tracking-widest self-center" id="swipe-flip-hint">Tap card to reveal answer</div>
-            <button id="swipe-burn-btn" onclick="app.swipeBurn()" class="border border-[#FF6600]/40 text-[#FF6600]/70 hover:text-[#FF6600] hover:border-[#FF6600] px-5 py-3 font-bold text-[10px] uppercase tracking-widest font-mono transition-colors hidden">🔥 BURN</button>
+            <div class="px-5 py-3 text-[10px] font-mono text-[#39FF14]/15 uppercase tracking-widest self-center">↑ Skip &nbsp; ↓ Back</div>
         </div>
     </div>
 
@@ -3192,7 +3192,6 @@
                 const boxBadge = document.getElementById('swipe-box-badge');
                 const face = document.getElementById('swipe-card-face');
                 const label = document.getElementById('swipe-card-label');
-                const burnBtn = document.getElementById('swipe-burn-btn');
                 const gradeRow = document.getElementById('swipe-grade-btns');
                 const flipHint = document.getElementById('swipe-flip-hint');
                 const backBtn = document.getElementById('swipe-back-btn');
@@ -3204,7 +3203,6 @@
                 if (label) { label.textContent = state.swipeHUDFlipped ? '↑ to skip / use buttons below' : 'TAP TO REVEAL'; label.style.color = state.swipeHUDFlipped ? '#39FF14' : ''; }
                 if (gradeRow) { gradeRow.classList.toggle('hidden', !state.swipeHUDFlipped); }
                 if (flipHint) { flipHint.textContent = state.swipeHUDFlipped ? '' : 'Tap card to reveal'; }
-                if (burnBtn) { burnBtn.classList.toggle('hidden', card.box !== 5); }
                 if (backBtn) { backBtn.classList.toggle('opacity-30', state.swipeHistory.length === 0); backBtn.classList.toggle('pointer-events-none', state.swipeHistory.length === 0); }
                 const inner = document.getElementById('swipe-card-inner');
                 if (inner) inner.style.borderColor = state.swipeHUDFlipped ? 'rgba(57,255,20,0.4)' : 'rgba(57,255,20,0.15)';
@@ -3279,16 +3277,6 @@
                         if (modal) modal.classList.remove('hidden');
                     }
                 }, 220);
-            },
-            swipeBurn() {
-                const card = state.fcStudyQueue[state.fcStudyIndex];
-                if (!card || card.box !== 5) return;
-                app.closeSwipeHUD();
-                state.burnCardPending = card;
-                const el = document.getElementById('burn-card-concept');
-                if (el) el.textContent = '"' + card.front + '"';
-                const modal = document.getElementById('burn-modal');
-                if (modal) modal.classList.remove('hidden');
             },
             swipeTouchStart(e) {
                 state.swipeTouchStartY = e.touches[0].clientY;
@@ -3389,6 +3377,7 @@
                         <div class="w-full border border-[${won ? '#39FF14' : '#FF00FF'}]/30 p-6 space-y-3">
                             <div class="flex justify-between"><span class="text-stone-400 text-xs uppercase tracking-widest">Score</span><span class="font-bold text-white">${state.bossCorrect} / ${state.bossTotal}</span></div>
                             <div class="flex justify-between"><span class="text-stone-400 text-xs uppercase tracking-widest">Accuracy</span><span class="font-bold ${won ? 'text-[#39FF14]' : 'text-[#FF00FF]'}">${pct}%</span></div>
+                            <div class="flex justify-between"><span class="text-stone-400 text-xs uppercase tracking-widest">Rank Evidence</span><span class="font-bold text-[#39FF14]/80 text-xs">+1 Diagnostic ✓</span></div>
                         </div>
                         <div class="flex gap-3 w-full">
                             <button onclick="app.bossSetup()" class="flex-1 border border-[#FF00FF]/40 text-[#FF00FF]/70 hover:text-[#FF00FF] hover:border-[#FF00FF] py-3 font-bold text-xs uppercase tracking-widest font-mono transition-colors">[ RETRY ]</button>
@@ -3467,7 +3456,7 @@
             async generateCurrentCardMnemonic() {
                 const card = state.fcStudyQueue[state.fcStudyIndex];
                 if (!card) return;
-                await app.generateMnemonic(card.front + ' / ' + card.back);
+                await app.generateMnemonic(card.front);
             },
             async generateBabelMnemonic() {
                 const concept = document.getElementById('babel-concept');
