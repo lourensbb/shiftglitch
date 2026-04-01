@@ -1,5 +1,6 @@
 const oidc = require('openid-client');
 const session = require('express-session');
+const pgSession = require('connect-pg-simple')(session);
 const { Pool } = require('pg');
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
@@ -97,12 +98,17 @@ async function ensureSchema() {
 
 function getSessionMiddleware() {
   return session({
-    secret: process.env.SESSION_SECRET,
+    store: new pgSession({
+      pool,
+      tableName: 'sessions',
+      createTableIfMissing: true
+    }),
+    secret: process.env.SESSION_SECRET || 'shiftglitch-dev-secret',
     resave: false,
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: true,
+      secure: process.env.NODE_ENV !== 'development',
       sameSite: 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000
     }
@@ -142,11 +148,13 @@ function setupAuthRoutes(app) {
       const config = await getOidcConfig();
       const host = (process.env.REPLIT_DOMAINS || process.env.REPLIT_DEV_DOMAIN || req.get('x-forwarded-host') || req.hostname).split(',')[0].trim();
       const callbackUrl = `https://${host}/api/callback`;
-      const crypto = require('crypto');
-      const state = crypto.randomBytes(16).toString('hex');
-      const nonce = crypto.randomBytes(16).toString('hex');
+      const state = oidc.randomState();
+      const nonce = oidc.randomNonce();
+      const codeVerifier = oidc.randomPKCECodeVerifier();
+      const codeChallenge = await oidc.calculatePKCECodeChallenge(codeVerifier);
       req.session.oauthState = state;
       req.session.oauthNonce = nonce;
+      req.session.oauthCodeVerifier = codeVerifier;
       req.session.oauthCallback = callbackUrl;
       await new Promise((resolve, reject) => req.session.save(e => e ? reject(e) : resolve()));
       const url = oidc.buildAuthorizationUrl(config, {
@@ -154,6 +162,8 @@ function setupAuthRoutes(app) {
         scope: 'openid email profile offline_access',
         state,
         nonce,
+        code_challenge: codeChallenge,
+        code_challenge_method: 'S256',
         prompt: 'login consent'
       });
       res.redirect(url.href);
@@ -193,6 +203,7 @@ function setupAuthRoutes(app) {
       const tokens = await oidc.authorizationCodeGrant(config, new URL(req.url, `https://${host}`), {
         expectedState: req.session.oauthState,
         expectedNonce: req.session.oauthNonce,
+        pkceCodeVerifier: req.session.oauthCodeVerifier,
         redirectUri: callbackUrl
       });
       const claims = tokens.claims();
