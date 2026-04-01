@@ -181,6 +181,39 @@
 
         /* Print */
         @media print { .no-print { display: none !important; } body { background: white; color: black; } .print-break { page-break-before: always; } }
+
+        /* === BURN AFTER READING === */
+        @keyframes sg-burn-out {
+            0% { transform: scale(1); filter: none; opacity: 1; }
+            30% { transform: scale(1.04); filter: brightness(1.8) saturate(2) hue-rotate(15deg); }
+            70% { transform: scale(0.96); filter: brightness(4) saturate(3) blur(3px); opacity: 0.5; }
+            100% { transform: scale(0.5); filter: brightness(8) blur(14px); opacity: 0; }
+        }
+        @keyframes sg-ember-float { 0%{opacity:0;transform:translateY(0) scale(0.5);} 50%{opacity:1;} 100%{opacity:0;transform:translateY(-60px) scale(0.2);} }
+        .sg-burn-anim { animation: sg-burn-out 1.2s ease-in forwards; }
+        .sg-ember { position:absolute; width:4px; height:4px; border-radius:50%; background:#FF6600; animation: sg-ember-float 0.8s ease-out forwards; pointer-events:none; }
+
+        /* === BOSS FIGHT === */
+        @keyframes sg-flash-correct { 0%,100%{background-color:transparent;} 25%,75%{background-color:rgba(57,255,20,0.12);} }
+        @keyframes sg-flash-wrong { 0%,100%{background-color:transparent;} 25%,75%{background-color:rgba(255,0,255,0.12);} }
+        @keyframes sg-shake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-8px);} 40%{transform:translateX(8px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
+        @keyframes sg-boss-timer-pulse { 0%,100%{text-shadow:0 0 8px #FF4444;} 50%{text-shadow:0 0 20px #FF2222, 0 0 40px #FF0000;} }
+        .sg-flash-correct { animation: sg-flash-correct 0.5s ease; }
+        .sg-flash-wrong { animation: sg-shake 0.3s ease; background-color: rgba(255,0,255,0.08) !important; }
+        .sg-boss-timer-danger { color: #FF4444 !important; animation: sg-boss-timer-pulse 0.8s ease infinite; }
+
+        /* === ELI5 SLIDE-IN === */
+        @keyframes sg-slide-up { from{transform:translateY(100%);} to{transform:translateY(0);} }
+        .sg-eli5-panel { animation: sg-slide-up 0.3s cubic-bezier(0.4,0,0.2,1); }
+
+        /* === MNEMONIC MODAL === */
+        @keyframes sg-glitch-in { 0%{transform:scale(0.85) skewX(-3deg);opacity:0;} 60%{transform:scale(1.03) skewX(1deg);opacity:1;} 100%{transform:scale(1) skewX(0);} }
+        .sg-mnemonic-pop { animation: sg-glitch-in 0.3s ease; }
+
+        /* === SWIPE HUD === */
+        .sg-swipe-wrap { transition: transform 0.22s ease, opacity 0.22s ease; touch-action: pan-x; }
+        .sg-swipe-exit-up { transform: translateY(-100px) rotate(-3deg); opacity: 0; }
+        .sg-swipe-exit-down { transform: translateY(100px) rotate(3deg); opacity: 0; }
     </style>
 </head>
 <body class="antialiased font-sans dark">
@@ -258,6 +291,86 @@
     <div id="notification-box" class="fixed bottom-8 left-1/2 transform -translate-x-1/2 bg-stone-900 text-white px-6 py-4 rounded-2xl shadow-2xl z-[100] hidden flex items-center gap-4">
         <span id="notification-msg" class="font-medium">Session Complete!</span>
         <button onclick="app.hideNotification()" class="bg-white/20 hover:bg-white/30 px-3 py-1 rounded-lg text-xs font-bold uppercase">Close</button>
+    </div>
+
+    <!-- Burn After Reading Modal -->
+    <div id="burn-modal" class="fixed inset-0 bg-black/90 backdrop-blur-sm z-[300] hidden flex items-center justify-center p-4">
+        <div id="burn-card-display" class="bg-black border border-[#FF6600]/60 p-8 max-w-sm w-full shadow-[0_0_60px_rgba(255,100,0,0.2)] sg-mnemonic-pop" style="font-family:'Share Tech Mono',monospace;">
+            <div class="text-[#FF6600]/50 text-xs mb-3 uppercase tracking-widest">// BOX_5 MASTERY_CONFIRMED</div>
+            <div class="text-center mb-6">
+                <div class="text-5xl mb-3">🔥</div>
+                <h3 class="text-[#FF6600] font-mono font-bold text-xl mb-1 uppercase tracking-widest">CARD FULLY MASTERED</h3>
+                <p id="burn-card-concept" class="text-[#FF6600]/60 text-sm mt-2 font-mono"></p>
+            </div>
+            <p class="text-[#FF6600]/50 text-xs mb-5 text-center leading-relaxed">This shard has reached Stable Orbit. Burn it permanently or keep it cycling.</p>
+            <div class="flex gap-3">
+                <button onclick="app.burnCard()" class="flex-1 bg-[#FF6600] hover:bg-[#FF8800] text-black py-3 font-bold text-xs uppercase tracking-widest font-mono transition-colors">[ BURN IT ]</button>
+                <button onclick="app.burnKeep()" class="flex-1 border border-[#FF6600]/30 text-[#FF6600]/50 hover:text-[#FF6600] hover:border-[#FF6600]/60 py-3 font-bold text-xs font-mono uppercase tracking-widest transition-colors">[ KEEP ]</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Swipe HUD -->
+    <div id="swipe-hud" class="fixed inset-0 bg-black z-[250] hidden flex-col" style="font-family:'Share Tech Mono',monospace;">
+        <div class="h-1.5 w-full bg-[#39FF14]/10">
+            <div id="swipe-progress-bar" class="h-full bg-[#39FF14] transition-all duration-300 shadow-[0_0_10px_#39FF14]" style="width:0%"></div>
+        </div>
+        <div class="flex items-center justify-between px-6 py-3 border-b border-[#39FF14]/10">
+            <button onclick="app.closeSwipeHUD()" class="text-[#39FF14]/40 hover:text-[#39FF14] text-sm font-mono uppercase tracking-widest">← EXIT</button>
+            <span id="swipe-counter" class="text-[#39FF14]/50 text-xs font-mono uppercase tracking-widest">0 / 0</span>
+            <div id="swipe-box-badge" class="text-[10px] font-bold text-[#39FF14]/40 uppercase tracking-widest">Box 1</div>
+        </div>
+        <div class="flex-1 flex flex-col items-center justify-center px-6 py-4 relative overflow-hidden select-none">
+            <div id="swipe-hint-up" class="absolute top-8 text-[#39FF14]/20 text-xs font-mono uppercase tracking-widest">↑ Skip</div>
+            <div id="swipe-hint-down" class="absolute bottom-28 text-[#39FF14]/20 text-xs font-mono uppercase tracking-widest">↓ Got It</div>
+            <div id="swipe-card-wrap" class="sg-swipe-wrap w-full max-w-sm cursor-pointer" ontouchstart="app.swipeTouchStart(event)" ontouchend="app.swipeTouchEnd(event)" onmousedown="app.swipeMouseDown(event)">
+                <div id="swipe-card-inner" class="bg-black border border-[#39FF14]/30 p-8 min-h-[280px] flex flex-col items-center justify-center text-center shadow-[0_0_30px_rgba(57,255,20,0.06)]" onclick="app.swipeFlip()">
+                    <div id="swipe-card-face" class="text-white text-xl font-bold leading-relaxed"></div>
+                    <div id="swipe-card-label" class="text-[#39FF14]/30 text-xs uppercase tracking-widest mt-4 font-mono">TAP TO REVEAL</div>
+                </div>
+            </div>
+        </div>
+        <div class="flex gap-3 px-6 pb-8 pt-3 border-t border-[#39FF14]/10">
+            <button onclick="app.swipeRate(false)" class="flex-1 border border-[#FF00FF]/40 text-[#FF00FF]/70 hover:text-[#FF00FF] hover:border-[#FF00FF] py-4 font-bold text-xs uppercase tracking-widest font-mono transition-colors">[ SKIP ]</button>
+            <button id="swipe-burn-btn" onclick="app.swipeBurn()" class="border border-[#FF6600]/40 text-[#FF6600]/70 hover:text-[#FF6600] hover:border-[#FF6600] px-5 py-4 font-bold text-xs uppercase tracking-widest font-mono transition-colors hidden">🔥</button>
+            <button onclick="app.swipeRate(true)" class="flex-1 border border-[#39FF14]/40 text-[#39FF14]/70 hover:text-[#39FF14] hover:border-[#39FF14] py-4 font-bold text-xs uppercase tracking-widest font-mono transition-colors">[ GOT IT ]</button>
+        </div>
+    </div>
+
+    <!-- Boss Fight Overlay -->
+    <div id="boss-fight-overlay" class="fixed inset-0 bg-black z-[280] hidden flex-col" style="font-family:'Share Tech Mono',monospace;">
+        <div id="boss-fight-inner" class="flex-1 flex flex-col"></div>
+    </div>
+
+    <!-- Mnemonic Modal -->
+    <div id="mnemonic-modal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-[320] hidden flex items-center justify-center p-4">
+        <div class="bg-black border border-[#FF00FF]/50 p-8 max-w-md w-full shadow-[0_0_60px_rgba(255,0,255,0.15)] sg-mnemonic-pop" style="font-family:'Share Tech Mono',monospace;">
+            <div class="text-[#FF00FF]/40 text-xs mb-3 uppercase tracking-widest">// mnemonic.generate() → RESULT</div>
+            <h3 class="text-[#FF00FF] font-mono font-bold text-lg mb-4 uppercase tracking-widest">⚡ Unhinged Mnemonic</h3>
+            <div id="mnemonic-loading" class="hidden text-center py-6">
+                <div class="text-[#FF00FF]/60 text-sm font-mono animate-pulse">[ GENERATING CHAOS... ]</div>
+            </div>
+            <div id="mnemonic-result" class="text-[#FF00FF]/80 text-sm leading-relaxed font-mono border border-[#FF00FF]/20 p-4 min-h-[80px] hidden"></div>
+            <button onclick="app.closeMnemonicModal()" class="mt-5 w-full border border-[#FF00FF]/30 text-[#FF00FF]/50 hover:text-[#FF00FF] hover:border-[#FF00FF]/60 py-3 font-bold text-xs font-mono uppercase tracking-widest transition-colors">[ CLOSE ]</button>
+        </div>
+    </div>
+
+    <!-- ELI5 Modal (slide-in from bottom) -->
+    <div id="eli5-backdrop" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[310] hidden" onclick="app.closeELI5Modal()"></div>
+    <div id="eli5-modal" class="fixed bottom-0 left-0 right-0 bg-black border-t border-[#8A2BE2]/60 z-[311] hidden p-6 max-h-[60vh] overflow-y-auto sg-eli5-panel" style="font-family:'Share Tech Mono',monospace;">
+        <div class="max-w-2xl mx-auto">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <div class="text-[#8A2BE2]/50 text-xs uppercase tracking-widest mb-1">// eli5.explain() → PLAIN_SPEAK</div>
+                    <h3 class="text-[#8A2BE2] font-mono font-bold text-lg uppercase tracking-widest">ELI5 — Explain Like I'm 5</h3>
+                </div>
+                <button onclick="app.closeELI5Modal()" class="text-[#8A2BE2]/40 hover:text-[#8A2BE2] text-xl font-mono">×</button>
+            </div>
+            <div id="eli5-loading" class="hidden text-center py-4">
+                <div class="text-[#8A2BE2]/60 text-sm font-mono animate-pulse">[ TRANSLATING TO CHILD-SPEAK... ]</div>
+            </div>
+            <div id="eli5-result" class="text-[#8A2BE2]/80 text-sm leading-relaxed font-mono hidden"></div>
+        </div>
     </div>
 
     <script>
@@ -863,6 +976,29 @@
             babelSessions: [], babelPhase: 'list',
             yetMoments: [], showYetShield: false, yetConcept: '',
             examCountdowns: [], wilLog: [], timerSubject: '', buddyData: null,
+            burnCardPending: null,
+            burnedCount: 0,
+            swipeHUDFlipped: false,
+            swipeTouchStartY: 0,
+            swipeMouseStartY: 0,
+            swipeMouseDown: false,
+            bossModeActive: false,
+            bossDuration: 10 * 60,
+            bossTimeLeft: 0,
+            bossInterval: null,
+            bossAnswers: {},
+            bossCorrect: 0,
+            bossTotal: 0,
+            bossPhase: 'idle',
+            bossMissionIdx: 0,
+            bossQuestionIdx: 0,
+            bossAnswered: false,
+            bossFlash: null,
+            mnemonicLoading: false,
+            mnemonicText: '',
+            eli5Loading: false,
+            eli5Text: '',
+            afkStart: null,
         };
 
         const app = {
@@ -873,6 +1009,7 @@
                 document.body.classList.add('dark');
 
                 deckStore.load(); cardStore.load(); pomodoroStore.load(); blurtStore.load(); eisenhowerStore.load(); todoStore.load(); mcqStore.load(); recalStore.load(); babelStore.load(); yetStore.load(); examStore.load(); learningStore.load();
+                state.burnedCount = parseInt(localStorage.getItem('synapse_burned') || '0', 10);
                 rankEngine.load(); rankEngine.trackActiveDay(); rankEngine.updateNavRank();
 
                 const djTodoText = 'Complete the Diagnostics Journey';
@@ -910,6 +1047,7 @@
                 window.addEventListener('resize', app.handleResize);
                 document.addEventListener('click', (e) => { if (!e.target.closest('#tools-dropdown')) app.closeToolsMenu(); });
                 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') app.closeToolsMenu(); });
+                document.addEventListener('visibilitychange', app.handleVisibilityChange);
             },
 
             handleResize: () => { if (state.view === 'dashboard') app.renderCharts(); },
@@ -1144,6 +1282,7 @@
             studyRate: (correct) => {
                 const card = state.fcStudyQueue[state.fcStudyIndex];
                 if (!card) return;
+                const wasBox5 = card.box === 5;
                 if (correct) { cardStore.promote(card); } else { cardStore.demote(card); state.fcStudyQueue.push(card); state.showYetShield = true; state.yetConcept = card.front; }
                 rankEngine.recordCardStudy();
                 state.fcStudyIndex++;
@@ -1153,6 +1292,13 @@
                     state.view = 'decks'; state.fcCurrentDeck = card.deckId;
                 }
                 app.render();
+                if (correct && wasBox5) {
+                    state.burnCardPending = card;
+                    const el = document.getElementById('burn-card-concept');
+                    if (el) el.textContent = '"' + card.front + '"';
+                    const modal = document.getElementById('burn-modal');
+                    if (modal) modal.classList.remove('hidden');
+                }
             },
 
             blurtCreate: () => {
@@ -1694,8 +1840,15 @@
                 if (state.fcStudyIndex >= state.fcStudyQueue.length) return '<div class="text-center py-20"><h1 class="text-4xl font-serif font-bold mb-4">Session Complete!</h1><button onclick="app.navTo(\'decks\')" class="bg-orange-600 text-white px-8 py-3 rounded-2xl font-bold">Back to Decks</button></div>';
                 const card = state.fcStudyQueue[state.fcStudyIndex];
                 const remaining = state.fcStudyQueue.length - state.fcStudyIndex;
+                const isBox5 = card.box === 5;
                 return `<div class="animate-fade-in max-w-2xl mx-auto space-y-8">
-                    <div class="flex items-center justify-between"><span class="text-xs font-bold text-stone-400 uppercase tracking-widest">${remaining} cards remaining</span><span class="text-xs font-bold text-orange-600 uppercase tracking-widest">Box ${card.box}</span></div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-stone-400 uppercase tracking-widest">${remaining} cards remaining</span>
+                        <div class="flex items-center gap-3">
+                            <span class="text-xs font-bold text-orange-600 uppercase tracking-widest">Box ${card.box}${isBox5 ? ' ✨' : ''}</span>
+                            <button onclick="app.openSwipeHUD()" class="text-[10px] font-bold uppercase tracking-widest border border-[#39FF14]/30 text-[#39FF14]/60 hover:text-[#39FF14] hover:border-[#39FF14] px-2 py-1 font-mono transition-colors">⟳ Swipe</button>
+                        </div>
+                    </div>
                     <div class="perspective-1000 cursor-pointer" onclick="app.studyFlip()">
                         <div class="card-inner transform-style-3d relative h-64 ${state.fcFlipped ? 'flipped' : ''}">
                             <div class="backface-hidden absolute inset-0 bg-white dark:bg-[#292524] rounded-[2rem] border border-stone-100 dark:border-stone-800 flex items-center justify-center p-8 shadow-sm"><p class="text-2xl font-serif font-bold text-center">${esc(card.front)}</p></div>
@@ -1710,7 +1863,14 @@
                         <p class="text-xs text-stone-500 mb-3">You're a Galactic Explorer in Training. This card will come back — and next time, you'll nail it.</p>
                         <button onclick="app.yetDismiss()" class="bg-purple-600 hover:bg-purple-500 text-white px-5 py-2 rounded-xl font-bold text-xs uppercase tracking-widest transition-colors">I'll learn this — continue</button>
                     </div>` : ''}
-                    ${state.fcFlipped ? `<div class="flex gap-3"><button onclick="app.studyRate(false)" class="flex-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 py-4 rounded-2xl font-bold uppercase tracking-widest text-sm">Again</button><button onclick="app.studyYet()" class="flex-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 py-4 rounded-2xl font-bold uppercase tracking-widest text-sm">Not Yet 🛡️</button><button onclick="app.studyRate(true)" class="flex-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 py-4 rounded-2xl font-bold uppercase tracking-widest text-sm">Got It</button></div>` : '<p class="text-center text-stone-400 text-sm">Tap card to reveal answer</p>'}
+                    ${state.fcFlipped ? `<div class="flex gap-3">
+                        <button onclick="app.studyRate(false)" class="flex-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 py-4 rounded-2xl font-bold uppercase tracking-widest text-sm">Again</button>
+                        <button onclick="app.studyYet()" class="flex-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 py-4 rounded-2xl font-bold uppercase tracking-widest text-sm">Not Yet 🛡️</button>
+                        <button onclick="app.studyRate(true)" class="flex-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 py-4 rounded-2xl font-bold uppercase tracking-widest text-sm">Got It</button>
+                    </div>
+                    <div class="flex justify-center">
+                        <button onclick="app.generateCurrentCardMnemonic()" class="text-[10px] font-mono font-bold uppercase tracking-widest border border-[#FF00FF]/30 text-[#FF00FF]/50 hover:text-[#FF00FF] hover:border-[#FF00FF] px-4 py-2 transition-colors">⚡ Generate Mnemonic</button>
+                    </div>` : '<p class="text-center text-stone-400 text-sm">Tap card to reveal answer</p>'}
                 </div>`;
             },
 
@@ -1882,7 +2042,7 @@
                         <h1 class="text-5xl font-serif font-bold mb-4">Session Stats</h1>
                         <p class="text-stone-500 dark:text-stone-400 italic">Your learning journey at a glance</p>
                     </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-6">
                         <div class="bg-white dark:bg-[#292524] p-8 rounded-[2rem] border border-stone-100 dark:border-stone-800 text-center">
                             <div class="text-4xl font-serif font-bold text-orange-600">${totalSessions}</div>
                             <div class="text-xs font-bold uppercase tracking-widest text-stone-400 mt-2">Focus Sessions</div>
@@ -1894,6 +2054,10 @@
                         <div class="bg-white dark:bg-[#292524] p-8 rounded-[2rem] border border-stone-100 dark:border-stone-800 text-center">
                             <div class="text-4xl font-serif font-bold text-orange-600">${state.fcDecks.length}</div>
                             <div class="text-xs font-bold uppercase tracking-widest text-stone-400 mt-2">Flashcard Decks</div>
+                        </div>
+                        <div class="bg-black border border-[#FF6600]/30 p-8 rounded-[2rem] text-center shadow-[0_0_20px_rgba(255,100,0,0.06)]">
+                            <div class="text-4xl font-serif font-bold text-[#FF6600]">${state.burnedCount}</div>
+                            <div class="text-xs font-bold uppercase tracking-widest text-[#FF6600]/50 mt-2">Burned Cards 🔥</div>
                         </div>
                     </div>
                     <div class="bg-white dark:bg-[#292524] rounded-[2rem] p-8 border border-stone-100 dark:border-stone-800">
@@ -2456,6 +2620,16 @@
                             </div>
                         </div>
                     </div>
+                    <div class="bg-black border border-[#FF00FF]/30 p-5 shadow-[0_0_30px_rgba(255,0,255,0.08)]">
+                        <div class="flex items-center justify-between mb-3">
+                            <div>
+                                <div class="text-[#FF00FF]/40 text-[10px] font-mono uppercase tracking-widest mb-1">// boss_fight.mode — TIMED_ASSAULT</div>
+                                <h3 class="text-[#FF00FF] font-mono font-bold text-base uppercase tracking-widest">⚔ Boss Fight Mode</h3>
+                                <p class="text-[#FF00FF]/50 text-xs font-mono mt-1">Race the clock. Every correct answer matters.</p>
+                            </div>
+                            <button onclick="app.bossSetup()" class="${!hasActivity ? 'opacity-40 pointer-events-none' : ''} border border-[#FF00FF]/50 hover:bg-[#FF00FF]/10 text-[#FF00FF] px-5 py-2.5 text-xs font-bold font-mono uppercase tracking-widest transition-colors">[ ENTER BOSS FIGHT ]</button>
+                        </div>
+                    </div>
                     <div class="space-y-4">
                         ${mcqBank.map((m, idx) => {
                             const attempts = mcqStore.getAttemptCount(idx);
@@ -2526,7 +2700,10 @@
                     </div>
                     <div class="w-full bg-stone-100 dark:bg-stone-800 rounded-full h-1.5 overflow-hidden"><div class="h-full rounded-full bg-orange-600 transition-all" style="width:${((idx + 1) / total) * 100}%"></div></div>
                     <div class="bg-white dark:bg-[#292524] rounded-[2rem] p-8 border border-stone-100 dark:border-stone-800 shadow-sm">
-                        <p class="text-lg font-serif font-semibold text-stone-900 dark:text-stone-50 mb-6 leading-relaxed">${esc(q.question)}</p>
+                        <div class="flex items-start justify-between gap-3 mb-6">
+                            <p class="text-lg font-serif font-semibold text-stone-900 dark:text-stone-50 leading-relaxed flex-grow">${esc(q.question)}</p>
+                            <button onclick="app.generateELI5ForMCQ()" class="flex-shrink-0 border border-[#8A2BE2]/40 text-[#8A2BE2]/60 hover:text-[#8A2BE2] hover:border-[#8A2BE2] px-2 py-1 text-[10px] font-mono font-bold uppercase tracking-widest transition-colors" title="Explain this in simple language">ELI5</button>
+                        </div>
                         <div class="space-y-3">
                             ${q.options.map(opt => {
                                 const letter = opt.charAt(0);
@@ -2793,6 +2970,10 @@
                                 <input id="babel-doodle" type="text" placeholder="Describe a silly picture that represents this concept — the weirder the better!" class="w-full bg-stone-50 dark:bg-stone-800 px-4 py-3 rounded-xl border border-stone-200 dark:border-stone-700 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
                             </div>
                             <button onclick="app.babelSubmit()" class="w-full bg-orange-600 hover:bg-orange-500 text-white py-4 rounded-2xl font-bold uppercase tracking-widest text-sm">Submit Translation</button>
+                        <div class="flex gap-3 pt-2">
+                            <button onclick="app.generateBabelMnemonic()" class="flex-1 border border-[#FF00FF]/30 text-[#FF00FF]/50 hover:text-[#FF00FF] hover:border-[#FF00FF] py-2.5 text-[10px] font-mono font-bold uppercase tracking-widest transition-colors">⚡ Unhinged Mnemonic</button>
+                            <button onclick="app.generateBabelELI5()" class="flex-1 border border-[#8A2BE2]/30 text-[#8A2BE2]/50 hover:text-[#8A2BE2] hover:border-[#8A2BE2] py-2.5 text-[10px] font-mono font-bold uppercase tracking-widest transition-colors">ELI5 Panic Button</button>
+                        </div>
                         </div>
                     </div>`;
                 }
@@ -2935,7 +3116,367 @@
                 navigator.clipboard.writeText(url).then(() => app.showNotification('Report link copied! Send it to a parent or teacher.')).catch(() => app.showNotification('Copy this: ' + url));
             },
 
-            showAbout: () => alert("ShiftGlitch v1.0 - Cyberpunk Study OS // Exploit Your Grades")
+            showAbout: () => alert("ShiftGlitch v1.0 - Cyberpunk Study OS // Exploit Your Grades"),
+
+            // === AFK FOCUS FARMING ===
+            handleVisibilityChange() {
+                if (document.hidden) {
+                    if (state.timerIsRunning && state.timerMode === 'work') {
+                        state.afkStart = Date.now();
+                    }
+                } else {
+                    if (state.afkStart !== null && state.timerIsRunning && state.timerMode === 'work') {
+                        const afkMs = Date.now() - state.afkStart;
+                        const afkMins = Math.floor(afkMs / 60000);
+                        if (afkMins >= 1) {
+                            app.showNotification('You farmed ' + afkMins + ' min AFK 🌾 Session still running. Streak intact.');
+                        }
+                    }
+                    state.afkStart = null;
+                }
+            },
+
+            // === BURN AFTER READING ===
+            burnCard() {
+                const card = state.burnCardPending;
+                if (!card) return;
+                const cardEl = document.getElementById('burn-card-display');
+                if (cardEl) cardEl.classList.add('sg-burn-anim');
+                setTimeout(() => {
+                    cardStore.remove(card.id);
+                    state.burnedCount++;
+                    localStorage.setItem('synapse_burned', String(state.burnedCount));
+                    state.burnCardPending = null;
+                    const modal = document.getElementById('burn-modal');
+                    if (modal) modal.classList.add('hidden');
+                    if (cardEl) cardEl.classList.remove('sg-burn-anim');
+                    app.showNotification('🔥 CARD INCINERATED — DATA PURGED');
+                    app.render();
+                }, 1200);
+            },
+            burnKeep() {
+                state.burnCardPending = null;
+                const modal = document.getElementById('burn-modal');
+                if (modal) modal.classList.add('hidden');
+            },
+
+            // === SWIPE HUD ===
+            openSwipeHUD() {
+                const hud = document.getElementById('swipe-hud');
+                if (!hud) return;
+                hud.classList.remove('hidden');
+                hud.classList.add('flex');
+                state.swipeHUDFlipped = false;
+                app.swipeUpdateCard();
+            },
+            closeSwipeHUD() {
+                const hud = document.getElementById('swipe-hud');
+                if (hud) { hud.classList.add('hidden'); hud.classList.remove('flex'); }
+            },
+            swipeUpdateCard() {
+                const card = state.fcStudyQueue[state.fcStudyIndex];
+                const total = state.fcStudyQueue.length;
+                const idx = state.fcStudyIndex;
+                const progressBar = document.getElementById('swipe-progress-bar');
+                const counter = document.getElementById('swipe-counter');
+                const boxBadge = document.getElementById('swipe-box-badge');
+                const face = document.getElementById('swipe-card-face');
+                const label = document.getElementById('swipe-card-label');
+                const burnBtn = document.getElementById('swipe-burn-btn');
+                if (!card) { app.closeSwipeHUD(); app.showNotification('Study session complete!'); state.view = 'decks'; app.render(); return; }
+                if (progressBar) progressBar.style.width = ((idx / total) * 100) + '%';
+                if (counter) counter.textContent = (idx + 1) + ' / ' + total;
+                if (boxBadge) boxBadge.textContent = 'Box ' + card.box;
+                if (face) face.textContent = state.swipeHUDFlipped ? card.back : card.front;
+                if (label) { label.textContent = state.swipeHUDFlipped ? 'BOX ' + card.box : 'TAP TO REVEAL'; label.style.color = state.swipeHUDFlipped ? '#39FF14' : ''; }
+                if (burnBtn) { burnBtn.classList.toggle('hidden', card.box !== 5); }
+                const inner = document.getElementById('swipe-card-inner');
+                if (inner) inner.style.borderColor = state.swipeHUDFlipped ? 'rgba(57,255,20,0.4)' : 'rgba(57,255,20,0.15)';
+            },
+            swipeFlip() {
+                state.swipeHUDFlipped = !state.swipeHUDFlipped;
+                app.swipeUpdateCard();
+            },
+            swipeRate(correct) {
+                const card = state.fcStudyQueue[state.fcStudyIndex];
+                if (!card) return;
+                const wasBox5 = card.box === 5;
+                const wrap = document.getElementById('swipe-card-wrap');
+                if (wrap) { wrap.classList.add(correct ? 'sg-swipe-exit-down' : 'sg-swipe-exit-up'); }
+                setTimeout(() => {
+                    if (wrap) wrap.classList.remove('sg-swipe-exit-up', 'sg-swipe-exit-down');
+                    if (correct) { cardStore.promote(card); } else { cardStore.demote(card); state.fcStudyQueue.push(card); }
+                    rankEngine.recordCardStudy();
+                    state.fcStudyIndex++;
+                    state.swipeHUDFlipped = false;
+                    app.swipeUpdateCard();
+                    app.render();
+                    if (correct && wasBox5) {
+                        app.closeSwipeHUD();
+                        state.burnCardPending = card;
+                        const el = document.getElementById('burn-card-concept');
+                        if (el) el.textContent = '"' + card.front + '"';
+                        const modal = document.getElementById('burn-modal');
+                        if (modal) modal.classList.remove('hidden');
+                    }
+                }, 220);
+            },
+            swipeBurn() {
+                const card = state.fcStudyQueue[state.fcStudyIndex];
+                if (!card || card.box !== 5) return;
+                app.closeSwipeHUD();
+                state.burnCardPending = card;
+                const el = document.getElementById('burn-card-concept');
+                if (el) el.textContent = '"' + card.front + '"';
+                const modal = document.getElementById('burn-modal');
+                if (modal) modal.classList.remove('hidden');
+            },
+            swipeTouchStart(e) {
+                state.swipeTouchStartY = e.touches[0].clientY;
+            },
+            swipeTouchEnd(e) {
+                const dy = e.changedTouches[0].clientY - state.swipeTouchStartY;
+                if (Math.abs(dy) > 60) {
+                    if (!state.swipeHUDFlipped) { app.swipeFlip(); return; }
+                    app.swipeRate(dy < 0);
+                }
+            },
+            swipeMouseDown(e) {
+                state.swipeMouseDown = true;
+                state.swipeMouseStartY = e.clientY;
+                const up = (ev) => {
+                    if (!state.swipeMouseDown) return;
+                    state.swipeMouseDown = false;
+                    const dy = ev.clientY - state.swipeMouseStartY;
+                    if (Math.abs(dy) > 60) {
+                        if (!state.swipeHUDFlipped) { app.swipeFlip(); }
+                        else { app.swipeRate(dy < 0); }
+                    }
+                    document.removeEventListener('mouseup', up);
+                };
+                document.addEventListener('mouseup', up);
+            },
+
+            // === BOSS FIGHT MODE ===
+            bossSetup() {
+                const overlay = document.getElementById('boss-fight-overlay');
+                if (!overlay) return;
+                overlay.classList.remove('hidden');
+                overlay.classList.add('flex');
+                state.bossPhase = 'setup';
+                app.bossRender();
+            },
+            bossRender() {
+                const inner = document.getElementById('boss-fight-inner');
+                if (!inner) return;
+                if (state.bossPhase === 'setup') {
+                    inner.innerHTML = `<div class="flex-1 flex flex-col items-center justify-center p-8 space-y-8 max-w-lg mx-auto w-full" style="font-family:'Share Tech Mono',monospace;">
+                        <div class="text-center">
+                            <div class="text-[#FF00FF]/40 text-[10px] uppercase tracking-widest mb-2">// BOSS_FIGHT.EXE — LOADING</div>
+                            <h2 class="text-[#FF00FF] text-3xl font-bold uppercase tracking-widest mb-2">⚔ Boss Fight Mode</h2>
+                            <p class="text-[#FF00FF]/50 text-xs">Select mission and timer. Survive the clock.</p>
+                        </div>
+                        <div class="w-full space-y-4">
+                            <div>
+                                <label class="text-[#FF00FF]/50 text-[10px] uppercase tracking-widest block mb-2">Select Mission</label>
+                                <select id="boss-mission-select" class="w-full bg-black border border-[#FF00FF]/30 text-[#FF00FF]/80 px-4 py-3 text-sm font-mono uppercase tracking-widest focus:outline-none focus:border-[#FF00FF]">
+                                    ${mcqBank.map((m, i) => '<option value="' + i + '">' + esc(m.mission) + '</option>').join('')}
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-[#FF00FF]/50 text-[10px] uppercase tracking-widest block mb-2">Timer Duration</label>
+                                <div class="flex gap-3">
+                                    ${[5,10,20].map(t => '<button onclick="state.bossDuration=' + (t*60) + '; document.querySelectorAll(\'.boss-dur-btn\').forEach(b=>b.classList.remove(\'border-[#FF00FF]\',\'text-[#FF00FF]\')); this.classList.add(\'border-[#FF00FF]\',\'text-[#FF00FF]\');" class="boss-dur-btn flex-1 border py-2.5 text-xs font-bold font-mono uppercase tracking-widest transition-colors ' + (t===10 ? 'border-[#FF00FF] text-[#FF00FF]' : 'border-[#FF00FF]/30 text-[#FF00FF]/40') + '">' + t + ' MIN</button>').join('')}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex gap-3 w-full">
+                            <button onclick="app.bossStart()" class="flex-1 bg-[#FF00FF] hover:bg-[#CC00CC] text-black py-4 font-bold text-sm uppercase tracking-widest font-mono transition-colors">[ START BOSS FIGHT ]</button>
+                            <button onclick="app.bossExit()" class="border border-[#FF00FF]/30 text-[#FF00FF]/40 hover:text-[#FF00FF] px-6 py-4 font-bold text-xs font-mono uppercase tracking-widest transition-colors">[ EXIT ]</button>
+                        </div>
+                    </div>`;
+                } else if (state.bossPhase === 'active') {
+                    const m = mcqBank[state.bossMissionIdx];
+                    const q = m.questions[state.bossQuestionIdx];
+                    const mins = Math.floor(state.bossTimeLeft / 60);
+                    const secs = state.bossTimeLeft % 60;
+                    const timerClass = state.bossTimeLeft <= 60 ? 'sg-boss-timer-danger' : 'text-[#FF00FF]';
+                    inner.innerHTML = `<div class="flex flex-col h-full" id="boss-active-area">
+                        <div class="flex items-center justify-between px-6 py-3 border-b border-[#FF00FF]/20" style="font-family:'Share Tech Mono',monospace;">
+                            <span class="text-[#FF00FF]/50 text-xs uppercase tracking-widest">Mission: ${esc(m.mission)}</span>
+                            <span id="boss-timer-display" class="text-xl font-bold font-mono ${timerClass}">${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}</span>
+                            <span class="text-[#FF00FF]/50 text-xs uppercase tracking-widest">${state.bossQuestionIdx + 1} / ${m.questions.length}</span>
+                        </div>
+                        <div class="h-0.5 w-full bg-[#FF00FF]/10"><div class="h-full bg-[#FF00FF] transition-all" style="width:${((state.bossQuestionIdx) / m.questions.length) * 100}%"></div></div>
+                        <div class="flex-1 flex flex-col justify-center p-6 max-w-2xl mx-auto w-full space-y-5" style="font-family:'Space Grotesk',sans-serif;">
+                            <p class="text-white text-lg font-semibold leading-relaxed">${esc(q.question)}</p>
+                            <div class="space-y-3" id="boss-options">
+                                ${q.options.map(opt => {
+                                    const letter = opt.charAt(0);
+                                    const sel = state.bossAnswers[q.id] === letter;
+                                    return '<button onclick="app.bossAnswer(\'' + letter + '\')" class="w-full text-left p-4 border-2 text-sm font-medium transition-all ' + (sel ? 'border-[#FF00FF] bg-[#FF00FF]/10 text-[#FF00FF]' : 'border-stone-700 text-stone-300 hover:border-[#FF00FF]/50') + ' ' + (state.bossAnswered ? 'pointer-events-none' : '') + '">' + esc(opt) + '</button>';
+                                }).join('')}
+                            </div>
+                            ${state.bossAnswered ? '<button onclick="app.bossNext()" class="w-full bg-[#FF00FF] hover:bg-[#CC00CC] text-black py-3 font-bold text-sm uppercase tracking-widest font-mono transition-colors">[ NEXT ]</button>' : ''}
+                        </div>
+                    </div>`;
+                } else if (state.bossPhase === 'results') {
+                    const pct = state.bossTotal > 0 ? Math.round((state.bossCorrect / state.bossTotal) * 100) : 0;
+                    const won = pct >= 60;
+                    inner.innerHTML = `<div class="flex-1 flex flex-col items-center justify-center p-8 space-y-6 max-w-lg mx-auto w-full text-center" style="font-family:'Share Tech Mono',monospace;">
+                        <div class="text-7xl">${won ? '💀' : '💥'}</div>
+                        <div>
+                            <div class="text-[${won ? '#39FF14' : '#FF00FF'}]/50 text-[10px] uppercase tracking-widest mb-2">${won ? '// BOSS_DEFEATED — XP LOGGED' : '// WIPE_DETECTED — RETRY_REQUIRED'}</div>
+                            <h2 class="text-3xl font-bold uppercase tracking-widest ${won ? 'text-[#39FF14]' : 'text-[#FF00FF]'}">${won ? 'BOSS DEFEATED' : 'WIPE — RETRY?'}</h2>
+                        </div>
+                        <div class="w-full border border-[${won ? '#39FF14' : '#FF00FF'}]/30 p-6 space-y-3">
+                            <div class="flex justify-between"><span class="text-stone-400 text-xs uppercase tracking-widest">Score</span><span class="font-bold text-white">${state.bossCorrect} / ${state.bossTotal}</span></div>
+                            <div class="flex justify-between"><span class="text-stone-400 text-xs uppercase tracking-widest">Accuracy</span><span class="font-bold ${won ? 'text-[#39FF14]' : 'text-[#FF00FF]'}">${pct}%</span></div>
+                        </div>
+                        <div class="flex gap-3 w-full">
+                            <button onclick="app.bossSetup()" class="flex-1 border border-[#FF00FF]/40 text-[#FF00FF]/70 hover:text-[#FF00FF] hover:border-[#FF00FF] py-3 font-bold text-xs uppercase tracking-widest font-mono transition-colors">[ RETRY ]</button>
+                            <button onclick="app.bossExit()" class="flex-1 bg-[#FF00FF] hover:bg-[#CC00CC] text-black py-3 font-bold text-xs uppercase tracking-widest font-mono transition-colors">[ EXIT ]</button>
+                        </div>
+                    </div>`;
+                }
+            },
+            bossStart() {
+                const sel = document.getElementById('boss-mission-select');
+                state.bossMissionIdx = sel ? parseInt(sel.value, 10) : 0;
+                const m = mcqBank[state.bossMissionIdx];
+                state.bossQuestionIdx = 0;
+                state.bossAnswers = {};
+                state.bossCorrect = 0;
+                state.bossTotal = m.questions.length;
+                state.bossAnswered = false;
+                state.bossTimeLeft = state.bossDuration;
+                state.bossPhase = 'active';
+                clearInterval(state.bossInterval);
+                state.bossInterval = setInterval(() => {
+                    state.bossTimeLeft--;
+                    const display = document.getElementById('boss-timer-display');
+                    if (display) {
+                        const mins = Math.floor(state.bossTimeLeft / 60);
+                        const secs = state.bossTimeLeft % 60;
+                        display.textContent = String(mins).padStart(2,'0') + ':' + String(secs).padStart(2,'0');
+                        if (state.bossTimeLeft <= 60) display.className = 'text-xl font-bold font-mono sg-boss-timer-danger';
+                    }
+                    if (state.bossTimeLeft <= 0) { clearInterval(state.bossInterval); app.bossEndFight(); }
+                }, 1000);
+                app.bossRender();
+            },
+            bossAnswer(letter) {
+                if (state.bossAnswered) return;
+                const m = mcqBank[state.bossMissionIdx];
+                const q = m.questions[state.bossQuestionIdx];
+                state.bossAnswers[q.id] = letter;
+                const correct = letter === q.answer;
+                if (correct) state.bossCorrect++;
+                state.bossAnswered = true;
+                const area = document.getElementById('boss-active-area');
+                if (area) {
+                    area.classList.add(correct ? 'sg-flash-correct' : 'sg-flash-wrong');
+                    setTimeout(() => area.classList.remove('sg-flash-correct', 'sg-flash-wrong'), 600);
+                }
+                if (navigator.vibrate) navigator.vibrate(correct ? [50] : [80, 30, 80]);
+                app.bossRender();
+            },
+            bossNext() {
+                const m = mcqBank[state.bossMissionIdx];
+                if (state.bossQuestionIdx < m.questions.length - 1) {
+                    state.bossQuestionIdx++;
+                    state.bossAnswered = false;
+                    app.bossRender();
+                } else {
+                    app.bossEndFight();
+                }
+            },
+            bossEndFight() {
+                clearInterval(state.bossInterval);
+                state.bossPhase = 'results';
+                mcqStore.recordAttempt(state.bossMissionIdx, {...state.bossAnswers}, state.bossCorrect, state.bossTotal);
+                rankEngine.recordDiagnostic();
+                app.bossRender();
+            },
+            bossExit() {
+                clearInterval(state.bossInterval);
+                const overlay = document.getElementById('boss-fight-overlay');
+                if (overlay) { overlay.classList.add('hidden'); overlay.classList.remove('flex'); }
+                state.bossPhase = 'idle';
+                app.render();
+            },
+
+            // === UNHINGED MNEMONICS ===
+            async generateCurrentCardMnemonic() {
+                const card = state.fcStudyQueue[state.fcStudyIndex];
+                if (!card) return;
+                await app.generateMnemonic(card.front + ' / ' + card.back);
+            },
+            async generateBabelMnemonic() {
+                const concept = document.getElementById('babel-concept');
+                const explanation = document.getElementById('babel-explanation');
+                const text = (concept ? concept.value.trim() : '') || (explanation ? explanation.value.trim() : '');
+                if (!text) { app.showNotification('Enter a concept first.'); return; }
+                await app.generateMnemonic(text);
+            },
+            async generateMnemonic(text) {
+                const modal = document.getElementById('mnemonic-modal');
+                const loading = document.getElementById('mnemonic-loading');
+                const result = document.getElementById('mnemonic-result');
+                if (!modal || !loading || !result) return;
+                modal.classList.remove('hidden');
+                loading.classList.remove('hidden');
+                result.classList.add('hidden');
+                result.textContent = '';
+                const systemPrompt = 'You are a chaotic, absurdist memory coach for teenagers. Generate ONE unhinged, funny, weird, memorable mnemonic or memory hook for the concept given. It should be: ridiculous, slightly inappropriate (but school-safe), uses vivid imagery, rhyme, or storytelling. Do NOT give a standard acronym. 2-4 sentences max. No disclaimers.';
+                const response = await aiService.callGemini('Create a wildly unhinged mnemonic for: ' + text, systemPrompt);
+                loading.classList.add('hidden');
+                result.textContent = response;
+                result.classList.remove('hidden');
+            },
+            closeMnemonicModal() {
+                const modal = document.getElementById('mnemonic-modal');
+                if (modal) modal.classList.add('hidden');
+            },
+
+            // === ELI5 ===
+            generateELI5ForMCQ() {
+                const m = mcqBank[state.mcqMissionIdx];
+                const q = m.questions[state.mcqQuestionIdx];
+                if (!q) return;
+                app.generateELI5(q.question + '\n\nConcept: ' + q.concept);
+            },
+            generateBabelELI5() {
+                const concept = document.getElementById('babel-concept');
+                const explanation = document.getElementById('babel-explanation');
+                const text = (concept ? concept.value.trim() : '') + (explanation ? ' — ' + explanation.value.trim() : '');
+                if (!text.trim() || text.trim() === '—') { app.showNotification('Enter a concept first.'); return; }
+                app.generateELI5(text);
+            },
+            async generateELI5(text) {
+                const backdrop = document.getElementById('eli5-backdrop');
+                const modal = document.getElementById('eli5-modal');
+                const loading = document.getElementById('eli5-loading');
+                const result = document.getElementById('eli5-result');
+                if (!modal || !loading || !result) return;
+                if (backdrop) backdrop.classList.remove('hidden');
+                modal.classList.remove('hidden');
+                modal.classList.add('sg-eli5-panel');
+                loading.classList.remove('hidden');
+                result.classList.add('hidden');
+                result.textContent = '';
+                const systemPrompt = 'You are explaining things to a curious 10-year-old. Use everyday casual language, simple analogies, and short sentences. No jargon. Be friendly and clear. 3-5 sentences max.';
+                const response = await aiService.callGemini('Explain this simply for a 10-year-old: ' + text, systemPrompt);
+                loading.classList.add('hidden');
+                result.textContent = response;
+                result.classList.remove('hidden');
+            },
+            closeELI5Modal() {
+                const backdrop = document.getElementById('eli5-backdrop');
+                const modal = document.getElementById('eli5-modal');
+                if (backdrop) backdrop.classList.add('hidden');
+                if (modal) { modal.classList.add('hidden'); modal.classList.remove('sg-eli5-panel'); }
+            },
         };
 
         document.addEventListener('DOMContentLoaded', app.init);
