@@ -35,11 +35,13 @@ async function ensureSchema() {
         first_name VARCHAR,
         last_name VARCHAR,
         profile_image_url VARCHAR,
+        replit_username VARCHAR,
         gamertag VARCHAR,
         created_at TIMESTAMP DEFAULT NOW(),
         updated_at TIMESTAMP DEFAULT NOW()
       );
       ALTER TABLE users ADD COLUMN IF NOT EXISTS gamertag VARCHAR;
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS replit_username VARCHAR;
     `);
     await client.query(`
       CREATE TABLE IF NOT EXISTS leaderboard (
@@ -85,17 +87,19 @@ function getSessionMiddleware() {
 }
 
 async function upsertUser(claims) {
+  const replitUsername = claims.preferred_username || claims.username || null;
   const { rows } = await pool.query(
-    `INSERT INTO users (id, email, first_name, last_name, profile_image_url, updated_at)
-     VALUES ($1, $2, $3, $4, $5, NOW())
+    `INSERT INTO users (id, email, first_name, last_name, profile_image_url, replit_username, updated_at)
+     VALUES ($1, $2, $3, $4, $5, $6, NOW())
      ON CONFLICT (id) DO UPDATE SET
        email = EXCLUDED.email,
        first_name = EXCLUDED.first_name,
        last_name = EXCLUDED.last_name,
        profile_image_url = EXCLUDED.profile_image_url,
+       replit_username = EXCLUDED.replit_username,
        updated_at = NOW()
      RETURNING *`,
-    [claims.sub, claims.email || null, claims.first_name || null, claims.last_name || null, claims.profile_image_url || null]
+    [claims.sub, claims.email || null, claims.first_name || null, claims.last_name || null, claims.profile_image_url || null, replitUsername]
   );
   return rows[0];
 }
@@ -231,23 +235,22 @@ async function updateGamertag(userId, gamertag) {
 }
 
 async function getUserGamertag(userId) {
-  const { rows } = await pool.query('SELECT gamertag, first_name, last_name, email FROM users WHERE id = $1', [userId]);
+  const { rows } = await pool.query('SELECT gamertag, replit_username FROM users WHERE id = $1', [userId]);
   const u = rows[0];
   if (!u) return null;
   if (u.gamertag) return u.gamertag;
   let derived = null;
-  if (u.first_name) {
-    const tag = (u.last_name ? `${u.first_name}${u.last_name.slice(0,1)}` : u.first_name)
-      .replace(/[^a-zA-Z0-9_\-\.]/g, '').slice(0, 20);
-    if (tag) derived = tag;
-  }
-  if (!derived && u.email) {
-    const tag = u.email.split('@')[0].replace(/[^a-zA-Z0-9_\-\.]/g, '').slice(0, 20);
+  if (u.replit_username) {
+    const tag = u.replit_username.replace(/[^a-zA-Z0-9_\-\.]/g, '').slice(0, 20);
     if (tag) derived = tag;
   }
   if (!derived) derived = 'OPERATIVE';
   await pool.query('UPDATE users SET gamertag = $1 WHERE id = $2 AND gamertag IS NULL', [derived, userId]);
   return derived;
+}
+
+async function updateLeaderboardGamertag(userId, gamertag) {
+  await pool.query('UPDATE leaderboard SET gamertag = $1 WHERE user_id = $2', [gamertag, userId]);
 }
 
 async function upsertLeaderboard({ userId, gamertag, focusScore, rankTier, streak, pomodoros, cardsMastered, blurts }) {
@@ -288,4 +291,4 @@ async function getMyLeaderboardEntry(userId) {
   return rows[0] || null;
 }
 
-module.exports = { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, updateGamertag, getUserGamertag, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry };
+module.exports = { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, updateGamertag, getUserGamertag, updateLeaderboardGamertag, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry };
