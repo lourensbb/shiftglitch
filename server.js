@@ -173,7 +173,9 @@ app.post('/api/squad/join', requireAuth, async (req, res) => {
   try {
     const { inviteCode } = req.body;
     if (!inviteCode || typeof inviteCode !== 'string') return res.status(400).json({ error: 'Invite code required' });
-    const squad = await joinSquad(req.session.userId, inviteCode.trim());
+    const sanitized = inviteCode.trim().toUpperCase();
+    if (!/^[A-Z0-9]{6}$/.test(sanitized)) return res.status(400).json({ error: 'Invalid invite code format. Must be 6 alphanumeric characters.' });
+    const squad = await joinSquad(req.session.userId, sanitized);
     res.json({ ok: true, squadId: squad.id, name: squad.name });
   } catch (err) {
     if (err.message === 'INVALID_CODE') return res.status(404).json({ error: 'Invalid invite code.' });
@@ -216,13 +218,12 @@ app.get('/api/squad', requireAuth, async (req, res) => {
         isMe
       };
     });
-    const minStreak = enriched.length > 0 ? Math.min(...enriched.map(m => m.streak)) : 0;
     res.json({
       squad: {
         id: squad.id,
         name: squad.name,
         inviteCode: squad.invite_code,
-        squadStreak: minStreak,
+        squadStreak: squad.shared_streak || 0,
         members: enriched
       }
     });

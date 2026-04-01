@@ -329,21 +329,28 @@ function generateCode(len) {
 }
 
 async function createSquad(userId, name) {
-  const squadId = generateCode(8);
-  const inviteCode = generateCode(6);
   const client = await pool.connect();
+  let squadId, inviteCode;
   try {
     await client.query('BEGIN');
-    const existingCheck = await client.query(
-      'SELECT 1 FROM squad_members WHERE user_id = $1 FOR UPDATE', [userId]
-    );
+    const existingCheck = await client.query('SELECT squad_id FROM squad_members WHERE user_id = $1', [userId]);
     if (existingCheck.rows.length) { await client.query('ROLLBACK'); throw new Error('ALREADY_IN_SQUAD'); }
-    await client.query('INSERT INTO squads (id, name, invite_code) VALUES ($1, $2, $3)', [squadId, name.trim().slice(0, 40), inviteCode]);
+    let inserted = false;
+    for (let attempt = 0; attempt < 5; attempt++) {
+      squadId = generateCode(8);
+      inviteCode = generateCode(6);
+      const res = await client.query(
+        'INSERT INTO squads (id, name, invite_code) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING RETURNING id',
+        [squadId, name.trim().slice(0, 40), inviteCode]
+      );
+      if (res.rows.length) { inserted = true; break; }
+    }
+    if (!inserted) { await client.query('ROLLBACK'); throw new Error('CODE_COLLISION'); }
     await client.query('INSERT INTO squad_members (squad_id, user_id, last_active) VALUES ($1, $2, NOW())', [squadId, userId]);
     await client.query('COMMIT');
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});
-    if (err.code === '23505') throw new Error('ALREADY_IN_SQUAD');
+    if (err.code === '23505' && err.constraint === 'squad_members_user_unique') throw new Error('ALREADY_IN_SQUAD');
     throw err;
   } finally {
     client.release();
