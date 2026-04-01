@@ -140,7 +140,7 @@ function setupAuthRoutes(app) {
   async function handleLogin(req, res) {
     try {
       const config = await getOidcConfig();
-      const host = process.env.REPLIT_DEV_DOMAIN || req.get('x-forwarded-host') || req.hostname;
+      const host = (process.env.REPLIT_DOMAINS || process.env.REPLIT_DEV_DOMAIN || req.get('x-forwarded-host') || req.hostname).split(',')[0].trim();
       const callbackUrl = `https://${host}/api/callback`;
       const crypto = require('crypto');
       const state = crypto.randomBytes(16).toString('hex');
@@ -167,7 +167,7 @@ function setupAuthRoutes(app) {
     try {
       const config = await getOidcConfig();
       req.session.destroy(() => {});
-      const host = process.env.REPLIT_DEV_DOMAIN || req.get('x-forwarded-host') || req.hostname;
+      const host = (process.env.REPLIT_DOMAINS || process.env.REPLIT_DEV_DOMAIN || req.get('x-forwarded-host') || req.hostname).split(',')[0].trim();
       const logoutUrl = oidc.buildEndSessionUrl(config, {
         client_id: process.env.REPL_ID,
         post_logout_redirect_uri: `https://${host}/login`
@@ -188,7 +188,7 @@ function setupAuthRoutes(app) {
   app.get('/api/callback', async (req, res) => {
     try {
       const config = await getOidcConfig();
-      const host = process.env.REPLIT_DEV_DOMAIN || req.get('x-forwarded-host') || req.hostname;
+      const host = (process.env.REPLIT_DOMAINS || process.env.REPLIT_DEV_DOMAIN || req.get('x-forwarded-host') || req.hostname).split(',')[0].trim();
       const callbackUrl = req.session.oauthCallback || `https://${host}/api/callback`;
       const tokens = await oidc.authorizationCodeGrant(config, new URL(req.url, `https://${host}`), {
         expectedState: req.session.oauthState,
