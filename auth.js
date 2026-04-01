@@ -73,8 +73,10 @@ async function ensureSchema() {
         id VARCHAR(8) PRIMARY KEY,
         name VARCHAR(40) NOT NULL,
         invite_code VARCHAR(8) UNIQUE NOT NULL,
+        shared_streak INTEGER NOT NULL DEFAULT 0,
         created_at TIMESTAMP DEFAULT NOW()
       );
+      ALTER TABLE squads ADD COLUMN IF NOT EXISTS shared_streak INTEGER NOT NULL DEFAULT 0;
       CREATE TABLE IF NOT EXISTS squad_members (
         squad_id VARCHAR(8) NOT NULL REFERENCES squads(id) ON DELETE CASCADE,
         user_id VARCHAR NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
@@ -356,17 +358,20 @@ async function joinSquad(userId, inviteCode) {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
-    const memberCount = await client.query(
-      'SELECT COUNT(*) FROM squad_members WHERE squad_id = $1 FOR UPDATE', [squad.id]
-    );
-    if (parseInt(memberCount.rows[0].count, 10) >= 4) { await client.query('ROLLBACK'); throw new Error('SQUAD_FULL'); }
-    const existingCheck = await client.query('SELECT 1 FROM squad_members WHERE user_id = $1', [userId]);
-    if (existingCheck.rows.length) { await client.query('ROLLBACK'); throw new Error('ALREADY_IN_SQUAD'); }
+    await client.query('SELECT id FROM squads WHERE id = $1 FOR UPDATE', [squad.id]);
+    const memberRows = await client.query('SELECT user_id FROM squad_members WHERE squad_id = $1', [squad.id]);
+    if (memberRows.rows.length >= 4) { await client.query('ROLLBACK'); throw new Error('SQUAD_FULL'); }
+    const existingCheck = await client.query('SELECT squad_id FROM squad_members WHERE user_id = $1', [userId]);
+    if (existingCheck.rows.length) {
+      await client.query('ROLLBACK');
+      throw existingCheck.rows[0].squad_id === squad.id ? new Error('ALREADY_MEMBER') : new Error('ALREADY_IN_SQUAD');
+    }
     await client.query('INSERT INTO squad_members (squad_id, user_id, last_active) VALUES ($1, $2, NOW())', [squad.id, userId]);
     await client.query('COMMIT');
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});
-    if (err.code === '23505') throw new Error('ALREADY_IN_SQUAD');
+    if (err.code === '23505' && err.constraint === 'squad_members_user_unique') throw new Error('ALREADY_IN_SQUAD');
+    if (err.code === '23505') throw new Error('ALREADY_MEMBER');
     throw err;
   } finally {
     client.release();
@@ -406,11 +411,26 @@ async function getSquadStats(squadId) {
   return rows;
 }
 
+async function recalcSquadStreak(squadId) {
+  await pool.query(
+    `UPDATE squads SET shared_streak = (
+       SELECT COALESCE(MIN(u.streak), 0)
+       FROM squad_members sm JOIN users u ON u.id = sm.user_id
+       WHERE sm.squad_id = $1
+     ) WHERE id = $1`,
+    [squadId]
+  );
+}
+
 async function updateSquadLastActive(userId) {
   await pool.query(
     'UPDATE squad_members SET last_active = NOW() WHERE user_id = $1',
     [userId]
   );
+  const squadRow = await pool.query('SELECT squad_id FROM squad_members WHERE user_id = $1', [userId]);
+  if (squadRow.rows.length) {
+    await recalcSquadStreak(squadRow.rows[0].squad_id).catch(() => {});
+  }
 }
 
 module.exports = { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, updateGamertag, getUserGamertag, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive };
