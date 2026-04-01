@@ -1,0 +1,304 @@
+THE PREPMERGENCY SEO MASTERPLAN
+PART 1 — CURRENT STATE AUDIT
+What you already have (good):
+
+Live domain at prepmergency.com ✅
+Title tag and meta description ✅
+Open Graph + Twitter Card tags ✅
+PWA manifest with "education" category ✅
+HTTPS ✅
+Mobile-first design ✅
+What is broken or missing (urgent fixes):
+
+og:url still points to lesson-generator.replit.app — Google sees the wrong canonical home ❌
+og:image is just the 512px app icon — you need a real social share image (1200×630px) ❌
+No robots.txt — crawlers have no instructions ❌
+No sitemap.xml — Google doesn't know your pages exist ❌
+No JSON-LD structured data — zero rich snippet eligibility ❌
+No canonical URL tags ❌
+All tab content (Browse, Quiz, Missions, Facts) is JavaScript-rendered — Google can struggle to index it ❌
+The standalone pages (/about, /docs, /legal, /join, /ebook) have no individual meta tags — they all share one title/description ❌
+PART 2 — KEYWORD STRATEGY
+Your Niche: Own "Emergency Lesson Plans"
+You cannot outrank TpT, Twinkl, or Education.com on broad terms like "lesson plans" — they have years of DA. But nobody owns the emergency/panic angle. This is your moat.
+
+Tier 1 — Core money keywords (build around these first):
+
+Keyword	Monthly Searches (Est.)	Difficulty
+emergency lesson plans for teachers	1,900/mo	Low
+no prep lesson plans	2,400/mo	Low–Med
+quick lesson plans last minute	880/mo	Low
+substitute teacher lesson plans	14,800/mo	Medium
+free lesson plans for teachers	27,100/mo	High
+instant lesson plan generator	720/mo	Low
+AI lesson plan generator	8,100/mo	Med
+lesson plan generator free	9,900/mo	Med
+emergency sub plans	1,300/mo	Low
+Tier 2 — Long-tail goldmines (blog content):
+
+Keyword	Why it works
+emergency lesson plans high school english	Very low competition, very specific
+30 minute lesson plan no prep	Matches your product exactly
+what to do when you have no lesson plan	Informational, captures panicking teachers
+last minute lesson ideas for any subject	Informational
+paper and pen classroom activities	Matches your offline-first positioning
+lesson plan generator for supply teachers	UK-specific, low competition
+free emergency lesson plan template	Template content ranks heavily
+classroom activities for bored students	Broad but low difficulty
+classroom activities no materials	Matches Missions perfectly
+Tier 3 — AI-angle keywords (trending, fast-growing):
+
+Keyword	Notes
+AI lesson plan generator free	Exploding search trend
+AI lesson planner for teachers	Growing fast
+ChatGPT lesson plans	People searching how to use AI for lessons — you can rank here
+Geographic modifiers to add to blog content (not homepage):
+
+"for UK teachers", "for Australian teachers", "for US teachers", "GCSE", "KS3", "Common Core"
+PART 3 — TECHNICAL SEO (Build These First)
+These are pure technical changes in the code — highest ROI, done once, lasts forever.
+
+3.1 Fix index.html immediately
+Change og:url from lesson-generator.replit.app/join → https://prepmergency.com/
+Change og:image to a proper 1200×630px social share image (create one — dark navy background, orange PrepMergency wordmark, "Emergency Lessons. Instant Calm." tagline)
+Add <link rel="canonical" href="https://prepmergency.com/" />
+Update Twitter image to match
+3.2 Per-page meta tags
+Every standalone page needs its own title and description injected into <head>:
+
+/about → "About PrepMergency — Emergency Lesson Generator for Teachers"
+/docs → "How to Use PrepMergency — Complete Teacher Guide"
+/join → "Join PrepMergency Free — 10 Lessons on Us"
+/legal → noindex (legal pages should not take up crawl budget)
+/ebook → "Free Teacher Emergency Handbook — PrepMergency Download"
+3.3 Add robots.txt to /public
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /payment-success.html
+Disallow: /payment-cancel.html
+Sitemap: https://prepmergency.com/sitemap.xml
+3.4 Add sitemap.xml to /public
+Static pages to include:
+
+https://prepmergency.com/
+https://prepmergency.com/join
+https://prepmergency.com/about
+https://prepmergency.com/docs
+https://prepmergency.com/ebook
+https://prepmergency.com/video
+Once the blog is live, add /blog/ and every post URL.
+
+3.5 JSON-LD Structured Data (in index.html)
+Add three schema types — these unlock rich results:
+
+WebApplication schema (eligibility for Google's app-result cards):
+
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "PrepMergency",
+  "url": "https://prepmergency.com",
+  "applicationCategory": "EducationApplication",
+  "operatingSystem": "Any",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "description": "AI-powered emergency lesson plan generator for teachers. Generate a full structured classroom activity in 60 seconds — works offline.",
+  "screenshot": "https://prepmergency.com/join-hero.png"
+}
+FAQPage schema (gets FAQ dropdowns in search results — massive click-through boost):
+
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "question": "What is PrepMergency?", "answer": "PrepMergency is a free AI-powered emergency lesson plan generator for teachers. Generate a full 30-minute classroom activity in under 60 seconds — no prep needed." },
+    { "question": "Does PrepMergency work offline?", "answer": "Yes. PrepMergency works fully offline. Your saved lessons and 30 pre-built activities are always available, even without internet." },
+    { "question": "Is PrepMergency free?", "answer": "Yes. PrepMergency is free to use. You get 10 free AI-generated lessons on signup. Premium plans start at $5/month." }
+  ]
+}
+Organization schema (brand recognition in Knowledge Panel):
+
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "PrepMergency",
+  "url": "https://prepmergency.com",
+  "logo": "https://prepmergency.com/icon-512.png",
+  "sameAs": []
+}
+3.6 Core Web Vitals — what to target
+Your app is Vite + React, which is already fast. Key checks:
+
+LCP < 2.5s — ensure hero image/video on home loads fast; use loading="eager" on above-fold images, loading="lazy" on everything else
+INP < 200ms — avoid blocking JavaScript on first interaction
+CLS = 0 — always set explicit width/height on images so layout doesn't shift when they load (your browse-hero.png, join-hero.png, missions-hero.png all need this)
+Run PageSpeed Insights on prepmergency.com after deploying — aim for 90+ mobile score
+3.7 Handle SPA crawlability
+Since the app is tab-based (/?tab=browse), Google won't index those tabs independently. The solution: the blog compensates for this entirely. Each blog post is a separate crawlable URL that drives traffic in. The app itself doesn't need to be indexed tab-by-tab — it needs to be discovered via blog and landing pages.
+
+PART 4 — CONTENT STRATEGY (Your #1 Long-Term SEO Lever)
+A blog is non-negotiable. No-budget SEO is content SEO. Here is the complete architecture.
+
+4.1 Blog Architecture
+Add a /blog route to the app. Each post is a static page at /blog/[slug]. You start with 3 posts, then publish 1–2 per week.
+
+Tech approach: Since you're already in Replit, a simple JSON-driven blog (posts stored as markdown or JSON files, rendered by a React component) is the fastest path. No CMS needed at first.
+
+4.2 Content Clusters (Topic Pillars)
+Pillar 1: "Emergency Lessons" (core money cluster)
+
+/blog/emergency-lesson-plans-teachers — pillar page, 2,000 words
+/blog/30-minute-no-prep-lesson-ideas
+/blog/what-to-do-when-you-have-no-lesson-plan
+/blog/emergency-sub-plans-any-subject
+/blog/classroom-activities-zero-materials
+Pillar 2: "AI for Teachers" (riding the trend)
+
+/blog/how-to-use-ai-to-create-lesson-plans
+/blog/best-ai-lesson-plan-generators-compared
+/blog/chatgpt-vs-prepmergency-lesson-plans
+/blog/ai-tools-for-teachers-2026
+Pillar 3: "Classroom Management" (broad audience capture)
+
+/blog/how-to-calm-a-noisy-class
+/blog/classroom-activities-bored-teenagers
+/blog/low-energy-classroom-activities
+/blog/paper-and-pen-classroom-games
+Pillar 4: "Free Resources" (template content — ranks enormously)
+
+/blog/free-emergency-lesson-plan-template
+/blog/free-substitute-teacher-lesson-plans
+/blog/printable-classroom-activities
+4.3 Content Formula (for every post, zero-budget)
+Each post follows this format:
+
+Target one keyword in the title, H1, first paragraph, and URL slug
+1,200–2,000 words (Google rewards depth)
+Answer the question in the first 100 words (featured snippet targeting)
+Include a CTA to PrepMergency: "Generate your emergency lesson now — free"
+Link internally to at least 2 other blog posts and the homepage
+One image with keyword-rich alt text
+Add FAQ schema to every post (5 Q&As minimum)
+4.4 Publishing schedule (realistic for one person)
+Month 1–2: Write the 5 emergency lesson pillar posts. These are your most important pages.
+Month 3–4: Write the AI-for-teachers cluster.
+Month 5–6: Write the classroom management cluster.
+Ongoing: 1 new post every 1–2 weeks, targeting one long-tail keyword per post.
+PART 5 — LINK BUILDING (Zero Budget)
+Without budget, links come from effort and positioning. Here is every viable tactic in order of impact:
+
+5.1 Directory Submissions (Do these Week 1, free, permanent)
+Submit PrepMergency to:
+
+Product Hunt — launch properly, schedule it, get upvotes. Teacher tools do very well here.
+AlternativeTo.net — list as alternative to Planbook, Curipod, Teachermade
+EdTech directories: EdSurge, ISTE EdTech product list, CommonSense Education
+SaaS directories: G2.com, Capterra, Slant, Stackshare
+AppSumo (if you ever add a lifetime deal — you already have $57 lifetime, this is perfect for AppSumo)
+Futurepedia (AI tools directory — very high DA, ranks for "AI for teachers")
+There's An AI For That — submit PrepMergency
+AI Tools Club, AITopTools — growing high-DA directories for AI tools
+Web App Award sites: Webby Awards (free submission), CSS Design Awards
+5.2 Teacher Community Outreach (Time-intensive but highest quality links)
+Teachers Pay Teachers — create a free resource (emergency lesson template PDF), link to PrepMergency in the description. TpT links are followed.
+Pinterest — create a "PrepMergency" board. Pin every blog post image. Pinterest drives enormous teacher traffic and Google indexes Pinterest pins.
+Reddit — post genuinely helpful content in r/Teachers, r/TeachingUK, r/education. Never spam. Share your blog posts when relevant. Include link in bio.
+Quora — answer every question about "what to do when you have no lesson plan", "emergency sub plans", "AI lesson generators". Link to PrepMergency naturally.
+Facebook teacher groups — "Emergency Sub Plans", "Teachers of the World", "Teaching Resources". Share value, not spam.
+5.3 HARO / Journalist Outreach (free, high DA links)
+Sign up for HARO (Help A Reporter Out) — now called Connectively. When journalists ask for "expert on education technology" or "teacher tips" — respond. One featured mention in EdSurge, TechCrunch Education, or a newspaper can give you a DA 80+ backlink.
+
+5.4 Competitor Backlink Analysis (Copy their best links)
+Use Ahrefs free tier or Ubersuggest free tier to look at who links to Curipod.com and Edcafe.ai. Any site linking to them is a candidate for linking to you. Reach out and offer PrepMergency as an additional resource.
+
+5.5 Guest Posts & Collaborations
+Reach out to teacher bloggers (search "teacher blog" on Google) and offer to write a guest post about emergency lesson planning. Include a link to PrepMergency.
+Offer to be interviewed on education podcasts about "using AI as a teacher". Podcast show notes almost always link to your site.
+5.6 "Built With Replit" SEO Bonus
+Your Replit Story page (/replit) can be indexed and rank for "built with AI agent" searches. The buildathon submission itself can attract developer-community backlinks.
+
+PART 6 — SOCIAL & COMMUNITY SIGNALS
+Social signals are not direct ranking factors, but they drive backlinks and traffic, which are.
+
+6.1 Pinterest (Highest ROI for teachers, seriously underrated)
+Create a PrepMergency Pinterest account
+For every blog post, create a vertical 1000×1500px pin image
+Pin: "30 Emergency Lesson Ideas for Any Class", "What To Do When You Have No Lesson Plan", etc.
+Pinterest pins rank in Google Images and Google Search for teacher topics. This is free traffic.
+6.2 YouTube (Second highest ROI, long-term)
+You already have an explainer video. Upload it to YouTube with:
+Title: "PrepMergency — Emergency Lesson Plans in 60 Seconds (Free AI Tool for Teachers)"
+Description: full keyword-rich 300-word description, link to prepmergency.com
+Tags: emergency lesson plans, AI lesson generator, substitute teacher plans, no prep lessons
+YouTube is the world's second-largest search engine. Teachers search here.
+6.3 TikTok / Instagram Reels
+Short video: "I had no lesson plan — here's what I did". Show the app in use. These go viral in teacher communities.
+
+PART 7 — INTERNATIONAL SEO
+Since you're targeting all English-speaking teachers globally with no physical location:
+
+Do not use hreflang tags — you have one English version, not separate UK/US/AU versions. Using hreflang incorrectly can hurt you.
+Do target geographic keywords in blog content — write posts like "Emergency lesson plans for UK supply teachers" or "Sub plans for Australian relief teachers". These are specific, low-competition, and let Google understand your global relevance.
+Spell things both ways in blog posts — "lesson plans" (universal), "supply teacher" (UK), "substitute teacher" (US), "relief teacher" (AU/NZ). One post can rank for all three geographies.
+PART 8 — GOOGLE SEARCH CONSOLE & TRACKING
+All free. Do this before anything else technical.
+
+Verify prepmergency.com in Google Search Console (add DNS TXT record or HTML file)
+Submit sitemap.xml once built
+Request indexing for each key URL manually via the URL Inspection tool
+Set up Google Analytics 4 — add the tracking snippet to index.html
+Monitor weekly: impressions, clicks, average position, Core Web Vitals
+Within 90 days, you should see impressions appearing for your target keywords. That's the signal to double down.
+PART 9 — 90-DAY EXECUTION ROADMAP
+Week 1–2: Technical foundation (build into app)
+Fix og:url and og:image in index.html
+Add canonical tags
+Add robots.txt
+Add sitemap.xml
+Add JSON-LD structured data (WebApplication + FAQPage + Organization)
+Set width/height on all images to prevent CLS
+Set up Google Search Console + submit sitemap
+Set up GA4
+Week 3–4: Content foundation
+Build the blog infrastructure into the app
+Write and publish: "Emergency Lesson Plans for Teachers — The Complete Guide" (pillar post, 2,000 words)
+Write and publish: "What To Do When You Have No Lesson Plan"
+Submit to Product Hunt
+Month 2: Directory blitz + social launch
+Submit to all AI tool directories (15+ this month)
+Submit to EdTech directories
+Launch Pinterest account
+Upload explainer video to YouTube
+Answer 10 Quora questions about emergency lessons
+Month 3: Content velocity + community
+Publish 2 blog posts/week
+Begin Reddit/Facebook community participation
+Sign up for HARO, respond to relevant queries
+Check Search Console — which keywords are appearing? Double down.
+Month 4–6: Scale what's working
+Write the AI-for-teachers content cluster
+Guest post on 2 teacher blogs
+Reach out to one education podcast
+Create Pinterest pins for every post
+PART 10 — QUICK WINS CHECKLIST (Things that take 1 hour each)
+Action	Impact	Time
+Fix og:url to prepmergency.com	High	5 min
+Add robots.txt	High	10 min
+Add sitemap.xml	High	20 min
+Add JSON-LD to index.html	Very High	1 hour
+Submit to Google Search Console	Critical	30 min
+Submit to Product Hunt	High	1 hour
+Submit to Futurepedia + There's An AI For That	High	30 min
+Upload explainer video to YouTube	High	30 min
+Create Pinterest account + first 5 pins	Medium	1 hour
+Answer 5 Quora questions about lesson plans	Medium	1 hour
+SUMMARY: YOUR UNFAIR ADVANTAGE
+PrepMergency owns a keyword niche that nobody has claimed: "emergency lesson plans". TpT is a marketplace. Curipod is interactive slides. You are the panic button. That positioning is unique, and it exactly matches what a teacher types into Google at 7:43am when they arrive at school with nothing.
+
+The plan above — done consistently over 6 months — will own the top 5 results for "emergency lesson plan generator", rank for dozens of long-tail teacher searches, and build a content moat that no competitor can copy quickly.
+
+The technical SEO items (Part 3) are all buildable in the app right now. Want me to create those as tasks and implement them — starting with the quick wins that go live immediately?

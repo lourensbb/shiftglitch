@@ -1,6 +1,90 @@
 const express = require('express');
 const path = require('path');
-const { getSessionMiddleware, setupAuthRoutes, requireAuth, getUserGamertag, updateGamertag, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead } = require('./auth');
+const { getSessionMiddleware, setupAuthRoutes, requireAuth, getUserGamertag, updateGamertag, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount } = require('./auth');
+
+async function sendWelcomeEmail(gamertag, email) {
+  const key = process.env.RESEND_API_KEY;
+  if (!key) return;
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Access Requested — ShiftGlitch</title>
+    </head>
+    <body style="margin:0;padding:0;background:#050505;font-family:'Courier New',monospace;">
+      <table width="100%" cellpadding="0" cellspacing="0" style="background:#050505;padding:40px 20px;">
+        <tr><td align="center">
+          <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;border:1px solid rgba(57,255,20,0.2);background:#080808;">
+            <tr>
+              <td style="padding:0;background:#000;border-bottom:2px solid #39FF14;">
+                <div style="padding:30px 40px;">
+                  <div style="font-family:'Courier New',monospace;font-size:10px;color:rgba(57,255,20,0.4);letter-spacing:3px;text-transform:uppercase;margin-bottom:8px;">// SHIFTGLITCH SYSTEMS — MAINFRAME NOTIFICATION</div>
+                  <div style="font-family:'Courier New',monospace;font-size:40px;color:#fff;letter-spacing:4px;font-weight:bold;line-height:1;">SHIFTGLITCH</div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:40px;">
+                <div style="font-family:'Courier New',monospace;font-size:11px;color:#FF0000;letter-spacing:2px;text-transform:uppercase;margin-bottom:20px;">[ INCOMING TRANSMISSION — PRIORITY ALPHA ]</div>
+                <div style="font-family:'Courier New',monospace;font-size:26px;color:#39FF14;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;text-shadow:0 0 20px rgba(57,255,20,0.4);">ACCESS REQUESTED.</div>
+                <div style="font-family:'Courier New',monospace;font-size:12px;color:rgba(57,255,20,0.5);letter-spacing:1px;margin-bottom:30px;">OPERATIVE: ${gamertag.toUpperCase()}</div>
+                <p style="font-family:'Courier New',monospace;font-size:13px;color:#666;line-height:1.8;margin:0 0 20px;">
+                  Comm-link registered in the mainframe.<br>
+                  Your request for system access has been logged.
+                </p>
+                <p style="font-family:'Courier New',monospace;font-size:13px;color:#555;line-height:1.8;margin:0 0 30px;">
+                  We are running a controlled rollout — letting in new Netrunners in batches.
+                  When your slot opens, you will receive a second transmission with your access credentials.
+                </p>
+                <div style="background:rgba(57,255,20,0.04);border:1px solid rgba(57,255,20,0.12);padding:20px;margin-bottom:30px;">
+                  <div style="font-family:'Courier New',monospace;font-size:10px;color:rgba(57,255,20,0.4);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;">// WHILE YOU WAIT</div>
+                  <div style="font-family:'Courier New',monospace;font-size:12px;color:#555;line-height:2;">
+                    &gt; Try the demo at shiftglitch.replit.app/demo<br>
+                    &gt; View pricing at shiftglitch.replit.app/pricing<br>
+                    &gt; Teachers: shiftglitch.replit.app/teacher
+                  </div>
+                </div>
+                <div style="font-family:'Courier New',monospace;font-size:10px;color:#222;letter-spacing:1px;">
+                  End-to-end encrypted. We do not sell your data.<br>
+                  You were added as: ${email}
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:20px 40px;border-top:1px solid rgba(57,255,20,0.06);">
+                <div style="font-family:'Courier New',monospace;font-size:9px;color:#1a1a1a;letter-spacing:1px;">
+                  SHIFTGLITCH SYSTEMS — THE STUDY OS FOR UK STUDENTS<br>
+                  shiftglitch.replit.app — &copy; 2026 Lourens Breytenbach
+                </div>
+              </td>
+            </tr>
+          </table>
+        </td></tr>
+      </table>
+    </body>
+    </html>
+  `;
+  try {
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        from: 'ShiftGlitch <access@shiftglitch.app>',
+        to: [email],
+        subject: '[ ACCESS REQUESTED ] — ShiftGlitch Mainframe',
+        html
+      })
+    });
+    if (!res.ok) {
+      const err = await res.text();
+      console.error('[email] Resend error:', err);
+    }
+  } catch (err) {
+    console.error('[email] Failed to send welcome email:', err.message);
+  }
+}
 
 const app = express();
 
@@ -43,11 +127,18 @@ app.post('/api/gemini', async (req, res) => {
 });
 
 app.get('/', (req, res) => {
+  trackPageView('home').catch(() => {});
   res.sendFile(path.join(__dirname, 'landing.html'));
 });
 
 app.get('/waitlist', (req, res) => {
+  trackPageView('waitlist').catch(() => {});
   res.sendFile(path.join(__dirname, 'waitlist.html'));
+});
+
+app.get('/pricing', (req, res) => {
+  trackPageView('pricing').catch(() => {});
+  res.sendFile(path.join(__dirname, 'pricing.html'));
 });
 
 app.post('/api/waitlist', async (req, res) => {
@@ -62,11 +153,21 @@ app.post('/api/waitlist', async (req, res) => {
     const cleanTag = gamertag.trim().slice(0, 30);
     const cleanEmail = email.trim().toLowerCase().slice(0, 254);
     await saveWaitlistLead(cleanTag, cleanEmail);
+    sendWelcomeEmail(cleanTag, cleanEmail).catch(() => {});
     res.json({ ok: true });
   } catch (err) {
     if (err.code === 'DUPLICATE') return res.status(409).json({ error: 'DUPLICATE' });
     console.error('/api/waitlist error:', err);
     res.status(500).json({ error: 'Server error' });
+  }
+});
+
+app.get('/api/stats', async (req, res) => {
+  try {
+    const [pages, waitlist] = await Promise.all([getPageStats(), getWaitlistCount()]);
+    res.json({ pages, waitlist });
+  } catch (err) {
+    res.status(500).json({ error: 'Stats unavailable' });
   }
 });
 
@@ -82,10 +183,12 @@ app.get('/app', requireAuth, (req, res) => {
 });
 
 app.get('/demo', (req, res) => {
+  trackPageView('demo').catch(() => {});
   res.sendFile(path.join(__dirname, 'demo.html'));
 });
 
 app.get('/teacher', (req, res) => {
+  trackPageView('teacher').catch(() => {});
   res.sendFile(path.join(__dirname, 'teacher.html'));
 });
 

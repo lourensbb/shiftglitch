@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Pricing — ShiftGlitch | Free, Pro &amp; School Plans</title>
+    <meta name="description" content="ShiftGlitch is free for individual students. Pro plans unlock AI study planning and Squad Mode. School licenses give your entire institution full access from £399/year.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://shiftglitch.replit.app/pricing">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://shiftglitch.replit.app/pricing">
+    <meta property="og:title" content="ShiftGlitch Pricing — Free, Pro &amp; School Plans">
+    <meta property="og:description" content="Free for students. Pro for serious revision. School licenses for institutions. Simple pricing that makes sense.">
+    <meta property="og:site_name" content="ShiftGlitch">
+
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "ShiftGlitch Pricing",
+      "url": "https://shiftglitch.replit.app/pricing",
+      "description": "Pricing plans for ShiftGlitch — the study OS for UK teenagers.",
+      "offers": [
+        {
+          "@type": "Offer",
+          "name": "Free",
+          "price": "0",
+          "priceCurrency": "GBP",
+          "description": "Core study tools — spaced repetition, Pomodoro, blurting, MCQ diagnostics. Free forever."
+        },
+        {
+          "@type": "Offer",
+          "name": "Netrunner Pro",
+          "price": "7.99",
+          "priceCurrency": "GBP",
+          "billingIncrement": "month",
+          "description": "Unlock AI study planning, Squad Mode, and priority access to new features."
+        },
+        {
+          "@type": "Offer",
+          "name": "School License",
+          "price": "399",
+          "priceCurrency": "GBP",
+          "billingIncrement": "year",
+          "description": "Full Pro access for all students plus Teacher Dashboard, class analytics, and CSV exports."
+        }
+      ]
+    }
+    </script>
+
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --green: #39FF14;
+            --magenta: #FF00FF;
+            --purple: #8A2BE2;
+            --bg: #050505;
+        }
+        html, body {
+            width: 100%; min-height: 100%;
+            background: var(--bg); color: #fff;
+            overflow-x: hidden;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        body::after {
+            content: '';
+            position: fixed; inset: 0;
+            pointer-events: none; z-index: 1;
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px);
+        }
+        .orb {
+            position: fixed; border-radius: 50%;
+            filter: blur(130px); pointer-events: none; z-index: 0;
+        }
+        .orb-green  { width:55vw;height:55vw;background:var(--green);  top:-15vw;left:-12vw;  opacity:0.1; }
+        .orb-purple { width:45vw;height:45vw;background:var(--purple); bottom:-10vw;right:-10vw; opacity:0.08; }
+
+        /* ── Nav ─── */
+        .nav {
+            position: relative; z-index: 20;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .nav-logo {
+            font-family: 'VT323', monospace;
+            font-size: 1.8rem; color: #fff;
+            text-decoration: none; letter-spacing: 0.08em;
+        }
+        .nav-logo span { color: var(--green); }
+        .nav-links {
+            display: flex; gap: 2rem;
+        }
+        .nav-link {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.7rem; letter-spacing: 0.1em;
+            text-transform: uppercase; text-decoration: none;
+            color: rgba(255,255,255,0.3);
+            transition: color 0.2s ease;
+        }
+        .nav-link:hover { color: rgba(255,255,255,0.7); }
+
+        /* ── Page ─── */
+        .page {
+            position: relative; z-index: 10;
+            max-width: 1100px; margin: 0 auto;
+            padding: 4rem 1.5rem 8rem;
+        }
+        .page-label {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.7rem; color: var(--green);
+            letter-spacing: 0.2em; text-transform: uppercase;
+            margin-bottom: 1rem; opacity: 0.6;
+        }
+        .page-title {
+            font-family: 'VT323', monospace;
+            font-size: clamp(2.8rem, 8vw, 5rem);
+            color: #fff; text-transform: uppercase;
+            letter-spacing: 0.04em; line-height: 1.05;
+            margin-bottom: 1rem;
+        }
+        .page-sub {
+            font-size: 1rem; color: #666; line-height: 1.8;
+            max-width: 600px; margin-bottom: 4rem;
+        }
+
+        /* ── Toggle ─── */
+        .billing-toggle {
+            display: flex; align-items: center;
+            gap: 1rem; margin-bottom: 3rem;
+        }
+        .toggle-label {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.75rem; letter-spacing: 0.1em;
+            text-transform: uppercase;
+            transition: color 0.2s ease;
+            cursor: pointer;
+        }
+        .toggle-label.active { color: var(--green); }
+        .toggle-label.inactive { color: #444; }
+        .toggle-track {
+            width: 44px; height: 22px;
+            background: rgba(57,255,20,0.1);
+            border: 1px solid rgba(57,255,20,0.2);
+            border-radius: 11px;
+            position: relative; cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        .toggle-track.annual { background: rgba(57,255,20,0.15); }
+        .toggle-thumb {
+            width: 16px; height: 16px;
+            background: var(--green);
+            border-radius: 50%;
+            position: absolute; top: 2px; left: 2px;
+            transition: left 0.2s ease;
+            box-shadow: 0 0 8px rgba(57,255,20,0.5);
+        }
+        .toggle-track.annual .toggle-thumb { left: 24px; }
+        .save-badge {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.6rem; letter-spacing: 0.1em;
+            text-transform: uppercase;
+            background: rgba(57,255,20,0.12);
+            color: var(--green);
+            border: 1px solid rgba(57,255,20,0.2);
+            padding: 0.2rem 0.5rem;
+            display: none;
+        }
+        .toggle-track.annual ~ .save-badge { display: inline; }
+
+        /* ── Pricing grid ─── */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+        @media (max-width: 800px) {
+            .pricing-grid { grid-template-columns: 1fr; max-width: 480px; }
+        }
+
+        .plan-card {
+            border: 1px solid rgba(255,255,255,0.07);
+            padding: 2.25rem 2rem;
+            background: rgba(255,255,255,0.015);
+            position: relative;
+            display: flex; flex-direction: column;
+            transition: border-color 0.2s ease;
+        }
+        .plan-card.featured {
+            border-color: rgba(57,255,20,0.3);
+            background: rgba(57,255,20,0.03);
+        }
+        .plan-card.featured::before {
+            content: '// RECOMMENDED';
+            position: absolute; top: -1px; left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.55rem; letter-spacing: 0.18em;
+            text-transform: uppercase;
+            background: var(--green); color: #000;
+            padding: 0.2rem 0.75rem;
+            white-space: nowrap;
+        }
+        .plan-card.school {
+            border-color: rgba(138,43,226,0.25);
+            background: rgba(138,43,226,0.02);
+        }
+        .plan-name {
+            font-family: 'VT323', monospace;
+            font-size: 2rem; text-transform: uppercase;
+            letter-spacing: 0.05em; margin-bottom: 0.5rem;
+        }
+        .plan-card.featured .plan-name { color: var(--green); }
+        .plan-card.school  .plan-name  { color: var(--purple); }
+        .plan-tagline {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.65rem; letter-spacing: 0.1em;
+            text-transform: uppercase; color: #444;
+            margin-bottom: 2rem;
+        }
+        .plan-price {
+            display: flex; align-items: baseline;
+            gap: 0.35rem; margin-bottom: 0.4rem;
+        }
+        .price-currency {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 1rem; color: #555;
+            align-self: flex-start; padding-top: 0.4rem;
+        }
+        .price-amount {
+            font-family: 'VT323', monospace;
+            font-size: 4rem; line-height: 1;
+            color: #fff;
+        }
+        .plan-card.featured .price-amount { color: var(--green); text-shadow: 0 0 30px rgba(57,255,20,0.25); }
+        .plan-card.school .price-amount   { color: var(--purple); }
+        .price-period {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.65rem; color: #444;
+            letter-spacing: 0.08em; text-transform: uppercase;
+            align-self: flex-end; padding-bottom: 0.6rem;
+        }
+        .price-annual {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.65rem; color: var(--green);
+            letter-spacing: 0.08em; margin-bottom: 1.5rem;
+            display: none;
+        }
+        .price-annual.visible { display: block; }
+        .price-note {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.65rem; color: #333;
+            letter-spacing: 0.06em; margin-bottom: 1.5rem;
+        }
+
+        .features-list {
+            list-style: none;
+            flex: 1;
+            display: flex; flex-direction: column; gap: 0.6rem;
+            margin-bottom: 2rem;
+        }
+        .features-list li {
+            font-size: 0.88rem; color: #888;
+            display: flex; gap: 0.75rem; align-items: flex-start;
+            line-height: 1.5;
+        }
+        .features-list .check {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.8rem; flex-shrink: 0; margin-top: 0.05rem;
+        }
+        .plan-card:not(.featured):not(.school) .check { color: #444; }
+        .plan-card.featured .check { color: var(--green); }
+        .plan-card.school   .check { color: var(--purple); }
+        .features-list .dim { color: #333; }
+
+        .plan-cta {
+            display: block; width: 100%;
+            padding: 1rem 1.5rem;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.82rem; font-weight: bold;
+            letter-spacing: 0.15em; text-transform: uppercase;
+            text-decoration: none; text-align: center;
+            transition: all 0.2s ease; cursor: pointer;
+        }
+        .plan-card:not(.featured):not(.school) .plan-cta {
+            color: rgba(255,255,255,0.4);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .plan-card:not(.featured):not(.school) .plan-cta:hover {
+            color: rgba(255,255,255,0.7);
+            border-color: rgba(255,255,255,0.25);
+        }
+        .plan-card.featured .plan-cta {
+            color: #000; background: var(--green);
+            border: 2px solid var(--green);
+            box-shadow: 0 0 30px rgba(57,255,20,0.3);
+        }
+        .plan-card.featured .plan-cta:hover {
+            box-shadow: 0 0 50px rgba(57,255,20,0.5);
+        }
+        .plan-card.school .plan-cta {
+            color: var(--purple);
+            border: 1px solid rgba(138,43,226,0.4);
+        }
+        .plan-card.school .plan-cta:hover {
+            background: rgba(138,43,226,0.1);
+            box-shadow: 0 0 30px rgba(138,43,226,0.2);
+        }
+
+        /* ── Comparison table ─── */
+        .compare-section {
+            margin-top: 5rem;
+        }
+        .compare-title {
+            font-family: 'VT323', monospace;
+            font-size: 2rem; text-transform: uppercase;
+            letter-spacing: 0.04em; margin-bottom: 2rem;
+        }
+        .compare-table {
+            width: 100%; border-collapse: collapse;
+        }
+        .compare-table th {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.65rem; letter-spacing: 0.12em;
+            text-transform: uppercase; padding: 1rem 0.75rem;
+            text-align: left; color: #444;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .compare-table th.green { color: var(--green); }
+        .compare-table th.purple { color: var(--purple); }
+        .compare-table td {
+            padding: 0.85rem 0.75rem;
+            font-size: 0.88rem; color: #666;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+        .compare-table td:first-child { color: #aaa; }
+        .compare-table td .y {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.8rem; color: var(--green);
+        }
+        .compare-table td .n {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.8rem; color: #2a2a2a;
+        }
+        .compare-table td .p {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.8rem; color: var(--purple);
+        }
+
+        /* ── FAQ ─── */
+        .faq-section { margin-top: 5rem; }
+        .faq-title {
+            font-family: 'VT323', monospace;
+            font-size: 2rem; text-transform: uppercase;
+            letter-spacing: 0.04em; margin-bottom: 2rem;
+        }
+        .faq-item {
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            padding: 1.5rem 0;
+        }
+        .faq-q {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.85rem; letter-spacing: 0.04em;
+            color: rgba(255,255,255,0.7); margin-bottom: 0.6rem;
+        }
+        .faq-a {
+            font-size: 0.88rem; color: #555; line-height: 1.7;
+        }
+
+        /* ── Back link ─── */
+        .back-link {
+            display: inline-block; margin-top: 4rem;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.65rem; color: rgba(57,255,20,0.3);
+            letter-spacing: 0.1em; text-transform: uppercase;
+            text-decoration: none; transition: color 0.2s ease;
+        }
+        .back-link:hover { color: rgba(57,255,20,0.7); }
+    </style>
+</head>
+<body>
+
+    <div class="orb orb-green"></div>
+    <div class="orb orb-purple"></div>
+
+    <nav class="nav" aria-label="Site navigation">
+        <a href="/" class="nav-logo">SHIFT<span>GLITCH</span></a>
+        <div class="nav-links">
+            <a href="/demo" class="nav-link">Demo</a>
+            <a href="/teacher" class="nav-link">Teachers</a>
+            <a href="/waitlist" class="nav-link">Waitlist</a>
+        </div>
+    </nav>
+
+    <main class="page">
+        <p class="page-label">// pricing.config</p>
+        <h1 class="page-title">Access Tiers</h1>
+        <p class="page-sub">
+            The core tools are free. Always. If you want AI and Squad Mode, that is Pro.
+            If you are a school, one license covers every student.
+        </p>
+
+        <div class="billing-toggle" aria-label="Billing period toggle">
+            <span class="toggle-label active" id="lbl-monthly">Monthly</span>
+            <div class="toggle-track" id="billing-toggle" role="switch" aria-checked="false" tabindex="0">
+                <div class="toggle-thumb"></div>
+            </div>
+            <span class="toggle-label inactive" id="lbl-annual">Annual</span>
+            <span class="save-badge">Save 35%</span>
+        </div>
+
+        <div class="pricing-grid" role="list">
+
+            <!-- FREE -->
+            <div class="plan-card" role="listitem" aria-label="Free plan">
+                <div class="plan-name">Free</div>
+                <div class="plan-tagline">// for individual students</div>
+                <div class="plan-price">
+                    <span class="price-currency">£</span>
+                    <span class="price-amount">0</span>
+                    <span class="price-period">forever</span>
+                </div>
+                <div class="price-note">No credit card. No trial. No catch.</div>
+                <ul class="features-list" aria-label="Free plan features">
+                    <li><span class="check">✓</span> Leitner Flashcard Decks (unlimited)</li>
+                    <li><span class="check">✓</span> Focus Governor (Pomodoro timer)</li>
+                    <li><span class="check">✓</span> Blurting Engine</li>
+                    <li><span class="check">✓</span> Diagnostic MCQ Arena</li>
+                    <li><span class="check">✓</span> Rank progression (NPC → System Admin)</li>
+                    <li><span class="check">✓</span> Progress tracking &amp; streaks</li>
+                    <li><span class="check dim">—</span> <span class="dim">AI Mission Architect</span></li>
+                    <li><span class="check dim">—</span> <span class="dim">Squad Mode</span></li>
+                    <li><span class="check dim">—</span> <span class="dim">Priority access</span></li>
+                </ul>
+                <a href="/waitlist" class="plan-cta" aria-label="Join the free waitlist">Join Waitlist</a>
+            </div>
+
+            <!-- PRO -->
+            <div class="plan-card featured" role="listitem" aria-label="Netrunner Pro plan">
+                <div class="plan-name">Netrunner Pro</div>
+                <div class="plan-tagline">// for serious revision</div>
+                <div class="plan-price">
+                    <span class="price-currency">£</span>
+                    <span class="price-amount" id="pro-price">7.99</span>
+                    <span class="price-period" id="pro-period">/month</span>
+                </div>
+                <div class="price-annual" id="pro-annual">£59.99/year — billed once (save £35.89)</div>
+                <div class="price-note" id="pro-note">Billed monthly. Cancel any time.</div>
+                <ul class="features-list" aria-label="Pro plan features">
+                    <li><span class="check">✓</span> Everything in Free</li>
+                    <li><span class="check">✓</span> AI Mission Architect (unlimited)</li>
+                    <li><span class="check">✓</span> Squad Mode (study with up to 4 players)</li>
+                    <li><span class="check">✓</span> Priority access to new features</li>
+                    <li><span class="check">✓</span> Bring Your Own Gemini Key (BYOK)</li>
+                    <li><span class="check">✓</span> Early access to beta modules</li>
+                    <li><span class="check">✓</span> Export all data (JSON)</li>
+                </ul>
+                <a href="/waitlist" class="plan-cta" aria-label="Join Pro waitlist">Join Pro Waitlist</a>
+            </div>
+
+            <!-- SCHOOL -->
+            <div class="plan-card school" role="listitem" aria-label="School license plan">
+                <div class="plan-name">School License</div>
+                <div class="plan-tagline">// for institutions</div>
+                <div class="plan-price">
+                    <span class="price-currency">£</span>
+                    <span class="price-amount">399</span>
+                    <span class="price-period">/year</span>
+                </div>
+                <div class="price-note">Covers your entire school. One invoice.</div>
+                <ul class="features-list" aria-label="School license features">
+                    <li><span class="check">✓</span> Pro access for all students</li>
+                    <li><span class="check">✓</span> Teacher Dashboard (student analytics)</li>
+                    <li><span class="check">✓</span> Class progress reports (CSV export)</li>
+                    <li><span class="check">✓</span> At-risk student identification</li>
+                    <li><span class="check">✓</span> Priority email support</li>
+                    <li><span class="check">✓</span> Setup walkthrough call included</li>
+                    <li><span class="check">✓</span> Formal invoice for finance department</li>
+                </ul>
+                <a href="mailto:schools@shiftglitch.app?subject=School%20License%20Enquiry" class="plan-cta" aria-label="Contact for school pricing">Contact Us →</a>
+            </div>
+
+        </div>
+
+        <!-- Comparison table -->
+        <div class="compare-section">
+            <h2 class="compare-title">Full Comparison</h2>
+            <table class="compare-table" aria-label="Feature comparison across plans">
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>Free</th>
+                        <th class="green">Pro</th>
+                        <th class="purple">School</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Leitner Flashcard Decks</td><td><span class="y">✓ Unlimited</span></td><td><span class="y">✓ Unlimited</span></td><td><span class="y">✓ Unlimited</span></td></tr>
+                    <tr><td>Focus Governor (Pomodoro)</td><td><span class="y">✓</span></td><td><span class="y">✓</span></td><td><span class="y">✓</span></td></tr>
+                    <tr><td>Blurting Engine</td><td><span class="y">✓</span></td><td><span class="y">✓</span></td><td><span class="y">✓</span></td></tr>
+                    <tr><td>MCQ Diagnostic Arena</td><td><span class="y">✓</span></td><td><span class="y">✓</span></td><td><span class="y">✓</span></td></tr>
+                    <tr><td>Rank Progression</td><td><span class="y">✓</span></td><td><span class="y">✓</span></td><td><span class="y">✓</span></td></tr>
+                    <tr><td>Progress Tracking &amp; Streaks</td><td><span class="y">✓</span></td><td><span class="y">✓</span></td><td><span class="y">✓</span></td></tr>
+                    <tr><td>AI Mission Architect</td><td><span class="n">—</span></td><td><span class="y">✓ Unlimited</span></td><td><span class="y">✓ Unlimited</span></td></tr>
+                    <tr><td>Squad Mode (multiplayer study)</td><td><span class="n">—</span></td><td><span class="y">✓</span></td><td><span class="y">✓</span></td></tr>
+                    <tr><td>BYOK (Bring Your Own API Key)</td><td><span class="n">—</span></td><td><span class="y">✓</span></td><td><span class="y">✓</span></td></tr>
+                    <tr><td>Data export (JSON)</td><td><span class="n">—</span></td><td><span class="y">✓</span></td><td><span class="y">✓</span></td></tr>
+                    <tr><td>Teacher Dashboard</td><td><span class="n">—</span></td><td><span class="n">—</span></td><td><span class="p">✓</span></td></tr>
+                    <tr><td>Class Progress Reports</td><td><span class="n">—</span></td><td><span class="n">—</span></td><td><span class="p">✓</span></td></tr>
+                    <tr><td>CSV Export for School Records</td><td><span class="n">—</span></td><td><span class="n">—</span></td><td><span class="p">✓</span></td></tr>
+                    <tr><td>Setup Call</td><td><span class="n">—</span></td><td><span class="n">—</span></td><td><span class="p">✓ Included</span></td></tr>
+                    <tr><td>Formal Invoice</td><td><span class="n">—</span></td><td><span class="n">—</span></td><td><span class="p">✓</span></td></tr>
+                    <tr><td>Priority Support</td><td><span class="n">—</span></td><td><span class="n">—</span></td><td><span class="p">✓</span></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- FAQ -->
+        <div class="faq-section">
+            <h2 class="faq-title">Frequently Asked Questions</h2>
+
+            <div class="faq-item">
+                <div class="faq-q">// Is the free tier actually free, or is there a catch?</div>
+                <div class="faq-a">It is genuinely free. The core tools — flashcards, Pomodoro, blurting, and MCQ diagnostics — are free forever with no credit card required. The free tier exists because we believe students should not have to pay to access effective revision tools.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q">// Why does Pro cost money?</div>
+                <div class="faq-a">The AI study planning feature (Mission Architect) uses Google Gemini, which has real API costs. Pro pays for the AI infrastructure and supports continued development of the platform.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q">// Can I pay for Pro annually to save money?</div>
+                <div class="faq-a">Yes. Annual billing is £59.99/year — which works out to £5/month, saving you £35.89 compared to paying month-to-month. Toggle the billing switch above to see annual pricing.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q">// What does the School License cover exactly?</div>
+                <div class="faq-a">One School License covers your entire institution — all students, all teachers, no per-head fees. You get everything in Pro plus the Teacher Dashboard, which shows you each student's study habits, streaks, and rank progression without requiring student login access.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q">// How do I get an invoice for my school's finance department?</div>
+                <div class="faq-a">Email us at schools@shiftglitch.app with your school name and address. We will send a formal invoice. Most schools process payment within 5–10 working days.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-q">// Can I try the app before paying for anything?</div>
+                <div class="faq-a">Yes. The demo at /demo lets you explore all the core tools without creating an account. The Teacher Dashboard at /teacher can be accessed with any student data export — no login required.</div>
+            </div>
+        </div>
+
+        <a href="/" class="back-link">← Return to home</a>
+    </main>
+
+    <script>
+        const toggle = document.getElementById('billing-toggle');
+        const proPrice  = document.getElementById('pro-price');
+        const proPeriod = document.getElementById('pro-period');
+        const proAnnual = document.getElementById('pro-annual');
+        const proNote   = document.getElementById('pro-note');
+        const lblM = document.getElementById('lbl-monthly');
+        const lblA = document.getElementById('lbl-annual');
+        let isAnnual = false;
+
+        function setAnnual(v) {
+            isAnnual = v;
+            toggle.classList.toggle('annual', v);
+            toggle.setAttribute('aria-checked', v ? 'true' : 'false');
+            lblM.classList.toggle('active', !v);
+            lblM.classList.toggle('inactive', v);
+            lblA.classList.toggle('active', v);
+            lblA.classList.toggle('inactive', !v);
+            if (v) {
+                proPrice.textContent  = '5.00';
+                proPeriod.textContent = '/month';
+                proAnnual.classList.add('visible');
+                proNote.textContent = 'Billed as £59.99/year. Cancel any time.';
+            } else {
+                proPrice.textContent  = '7.99';
+                proPeriod.textContent = '/month';
+                proAnnual.classList.remove('visible');
+                proNote.textContent = 'Billed monthly. Cancel any time.';
+            }
+        }
+
+        toggle.addEventListener('click', () => setAnnual(!isAnnual));
+        toggle.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setAnnual(!isAnnual); }
+        });
+    </script>
+</body>
+</html>

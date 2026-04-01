@@ -92,6 +92,11 @@ async function ensureSchema() {
         email VARCHAR(254) UNIQUE NOT NULL,
         created_at TIMESTAMP DEFAULT NOW()
       );
+      CREATE TABLE IF NOT EXISTS page_views (
+        page VARCHAR(100) NOT NULL,
+        views BIGINT NOT NULL DEFAULT 0,
+        PRIMARY KEY (page)
+      );
     `);
     console.log('[auth] DB schema ready');
   } catch (err) {
@@ -469,4 +474,24 @@ async function saveWaitlistLead(gamertag, email) {
   return res.rows[0];
 }
 
-module.exports = { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, updateGamertag, getUserGamertag, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead };
+async function trackPageView(page) {
+  try {
+    await pool.query(
+      `INSERT INTO page_views (page, views) VALUES ($1, 1)
+       ON CONFLICT (page) DO UPDATE SET views = page_views.views + 1`,
+      [page]
+    );
+  } catch {}
+}
+
+async function getPageStats() {
+  const res = await pool.query('SELECT page, views FROM page_views ORDER BY views DESC');
+  return res.rows;
+}
+
+async function getWaitlistCount() {
+  const res = await pool.query('SELECT COUNT(*) as count FROM waitlist_leads');
+  return parseInt(res.rows[0].count, 10);
+}
+
+module.exports = { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, updateGamertag, getUserGamertag, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount };

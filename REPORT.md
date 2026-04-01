@@ -1,4 +1,4 @@
-# Synapse — Full App Report & User Guide
+# ShiftGlitch — Full App Report & User Guide
 
 *Definitive reference document covering the current state of the app, a complete module and data inventory, and a full step-by-step user guide.*
 
@@ -27,7 +27,7 @@
 
 | Field | Value |
 |-------|-------|
-| **App name** | Synapse — Interactive Learning OS |
+| **App name** | ShiftGlitch — Interactive Learning OS |
 | **Version** | Current build (March 2025) |
 | **Status** | Live and deployed on Replit |
 | **Primary URL** | Development: `https://b5334299-5744-414f-a9ca-149ecb28cf53-00-24j1nsrxtgbcv.picard.replit.dev` — Production deployment URL is set at publish time via Replit Deployments |
@@ -42,7 +42,7 @@
 |-------|-------|
 | **Prior customisation** | School-specific edition (institution-specific branding and Gumroad links) — since removed |
 | **Current state** | All school-specific customisation has been removed. The app is now brand-neutral. |
-| **App name** | Synapse — in use throughout; a full rebrand is planned as part of the upcoming commercial revamp |
+| **App name** | ShiftGlitch — in use throughout; a full rebrand is planned as part of the upcoming commercial revamp |
 | **Gumroad** | References removed; `GUMROAD_URL` set to `#` placeholder in `demo.html` |
 
 The initial deployment was an institution-specific edition. That customisation has been fully stripped to prepare the product for a global commercial release.
@@ -80,8 +80,8 @@ The navigation bar has four primary destinations (Mission, Vault, Decks, Rank, S
 |-------|--------|
 | **Navigation label** | Mission |
 | **Route** | `dashboard` |
-| **What it does** | The home screen. Displays a rotating motivational quote, the Mission Architect AI panel, Cornell Notes panel, exam countdown sidebar widget, and a "How to Use Synapse" introduction section. |
-| **Data stored** | Cornell notes (key: `cornellNotes`), exam countdowns (key: `synapse_exams`). Mission tasks stored in `synapse_todos`. |
+| **What it does** | The home screen. Displays a rotating motivational quote, the Mission Architect AI panel, Cornell Notes panel, exam countdown sidebar widget, and a "How to Use ShiftGlitch" introduction section. |
+| **Data stored** | Cornell notes (key: `cornellNotes`), exam countdowns (key: `sg_exams`). Mission tasks stored in `synapse_todos`. |
 | **Rank contribution** | None directly, but completing mission tasks and saving notes supports other rank-contributing activities. |
 
 **Subfeatures:**
@@ -111,7 +111,7 @@ The navigation bar has four primary destinations (Mission, Vault, Decks, Rank, S
 | **Navigation label** | Decks |
 | **Route** | `decks` |
 | **What it does** | Full flashcard management. Create multiple named decks. Within each deck, create cards (front/back). Study mode uses the Leitner 5-box spaced repetition system with visual orbit stability indicators. |
-| **Data stored** | Deck metadata → `synapse_decks`. All card content and Leitner box positions → `synapse_cards`. |
+| **Data stored** | Deck metadata → `sg_decks`. All card content and Leitner box positions → `sg_cards`. |
 | **Rank contribution** | Yes — cards advancing through Leitner boxes count as rank evidence (`cardsAdvanced`). |
 
 **Study mode controls:**
@@ -138,7 +138,7 @@ The navigation bar has four primary destinations (Mission, Vault, Decks, Rank, S
 | **Navigation label** | Timer (within Mission / Dashboard) |
 | **Route** | Accessible from the dashboard |
 | **What it does** | A Pomodoro-style focus timer. Duration is fixed at 25 minutes (work) / 5 minutes (break) — there is no custom duration input. The learner selects a subject tag and starts the session. A circular progress ring counts down. Phone-lock nudge fires on start. A "What I Learned?" modal appears at session end. After 4 consecutive sessions on the same task, the Governor blocks further sessions and requires the learner to break down the task or switch. |
-| **Data stored** | Completed sessions appended to `synapse_pomodoro_log`. WIL entries saved to `synapse_wil`. |
+| **Data stored** | Completed sessions appended to `sg_pomodoro_log`. WIL entries saved to `sg_wil`. |
 | **Rank contribution** | Yes — each completed session counts as one `pomodorosCompleted`. Each deliberate governor breakdown counts as one `governorBreakdowns`. |
 
 **Subject tags available:** Maths, English, Science, History, Geography, Languages, Art, Other.
@@ -158,7 +158,7 @@ The navigation bar has four primary destinations (Mission, Vault, Decks, Rank, S
 | **Navigation label** | Tools → Blurt |
 | **Route** | `blurt` |
 | **What it does** | A guided 4-phase active recall exercise. Phase 1: write everything you know from memory. Phase 2: read your notes. Phase 3: blurt again (capture what you missed). Phase 4: compare with your notes. |
-| **Data stored** | Completed blurt sessions saved to `synapse_blurt`. |
+| **Data stored** | Completed blurt sessions saved to `sg_blurt`. |
 | **Rank contribution** | Yes — each completed session counts as one `blurtsCompleted`. |
 
 **The 4 phases:**
@@ -176,7 +176,7 @@ The navigation bar has four primary destinations (Mission, Vault, Decks, Rank, S
 | **Navigation label** | Tools → Babel Fish |
 | **Route** | `babel` |
 | **What it does** | Feynman Technique implementation. Choose a concept, write a plain-language explanation as if teaching it to a 10-year-old, and optionally sketch a "stupid doodle." Exercises are saved and viewable. |
-| **Data stored** | Completed exercises saved to `synapse_babel`. |
+| **Data stored** | Completed exercises saved to `sg_babel`. |
 | **Rank contribution** | No direct contribution to rank counters, but builds learning depth. |
 
 ---
@@ -200,7 +200,7 @@ The navigation bar has four primary destinations (Mission, Vault, Decks, Rank, S
 | **Navigation label** | Tools → Matrix |
 | **Route** | `matrix` |
 | **What it does** | An interactive task prioritisation tool. Add tasks and drag/sort them into four quadrants: Do (urgent + important), Schedule (important, not urgent), Delegate (urgent, not important), and Eliminate (neither). Each quadrant has a reflection prompt. |
-| **Data stored** | All tasks and quadrant assignments saved to `synapse_eisenhower`. |
+| **Data stored** | All tasks and quadrant assignments saved to `sg_eisenhower`. |
 | **Rank contribution** | None. |
 
 ---
@@ -212,7 +212,7 @@ The navigation bar has four primary destinations (Mission, Vault, Decks, Rank, S
 | **Navigation label** | Tools → Recalibrator |
 | **Route** | `recal` |
 | **What it does** | Anti-procrastination tools. **Stealth Mode** breaks a session into tiny, non-threatening micro-tasks to reduce the psychological weight of starting. **Entry Rocket** provides a high-energy motivational launch sequence for getting into study mode quickly. |
-| **Data stored** | Session usage counts saved to `synapse_recal`. |
+| **Data stored** | Session usage counts saved to `sg_recal`. |
 | **Rank contribution** | None. |
 
 ---
@@ -223,8 +223,8 @@ The navigation bar has four primary destinations (Mission, Vault, Decks, Rank, S
 |-------|--------|
 | **Navigation label** | Tools → Nav Check |
 | **Route** | `diagnostic` |
-| **What it does** | A 100-question multiple-choice diagnostic across 5 themed missions, each with 20 questions. Tests knowledge of the learning science that underpins Synapse's tools. Tracks attempts, scores, and knowledge gaps. Provides reflection prompts for incorrect answers. |
-| **Data stored** | All attempt history, scores, and identified knowledge gaps saved to `synapse_mcq`. |
+| **What it does** | A 100-question multiple-choice diagnostic across 5 themed missions, each with 20 questions. Tests knowledge of the learning science that underpins ShiftGlitch's tools. Tracks attempts, scores, and knowledge gaps. Provides reflection prompts for incorrect answers. |
+| **Data stored** | All attempt history, scores, and identified knowledge gaps saved to `sg_mcq`. |
 | **Rank contribution** | Yes — each completed mission counts as one `diagnosticsCompleted`. |
 
 ---
@@ -236,7 +236,7 @@ The navigation bar has four primary destinations (Mission, Vault, Decks, Rank, S
 | **Navigation label** | Accessible via flashcard "Not Yet" button and within the Vault |
 | **Route** | `yet` (or triggered contextually) |
 | **What it does** | Growth mindset reframing tool. When a learner acknowledges not knowing something, it reframes the moment: "I don't understand X" becomes "I don't understand X YET." Saves growth moments to a log. |
-| **Data stored** | Growth moments saved to `synapse_yet`. |
+| **Data stored** | Growth moments saved to `sg_yet`. |
 | **Rank contribution** | None directly. |
 
 ---
@@ -248,7 +248,7 @@ The navigation bar has four primary destinations (Mission, Vault, Decks, Rank, S
 | **Navigation label** | Rank |
 | **Route** | `rank` |
 | **What it does** | Displays the learner's current rank, progress bars showing evidence toward the next rank, and all six evidence counters. Also hosts the Study Buddy system and Shareable Progress Report tools. |
-| **Data stored** | Rank level and all evidence counters saved to `synapse_rank`. Buddy codes and shared report URLs are generated on demand and not stored. |
+| **Data stored** | Rank level and all evidence counters saved to `sg_rank`. Buddy codes and shared report URLs are generated on demand and not stored. |
 | **Rank contribution** | This page reads rank data; it does not generate it. |
 
 **Study Buddy:** Generate a compact base64 code containing your rank and stats. Share it with a friend. Paste their code to see a side-by-side comparison.
@@ -276,7 +276,7 @@ The navigation bar has four primary destinations (Mission, Vault, Decks, Rank, S
 | **Navigation label** | Gear icon (⚙️) |
 | **Route** | `settings` |
 | **What it does** | Manage the Gemini API key: paste, save, view (masked), and remove. Step-by-step setup instructions included. Shows Firebase connection status. Theme toggle also accessible from the nav bar. |
-| **Data stored** | Gemini API key → `synapse_gemini_key`. Theme preference → `synapse_theme`. |
+| **Data stored** | Gemini API key → `sg_gemini_key`. Theme preference → `sg_theme`. |
 | **Rank contribution** | None. |
 
 ---
@@ -289,29 +289,29 @@ All data is stored in the browser's localStorage. Clearing browser data or using
 
 | Key | Owner module | Exact schema | Written when | Read when | Exported? |
 |-----|-------------|-------------|-------------|-----------|-----------|
-| `synapse_decks` | Flashcard Decks | JSON array: `{ id, title, createdAt }` | On deck create or delete | Decks page loads; stats render | Yes |
-| `synapse_cards` | Flashcard Decks | JSON array: `{ id, deckId, front, back, box, nextReview, createdAt }` | On card create, edit, delete, or review (box/nextReview updated) | Deck opened for browsing or study | Yes |
-| `synapse_pomodoro_log` | Learning Governor | JSON array: `{ task, completedAt, duration }` — `task` is the normalised subject label; breakdown entries use `task: '__breakdown__'` with no `duration` | On session complete; on governor breakdown | Stats render; rank evidence calculated on app load | Yes |
-| `synapse_blurt` | Blurting Method | JSON array: `{ id, title, source, recall, gaps, reviewCount, createdAt, updatedAt }` — `title` = topic; `source` = notes (phase 2); `recall` = second blurt (phase 3); `gaps` = identified gaps (phase 4) | On each phase save and on session complete | Blurt history renders; rank evidence calculated | Yes |
+| `sg_decks` | Flashcard Decks | JSON array: `{ id, title, createdAt }` | On deck create or delete | Decks page loads; stats render | Yes |
+| `sg_cards` | Flashcard Decks | JSON array: `{ id, deckId, front, back, box, nextReview, createdAt }` | On card create, edit, delete, or review (box/nextReview updated) | Deck opened for browsing or study | Yes |
+| `sg_pomodoro_log` | Learning Governor | JSON array: `{ task, completedAt, duration }` — `task` is the normalised subject label; breakdown entries use `task: '__breakdown__'` with no `duration` | On session complete; on governor breakdown | Stats render; rank evidence calculated on app load | Yes |
+| `sg_blurt` | Blurting Method | JSON array: `{ id, title, source, recall, gaps, reviewCount, createdAt, updatedAt }` — `title` = topic; `source` = notes (phase 2); `recall` = second blurt (phase 3); `gaps` = identified gaps (phase 4) | On each phase save and on session complete | Blurt history renders; rank evidence calculated | Yes |
 | `synapse_todos` | Dashboard (Cornell) | JSON array: `{ id, text, done }` | Adding, toggling, or deleting a mission task | Dashboard renders | Yes |
-| `synapse_eisenhower` | Eisenhower Matrix | JSON object: `{ tasks: [{ id, text, quadrant, createdAt, completed?, completedAt? }], reflections: [{ text, createdAt }] }` — quadrant 0 = unsorted, 1–4 = the four matrix quadrants | Adding/moving/completing/deleting tasks; adding a reflection | Matrix page renders | Yes |
-| `synapse_recal` | Dopamine Recalibrator | JSON object: `{ sessions: [{ type, date }], stealthCount, rocketCount }` — `type` is `'stealth'` or `'rocket'` | On each Stealth Mode or Entry Rocket activation | Recalibrator page renders | Yes |
-| `synapse_babel` | Babel Fish | JSON array: `{ id, concept, explanation, doodle, createdAt, hasBadge }` | Saving a completed Feynman exercise | Babel Fish history section loads | Yes |
-| `synapse_yet` | YET Growth Shield | JSON array: `{ concept, date }` | Logging a YET moment (via "Not Yet 🛡️" button or direct YET page) | YET page renders | Yes |
-| `synapse_rank` | Rank System | JSON object: `{ rank, rankEvidence: { blurtsCompleted, governorBreakdowns, cardsAdvanced, activeDays, pomodorosCompleted, diagnosticsCompleted, lastActiveDate, activeDateLog } }` | Any rank-contributing action; active day logged; promotion occurs | App boot; Rank page renders; nav bar rank badge updates | Yes |
-| `synapse_mcq` | MCQ Diagnostics | JSON object: `{ attempts: { [missionIdx]: [{ answers, correct, total, date }] }, gaps: string[], reflections: { [missionIdx]: string } }` — `missionIdx` is 0-based (0–4) | On mission submit; when a gap concept is identified; when a reflection is saved | Diagnostic page renders; rank evidence calculated | Yes |
-| `synapse_exams` | Exam Countdown | JSON array: `{ id, label, date }` — `label` = exam name; `date` = ISO date string (sorted ascending) | Adding or removing an exam | Dashboard sidebar widget renders | Yes |
-| `synapse_wil` | Learning Governor | JSON array: `{ entry, subject, date }` — `entry` = the one-sentence learning; `subject` = subject tag from the timer; `date` = ISO timestamp | Saving a "What I Learned?" modal entry | Stats → WIL log section renders | Yes |
-| `synapse_theme` | App-wide | String: `"dark"` or `"light"` | Toggling the moon/sun icon in the nav bar | On app init — `dark` class toggled on `document.body` during app startup | Yes |
-| `synapse_gemini_key` | Settings | String: plain API key text | Saving the key in Settings | Before every Gemini API call (checked first; if present, bypasses server proxy) | **No — excluded for security** |
+| `sg_eisenhower` | Eisenhower Matrix | JSON object: `{ tasks: [{ id, text, quadrant, createdAt, completed?, completedAt? }], reflections: [{ text, createdAt }] }` — quadrant 0 = unsorted, 1–4 = the four matrix quadrants | Adding/moving/completing/deleting tasks; adding a reflection | Matrix page renders | Yes |
+| `sg_recal` | Dopamine Recalibrator | JSON object: `{ sessions: [{ type, date }], stealthCount, rocketCount }` — `type` is `'stealth'` or `'rocket'` | On each Stealth Mode or Entry Rocket activation | Recalibrator page renders | Yes |
+| `sg_babel` | Babel Fish | JSON array: `{ id, concept, explanation, doodle, createdAt, hasBadge }` | Saving a completed Feynman exercise | Babel Fish history section loads | Yes |
+| `sg_yet` | YET Growth Shield | JSON array: `{ concept, date }` | Logging a YET moment (via "Not Yet 🛡️" button or direct YET page) | YET page renders | Yes |
+| `sg_rank` | Rank System | JSON object: `{ rank, rankEvidence: { blurtsCompleted, governorBreakdowns, cardsAdvanced, activeDays, pomodorosCompleted, diagnosticsCompleted, lastActiveDate, activeDateLog } }` | Any rank-contributing action; active day logged; promotion occurs | App boot; Rank page renders; nav bar rank badge updates | Yes |
+| `sg_mcq` | MCQ Diagnostics | JSON object: `{ attempts: { [missionIdx]: [{ answers, correct, total, date }] }, gaps: string[], reflections: { [missionIdx]: string } }` — `missionIdx` is 0-based (0–4) | On mission submit; when a gap concept is identified; when a reflection is saved | Diagnostic page renders; rank evidence calculated | Yes |
+| `sg_exams` | Exam Countdown | JSON array: `{ id, label, date }` — `label` = exam name; `date` = ISO date string (sorted ascending) | Adding or removing an exam | Dashboard sidebar widget renders | Yes |
+| `sg_wil` | Learning Governor | JSON array: `{ entry, subject, date }` — `entry` = the one-sentence learning; `subject` = subject tag from the timer; `date` = ISO timestamp | Saving a "What I Learned?" modal entry | Stats → WIL log section renders | Yes |
+| `sg_theme` | App-wide | String: `"dark"` or `"light"` | Toggling the moon/sun icon in the nav bar | On app init — `dark` class toggled on `document.body` during app startup | Yes |
+| `sg_gemini_key` | Settings | String: plain API key text | Saving the key in Settings | Before every Gemini API call (checked first; if present, bypasses server proxy) | **No — excluded for security** |
 | `cornellNotes` | Dashboard (Cornell) | HTML string: serialised `innerHTML` of the Cornell Notes `contenteditable` div | Auto-saved as the user types in the notes panel | Dashboard renders; Cornell Notes panel content populated | Yes |
 
 **Notes:**
-- `synapse_gemini_key` is excluded from all exports. It must be re-entered on any new browser or device.
+- `sg_gemini_key` is excluded from all exports. It must be re-entered on any new browser or device.
 - `cornellNotes` has no `synapse_` prefix — this is a legacy key retained intentionally to avoid wiping existing user notes.
-- `synapse_pomodoro_log` entries where `task === '__breakdown__'` are deliberate break events (counted toward rank as `governorBreakdowns`), not study sessions. These entries have no `duration` field.
-- `synapse_rank.rankEvidence.activeDateLog` is an array of ISO date strings (`YYYY-MM-DD`) representing every unique day the user has been active. `activeDays` is the length of this array.
-- `synapse_eisenhower` quadrant values: 0 = unsorted, 1 = Urgent & Important (Do), 2 = Important Not Urgent (Schedule), 3 = Urgent Not Important (Delegate), 4 = Not Urgent Not Important (Eliminate).
+- `sg_pomodoro_log` entries where `task === '__breakdown__'` are deliberate break events (counted toward rank as `governorBreakdowns`), not study sessions. These entries have no `duration` field.
+- `sg_rank.rankEvidence.activeDateLog` is an array of ISO date strings (`YYYY-MM-DD`) representing every unique day the user has been active. `activeDays` is the length of this array.
+- `sg_eisenhower` quadrant values: 0 = unsorted, 1 = Urgent & Important (Do), 2 = Important Not Urgent (Schedule), 3 = Urgent Not Important (Delegate), 4 = Not Urgent Not Important (Eliminate).
 
 ---
 
@@ -342,7 +342,7 @@ The rank system is the core progression spine. Promotion is permanent — once e
 
 ### Evidence Tracking
 
-The `synapse_rank` localStorage key stores all six evidence counters alongside the current rank level. The Rank page displays each counter with a progress bar showing how close the learner is to their next promotion.
+The `sg_rank` localStorage key stores all six evidence counters alongside the current rank level. The Rank page displays each counter with a progress bar showing how close the learner is to their next promotion.
 
 ---
 
@@ -376,7 +376,7 @@ The Mission Architect uses Google's Gemini AI. The key is stored in your browser
 1. Go to [aistudio.google.com/apikey](https://aistudio.google.com/apikey)
 2. Sign in with any Google account
 3. Click "Create API Key"
-4. Open Synapse, click the gear icon (⚙️) in the navigation bar
+4. Open ShiftGlitch, click the gear icon in the navigation bar
 5. Paste your key into the API key field and click Save
 
 **What changes:** A masked version of your key is shown in Settings. The Mission Architect panel on the dashboard becomes active.
@@ -387,7 +387,7 @@ The Mission Architect uses Google's Gemini AI. The key is stored in your browser
 
 ### Theme (Dark / Light Mode)
 
-The app launches in dark mode by default on first use. The current theme is saved permanently to `synapse_theme`.
+The app launches in dark mode by default on first use. The current theme is saved permanently to `sg_theme`.
 
 To toggle: click the moon (🌙) icon in the navigation bar. This switches between dark and light mode and saves the preference immediately.
 
@@ -409,9 +409,9 @@ All data management controls are in **Stats → Data Management**.
 
 Click **"Export All Data"**. A JSON file downloads to your device. This file contains all study data across all modules. Import this file on any device to restore your data.
 
-**What is included:** All 15 `synapse_*` localStorage keys + `cornellNotes`.
+**What is included:** All 15 `sg_*` localStorage keys + `cornellNotes`.
 
-**What is excluded:** `synapse_gemini_key` (API key, never exported for security).
+**What is excluded:** `sg_gemini_key` (API key, never exported for security).
 
 ### Import Data
 
@@ -441,13 +441,13 @@ No data is stored on any server. The stats are encoded directly in the URL.
 
 ## 8. New User Guide
 
-*This section is written for a student who has never opened Synapse before.*
+*This section is written for a student who has never opened ShiftGlitch before.*
 
 ---
 
 ### First Time Opening the App
 
-When you first open Synapse, you will notice:
+When you first open ShiftGlitch, you will notice:
 
 - The app loads in **dark mode** — a warm, dark background. This is the default. You can switch to light mode at any time using the moon icon (🌙) in the top navigation bar.
 - Your rank in the top right shows **Space Cadet** — your starting rank. This will change as you study.
@@ -477,7 +477,7 @@ On a phone, tap the hamburger menu (☰) to open the navigation.
 
 ### Starting Your First Study Session
 
-The focus timer is the core of Synapse. Here is how to use it.
+The focus timer is the core of ShiftGlitch. Here is how to use it.
 
 1. From the **Mission** page, look for the **Learning Governor** timer section.
 2. Choose your **subject** from the dropdown: Maths, English, Science, History, Geography, Languages, Art, or Other.
@@ -619,7 +619,7 @@ Teachers collect progress data from their students and view it in the Teacher Da
 
 ### Step 1: Have Students Export Their Data
 
-1. Students open Synapse in their browser.
+1. Students open ShiftGlitch in their browser.
 2. Students click **Stats** in the navigation bar.
 3. Students scroll to the **Data Management** section.
 4. Students click the orange **"Export for Teacher"** button.
@@ -633,7 +633,7 @@ Teachers collect progress data from their students and view it in the Teacher Da
 
 ### Step 2: Open the Teacher Dashboard
 
-Navigate to `/teacher` on your Synapse URL (e.g., `https://your-replit-url.replit.app/teacher`).
+Navigate to `/teacher` on your ShiftGlitch URL (e.g., `https://your-replit-url.replit.app/teacher`).
 
 Alternatively, if you have the files locally, open `teacher.html` directly in your browser.
 
@@ -812,7 +812,7 @@ No other packages are installed. No build tools, bundlers, or transpilers are us
 ### Security Notes
 
 - **XSS protection:** All user-generated content rendered in the DOM is passed through the `esc()` utility function, which escapes HTML entities before rendering.
-- **API key isolation:** The Gemini key is stored in `localStorage` under `synapse_gemini_key`. It is excluded from all data exports. It is not transmitted to any server when the user's own key is used — API calls go directly from the browser to Google's servers.
+- **API key isolation:** The Gemini key is stored in `localStorage` under `sg_gemini_key`. It is excluded from all data exports. It is not transmitted to any server when the user's own key is used — API calls go directly from the browser to Google's servers.
 - **No user accounts:** The app does not collect, store, or transmit personally identifiable information. All data stays in the user's browser.
 - **Firebase anonymous auth:** If Firebase is configured, the app signs in anonymously — no email, password, or personal information is required.
 - **Content Security:** No `eval()` or dynamic script injection is used in the application code.
@@ -839,6 +839,6 @@ Works for fully offline use. All features except the Gemini server proxy (which 
 
 ---
 
-*Synapse — Interactive Learning OS*
+*ShiftGlitch — Interactive Learning OS*
 *REPORT.md — Full App Report & User Guide*
 *Current as of March 2025.*
