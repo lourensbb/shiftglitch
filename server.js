@@ -476,6 +476,15 @@ app.post('/api/paypal-checkout', requireAuth, checkoutLimiter, async (req, res) 
   }
 });
 
+if (process.env.NODE_ENV !== 'production') {
+  app.post('/api/dev/set-tier', requireAuth, async (req, res) => {
+    const { tier } = req.body;
+    if (!['free', 'pro'].includes(tier)) return res.status(400).json({ error: 'tier must be "free" or "pro"' });
+    await updateMembershipTier(req.session.userId, tier, tier === 'pro' ? 'dev_test' : null);
+    res.json({ ok: true, tier });
+  });
+}
+
 app.get('/login', (req, res) => {
   if (req.session && req.session.userId) {
     return res.redirect('/app');
