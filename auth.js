@@ -50,6 +50,10 @@ async function ensureSchema() {
       ALTER TABLE users ADD COLUMN IF NOT EXISTS last_updated TIMESTAMP DEFAULT NOW();
       ALTER TABLE users ADD COLUMN IF NOT EXISTS membership_tier VARCHAR NOT NULL DEFAULT 'free';
       ALTER TABLE users ADD COLUMN IF NOT EXISTS stripe_customer_id VARCHAR;
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS payment_ref VARCHAR;
+    `);
+    await client.query(`
+      UPDATE users SET payment_ref = stripe_customer_id WHERE payment_ref IS NULL AND stripe_customer_id IS NOT NULL
     `);
     const { rows: lbExists } = await client.query(`
       SELECT 1 FROM information_schema.tables WHERE table_name = 'leaderboard'
@@ -288,14 +292,14 @@ async function updateMembershipTier(userId, tier, paymentRef = null) {
   const allowedTiers = ['free', 'pro'];
   if (!allowedTiers.includes(tier)) throw new Error('Invalid tier: ' + tier);
   await pool.query(
-    `UPDATE users SET membership_tier = $1, stripe_customer_id = COALESCE($2, stripe_customer_id), updated_at = NOW() WHERE id = $3`,
+    `UPDATE users SET membership_tier = $1, payment_ref = COALESCE($2, payment_ref), updated_at = NOW() WHERE id = $3`,
     [tier, paymentRef, userId]
   );
   console.log(`[membership] User ${userId} tier set to ${tier}`);
 }
 
 async function getUserByPaymentRef(ref) {
-  const { rows } = await pool.query('SELECT * FROM users WHERE stripe_customer_id = $1', [ref]);
+  const { rows } = await pool.query('SELECT * FROM users WHERE payment_ref = $1', [ref]);
   return rows[0] || null;
 }
 

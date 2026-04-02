@@ -123,6 +123,14 @@ app.post('/api/payfast-itn', express.urlencoded({ extended: false }), async (req
   try {
     const data = req.body;
     if (!data || !data.m_payment_id) { console.warn('[payfast-itn] Missing m_payment_id'); return; }
+
+    const expectedMerchantId = process.env.PAYFAST_MERCHANT_ID;
+    if (!expectedMerchantId) { console.warn('[payfast-itn] PAYFAST_MERCHANT_ID not set — ignoring ITN'); return; }
+    if (data.merchant_id !== expectedMerchantId) {
+      console.warn(`[payfast-itn] Merchant ID mismatch: got ${data.merchant_id}, expected ${expectedMerchantId}`);
+      return;
+    }
+
     const pfHost = PAYFAST_SANDBOX ? 'sandbox.payfast.co.za' : 'www.payfast.co.za';
     const validationRes = await fetch(`https://${pfHost}/eng/query/validate`, {
       method: 'POST',
@@ -130,12 +138,30 @@ app.post('/api/payfast-itn', express.urlencoded({ extended: false }), async (req
       body: new URLSearchParams(data).toString()
     });
     const validation = await validationRes.text();
-    if (validation !== 'VALID') { console.warn('[payfast-itn] Validation failed:', validation); return; }
-    if (data.payment_status !== 'COMPLETE') { console.log('[payfast-itn] Non-complete status:', data.payment_status); return; }
+    if (validation !== 'VALID') { console.warn('[payfast-itn] PayFast validation returned:', validation); return; }
+
+    if (data.payment_status !== 'COMPLETE') { console.log('[payfast-itn] Skipping non-COMPLETE status:', data.payment_status); return; }
+
+    const grossAmount = parseFloat(data.amount_gross || '0');
+    const expectedMonthly = parseFloat(PAYFAST_MONTHLY_ZAR);
+    const expectedAnnual  = parseFloat(PAYFAST_ANNUAL_ZAR);
+    const isValidAmount = Math.abs(grossAmount - expectedMonthly) < 1.0 || Math.abs(grossAmount - expectedAnnual) < 1.0;
+    if (!isValidAmount) {
+      console.warn(`[payfast-itn] Unexpected amount R${grossAmount} — expected R${expectedMonthly} or R${expectedAnnual}`);
+      return;
+    }
+
+    const itemName = data.item_name || '';
+    const isNetrunnerItem = itemName.toLowerCase().includes('netrunner pro');
+    if (!isNetrunnerItem) {
+      console.warn(`[payfast-itn] Unexpected item_name: "${itemName}" — ignoring`);
+      return;
+    }
+
     const userId = data.m_payment_id.split('_')[0];
     if (!userId) { console.warn('[payfast-itn] Could not parse userId from m_payment_id:', data.m_payment_id); return; }
     await updateMembershipTier(userId, 'pro', `payfast_${data.pf_payment_id || data.m_payment_id}`);
-    console.log(`[payfast-itn] User ${userId} upgraded to pro`);
+    console.log(`[payfast-itn] User ${userId} upgraded to pro (R${grossAmount}, "${itemName}")`);
   } catch (err) {
     console.error('[payfast-itn] Error:', err.message);
   }
@@ -303,6 +329,10 @@ app.post('/api/payfast-checkout', requireAuth, async (req, res) => {
   if (!merchantId || !merchantKey) {
     console.warn('[payfast] PAYFAST_MERCHANT_ID or PAYFAST_MERCHANT_KEY not set');
     return res.status(503).json({ error: 'PayFast not configured yet. Email admin@shiftglitch.com for help.' });
+  }
+  if (!process.env.PAYFAST_PASSPHRASE && !PAYFAST_SANDBOX) {
+    console.error('[payfast] PAYFAST_PASSPHRASE is required in production — checkout blocked for security');
+    return res.status(503).json({ error: 'Payment gateway misconfiguration. Contact admin@shiftglitch.com.' });
   }
   const { plan } = req.body;
   if (!plan || !['monthly', 'annual'].includes(plan)) {
