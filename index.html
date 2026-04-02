@@ -256,10 +256,11 @@
     <nav class="sticky top-0 z-50 bg-black backdrop-blur-md border-b border-[#39FF14]/20">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16 items-center">
-                <div class="flex items-center gap-3 cursor-pointer" onclick="app.navTo('dashboard')">
+                <div class="flex items-center gap-3 cursor-pointer" onclick="app.navTo('start')">
                     <span class="font-mono font-bold text-lg tracking-widest uppercase sg-wordmark" data-text="SHIFTGLITCH">SHIFTGLITCH</span>
                 </div>
                 <div class="hidden md:flex items-center gap-4" id="desktop-nav">
+                    <button onclick="app.navTo('start')" class="nav-btn text-[#FF3333]/80 hover:text-[#FF3333] text-xs font-bold tracking-widest transition-colors uppercase border border-[#FF3333]/40 px-2 py-1 rounded">▶ START HERE</button>
                     <button onclick="app.navTo('dashboard')" class="nav-btn text-[#39FF14]/50 hover:text-[#39FF14] text-xs font-bold tracking-widest transition-colors uppercase">Mission</button>
                     <button onclick="app.navTo('explore')" class="nav-btn text-[#39FF14]/50 hover:text-[#39FF14] text-xs font-bold tracking-widest transition-colors uppercase">Vault</button>
                     <button onclick="app.navTo('decks')" class="nav-btn text-[#39FF14]/50 hover:text-[#39FF14] text-xs font-bold tracking-widest transition-colors uppercase">Data Shards</button>
@@ -293,6 +294,7 @@
             </div>
         </div>
         <div id="mobile-menu" class="hidden md:hidden bg-black border-b border-[#39FF14]/20 px-4 pt-2 pb-6 space-y-1">
+            <button onclick="app.navTo('start')" class="block w-full text-left px-4 py-3 rounded text-[#FF3333] font-bold uppercase text-sm tracking-widest border border-[#FF3333]/40 mt-2 mb-1">▶ START HERE</button>
             <button onclick="app.navTo('dashboard')" class="block w-full text-left px-4 py-3 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Mission</button>
             <button onclick="app.navTo('explore')" class="block w-full text-left px-4 py-3 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Vault</button>
             <button onclick="app.navTo('decks')" class="block w-full text-left px-4 py-3 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Data Shards</button>
@@ -1113,7 +1115,7 @@
         };
 
         const state = {
-            view: 'dashboard', search: '', aiOutput: '', isAiLoading: false, user: null, breakdown: '', progress: {},
+            view: 'start', search: '', aiOutput: '', isAiLoading: false, user: null, breakdown: '', progress: {},
             timerSeconds: 25 * 60, timerInitialSeconds: 25 * 60, timerIsRunning: false, timerMode: 'work', timerInterval: null,
             timerTaskLabel: '', governorBlocked: false, pomodoroLog: [],
             fcDecks: [], fcCards: [], fcCurrentDeck: null, fcStudyQueue: [], fcStudyIndex: 0, fcFlipped: false,
@@ -1602,7 +1604,9 @@
                 const container = document.getElementById('app-container');
                 try {
                     const savedNotes = localStorage.getItem('cornellNotes');
-                    if (state.view === 'dashboard') {
+                    if (state.view === 'start') {
+                        container.innerHTML = app.getStartHTML();
+                    } else if (state.view === 'dashboard') {
                         let dashHTML;
                         try { dashHTML = app.getDashboardHTML(savedNotes); } catch(dashErr) { throw new Error('getDashboardHTML: ' + dashErr.message); }
                         container.innerHTML = dashHTML;
@@ -1610,6 +1614,7 @@
                         if (!state._dashboardDataLoaded) { app.loadUserData(); state._dashboardDataLoaded = true; }
                         app.updateTimerUI();
                     } else if (state.view === 'explore') {
+                        localStorage.setItem('sg_vault_visited', '1');
                         container.innerHTML = app.getExploreHTML();
                         app.renderVault();
                     } else if (state.view === 'spaced') {
@@ -1652,10 +1657,131 @@
                 }
             },
 
+            getJourneyNavHTML: (currentView) => {
+                const journey = ['dashboard', 'explore', 'decks', 'blurt', 'diagnostic'];
+                const labels  = ['Mission', 'Vault', 'Data Shards', 'BrainDump', 'Diagnostics'];
+                const idx = journey.indexOf(currentView);
+                const prevView = idx > 0 ? journey[idx - 1] : 'start';
+                const prevLabel = idx > 0 ? labels[idx - 1] : 'Start Here';
+                const nextView = idx < journey.length - 1 ? journey[idx + 1] : null;
+                const nextLabel = idx < journey.length - 1 ? labels[idx + 1] : null;
+                return `<div style="display:flex;align-items:center;justify-content:space-between;background:#0a0a0a;border:1px solid #39FF14;padding:0.75rem 1.25rem;margin-bottom:1.5rem;font-family:'Share Tech Mono',monospace;">
+                    <button onclick="app.navTo('${prevView}')" style="background:none;border:1px solid #39FF14;color:#39FF14;font-family:'Share Tech Mono',monospace;font-size:0.9rem;font-weight:bold;padding:0.5rem 1rem;cursor:pointer;text-transform:uppercase;letter-spacing:0.08em;">← ${prevLabel}</button>
+                    <span style="color:#39FF14;font-size:0.8rem;opacity:0.7;letter-spacing:0.1em;text-transform:uppercase;">Step ${idx + 1} of ${journey.length}</span>
+                    ${nextView ? `<button onclick="app.navTo('${nextView}')" style="background:#39FF14;border:none;color:#000;font-family:'Share Tech Mono',monospace;font-size:0.9rem;font-weight:bold;padding:0.5rem 1rem;cursor:pointer;text-transform:uppercase;letter-spacing:0.08em;">${nextLabel} →</button>` : `<span style="color:#39FF14;font-size:0.85rem;font-weight:bold;letter-spacing:0.05em;">✓ Journey Complete!</span>`}
+                </div>`;
+            },
+
+            getStartHTML: () => {
+                const hasGamertag = !!localStorage.getItem('sg_gamertag_set');
+                const hasExam = state.examCountdowns && state.examCountdowns.length > 0;
+                const hasVaultVisit = !!localStorage.getItem('sg_vault_visited');
+                const hasFocusSession = pomodoroStore.totalSessions() > 0;
+                const hasDeck = state.fcDecks && state.fcDecks.length > 0;
+                const hasBlurt = state.blurtSessions && state.blurtSessions.length > 0;
+                const hasDiagnostic = state.mcqAttempts && Object.keys(state.mcqAttempts).length > 0;
+
+                const step = (num, done, title, what, why, btnLabel, navTarget) => {
+                    const tick = done ? '✓' : num;
+                    const tickColor = done ? '#39FF14' : '#FF3333';
+                    const border = done ? '#39FF14' : '#333';
+                    const opacity = done ? '0.6' : '1';
+                    return `<div style="display:flex;gap:1.25rem;padding:1.5rem;background:#0a0a0a;border:2px solid ${border};margin-bottom:1rem;opacity:${opacity};">
+                        <div style="flex-shrink:0;width:2.8rem;height:2.8rem;background:${tickColor};color:#000;font-family:'VT323',monospace;font-size:1.6rem;font-weight:bold;display:flex;align-items:center;justify-content:center;">${tick}</div>
+                        <div style="flex:1;min-width:0;">
+                            <div style="color:${done ? '#39FF14' : '#fff'};font-family:'Share Tech Mono',monospace;font-size:1.05rem;font-weight:bold;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.4rem;">${title}</div>
+                            <div style="color:#ddd;font-size:1rem;line-height:1.6;margin-bottom:0.3rem;"><strong style="color:#fff;">What:</strong> ${what}</div>
+                            <div style="color:#aaa;font-size:0.9rem;line-height:1.5;margin-bottom:0.9rem;"><strong style="color:#ccc;">Why:</strong> ${why}</div>
+                            ${done
+                                ? `<span style="color:#39FF14;font-family:'Share Tech Mono',monospace;font-size:0.85rem;font-weight:bold;">✓ DONE</span>`
+                                : `<button onclick="app.navTo('${navTarget}')" style="background:#FF3333;color:#fff;border:none;font-family:'Share Tech Mono',monospace;font-size:0.95rem;font-weight:bold;padding:0.6rem 1.5rem;cursor:pointer;text-transform:uppercase;letter-spacing:0.1em;">DO THIS NOW →</button>`}
+                        </div>
+                    </div>`;
+                };
+
+                const totalDone = [hasGamertag, hasExam, hasVaultVisit, hasFocusSession, hasDeck, hasBlurt, hasDiagnostic].filter(Boolean).length;
+                const pct = Math.round((totalDone / 7) * 100);
+
+                return `<div class="animate-fade-in" style="max-width:720px;margin:0 auto;padding:1rem;font-family:'Space Grotesk',sans-serif;">
+                    <div style="text-align:center;margin-bottom:2rem;">
+                        <div style="color:#FF3333;font-family:'Share Tech Mono',monospace;font-size:0.85rem;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:0.5rem;">// BOOT_SEQUENCE — FOLLOW THESE STEPS IN ORDER</div>
+                        <h1 style="color:#fff;font-family:'VT323',monospace;font-size:3.5rem;text-transform:uppercase;letter-spacing:0.05em;line-height:1;margin-bottom:0.75rem;">START HERE</h1>
+                        <p style="color:#ccc;font-size:1.1rem;line-height:1.6;margin-bottom:1.25rem;">You just logged in. Good. Now follow these 7 steps in order.<br>Each one teaches you how to use a part of ShiftGlitch properly.</p>
+                        <div style="background:#111;border:1px solid #39FF14;padding:0.75rem 1.5rem;display:inline-block;">
+                            <div style="color:#39FF14;font-family:'Share Tech Mono',monospace;font-size:0.85rem;margin-bottom:0.4rem;text-transform:uppercase;letter-spacing:0.1em;">Progress: ${totalDone}/7 steps done</div>
+                            <div style="background:#222;height:10px;border-radius:0;overflow:hidden;width:300px;max-width:100%;">
+                                <div style="background:#39FF14;width:${pct}%;height:100%;transition:width 0.5s ease;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    ${step(1, hasGamertag,
+                        'Set your gamertag (username)',
+                        'Go to Settings and type in the name you want to go by on the leaderboard.',
+                        'This is how other students see you on the leaderboard. Without it, you\'re anonymous.',
+                        'Go to Settings', 'settings')}
+
+                    ${step(2, hasExam,
+                        'Add your exam dates',
+                        'Go to Mission and add the subjects you\'re studying and when your exams are.',
+                        'The countdown timer keeps your deadline visible at all times — panic prevention.',
+                        'Go to Mission', 'dashboard')}
+
+                    ${step(3, hasVaultVisit,
+                        'Read the Study Q&A',
+                        'Go to Vault and read through the Q&A section — 20 real questions from real students.',
+                        'Before you can study effectively, you need to know HOW to study. This answers the big questions.',
+                        'Go to Vault', 'explore')}
+
+                    ${step(4, hasFocusSession,
+                        'Complete your first Focus Timer session',
+                        'Scroll to the bottom of the Vault page and start the 25-minute Focus Timer.',
+                        'A 25-minute focused session is proven to be the most effective way to study. No phone allowed.',
+                        'Go to Vault', 'explore')}
+
+                    ${step(5, hasDeck,
+                        'Create a flashcard deck',
+                        'Go to Data Shards, click New Deck, and create at least 5 flashcards for something you\'re studying.',
+                        'Flashcards using active recall are the single most effective study method. Build the habit now.',
+                        'Go to Data Shards', 'decks')}
+
+                    ${step(6, hasBlurt,
+                        'Do a BrainDump session',
+                        'Go to BrainDump.exe, type a topic you just studied, and write everything you can remember from memory.',
+                        'Writing from memory (without looking) is called retrieval practice. It doubles how much you retain.',
+                        'Go to BrainDump', 'blurt')}
+
+                    ${step(7, hasDiagnostic,
+                        'Complete a Knowledge Diagnostic',
+                        'Go to Exploit Missions and complete at least one diagnostic quiz.',
+                        'Diagnostics reveal your gaps — what you THINK you know vs what you actually know. No surprises on exam day.',
+                        'Go to Exploit Missions', 'diagnostic')}
+
+                    <div style="text-align:center;margin-top:2rem;padding:1.5rem;background:#0a0a0a;border:1px solid #39FF14;">
+                        <div style="color:#39FF14;font-family:'Share Tech Mono',monospace;font-size:0.85rem;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.75rem;">Done with the steps? Keep going →</div>
+                        <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+                            <button onclick="app.navTo('dashboard')" style="background:#39FF14;color:#000;border:none;font-family:'Share Tech Mono',monospace;font-size:0.9rem;font-weight:bold;padding:0.65rem 1.4rem;cursor:pointer;text-transform:uppercase;letter-spacing:0.08em;">Mission Control</button>
+                            <button onclick="app.navTo('leaderboard')" style="background:#FF00FF;color:#000;border:none;font-family:'Share Tech Mono',monospace;font-size:0.9rem;font-weight:bold;padding:0.65rem 1.4rem;cursor:pointer;text-transform:uppercase;letter-spacing:0.08em;">Leaderboard</button>
+                            <button onclick="app.navTo('rank')" style="background:#8A2BE2;color:#fff;border:none;font-family:'Share Tech Mono',monospace;font-size:0.9rem;font-weight:bold;padding:0.65rem 1.4rem;cursor:pointer;text-transform:uppercase;letter-spacing:0.08em;">My Rank</button>
+                        </div>
+                    </div>
+                </div>`;
+            },
+
             getDashboardHTML: (savedNotes) => {
                 const q = STUDY_QUOTES[Math.floor(Math.random() * STUDY_QUOTES.length)];
                 return `
                 <div class="animate-fade-in space-y-12">
+                    ${app.getJourneyNavHTML('dashboard')}
+                    <div style="background:#0a0a0a;border-left:4px solid #39FF14;padding:1.25rem 1.5rem;margin-bottom:0.5rem;font-family:'Space Grotesk',sans-serif;">
+                        <div style="color:#39FF14;font-family:'Share Tech Mono',monospace;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:0.5rem;">// WHAT TO DO ON THIS PAGE</div>
+                        <p style="color:#fff;font-size:1.05rem;font-weight:bold;margin-bottom:0.3rem;">MISSION CONTROL — Your study planner</p>
+                        <ol style="color:#ccc;font-size:0.95rem;line-height:1.8;margin:0;padding-left:1.3rem;">
+                            <li><strong style="color:#39FF14;">Add your exams</strong> — scroll down to "Exam Countdowns" and type in your subject + exam date</li>
+                            <li><strong style="color:#39FF14;">Add your tasks</strong> — use the to-do list to write what you need to study this week</li>
+                            <li><strong style="color:#39FF14;">Use the AI planner</strong> — type a subject below and click "Inject Strat" to get a study plan</li>
+                        </ol>
+                    </div>
                     <section class="text-center">
                         <h1 class="text-5xl md:text-7xl font-serif font-bold mb-4">Exploit HQ</h1>
                         <p class="text-[#39FF14]/60 max-w-xl mx-auto font-medium mb-6">Your study base. Every session is an exploit. Run them all.</p>
@@ -1807,6 +1933,16 @@
 
             getExploreHTML: () => `
                 <div class="animate-fade-in text-center">
+                    ${app.getJourneyNavHTML('explore')}
+                    <div style="background:#0a0a0a;border-left:4px solid #39FF14;padding:1.25rem 1.5rem;margin-bottom:1.5rem;text-align:left;font-family:'Space Grotesk',sans-serif;">
+                        <div style="color:#39FF14;font-family:'Share Tech Mono',monospace;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:0.5rem;">// WHAT TO DO ON THIS PAGE</div>
+                        <p style="color:#fff;font-size:1.05rem;font-weight:bold;margin-bottom:0.3rem;">THE VAULT — Learn HOW to study, then do it</p>
+                        <ol style="color:#ccc;font-size:0.95rem;line-height:1.8;margin:0;padding-left:1.3rem;">
+                            <li><strong style="color:#39FF14;">Read the Q&amp;A below</strong> — click each question to open the answer. Read ALL 20.</li>
+                            <li><strong style="color:#39FF14;">Scroll down and start the Focus Timer</strong> — set a task name, hit Start, and study for 25 minutes.</li>
+                            <li><strong style="color:#39FF14;">When the timer ends</strong> — go to BrainDump (in the Tools menu) and write what you remember.</li>
+                        </ol>
+                    </div>
                     <h1 class="text-6xl font-serif font-bold mb-8">The Vault</h1>
                     <div class="text-left max-w-4xl mx-auto mb-12">
                         <div class="bg-white dark:bg-[#292524] rounded-[2rem] border border-stone-100 dark:border-stone-800 shadow-sm overflow-hidden">
@@ -1958,6 +2094,16 @@
                     </div>`;
                 }
                 return `<div class="animate-fade-in max-w-4xl mx-auto space-y-8">
+                    ${app.getJourneyNavHTML('decks')}
+                    <div style="background:#0a0a0a;border-left:4px solid #39FF14;padding:1.25rem 1.5rem;font-family:'Space Grotesk',sans-serif;">
+                        <div style="color:#39FF14;font-family:'Share Tech Mono',monospace;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:0.5rem;">// WHAT TO DO ON THIS PAGE</div>
+                        <p style="color:#fff;font-size:1.05rem;font-weight:bold;margin-bottom:0.3rem;">DATA SHARDS — Make and study your flashcards</p>
+                        <ol style="color:#ccc;font-size:0.95rem;line-height:1.8;margin:0;padding-left:1.3rem;">
+                            <li><strong style="color:#39FF14;">Click "New Deck"</strong> — give it a name like "Biology Chapter 3"</li>
+                            <li><strong style="color:#39FF14;">Add at least 5 cards</strong> — question on the front, answer on the back</li>
+                            <li><strong style="color:#39FF14;">Click "Study"</strong> — answer each card, cards you get right move up, wrong ones go back to box 1</li>
+                        </ol>
+                    </div>
                     <div class="text-center mb-8">
                         <h1 class="text-5xl font-serif font-bold mb-4">Data Shards</h1>
                         <p class="text-stone-500 dark:text-stone-400 italic">Leitner System: 5-box spaced repetition</p>
@@ -2093,6 +2239,16 @@
                     </div>`;
                 }
                 return `<div class="animate-fade-in max-w-3xl mx-auto space-y-8">
+                    ${app.getJourneyNavHTML('blurt')}
+                    <div style="background:#0a0a0a;border-left:4px solid #39FF14;padding:1.25rem 1.5rem;font-family:'Space Grotesk',sans-serif;">
+                        <div style="color:#39FF14;font-family:'Share Tech Mono',monospace;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:0.5rem;">// WHAT TO DO ON THIS PAGE</div>
+                        <p style="color:#fff;font-size:1.05rem;font-weight:bold;margin-bottom:0.3rem;">BRAINDUMP — Write what you know from memory</p>
+                        <ol style="color:#ccc;font-size:0.95rem;line-height:1.8;margin:0;padding-left:1.3rem;">
+                            <li><strong style="color:#39FF14;">Type a session title</strong> — e.g. "Biology Chapter 3" then click New Session</li>
+                            <li><strong style="color:#39FF14;">Paste or type the source</strong> — the notes or text you want to remember, then click "I've Read It"</li>
+                            <li><strong style="color:#39FF14;">Write from memory</strong> — close your notes and type everything you remember, then compare</li>
+                        </ol>
+                    </div>
                     <div class="text-center mb-8">
                         <h1 class="text-5xl font-serif font-bold mb-4">BrainDump.exe</h1>
                         <p class="text-stone-500 dark:text-stone-400 italic">Read. Hide. Blurt. Compare. Fill gaps.</p>
@@ -2379,7 +2535,7 @@
                     const res = await fetch('/api/settings/gamertag', { credentials: 'same-origin' });
                     const data = await res.json();
                     const el = document.getElementById('gamertag-input');
-                    if (el && data.gamertag) el.value = data.gamertag;
+                    if (el && data.gamertag) { el.value = data.gamertag; localStorage.setItem('sg_gamertag_set', '1'); }
                 } catch (e) {}
             },
 
@@ -2398,6 +2554,7 @@
                     if (data.ok) {
                         app.showNotification(`Gamertag set: ${data.gamertag}`);
                         if (el) el.value = data.gamertag;
+                        localStorage.setItem('sg_gamertag_set', '1');
                     } else {
                         app.showNotification(data.error || 'Failed to save gamertag.');
                     }
@@ -3074,6 +3231,16 @@
                 const completedMissions = mcqBank.filter((m, i) => mcqStore.getAttemptCount(i) > 0).length;
                 const journeyComplete = completedMissions >= mcqBank.length;
                 return `<div class="animate-fade-in max-w-4xl mx-auto space-y-8">
+                    ${app.getJourneyNavHTML('diagnostic')}
+                    <div style="background:#0a0a0a;border-left:4px solid #39FF14;padding:1.25rem 1.5rem;font-family:'Space Grotesk',sans-serif;">
+                        <div style="color:#39FF14;font-family:'Share Tech Mono',monospace;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:0.5rem;">// WHAT TO DO ON THIS PAGE</div>
+                        <p style="color:#fff;font-size:1.05rem;font-weight:bold;margin-bottom:0.3rem;">EXPLOIT MISSIONS — Find the gaps in your knowledge</p>
+                        <ol style="color:#ccc;font-size:0.95rem;line-height:1.8;margin:0;padding-left:1.3rem;">
+                            <li><strong style="color:#39FF14;">Pick a mission below</strong> — start with Mission 1 (The Learning Engine)</li>
+                            <li><strong style="color:#39FF14;">Answer all the questions</strong> — multiple choice, 15 seconds per question</li>
+                            <li><strong style="color:#39FF14;">Check your results</strong> — the gaps you missed are what you need to study next</li>
+                        </ol>
+                    </div>
                     <div class="text-center mb-8">
                         <h1 class="text-5xl font-serif font-bold mb-4">Exploit Missions</h1>
                         <p class="text-stone-500 dark:text-stone-400 italic">Systems diagnostic — confirm what you've learned, reveal what needs practice.</p>
