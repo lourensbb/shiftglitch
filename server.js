@@ -3,7 +3,7 @@ const path = require('path');
 const crypto = require('crypto');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-const { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, getUserGamertag, updateGamertag, updateMembershipTier, checkAndExpireUser, getUserByPaymentRef, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount } = require('./auth');
+const { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, getUserGamertag, updateGamertag, updateMembershipTier, checkAndExpireUser, getUserByPaymentRef, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount, getUserBadges, setUserBadges } = require('./auth');
 
 async function requirePro(req, res, next) {
   try {
@@ -443,6 +443,30 @@ app.get('/api/leaderboard', requireAuth, async (req, res) => {
   } catch (err) {
     console.error('/api/leaderboard error:', err);
     res.status(500).json({ error: 'Failed to load leaderboard' });
+  }
+});
+
+app.get('/api/user/badges', requireAuth, async (req, res) => {
+  try {
+    const badges = await getUserBadges(req.session.userId);
+    res.json({ badges });
+  } catch (err) {
+    console.error('/api/user/badges GET error:', err);
+    res.json({ badges: [] });
+  }
+});
+
+app.post('/api/user/badges', requireAuth, async (req, res) => {
+  try {
+    const { badges } = req.body;
+    if (!Array.isArray(badges)) return res.status(400).json({ error: 'badges must be array' });
+    const validIds = ['first-exploit','streak-3','streak-7','first-rank-up','recall-sprint','pattern-lock','domain-mapped','shards-50','survived-rollback','reached-glitch-tech','reached-netrunner','reached-system-admin'];
+    const clean = badges.filter(b => validIds.includes(b));
+    await setUserBadges(req.session.userId, clean);
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('/api/user/badges POST error:', err);
+    res.status(500).json({ error: 'Failed to save badges' });
   }
 });
 

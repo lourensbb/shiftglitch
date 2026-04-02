@@ -52,6 +52,7 @@ async function ensureSchema() {
       ALTER TABLE users ADD COLUMN IF NOT EXISTS stripe_customer_id VARCHAR;
       ALTER TABLE users ADD COLUMN IF NOT EXISTS payment_ref VARCHAR;
       ALTER TABLE users ADD COLUMN IF NOT EXISTS pro_expires_at TIMESTAMP;
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS badges JSONB DEFAULT '[]'::jsonb;
     `);
     await client.query(`
       UPDATE users SET payment_ref = stripe_customer_id WHERE payment_ref IS NULL AND stripe_customer_id IS NOT NULL
@@ -538,4 +539,23 @@ async function getWaitlistCount() {
   return parseInt(res.rows[0].count, 10);
 }
 
-module.exports = { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, updateGamertag, getUserGamertag, updateMembershipTier, checkAndExpireUser, getUserByPaymentRef, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount };
+async function getUserBadges(userId) {
+  try {
+    const { rows } = await pool.query('SELECT COALESCE(badges, \'[]\'::jsonb) AS badges FROM users WHERE id = $1', [userId]);
+    return rows[0] ? (rows[0].badges || []) : [];
+  } catch (e) {
+    console.error('[auth] getUserBadges error:', e.message);
+    return [];
+  }
+}
+
+async function setUserBadges(userId, badges) {
+  try {
+    if (!Array.isArray(badges)) return;
+    await pool.query('UPDATE users SET badges = $1::jsonb WHERE id = $2', [JSON.stringify(badges), userId]);
+  } catch (e) {
+    console.error('[auth] setUserBadges error:', e.message);
+  }
+}
+
+module.exports = { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, updateGamertag, getUserGamertag, updateMembershipTier, checkAndExpireUser, getUserByPaymentRef, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount, getUserBadges, setUserBadges };

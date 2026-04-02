@@ -1196,10 +1196,28 @@
             _unlocked: [],
             load() { try { this._unlocked = JSON.parse(localStorage.getItem('sg_badges') || '[]'); } catch(e) { this._unlocked = []; } },
             save() { localStorage.setItem('sg_badges', JSON.stringify(this._unlocked)); },
+            async loadFromServer() {
+                try {
+                    const res = await fetch('/api/user/badges');
+                    if (!res.ok) return;
+                    const data = await res.json();
+                    if (Array.isArray(data.badges) && data.badges.length > 0) {
+                        const merged = [...new Set([...this._unlocked, ...data.badges])];
+                        if (merged.length !== this._unlocked.length) { this._unlocked = merged; this.save(); }
+                    }
+                } catch(e) {}
+            },
+            _syncToServer() {
+                fetch('/api/user/badges', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ badges: this._unlocked })
+                }).catch(() => {});
+            },
             isUnlocked(id) { return this._unlocked.includes(id); },
             unlock(id) {
                 if (this.isUnlocked(id)) return false;
-                this._unlocked.push(id); this.save(); return true;
+                this._unlocked.push(id); this.save(); this._syncToServer(); return true;
             },
             _tryUnlock(id) {
                 if (this.unlock(id)) setTimeout(() => SysInterrupt.show('achievement', { badgeId: id }), 600);
@@ -1251,6 +1269,8 @@
         const SysInterrupt = {
             _active: false,
             _queue: [],
+            _loadDone: false,
+            _escHandler: null,
             WARDEN_MSGS: [
                 { msg: "The Mainframe remembers every session you missed.", sub: "Consistency is your highest clearance." },
                 { msg: "Every concept you avoid becomes a vulnerability.", sub: "Run the exploit you have been postponing." },
@@ -1278,7 +1298,14 @@
                 { msg: "System Admin is not a destination.", sub: "It is a habit wearing a title. Build the habit." },
             ],
             init() {
-                this._checkInactivityThreats();
+                const hadThreat = this._checkInactivityThreats();
+                if (!hadThreat && !this._loadDone) {
+                    if (Math.random() < 0.30) {
+                        this._loadDone = true;
+                        const challengeType = Math.random() < 0.5 ? 'recall-sprint' : 'pattern-lock';
+                        setTimeout(() => this.show(challengeType, {}), 2 * 60 * 1000);
+                    }
+                }
                 if (!sessionStorage.getItem('sg_warden_session')) {
                     setTimeout(() => {
                         if (!sessionStorage.getItem('sg_warden_session')) {
@@ -1289,8 +1316,9 @@
                 }
             },
             _checkInactivityThreats() {
+                if (this._loadDone) return false;
                 const log = (state.rankEvidence && state.rankEvidence.activeDateLog) || [];
-                if (log.length < 1) return;
+                if (log.length < 1) return false;
                 const today = new Date().toISOString().slice(0, 10);
                 const sorted = [...log].sort().reverse();
                 if (sorted[0] === today) {
@@ -1300,14 +1328,23 @@
                             badgeEngine.unlock('survived-rollback');
                         }
                     }
-                    return;
+                    return false;
                 }
                 const daysSince = Math.round((new Date(today) - new Date(sorted[0])) / 86400000);
-                if (daysSince >= 5) {
+                if (daysSince >= 10) {
+                    this._loadDone = true;
+                    setTimeout(() => this.show('system-rollback', { days: daysSince }), 2000);
+                    return true;
+                } else if (daysSince >= 5) {
+                    this._loadDone = true;
                     setTimeout(() => this.show('coherence-failure', { days: daysSince }), 2000);
+                    return true;
                 } else if (daysSince >= 3) {
+                    this._loadDone = true;
                     setTimeout(() => this.show('memory-degradation', { days: daysSince }), 2000);
+                    return true;
                 }
+                return false;
             },
             show(type, payload = {}) {
                 if (this._active) { this._queue.push({ type, payload }); return; }
@@ -1318,12 +1355,22 @@
                 el.innerHTML = html;
                 const overlay = el.firstElementChild;
                 document.body.appendChild(overlay);
+                const nonDismissible = ['system-rollback'];
+                if (!nonDismissible.includes(type)) {
+                    const esc = (e) => { if (e.key === 'Escape') { document.removeEventListener('keydown', esc); this.dismiss(id); } };
+                    document.addEventListener('keydown', esc);
+                    this._escHandler = esc;
+                    overlay.addEventListener('click', (e) => { if (e.target === overlay) this.dismiss(id); });
+                }
                 requestAnimationFrame(() => requestAnimationFrame(() => {
                     overlay.classList.add('si-visible');
-                    if (type === 'pattern-lock') {
+                    if (type === 'recall-sprint') {
+                        setTimeout(() => this.launchRecallSprint(id), 600);
+                    } else if (type === 'pattern-lock') {
                         const colors = ['#FF4444','#39FF14','#4488FF','#FF00FF'];
-                        const labels = ['RED','GRN','BLU','MGT'];
-                        const seq = Array.from({length:4}, () => Math.floor(Math.random()*4));
+                        const rankIdx = Math.max(0, RANKS.indexOf(state.rank));
+                        const seqLen = Math.min(4 + Math.floor(rankIdx * 0.5), 6);
+                        const seq = Array.from({length: seqLen}, () => Math.floor(Math.random()*4));
                         window['_si_'+id+'_plSeq'] = seq;
                         window['_si_'+id+'_plUser'] = [];
                         window['_si_'+id+'_plAttempts'] = 0;
@@ -1332,6 +1379,7 @@
                 }));
             },
             dismiss(id) {
+                if (this._escHandler) { document.removeEventListener('keydown', this._escHandler); this._escHandler = null; }
                 const el = document.getElementById(id);
                 if (!el) return;
                 el.classList.remove('si-visible');
@@ -1449,9 +1497,25 @@
                     if (boxEl) boxEl.innerHTML = '<div class="si-body" style="text-align:center;padding:40px 24px;"><div style="font-size:52px;margin-bottom:12px;">🔓</div><div style="color:#39FF14;font-size:14px;letter-spacing:2px;margin-bottom:12px;">PATTERN LOCK CRACKED</div><p style="color:#777;font-size:12px;margin-bottom:28px;">Pattern recognition is a core Mainframe exploit. You are learning to see what others miss.</p><button onclick="SysInterrupt.dismiss(\''+id+'\')" style="background:#39FF14;color:#000;border:none;padding:10px 28px;font-family:inherit;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-weight:bold;border-radius:4px;">JACK OUT</button></div>';
                 }
             },
+            acknowledgeRollback(id) {
+                localStorage.setItem('sg_rollback_ack', new Date().toISOString());
+                if (!badgeEngine.isUnlocked('survived-rollback')) {
+                    badgeEngine.unlock('survived-rollback');
+                    setTimeout(() => SysInterrupt.show('achievement', { badgeId: 'survived-rollback' }), 500);
+                }
+                this.dismiss(id);
+            },
             _buildHTML(type, payload, id) {
                 let color = '#39FF14', glow = 'rgba(57,255,20,0.2)', innerHTML = '';
-                if (type === 'memory-degradation') {
+                if (type === 'system-rollback') {
+                    color='#FF0000'; glow='rgba(255,0,0,0.3)';
+                    innerHTML = '<div class="si-header" style="border-color:'+color+'"><span style="color:'+color+';font-size:20px;">⛔</span><span style="color:'+color+';font-size:13px;letter-spacing:2px;margin-left:8px;">SYSTEM ROLLBACK INITIATED</span></div>' +
+                        '<div class="si-body"><div style="color:'+color+';font-size:11px;letter-spacing:2px;margin-bottom:14px;">// CRITICAL — '+payload.days+' DAY DISCONNECT LOGGED</div>' +
+                        '<p style="color:#ccc;font-size:14px;line-height:1.8;margin-bottom:14px;">The Mainframe has initiated a <strong style="color:'+color+';">forced rollback</strong>. A '+payload.days+'-day disconnect has caused critical neural decay.</p>' +
+                        '<p style="color:#666;font-size:12px;line-height:1.8;margin-bottom:14px;">Your last clearance point is at risk. You must re-earn it through active sessions before the system purges it from your record.</p>' +
+                        '<div style="background:#1a0000;border:1px solid '+color+';padding:14px;border-radius:4px;margin-bottom:4px;"><div style="color:'+color+';font-size:10px;letter-spacing:2px;margin-bottom:6px;">RECOVERY PROTOCOL</div><p style="color:#aaa;font-size:12px;line-height:1.7;margin:0;">Run three consecutive sessions within the next 72 hours to stabilise your clearance. No shortcuts. No exceptions.</p></div></div>' +
+                        '<div class="si-footer" style="justify-content:center;"><button onclick="SysInterrupt.acknowledgeRollback(\''+id+'\')" style="background:'+color+';color:#fff;border:none;padding:12px 36px;font-family:inherit;font-size:11px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;font-weight:bold;border-radius:4px;width:100%;">ACKNOWLEDGE ROLLBACK</button></div>';
+                } else if (type === 'memory-degradation') {
                     color='#FF8800'; glow='rgba(255,136,0,0.2)';
                     innerHTML = '<div class="si-header" style="border-color:'+color+'"><span style="color:'+color+';font-size:20px;">⚠</span><span style="color:'+color+';font-size:13px;letter-spacing:2px;margin-left:8px;">MEMORY DEGRADATION DETECTED</span></div>' +
                         '<div class="si-body"><div style="color:'+color+';font-size:11px;letter-spacing:2px;margin-bottom:14px;">// '+payload.days+' DAYS SINCE LAST SESSION</div>' +
@@ -1498,6 +1562,10 @@
                         '<div class="si-body"><p style="color:#fff;font-size:16px;line-height:1.7;margin-bottom:14px;">"'+wm.msg+'"</p>' +
                         '<p style="color:#777;font-size:13px;line-height:1.7;font-style:italic;">— '+wm.sub+'</p></div>' +
                         '<div class="si-footer"><button onclick="SysInterrupt.dismiss(\''+id+'\')" style="background:'+color+';color:#000;border:none;padding:10px 28px;font-family:inherit;font-size:11px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;font-weight:bold;border-radius:4px;">RECEIVED</button></div>';
+                } else if (type === 'recall-sprint') {
+                    color='#FF8800'; glow='rgba(255,136,0,0.2)';
+                    innerHTML = '<div id="'+id+'-box"><div class="si-body" style="text-align:center;padding:40px 24px;color:#555;font-size:12px;letter-spacing:2px;">INITIALISING RECALL SPRINT...</div></div>';
+                    return '<div class="si-overlay" id="'+id+'"><div class="si-box si-scanlines si-pulse si-flicker" style="--si-color:'+color+';--si-glow:'+glow+';">'+innerHTML+'</div></div>';
                 } else if (type === 'pattern-lock') {
                     color='#FF8800'; glow='rgba(255,136,0,0.2)';
                     innerHTML = '<div id="'+id+'-box"><div class="si-body" style="text-align:center;padding:40px 24px;color:#555;font-size:12px;letter-spacing:2px;">INITIALISING PATTERN LOCK...</div></div>';
@@ -1517,7 +1585,7 @@
                 deckStore.load(); cardStore.load(); pomodoroStore.load(); blurtStore.load(); eisenhowerStore.load(); todoStore.load(); mcqStore.load(); recalStore.load(); babelStore.load(); yetStore.load(); examStore.load(); learningStore.load();
                 state.burnedCount = parseInt(localStorage.getItem('sg_burned') || '0', 10);
                 rankEngine.load(); rankEngine.trackActiveDay(); rankEngine.updateNavRank();
-                badgeEngine.load(); badgeEngine.checkOnLoad(); SysInterrupt.init();
+                badgeEngine.load(); await badgeEngine.loadFromServer(); badgeEngine.checkOnLoad(); SysInterrupt.init();
 
                 const djTodoText = 'Complete the Diagnostics Journey';
                 if (!state.missionTodos.some(t => t.text === djTodoText)) {
