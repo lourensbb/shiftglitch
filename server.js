@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-const { getSessionMiddleware, setupAuthRoutes, requireAuth, getUserGamertag, updateGamertag, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount } = require('./auth');
+const { getSessionMiddleware, setupAuthRoutes, requireAuth, getUserGamertag, updateGamertag, updateMembershipTier, getUserByStripeCustomerId, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount } = require('./auth');
 
 async function sendWelcomeEmail(gamertag, email) {
   const key = process.env.RESEND_API_KEY;
@@ -94,7 +94,66 @@ async function sendWelcomeEmail(gamertag, email) {
   }
 }
 
+function getStripe() {
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key) return null;
+  return require('stripe')(key);
+}
+
 const app = express();
+
+app.post('/api/stripe-webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+  const stripe = getStripe();
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  if (!stripe || !webhookSecret) {
+    console.warn('[stripe] Webhook received but STRIPE_SECRET_KEY or STRIPE_WEBHOOK_SECRET not set — skipping');
+    return res.json({ received: true });
+  }
+  let event;
+  try {
+    event = stripe.webhooks.constructEvent(req.body, req.headers['stripe-signature'], webhookSecret);
+  } catch (err) {
+    console.error('[stripe] Webhook signature verification failed:', err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+  try {
+    if (event.type === 'checkout.session.completed') {
+      const session = event.data.object;
+      const userId = session.metadata && session.metadata.userId;
+      const customerId = session.customer;
+      if (userId) {
+        await updateMembershipTier(userId, 'pro', customerId);
+        console.log(`[stripe] checkout.session.completed — user ${userId} upgraded to pro`);
+      } else if (customerId) {
+        const user = await getUserByStripeCustomerId(customerId);
+        if (user) {
+          await updateMembershipTier(user.id, 'pro', customerId);
+          console.log(`[stripe] checkout.session.completed — customer ${customerId} upgraded to pro`);
+        } else {
+          console.warn('[stripe] No user found for customer:', customerId);
+        }
+      }
+    } else if (event.type === 'customer.subscription.deleted') {
+      const sub = event.data.object;
+      const customerId = sub.customer;
+      if (customerId) {
+        const user = await getUserByStripeCustomerId(customerId);
+        if (user) {
+          await updateMembershipTier(user.id, 'free', null);
+          console.log(`[stripe] customer.subscription.deleted — user ${user.id} downgraded to free`);
+        }
+      }
+    } else if (event.type === 'invoice.payment_failed') {
+      console.log('[stripe] invoice.payment_failed — no action taken (subscription remains until Stripe cancels)');
+    } else {
+      console.log('[stripe] Unhandled event type:', event.type);
+    }
+  } catch (err) {
+    console.error('[stripe] Error handling webhook event:', err.message);
+    return res.status(500).json({ error: 'Webhook handler error' });
+  }
+  res.json({ received: true });
+});
 
 app.use(express.json());
 
@@ -176,6 +235,45 @@ app.get('/api/stats', async (req, res) => {
     res.json({ pages, waitlist });
   } catch (err) {
     res.status(500).json({ error: 'Stats unavailable' });
+  }
+});
+
+app.post('/api/create-checkout-session', requireAuth, async (req, res) => {
+  const stripe = getStripe();
+  if (!stripe) {
+    console.warn('[stripe] STRIPE_SECRET_KEY not set — checkout unavailable');
+    return res.status(503).json({ error: 'Payments not configured yet. Please contact support.' });
+  }
+  const { plan } = req.body;
+  if (!plan || !['monthly', 'annual'].includes(plan)) {
+    return res.status(400).json({ error: 'Invalid plan. Must be "monthly" or "annual".' });
+  }
+  const monthlyPriceId = process.env.STRIPE_MONTHLY_PRICE_ID;
+  const annualPriceId = process.env.STRIPE_ANNUAL_PRICE_ID;
+  const priceId = plan === 'annual' ? annualPriceId : monthlyPriceId;
+  if (!priceId) {
+    console.error(`[stripe] Price ID env var not set for plan: ${plan}`);
+    return res.status(503).json({ error: 'Pricing not configured. Contact support.' });
+  }
+  const userId = req.session.userId;
+  const host = (process.env.REPLIT_DOMAINS || process.env.REPLIT_DEV_DOMAIN || req.get('x-forwarded-host') || req.hostname).split(',')[0].trim();
+  const baseUrl = `https://${host}`;
+  try {
+    const session = await stripe.checkout.sessions.create({
+      mode: 'subscription',
+      line_items: [{ price: priceId, quantity: 1 }],
+      metadata: { userId },
+      success_url: `${baseUrl}/pricing?success=1&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${baseUrl}/pricing?cancelled=1`,
+      allow_promotion_codes: true,
+      billing_address_collection: 'auto',
+      subscription_data: { metadata: { userId } }
+    });
+    console.log(`[stripe] Checkout session created for user ${userId}: ${session.id}`);
+    res.json({ url: session.url });
+  } catch (err) {
+    console.error('[stripe] Failed to create checkout session:', err.message);
+    res.status(500).json({ error: 'Failed to start checkout. Please try again.' });
   }
 });
 

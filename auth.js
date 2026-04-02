@@ -48,6 +48,8 @@ async function ensureSchema() {
       ALTER TABLE users ADD COLUMN IF NOT EXISTS cards_mastered INTEGER NOT NULL DEFAULT 0;
       ALTER TABLE users ADD COLUMN IF NOT EXISTS blurts INTEGER NOT NULL DEFAULT 0;
       ALTER TABLE users ADD COLUMN IF NOT EXISTS last_updated TIMESTAMP DEFAULT NOW();
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS membership_tier VARCHAR NOT NULL DEFAULT 'free';
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS stripe_customer_id VARCHAR;
     `);
     const { rows: lbExists } = await client.query(`
       SELECT 1 FROM information_schema.tables WHERE table_name = 'leaderboard'
@@ -255,7 +257,8 @@ function setupAuthRoutes(app) {
         firstName: user.first_name || profile.firstName,
         lastName: user.last_name || profile.lastName,
         profileImageUrl: user.profile_image_url || profile.profileImageUrl,
-        createdAt: user.created_at
+        createdAt: user.created_at,
+        membershipTier: user.membership_tier || 'free'
       });
     } catch (err) {
       console.error('/api/me error:', err);
@@ -279,6 +282,21 @@ async function updateGamertag(userId, gamertag) {
     'UPDATE users SET gamertag = $1, updated_at = NOW() WHERE id = $2',
     [gamertag, userId]
   );
+}
+
+async function updateMembershipTier(userId, tier, stripeCustomerId = null) {
+  const allowedTiers = ['free', 'pro'];
+  if (!allowedTiers.includes(tier)) throw new Error('Invalid tier: ' + tier);
+  await pool.query(
+    `UPDATE users SET membership_tier = $1, stripe_customer_id = COALESCE($2, stripe_customer_id), updated_at = NOW() WHERE id = $3`,
+    [tier, stripeCustomerId, userId]
+  );
+  console.log(`[membership] User ${userId} tier set to ${tier}`);
+}
+
+async function getUserByStripeCustomerId(stripeCustomerId) {
+  const { rows } = await pool.query('SELECT * FROM users WHERE stripe_customer_id = $1', [stripeCustomerId]);
+  return rows[0] || null;
 }
 
 async function getUserGamertag(userId) {
@@ -494,4 +512,4 @@ async function getWaitlistCount() {
   return parseInt(res.rows[0].count, 10);
 }
 
-module.exports = { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, updateGamertag, getUserGamertag, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount };
+module.exports = { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, updateGamertag, getUserGamertag, updateMembershipTier, getUserByStripeCustomerId, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount };
