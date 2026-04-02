@@ -47,6 +47,6 @@ timeoutMs = 60000
 [userenv]
 
 [userenv.shared]
-PAYFAST_SANDBOX = "true"
+PAYFAST_SANDBOX = "false"
 PAYFAST_MONTHLY_ZAR = "179.99"
 PAYFAST_ANNUAL_ZAR = "1349.99"

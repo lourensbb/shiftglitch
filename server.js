@@ -117,9 +117,9 @@ function getBaseUrl(req) {
 }
 
 function payfastSignature(data, passphrase) {
-  const pfOutput = Object.keys(data).sort()
-    .filter(k => data[k] !== '' && data[k] !== undefined && data[k] !== null)
-    .map(k => `${k}=${encodeURIComponent(String(data[k]).trim()).replace(/%20/g, '+')}`)
+  const pfOutput = Object.entries(data)
+    .filter(([, v]) => v !== '' && v !== undefined && v !== null)
+    .map(([k, v]) => `${k}=${encodeURIComponent(String(v).trim()).replace(/%20/g, '+')}`)
     .join('&');
   const str = passphrase
     ? `${pfOutput}&passphrase=${encodeURIComponent(passphrase.trim()).replace(/%20/g, '+')}`
