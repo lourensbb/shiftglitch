@@ -510,9 +510,13 @@
                 }
                 const payload = { model: AI_MODEL, contents: [{ parts: [{ text: userQuery }] }], systemInstruction: { parts: [{ text: systemPrompt }] } };
                 try {
-                    const response = await fetch('/api/gemini', { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+                    const response = await fetch('/api/gemini', { method: "POST", headers: { "Content-Type": "application/json" }, credentials: 'same-origin', body: JSON.stringify(payload) });
                     if (!response.ok) {
                         const err = await response.json().catch(() => ({}));
+                        if (response.status === 403 && err.error === 'PRO_REQUIRED') {
+                            return '[[PRO_REQUIRED]]';
+                        }
+                        if (response.status === 401) return "// jack in first — you need to be logged in.";
                         const msg = err.error || "API error occurred.";
                         if (msg.includes('not configured')) return "No API key found. Go to Settings to add your Google Gemini API key.";
                         return msg;
@@ -1257,6 +1261,9 @@
             async generateMissionPlan() {
                 const subject = document.getElementById('subjectInput').value;
                 if (!subject) return;
+                if (!aiService.hasApiKey() && window._userMembershipTier !== 'pro') {
+                    state.aiOutput = '[[PRO_REQUIRED]]'; app.render(); return;
+                }
                 state.isAiLoading = true; app.render();
                 const res = await aiService.callGemini(
                     `I'm a student and I want to study "${esc(subject)}". Give me a simple, short study plan I can start right now.`,
@@ -1587,7 +1594,9 @@
                                 </button>
                             </div>
                             <div class="bg-white/5 p-6 rounded-2xl border border-white/10 text-stone-300 leading-relaxed font-sans text-sm md:text-base">
-                                ${state.aiOutput ? mdToHtml(state.aiOutput) : '// Type a topic above and hit Inject Strat to receive your exploit.'}
+                                ${state.aiOutput === '[[PRO_REQUIRED]]'
+                                    ? `<div class="text-center py-4 space-y-3"><p class="font-mono text-[#FF00FF] text-sm font-bold uppercase tracking-widest">// PRO FEATURE</p><p class="text-sm text-stone-400">AI Mission Architect requires Netrunner Pro — or add your own Gemini API key in Settings.</p><div class="flex flex-col sm:flex-row gap-3 justify-center mt-4"><a href="/pricing" class="inline-block px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-widest text-black" style="background:#39FF14;">Upgrade to Pro →</a><button onclick="app.navTo('settings')" class="inline-block px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-widest text-[#39FF14] border border-[#39FF14]/30">Add API Key</button></div></div>`
+                                    : (state.aiOutput ? mdToHtml(state.aiOutput) : '// Type a topic above and hit Inject Strat to receive your exploit.')}
                             </div>
                         </div>
                     </section>
@@ -2021,12 +2030,22 @@
                 app.showNotification('API key removed.');
                 app.render();
             },
-            getSquadHTML: () => `
+            getSquadHTML: () => {
+                const isPro = window._userMembershipTier === 'pro';
+                return `
                 <div class="animate-fade-in max-w-3xl mx-auto space-y-8">
                     <div class="text-center mb-6">
                         <h1 class="text-5xl font-serif font-bold mb-2" style="color:#8A2BE2;text-shadow:0 0 20px rgba(138,43,226,0.4);">SQUAD</h1>
                         <p class="text-[#39FF14]/50 font-mono text-sm">// async co-op mode — peer pressure study tool</p>
                     </div>
+                    ${!isPro ? `
+                    <div class="bg-black border border-[#8A2BE2]/30 rounded-2xl p-10 text-center space-y-5">
+                        <div class="text-4xl">⚔️</div>
+                        <p class="font-mono text-[#FF00FF] text-sm font-bold uppercase tracking-widest">// PRO FEATURE</p>
+                        <p class="text-stone-400 text-sm max-w-sm mx-auto">Squad Mode is exclusive to Netrunner Pro. Study with up to 4 operatives, share streaks, and hold each other accountable.</p>
+                        <a href="/pricing" class="inline-block px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest text-black mt-2" style="background:#39FF14;">Unlock Squad Mode →</a>
+                    </div>
+                    ` : `
                     <div id="squad-loading" class="text-center py-16">
                         <p class="font-mono text-[#39FF14]/40 text-sm animate-pulse">// scanning network...</p>
                     </div>
@@ -2048,9 +2067,12 @@
                         </div>
                         <p class="text-xs text-[#39FF14]/20 font-mono text-center">// max 4 operatives per squad</p>
                     </div>
-                </div>`,
+                    `}
+                </div>`;
+            },
 
             loadSquad: async () => {
+                if (window._userMembershipTier && window._userMembershipTier !== 'pro') return;
                 try {
                     const res = await fetch('/api/squad', { credentials: 'same-origin' });
                     const data = await res.json();
@@ -2127,6 +2149,7 @@
                         body: JSON.stringify({ name })
                     });
                     const data = await res.json();
+                    if (res.status === 403) { window.location.href = '/pricing'; return; }
                     if (data.ok) {
                         app.showNotification(`Squad created! Invite code: ${data.inviteCode}`);
                         app.loadSquad();
@@ -2150,6 +2173,7 @@
                         body: JSON.stringify({ inviteCode: code })
                     });
                     const data = await res.json();
+                    if (res.status === 403) { window.location.href = '/pricing'; return; }
                     if (data.ok) {
                         app.showNotification(`Joined "${data.name}"!`);
                         app.loadSquad();

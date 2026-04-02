@@ -3,7 +3,20 @@ const path = require('path');
 const crypto = require('crypto');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-const { getSessionMiddleware, setupAuthRoutes, requireAuth, getUserGamertag, updateGamertag, updateMembershipTier, getUserByPaymentRef, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount } = require('./auth');
+const { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, getUserGamertag, updateGamertag, updateMembershipTier, getUserByPaymentRef, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount } = require('./auth');
+
+async function requirePro(req, res, next) {
+  try {
+    const user = await getUser(req.session.userId);
+    if (!user || user.membership_tier !== 'pro') {
+      return res.status(403).json({ error: 'PRO_REQUIRED', message: 'Upgrade to Netrunner Pro to access this feature.' });
+    }
+    next();
+  } catch (err) {
+    console.error('[requirePro] Error:', err.message);
+    res.status(500).json({ error: 'Server error checking membership' });
+  }
+}
 
 async function sendWelcomeEmail(gamertag, email) {
   const key = process.env.RESEND_API_KEY;
@@ -292,7 +305,7 @@ app.use(getSessionMiddleware());
 
 setupAuthRoutes(app);
 
-app.post('/api/gemini', async (req, res) => {
+app.post('/api/gemini', requireAuth, requirePro, async (req, res) => {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     return res.status(500).json({ error: 'Gemini API key not configured on the server.' });
@@ -575,7 +588,7 @@ app.get('/api/settings/gamertag', requireAuth, async (req, res) => {
   }
 });
 
-app.post('/api/squad/create', requireAuth, async (req, res) => {
+app.post('/api/squad/create', requireAuth, requirePro, async (req, res) => {
   try {
     const { name } = req.body;
     if (!name || typeof name !== 'string' || !name.trim()) return res.status(400).json({ error: 'Squad name required' });
@@ -588,7 +601,7 @@ app.post('/api/squad/create', requireAuth, async (req, res) => {
   }
 });
 
-app.post('/api/squad/join', requireAuth, async (req, res) => {
+app.post('/api/squad/join', requireAuth, requirePro, async (req, res) => {
   try {
     const { inviteCode } = req.body;
     if (!inviteCode || typeof inviteCode !== 'string') return res.status(400).json({ error: 'Invite code required' });
