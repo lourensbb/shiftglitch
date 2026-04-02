@@ -50,3 +50,4 @@ timeoutMs = 60000
 PAYFAST_SANDBOX = "false"
 PAYFAST_MONTHLY_ZAR = "179.99"
 PAYFAST_ANNUAL_ZAR = "1349.99"
+RESEND_FROM_ADDRESS = "ShiftGlitch <admin@shiftglitch.com>"
