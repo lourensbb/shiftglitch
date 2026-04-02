@@ -64,6 +64,8 @@ An Express.js v5 server manages authentication, session handling, static file se
 - `memoizee` — OIDC config discovery caching
 - `passport` + `passport-openidconnect` (installed; auth uses openid-client directly instead)
 - `pg` — raw PostgreSQL queries for user upsert
+- `helmet` — security headers (X-Frame-Options, X-Content-Type-Options, HSTS, etc.)
+- `express-rate-limit` — rate limiting on /api/waitlist (10/15min) and checkout endpoints (20/15min)
 
 ### CDN Dependencies (Frontend)
 - Tailwind CSS

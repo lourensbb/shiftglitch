@@ -4,6 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ShiftGlitch — Exploit Your Grades</title>
+    <meta name="description" content="ShiftGlitch is the cyberpunk study OS for students who want to learn faster, retain more, and actually enjoy studying.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://shiftglitch.replit.app/">
+    <meta property="og:title" content="ShiftGlitch — Exploit Your Grades">
+    <meta property="og:description" content="The cyberpunk study OS. Flashcards, Pomodoro, AI mission planner, and more — free for students.">
+    <meta property="og:site_name" content="ShiftGlitch">
+    <meta property="og:image" content="https://shiftglitch.replit.app/assets/shiftglitch-logo.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="ShiftGlitch — Exploit Your Grades">
+    <meta name="twitter:description" content="The cyberpunk study OS. Flashcards, Pomodoro, AI mission planner, and more — free for students.">
+    <meta name="twitter:image" content="https://shiftglitch.replit.app/assets/shiftglitch-logo.png">
+    <link rel="icon" href="/assets/shiftglitch-logo-only.png" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -261,7 +273,7 @@
                     <button onclick="app.navTo('leaderboard')" class="nav-btn text-[#FF00FF]/50 hover:text-[#FF00FF] text-xs font-bold tracking-widest transition-colors uppercase">Board</button>
                     <button onclick="app.navTo('squad')" class="nav-btn text-[#8A2BE2]/70 hover:text-[#8A2BE2] text-xs font-bold tracking-widest transition-colors uppercase">Squad</button>
                     <button onclick="app.navTo('stats')" class="nav-btn text-[#39FF14]/50 hover:text-[#39FF14] text-xs font-bold tracking-widest transition-colors uppercase">Stats</button>
-                    <button onclick="app.navTo('settings')" class="nav-btn text-[#39FF14]/40 hover:text-[#39FF14] transition-colors" title="Settings"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></button>
+                    <button onclick="app.navTo('settings')" class="nav-btn text-[#39FF14]/40 hover:text-[#39FF14] transition-colors" aria-label="Settings" title="Settings"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></button>
                     <span id="nav-rank" class="text-xs font-bold text-black ml-2 bg-[#39FF14] px-3 py-1 rounded uppercase tracking-widest cursor-pointer" onclick="app.navTo('rank')">NPC</span>
                     <span id="nav-pro-badge" class="hidden text-xs font-bold text-black ml-1 bg-[#FF00FF] px-2 py-1 rounded uppercase tracking-widest" title="Netrunner Pro">PRO</span>
                     <div id="nav-user" class="hidden items-center gap-2 ml-2 pl-3 border-l border-[#39FF14]/20">
@@ -271,7 +283,7 @@
                     </div>
                 </div>
                 <div class="md:hidden flex items-center">
-                    <button onclick="app.toggleMobileMenu()" class="text-[#39FF14]/60 p-2 text-2xl"><span id="menu-icon">&#x2630;</span></button>
+                    <button onclick="app.toggleMobileMenu()" class="text-[#39FF14]/60 p-2 text-2xl" aria-label="Open navigation menu" aria-expanded="false" id="mobile-menu-btn"><span id="menu-icon">&#x2630;</span></button>
                 </div>
             </div>
         </div>
@@ -320,7 +332,7 @@
             <h3 class="text-[#39FF14] font-mono font-bold text-xl mb-1 uppercase tracking-widest">► memory.commit()</h3>
             <p class="text-[#39FF14]/60 text-xs mb-5 leading-relaxed">One output only. Logging this doubles retention. Skipping voids the session data.</p>
             <div class="text-[#39FF14]/40 text-xs mb-1">$ capture --session</div>
-            <textarea id="wil-input" rows="3" placeholder="> I just learned that..." class="w-full bg-black border border-[#39FF14]/30 px-4 py-3 text-[#39FF14] placeholder-[#39FF14]/25 font-mono text-sm focus:outline-none focus:border-[#39FF14] resize-none mb-4"></textarea>
+            <textarea id="wil-input" rows="3" placeholder="> I just learned that..." aria-label="What I learned this session" class="w-full bg-black border border-[#39FF14]/30 px-4 py-3 text-[#39FF14] placeholder-[#39FF14]/25 font-mono text-sm focus:outline-none focus:border-[#39FF14] resize-none mb-4"></textarea>
             <div class="flex gap-3">
                 <button onclick="app.saveWhatILearned()" class="flex-1 bg-[#39FF14] hover:bg-[#2ddd12] text-black py-3 font-bold text-xs uppercase tracking-widest font-mono transition-colors">[ COMMIT ]</button>
                 <button onclick="app.dismissWIL()" class="border border-[#39FF14]/25 text-[#39FF14]/40 hover:text-[#39FF14] hover:border-[#39FF14]/60 px-4 py-3 font-bold text-xs font-mono uppercase tracking-widest transition-colors">[ skip ]</button>

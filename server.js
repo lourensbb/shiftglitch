@@ -1,6 +1,8 @@
 const express = require('express');
 const path = require('path');
 const crypto = require('crypto');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const { getSessionMiddleware, setupAuthRoutes, requireAuth, getUserGamertag, updateGamertag, updateMembershipTier, getUserByPaymentRef, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount } = require('./auth');
 
 async function sendWelcomeEmail(gamertag, email) {
@@ -117,6 +119,18 @@ const PAYFAST_MONTHLY_ZAR = process.env.PAYFAST_MONTHLY_ZAR || '179.99';
 const PAYFAST_ANNUAL_ZAR  = process.env.PAYFAST_ANNUAL_ZAR  || '1349.99';
 
 const app = express();
+
+app.use(helmet({
+  contentSecurityPolicy: false,
+  crossOriginEmbedderPolicy: false
+}));
+
+const waitlistLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 10, standardHeaders: true, legacyHeaders: false, message: { error: 'Too many requests. Try again later.' } });
+const checkoutLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 20, standardHeaders: true, legacyHeaders: false, message: { error: 'Too many requests. Try again later.' } });
+
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', ts: Date.now() });
+});
 
 app.post('/api/payfast-itn', express.urlencoded({ extended: false }), async (req, res) => {
   try {
@@ -320,7 +334,15 @@ app.get('/pricing', (req, res) => {
   res.sendFile(path.join(__dirname, 'pricing.html'));
 });
 
-app.post('/api/waitlist', async (req, res) => {
+app.get('/privacy', (req, res) => {
+  res.sendFile(path.join(__dirname, 'privacy.html'));
+});
+
+app.get('/terms', (req, res) => {
+  res.sendFile(path.join(__dirname, 'terms.html'));
+});
+
+app.post('/api/waitlist', waitlistLimiter, async (req, res) => {
   try {
     const { gamertag, email } = req.body;
     if (!gamertag || typeof gamertag !== 'string' || !gamertag.trim()) {
@@ -350,7 +372,7 @@ app.get('/api/stats', async (req, res) => {
   }
 });
 
-app.post('/api/payfast-checkout', requireAuth, async (req, res) => {
+app.post('/api/payfast-checkout', requireAuth, checkoutLimiter, async (req, res) => {
   const merchantId  = process.env.PAYFAST_MERCHANT_ID;
   const merchantKey = process.env.PAYFAST_MERCHANT_KEY;
   if (!merchantId || !merchantKey) {
@@ -392,7 +414,7 @@ app.post('/api/payfast-checkout', requireAuth, async (req, res) => {
   res.json({ action, fields });
 });
 
-app.post('/api/paypal-checkout', requireAuth, async (req, res) => {
+app.post('/api/paypal-checkout', requireAuth, checkoutLimiter, async (req, res) => {
   const auth = await getPaypalToken();
   if (!auth) {
     console.warn('[paypal] PAYPAL_CLIENT_ID or PAYPAL_CLIENT_SECRET not set');
