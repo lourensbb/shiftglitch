@@ -54,8 +54,8 @@ async function sendWelcomeEmail(gamertag, email) {
                   You have been jacked into the Mainframe.
                 </p>
                 <p style="font-family:'Courier New',monospace;font-size:15px;color:#aaaaaa;line-height:1.9;margin:0 0 30px;">
-                  The Mainframe is the school system — exams, deadlines, grades.<br>
-                  Right now, it controls you. Your mission is to master the system<br>
+                  The Mainframe is a digital world built on knowledge and power.<br>
+                  Right now, it controls you. Your mission: master the cognitive exploits<br>
                   and earn your way to <span style="color:#FF00FF;">System Admin</span> status.
                 </p>
                 <div style="background:#1a1a1a;border:1px solid #39FF14;padding:24px;margin-bottom:28px;">
@@ -63,7 +63,7 @@ async function sendWelcomeEmail(gamertag, email) {
                   <div style="font-family:'Courier New',monospace;font-size:14px;color:#aaaaaa;line-height:2.4;">
                     <span style="color:#39FF14;">&gt;</span> Go to ShiftGlitch and click <span style="color:#fff;">START HERE</span><br>
                     <span style="color:#39FF14;">&gt;</span> Set your <span style="color:#fff;">gamertag</span> in Settings<br>
-                    <span style="color:#39FF14;">&gt;</span> Add your <span style="color:#fff;">exam dates</span> in Mission Control<br>
+                    <span style="color:#39FF14;">&gt;</span> Add your <span style="color:#fff;">mission deadlines</span> in Mission Control<br>
                     <span style="color:#39FF14;">&gt;</span> Read the <span style="color:#fff;">Q&amp;A in The Vault</span> — learn how to study<br>
                     <span style="color:#39FF14;">&gt;</span> Complete your first <span style="color:#fff;">25-minute Focus Session</span>
                   </div>

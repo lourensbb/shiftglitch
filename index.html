@@ -249,6 +249,19 @@
             0%, 100% { box-shadow: 0 0 24px rgba(255,51,51,0.55), 0 4px 16px rgba(0,0,0,0.5); transform: scale(1); }
             50% { box-shadow: 0 0 40px rgba(255,51,51,0.85), 0 4px 20px rgba(0,0,0,0.6); transform: scale(1.05); }
         }
+        /* === SYSTEM INTERRUPT ENGINE === */
+        .si-overlay{position:fixed;inset:0;z-index:9998;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0);transition:background 0.35s ease;pointer-events:none;font-family:'Share Tech Mono','Courier New',monospace;}
+        .si-overlay.si-visible{background:rgba(0,0,0,0.93);pointer-events:all;}
+        .si-box{width:90%;max-width:540px;border:2px solid var(--si-color,#39FF14);background:#050505;opacity:0;transform:scale(0.86) skewX(-2deg);transition:opacity 0.38s ease,transform 0.38s cubic-bezier(0.34,1.4,0.64,1);box-shadow:0 0 60px var(--si-glow,rgba(57,255,20,0.15)),inset 0 0 40px rgba(0,0,0,0.6);position:relative;overflow:hidden;}
+        .si-overlay.si-visible .si-box{opacity:1;transform:scale(1) skewX(0);}
+        .si-scanlines::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0px,transparent 2px,rgba(0,0,0,0.08) 2px,rgba(0,0,0,0.08) 4px);pointer-events:none;z-index:10;}
+        .si-header{padding:16px 24px;border-bottom:1px solid var(--si-color,#39FF14);display:flex;align-items:center;gap:10px;}
+        .si-body{padding:24px;position:relative;z-index:2;}
+        .si-footer{padding:14px 24px;border-top:1px solid rgba(255,255,255,0.07);display:flex;gap:10px;justify-content:flex-end;}
+        @keyframes si-flicker{0%,100%{opacity:1;}92%{opacity:1;}93%{opacity:0.82;}94%{opacity:1;}97%{opacity:0.91;}98%{opacity:1;}}
+        .si-flicker{animation:si-flicker 5s ease infinite;}
+        @keyframes si-pulse-border{0%,100%{box-shadow:0 0 30px var(--si-glow,rgba(57,255,20,0.12));}50%{box-shadow:0 0 70px var(--si-glow,rgba(57,255,20,0.4));}}
+        .si-pulse{animation:si-pulse-border 2s ease infinite;}
     </style>
 </head>
 <body class="antialiased font-sans dark">
@@ -1043,6 +1056,7 @@
                 state.rankEvidence.pomodorosCompleted++;
                 this.save();
                 this.checkPromotion();
+                badgeEngine.afterPomodoro();
             },
             recordGovernorBreakdown() {
                 state.rankEvidence.governorBreakdowns++;
@@ -1053,6 +1067,7 @@
                 state.rankEvidence.cardsAdvanced++;
                 this.save();
                 this.checkPromotion();
+                badgeEngine.afterCard();
             },
             recordBlurt() {
                 state.rankEvidence.blurtsCompleted++;
@@ -1081,7 +1096,10 @@
                     state.rank = nextRank;
                     this.save();
                     this.updateNavRank();
-                    app.showNotification(`Rank Promotion: You are now ${nextRank}!`);
+                    SysInterrupt.show('rank-promotion', { newRank: nextRank });
+                    const _rankBadgeMap = { 'Glitch Tech': 'reached-glitch-tech', 'Netrunner': 'reached-netrunner', 'System Admin': 'reached-system-admin' };
+                    if (_rankBadgeMap[nextRank]) setTimeout(() => badgeEngine._tryUnlock(_rankBadgeMap[nextRank]), 2500);
+                    if (!badgeEngine.isUnlocked('first-rank-up')) setTimeout(() => badgeEngine._tryUnlock('first-rank-up'), 3500);
                     this.checkPromotion();
                 }
             },
@@ -1157,6 +1175,338 @@
             afkStart: null,
         };
 
+        /* ============================================================
+           BADGE ENGINE — 12 clearance badges stored in localStorage
+        ============================================================ */
+        const badgeEngine = {
+            DEFS: {
+                'first-exploit':       { icon: '⚡', name: 'FIRST EXPLOIT',      desc: 'Completed your first Focus Session' },
+                'streak-3':            { icon: '🔥', name: 'STREAK ×3',           desc: '3-day login streak achieved' },
+                'streak-7':            { icon: '💀', name: 'STREAK ×7',           desc: '7-day streak — you are persistent' },
+                'first-rank-up':       { icon: '📡', name: 'RANK UPGRADE',        desc: 'First rank increase earned' },
+                'recall-sprint':       { icon: '🧠', name: 'RECALL SPRINT',       desc: 'Completed a Recall Sprint challenge' },
+                'pattern-lock':        { icon: '🔐', name: 'PATTERN LOCK',        desc: 'Cracked the Pattern Lock sequence' },
+                'domain-mapped':       { icon: '🗺️', name: 'DOMAIN MAPPED',       desc: 'First Data Shard deck created' },
+                'shards-50':           { icon: '💾', name: 'SHARD MASTER',        desc: '50 cards studied' },
+                'survived-rollback':   { icon: '⚠️', name: 'ROLLBACK SURVIVOR',  desc: 'Returned after a 3+ day absence' },
+                'reached-glitch-tech': { icon: '🔩', name: 'GLITCH TECH',         desc: 'Promoted to Glitch Tech' },
+                'reached-netrunner':   { icon: '🔌', name: 'NETRUNNER',           desc: 'Promoted to Netrunner rank' },
+                'reached-system-admin':{ icon: '👑', name: 'SYSTEM ADMIN',        desc: 'Reached maximum clearance' },
+            },
+            _unlocked: [],
+            load() { try { this._unlocked = JSON.parse(localStorage.getItem('sg_badges') || '[]'); } catch(e) { this._unlocked = []; } },
+            save() { localStorage.setItem('sg_badges', JSON.stringify(this._unlocked)); },
+            isUnlocked(id) { return this._unlocked.includes(id); },
+            unlock(id) {
+                if (this.isUnlocked(id)) return false;
+                this._unlocked.push(id); this.save(); return true;
+            },
+            _tryUnlock(id) {
+                if (this.unlock(id)) setTimeout(() => SysInterrupt.show('achievement', { badgeId: id }), 600);
+            },
+            checkOnLoad() {
+                const ev = state.rankEvidence;
+                const streak = rankEngine.getStreak();
+                const rankIdx = RANKS.indexOf(state.rank);
+                if (ev.pomodorosCompleted >= 1) this.unlock('first-exploit');
+                if (streak >= 3) this.unlock('streak-3');
+                if (streak >= 7) this.unlock('streak-7');
+                if (state.rank !== 'NPC') this.unlock('first-rank-up');
+                if (rankIdx >= RANKS.indexOf('Glitch Tech')) this.unlock('reached-glitch-tech');
+                if (rankIdx >= RANKS.indexOf('Netrunner')) this.unlock('reached-netrunner');
+                if (state.rank === 'System Admin') this.unlock('reached-system-admin');
+                if (ev.cardsAdvanced >= 50) this.unlock('shards-50');
+                if (state.fcDecks && state.fcDecks.length >= 1) this.unlock('domain-mapped');
+            },
+            afterPomodoro() {
+                const ev = state.rankEvidence;
+                const streak = rankEngine.getStreak();
+                if (ev.pomodorosCompleted === 1) this._tryUnlock('first-exploit');
+                if (streak >= 7 && !this.isUnlocked('streak-7')) this._tryUnlock('streak-7');
+                else if (streak >= 3 && !this.isUnlocked('streak-3')) this._tryUnlock('streak-3');
+                if (streak === 3 || streak === 7) setTimeout(() => SysInterrupt.show('streak-signal', { streak }), 1200);
+            },
+            afterCard() {
+                if (state.rankEvidence.cardsAdvanced >= 50 && !this.isUnlocked('shards-50')) this._tryUnlock('shards-50');
+            },
+            afterDeckCreate() {
+                if (!this.isUnlocked('domain-mapped')) this._tryUnlock('domain-mapped');
+            },
+            getBadgeHTML() {
+                return Object.entries(this.DEFS).map(([id, b]) => {
+                    const unlocked = this.isUnlocked(id);
+                    return '<div class="flex items-center gap-3 p-3 rounded-xl border ' + (unlocked ? 'border-[#39FF14]/30 bg-[#39FF14]/5' : 'border-stone-200 dark:border-stone-700 opacity-40') + '">' +
+                        '<div class="text-xl flex-shrink-0">' + b.icon + '</div>' +
+                        '<div class="min-w-0"><div class="text-[10px] font-bold uppercase tracking-widest ' + (unlocked ? 'text-[#39FF14]' : 'text-stone-400') + '">' + b.name + '</div>' +
+                        '<div class="text-[10px] text-stone-500 truncate">' + b.desc + '</div></div>' +
+                        (unlocked ? '<div class="ml-auto text-[#39FF14] text-[9px] font-bold flex-shrink-0">✓ EARNED</div>' : '') +
+                        '</div>';
+                }).join('');
+            }
+        };
+
+        /* ============================================================
+           SYSTEM INTERRUPT ENGINE — cinematic mid-session interrupts
+        ============================================================ */
+        const SysInterrupt = {
+            _active: false,
+            _queue: [],
+            WARDEN_MSGS: [
+                { msg: "The Mainframe remembers every session you missed.", sub: "Consistency is your highest clearance." },
+                { msg: "Every concept you avoid becomes a vulnerability.", sub: "Run the exploit you have been postponing." },
+                { msg: "Stress is the Mainframe testing your architecture.", sub: "Glitch Techs bend. NPCs break." },
+                { msg: "The gap between NPC and System Admin is not talent.", sub: "It is the number of sessions you showed up for." },
+                { msg: "Sleep is when the Mainframe defragments.", sub: "Do not skip the reboot. You need it." },
+                { msg: "You opened this app. That is 80% of the exploit.", sub: "Run the rest." },
+                { msg: "Distraction is a trap seeded by the Mainframe.", sub: "Every tab you close is a clearance point." },
+                { msg: "Recall is the real exploit. Recognition is a decoy.", sub: "Stop re-reading. Start blurting." },
+                { msg: "Fear of looking wrong is an NPC trait.", sub: "Glitch Techs guess and adjust. Do both." },
+                { msg: "What can you understand in 45 minutes?", sub: "More than you think. Start the timer." },
+                { msg: "The Mainframe rewards presence. Not perfection.", sub: "Show up again." },
+                { msg: "Your notes are a backup drive. Unreliable.", sub: "Your memory is the Mainframe. Encode directly." },
+                { msg: "An abandoned session is still a session.", sub: "Come back. Finish what you started." },
+                { msg: "There is no shortcut to System Admin.", sub: "There is only the next session." },
+                { msg: "The exploit you are avoiding is the one that promotes you.", sub: "Run it." },
+                { msg: "Every time you study without testing yourself, you load a corrupt file.", sub: "Blurt first. Read second." },
+                { msg: "Consistency beats intensity.", sub: "25 minutes today beats 3 hours next week." },
+                { msg: "The Mainframe does not grade on effort.", sub: "It grades on evidence. What is yours today?" },
+                { msg: "You are not falling behind.", sub: "You are falling through. There is a difference. Climb." },
+                { msg: "Your future self runs System Admin.", sub: "Your present self is the bridge. Build it." },
+                { msg: "The operatives who escape the Mainframe do not work harder.", sub: "They encode smarter. Learn the difference." },
+                { msg: "Blurting is not writing. It is thinking in public.", sub: "Do it now. Judge it later." },
+                { msg: "Your brain hates spaced repetition.", sub: "Your brain is wrong. Trust the protocol." },
+                { msg: "System Admin is not a destination.", sub: "It is a habit wearing a title. Build the habit." },
+            ],
+            init() {
+                this._checkInactivityThreats();
+                if (!sessionStorage.getItem('sg_warden_session')) {
+                    setTimeout(() => {
+                        if (!sessionStorage.getItem('sg_warden_session')) {
+                            sessionStorage.setItem('sg_warden_session', '1');
+                            this.show('warden', {});
+                        }
+                    }, 5 * 60 * 1000);
+                }
+            },
+            _checkInactivityThreats() {
+                const log = (state.rankEvidence && state.rankEvidence.activeDateLog) || [];
+                if (log.length < 1) return;
+                const today = new Date().toISOString().slice(0, 10);
+                const sorted = [...log].sort().reverse();
+                if (sorted[0] === today) {
+                    if (sorted[1]) {
+                        const gap = Math.round((new Date(today) - new Date(sorted[1])) / 86400000);
+                        if (gap >= 3 && !badgeEngine.isUnlocked('survived-rollback')) {
+                            badgeEngine.unlock('survived-rollback');
+                        }
+                    }
+                    return;
+                }
+                const daysSince = Math.round((new Date(today) - new Date(sorted[0])) / 86400000);
+                if (daysSince >= 5) {
+                    setTimeout(() => this.show('coherence-failure', { days: daysSince }), 2000);
+                } else if (daysSince >= 3) {
+                    setTimeout(() => this.show('memory-degradation', { days: daysSince }), 2000);
+                }
+            },
+            show(type, payload = {}) {
+                if (this._active) { this._queue.push({ type, payload }); return; }
+                this._active = true;
+                const id = 'si-' + Date.now();
+                const html = this._buildHTML(type, payload, id);
+                const el = document.createElement('div');
+                el.innerHTML = html;
+                const overlay = el.firstElementChild;
+                document.body.appendChild(overlay);
+                requestAnimationFrame(() => requestAnimationFrame(() => {
+                    overlay.classList.add('si-visible');
+                    if (type === 'pattern-lock') {
+                        const colors = ['#FF4444','#39FF14','#4488FF','#FF00FF'];
+                        const labels = ['RED','GRN','BLU','MGT'];
+                        const seq = Array.from({length:4}, () => Math.floor(Math.random()*4));
+                        window['_si_'+id+'_plSeq'] = seq;
+                        window['_si_'+id+'_plUser'] = [];
+                        window['_si_'+id+'_plAttempts'] = 0;
+                        this._runPatternSequence(id, colors, seq);
+                    }
+                }));
+            },
+            dismiss(id) {
+                const el = document.getElementById(id);
+                if (!el) return;
+                el.classList.remove('si-visible');
+                setTimeout(() => {
+                    el.remove(); this._active = false;
+                    if (this._queue.length > 0) {
+                        const next = this._queue.shift();
+                        setTimeout(() => this.show(next.type, next.payload), 300);
+                    }
+                }, 420);
+            },
+            launchRecallSprint(id) {
+                const boxEl = document.getElementById(id+'-box');
+                if (!boxEl) return;
+                boxEl.innerHTML = this._recallSprintHTML(id);
+                let seconds = 60;
+                const tick = setInterval(() => {
+                    seconds--;
+                    const te = document.getElementById(id+'-timer');
+                    const be = document.getElementById(id+'-bar');
+                    if (te) te.textContent = seconds;
+                    if (be) be.style.width = (seconds/60*100)+'%';
+                    if (seconds <= 0) { clearInterval(tick); this._finishRecallSprint(id); }
+                }, 1000);
+                window['_si_'+id+'_rTimer'] = tick;
+                const ta = document.getElementById(id+'-text');
+                if (ta) ta.addEventListener('input', () => {
+                    const wc = document.getElementById(id+'-wc');
+                    if (wc) wc.textContent = ta.value.trim().split(/\s+/).filter(Boolean).length + ' words';
+                });
+            },
+            submitRecallSprint(id) {
+                const t = window['_si_'+id+'_rTimer'];
+                if (t) clearInterval(t);
+                this._finishRecallSprint(id);
+            },
+            _finishRecallSprint(id) {
+                const ta = document.getElementById(id+'-text');
+                const text = ta ? ta.value.trim() : '';
+                const words = text.split(/\s+/).filter(Boolean).length;
+                const boxEl = document.getElementById(id+'-box');
+                if (!boxEl) return;
+                badgeEngine._tryUnlock('recall-sprint');
+                try {
+                    const arr = JSON.parse(localStorage.getItem('sg_recall_sprints')||'[]');
+                    arr.push({ date: new Date().toISOString(), words, text: text.slice(0,500) });
+                    localStorage.setItem('sg_recall_sprints', JSON.stringify(arr.slice(-20)));
+                } catch(e) {}
+                boxEl.innerHTML = '<div class="si-header" style="border-color:#FF8800"><span style="color:#FF8800;font-size:18px;">✓</span><span style="color:#FF8800;font-size:13px;letter-spacing:2px;margin-left:6px;">RECALL SPRINT — COMPLETE</span></div>' +
+                    '<div class="si-body" style="text-align:center;"><div style="font-size:52px;font-weight:bold;color:#FF8800;margin-bottom:6px;">' + words + '</div>' +
+                    '<div style="color:#666;font-size:11px;letter-spacing:2px;margin-bottom:20px;">WORDS ENCODED</div>' +
+                    '<p style="color:#aaa;font-size:13px;line-height:1.8;">The act of retrieval strengthens the neural pathway.<br>Every word you dumped is a connection reinforced.</p></div>' +
+                    '<div class="si-footer"><button onclick="SysInterrupt.dismiss(\''+id+'\')" style="background:#FF8800;color:#000;border:none;padding:10px 28px;font-family:inherit;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-weight:bold;">JACK OUT</button></div>';
+            },
+            _recallSprintHTML(id) {
+                return '<div class="si-header" style="border-color:#FF8800"><span style="color:#FF8800;font-size:18px;">⏱</span><span style="color:#FF8800;font-size:13px;letter-spacing:2px;margin-left:6px;">RECALL SPRINT — ACTIVE</span>' +
+                    '<span id="'+id+'-timer" style="margin-left:auto;color:#fff;font-size:18px;font-weight:bold;">60</span></div>' +
+                    '<div style="height:3px;background:#111;"><div id="'+id+'-bar" style="height:100%;background:#FF8800;width:100%;transition:width 1s linear;"></div></div>' +
+                    '<div class="si-body"><p style="color:#777;font-size:12px;letter-spacing:1px;margin-bottom:12px;">DUMP EVERYTHING you know about your current topic. No notes. Pure recall. Go.</p>' +
+                    '<textarea id="'+id+'-text" placeholder="Start typing — no looking back..." style="width:100%;height:140px;background:#0a0a0a;border:1px solid #333;color:#eee;padding:12px;font-family:inherit;font-size:13px;resize:none;outline:none;border-radius:4px;box-sizing:border-box;"></textarea>' +
+                    '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;"><span id="'+id+'-wc" style="color:#444;font-size:11px;letter-spacing:1px;">0 words</span>' +
+                    '<button onclick="SysInterrupt.submitRecallSprint(\''+id+'\')" style="background:#FF8800;color:#000;border:none;padding:8px 20px;font-family:inherit;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-weight:bold;">SUBMIT</button></div></div>';
+            },
+            _runPatternSequence(id, colors, seq) {
+                const boxEl = document.getElementById(id+'-box');
+                if (!boxEl) return;
+                const labels = ['RED','GRN','BLU','MGT'];
+                boxEl.innerHTML = '<div class="si-header" style="border-color:#FF8800"><span style="color:#FF8800;font-size:18px;">🔐</span>' +
+                    '<span style="color:#FF8800;font-size:13px;letter-spacing:2px;margin-left:6px;">PATTERN LOCK CHALLENGE</span></div>' +
+                    '<div class="si-body"><p id="'+id+'-pl-instr" style="color:#FF8800;font-size:11px;letter-spacing:2px;text-align:center;margin-bottom:24px;">WATCH THE SEQUENCE...</p>' +
+                    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:260px;margin:0 auto 20px;">' +
+                    colors.map((c,i) => '<button data-pl="'+i+'" onclick="SysInterrupt.clickPatternNode(\''+id+'\','+i+')" style="background:'+c+'22;border:2px solid '+c+';color:'+c+';padding:22px;font-family:inherit;font-size:12px;letter-spacing:2px;font-weight:bold;cursor:pointer;transition:all 0.15s;pointer-events:none;opacity:0.2;border-radius:4px;">'+labels[i]+'</button>').join('') +
+                    '</div><button onclick="SysInterrupt.dismiss(\''+id+'\')" style="background:transparent;border:1px solid #333;color:#555;padding:8px 20px;font-family:inherit;font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;width:100%;border-radius:4px;">SKIP CHALLENGE</button></div>';
+                let step = 0;
+                const showNext = () => {
+                    document.querySelectorAll('[data-pl]').forEach(b => { b.style.opacity='0.2'; b.style.transform=''; });
+                    if (step < seq.length) {
+                        const btn = document.querySelector('[data-pl="'+seq[step]+'"]');
+                        if (btn) { btn.style.opacity='1'; btn.style.transform='scale(1.18)'; }
+                        setTimeout(() => { if(btn){btn.style.opacity='0.2';btn.style.transform='';} step++; setTimeout(showNext, 350); }, 500);
+                    } else {
+                        const instr = document.getElementById(id+'-pl-instr');
+                        if (instr) instr.textContent = 'NOW REPRODUCE THE SEQUENCE';
+                        document.querySelectorAll('[data-pl]').forEach(b => { b.style.opacity='1'; b.style.pointerEvents='all'; });
+                    }
+                };
+                setTimeout(showNext, 600);
+            },
+            clickPatternNode(id, nodeIdx) {
+                const seq = window['_si_'+id+'_plSeq'];
+                const user = window['_si_'+id+'_plUser'];
+                if (!seq) return;
+                user.push(nodeIdx);
+                const step = user.length - 1;
+                if (nodeIdx !== seq[step]) {
+                    const attempts = ++window['_si_'+id+'_plAttempts'];
+                    window['_si_'+id+'_plUser'] = [];
+                    if (attempts >= 2) {
+                        const boxEl = document.getElementById(id+'-box');
+                        if (boxEl) boxEl.innerHTML = '<div class="si-body" style="text-align:center;padding:40px 24px;"><div style="font-size:36px;margin-bottom:12px;">🔒</div><div style="color:#FF4444;font-size:13px;letter-spacing:2px;margin-bottom:12px;">PATTERN LOCK FAILED</div><p style="color:#555;font-size:12px;margin-bottom:28px;">Train your sequential pattern recognition. The Mainframe logged this attempt.</p><button onclick="SysInterrupt.dismiss(\''+id+'\')" style="background:#333;color:#aaa;border:none;padding:10px 28px;font-family:inherit;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:4px;">JACK OUT</button></div>';
+                    } else {
+                        const instr = document.getElementById(id+'-pl-instr');
+                        if (instr) instr.textContent = 'WRONG — WATCH AGAIN';
+                        document.querySelectorAll('[data-pl]').forEach(b => { b.style.pointerEvents='none'; b.style.opacity='0.2'; });
+                        setTimeout(() => {
+                            const colors = ['#FF4444','#39FF14','#4488FF','#FF00FF'];
+                            this._runPatternSequence(id, colors, seq);
+                        }, 900);
+                    }
+                    return;
+                }
+                if (user.length === seq.length) {
+                    badgeEngine._tryUnlock('pattern-lock');
+                    const boxEl = document.getElementById(id+'-box');
+                    if (boxEl) boxEl.innerHTML = '<div class="si-body" style="text-align:center;padding:40px 24px;"><div style="font-size:52px;margin-bottom:12px;">🔓</div><div style="color:#39FF14;font-size:14px;letter-spacing:2px;margin-bottom:12px;">PATTERN LOCK CRACKED</div><p style="color:#777;font-size:12px;margin-bottom:28px;">Pattern recognition is a core Mainframe exploit. You are learning to see what others miss.</p><button onclick="SysInterrupt.dismiss(\''+id+'\')" style="background:#39FF14;color:#000;border:none;padding:10px 28px;font-family:inherit;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-weight:bold;border-radius:4px;">JACK OUT</button></div>';
+                }
+            },
+            _buildHTML(type, payload, id) {
+                let color = '#39FF14', glow = 'rgba(57,255,20,0.2)', innerHTML = '';
+                if (type === 'memory-degradation') {
+                    color='#FF8800'; glow='rgba(255,136,0,0.2)';
+                    innerHTML = '<div class="si-header" style="border-color:'+color+'"><span style="color:'+color+';font-size:20px;">⚠</span><span style="color:'+color+';font-size:13px;letter-spacing:2px;margin-left:8px;">MEMORY DEGRADATION DETECTED</span></div>' +
+                        '<div class="si-body"><div style="color:'+color+';font-size:11px;letter-spacing:2px;margin-bottom:14px;">// '+payload.days+' DAYS SINCE LAST SESSION</div>' +
+                        '<p style="color:#ccc;font-size:14px;line-height:1.8;margin-bottom:14px;">Neural pathways weaken with every missed session. The Mainframe has detected a <strong style="color:'+color+';">'+payload.days+'-day gap</strong> in your activity log.</p>' +
+                        '<p style="color:#666;font-size:12px;line-height:1.8;">Your rank is intact. Your progress is intact. But streaks are at risk.<br>The fastest fix: run a session right now.</p></div>' +
+                        '<div class="si-footer"><button onclick="SysInterrupt.launchRecallSprint(\''+id+'\')" style="background:'+color+';color:#000;border:none;padding:10px 24px;font-family:inherit;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-weight:bold;border-radius:4px;">RUN RECALL SPRINT</button><button onclick="SysInterrupt.dismiss(\''+id+'\')" style="background:transparent;border:1px solid #444;color:#666;padding:10px 20px;font-family:inherit;font-size:11px;letter-spacing:2px;cursor:pointer;border-radius:4px;">ACKNOWLEDGE</button></div>';
+                } else if (type === 'coherence-failure') {
+                    color='#FF2222'; glow='rgba(255,34,34,0.25)';
+                    innerHTML = '<div class="si-header" style="border-color:'+color+'"><span style="color:'+color+';font-size:20px;">🔴</span><span style="color:'+color+';font-size:13px;letter-spacing:2px;margin-left:8px;">COHERENCE FAILURE</span></div>' +
+                        '<div class="si-body"><div style="color:'+color+';font-size:11px;letter-spacing:2px;margin-bottom:14px;">// CRITICAL — '+payload.days+' DAY GAP DETECTED</div>' +
+                        '<p style="color:#ccc;font-size:14px;line-height:1.8;margin-bottom:14px;">The Mainframe has flagged a <strong style="color:'+color+';">critical '+payload.days+'-day disconnect</strong>. Neural encoding is actively degrading.</p>' +
+                        '<p style="color:#666;font-size:12px;line-height:1.8;">You have not been erased. But the system is forgetting you.<br>Every session you run rewrites this record. Run one now.</p></div>' +
+                        '<div class="si-footer"><button onclick="SysInterrupt.dismiss(\''+id+'\')" style="background:'+color+';color:#fff;border:none;padding:10px 28px;font-family:inherit;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-weight:bold;border-radius:4px;">RESTORE FROM BACKUP</button></div>';
+                } else if (type === 'rank-promotion') {
+                    color='#39FF14'; glow='rgba(57,255,20,0.3)';
+                    const rankIcons2 = {'Script Kiddie':'💾','Glitch Tech':'⚡','Netrunner':'🔌','System Admin':'👑'};
+                    const icon2 = rankIcons2[payload.newRank] || '📡';
+                    const rankIdx2 = RANKS.indexOf(payload.newRank);
+                    innerHTML = '<div class="si-header" style="border-color:'+color+'"><span style="color:'+color+';font-size:18px;">✦</span><span style="color:'+color+';font-size:13px;letter-spacing:2px;margin-left:8px;">RANK PROMOTION — CLEARANCE UPGRADE</span></div>' +
+                        '<div class="si-body" style="text-align:center;"><div style="font-size:56px;margin-bottom:8px;">'+icon2+'</div>' +
+                        '<div style="color:'+color+';font-size:26px;letter-spacing:4px;font-weight:bold;margin-bottom:4px;">'+(payload.newRank||'').toUpperCase()+'</div>' +
+                        '<div style="color:#444;font-size:11px;letter-spacing:2px;margin-bottom:24px;">CLEARANCE LEVEL '+( rankIdx2+1)+' OF '+RANKS.length+'</div>' +
+                        '<p style="color:#777;font-size:13px;line-height:1.8;">Ranks are earned through evidence. You have earned this.<br>The Mainframe acknowledges your progress.</p></div>' +
+                        '<div class="si-footer" style="justify-content:center;"><button onclick="SysInterrupt.dismiss(\''+id+'\')" style="background:'+color+';color:#000;border:none;padding:12px 36px;font-family:inherit;font-size:12px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;font-weight:bold;border-radius:4px;width:100%;">ACCEPT PROMOTION</button></div>';
+                } else if (type === 'streak-signal') {
+                    color='#39FF14'; glow='rgba(57,255,20,0.2)';
+                    innerHTML = '<div class="si-header" style="border-color:'+color+'"><span style="color:'+color+';font-size:18px;">🔥</span><span style="color:'+color+';font-size:13px;letter-spacing:2px;margin-left:8px;">STREAK SIGNAL DETECTED</span></div>' +
+                        '<div class="si-body" style="text-align:center;"><div style="font-size:60px;font-weight:bold;color:'+color+';line-height:1;">'+payload.streak+'</div>' +
+                        '<div style="color:#555;font-size:11px;letter-spacing:3px;margin:6px 0 20px;">DAY STREAK</div>' +
+                        '<p style="color:#aaa;font-size:13px;line-height:1.8;">'+(payload.streak>=7?'Seven consecutive sessions. The Mainframe is taking notice.':'Three sessions in a row. Consistency is how NPCs become Glitch Techs.')+'</p></div>' +
+                        '<div class="si-footer"><button onclick="SysInterrupt.dismiss(\''+id+'\')" style="background:'+color+';color:#000;border:none;padding:10px 36px;font-family:inherit;font-size:11px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;font-weight:bold;border-radius:4px;">ACKNOWLEDGED</button></div>';
+                } else if (type === 'achievement') {
+                    const bdg = badgeEngine.DEFS[payload.badgeId] || {icon:'⚡',name:'ACHIEVEMENT',desc:'Unlocked'};
+                    color='#8A2BE2'; glow='rgba(138,43,226,0.25)';
+                    innerHTML = '<div class="si-header" style="border-color:'+color+'"><span style="color:'+color+';font-size:18px;">◈</span><span style="color:'+color+';font-size:13px;letter-spacing:2px;margin-left:8px;">ACHIEVEMENT UNLOCKED</span></div>' +
+                        '<div class="si-body" style="text-align:center;"><div style="font-size:52px;margin-bottom:12px;">'+bdg.icon+'</div>' +
+                        '<div style="color:'+color+';font-size:18px;letter-spacing:3px;font-weight:bold;margin-bottom:8px;">'+bdg.name+'</div>' +
+                        '<p style="color:#777;font-size:13px;">'+bdg.desc+'</p></div>' +
+                        '<div class="si-footer"><button onclick="SysInterrupt.dismiss(\''+id+'\')" style="background:'+color+';color:#fff;border:none;padding:10px 36px;font-family:inherit;font-size:11px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;font-weight:bold;border-radius:4px;">CLAIMED</button></div>';
+                } else if (type === 'warden') {
+                    const wm = this.WARDEN_MSGS[Math.floor(Math.random()*this.WARDEN_MSGS.length)];
+                    color='#FF00FF'; glow='rgba(255,0,255,0.2)';
+                    innerHTML = '<div class="si-header" style="border-color:'+color+'"><span style="color:'+color+';font-size:18px;">◈</span><span style="color:'+color+';font-size:13px;letter-spacing:2px;margin-left:8px;">WARDEN TRANSMISSION</span></div>' +
+                        '<div class="si-body"><p style="color:#fff;font-size:16px;line-height:1.7;margin-bottom:14px;">"'+wm.msg+'"</p>' +
+                        '<p style="color:#777;font-size:13px;line-height:1.7;font-style:italic;">— '+wm.sub+'</p></div>' +
+                        '<div class="si-footer"><button onclick="SysInterrupt.dismiss(\''+id+'\')" style="background:'+color+';color:#000;border:none;padding:10px 28px;font-family:inherit;font-size:11px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;font-weight:bold;border-radius:4px;">RECEIVED</button></div>';
+                } else if (type === 'pattern-lock') {
+                    color='#FF8800'; glow='rgba(255,136,0,0.2)';
+                    innerHTML = '<div id="'+id+'-box"><div class="si-body" style="text-align:center;padding:40px 24px;color:#555;font-size:12px;letter-spacing:2px;">INITIALISING PATTERN LOCK...</div></div>';
+                    return '<div class="si-overlay" id="'+id+'"><div class="si-box si-scanlines si-pulse si-flicker" style="--si-color:'+color+';--si-glow:'+glow+';">'+innerHTML+'</div></div>';
+                }
+                return '<div class="si-overlay" id="'+id+'"><div class="si-box si-scanlines si-pulse si-flicker" style="--si-color:'+color+';--si-glow:'+glow+';"><div id="'+id+'-box">'+innerHTML+'</div></div></div>';
+            },
+        };
+
         const app = {
             charts: { scatter: null, doughnut: null },
 
@@ -1167,6 +1517,7 @@
                 deckStore.load(); cardStore.load(); pomodoroStore.load(); blurtStore.load(); eisenhowerStore.load(); todoStore.load(); mcqStore.load(); recalStore.load(); babelStore.load(); yetStore.load(); examStore.load(); learningStore.load();
                 state.burnedCount = parseInt(localStorage.getItem('sg_burned') || '0', 10);
                 rankEngine.load(); rankEngine.trackActiveDay(); rankEngine.updateNavRank();
+                badgeEngine.load(); badgeEngine.checkOnLoad(); SysInterrupt.init();
 
                 const djTodoText = 'Complete the Diagnostics Journey';
                 if (!state.missionTodos.some(t => t.text === djTodoText)) {
@@ -1425,7 +1776,9 @@
             deckCreate: () => {
                 const el = document.getElementById('new-deck-title');
                 if (!el || !el.value.trim()) return;
-                deckStore.add(el.value.trim()); app.render();
+                deckStore.add(el.value.trim());
+                badgeEngine.afterDeckCreate();
+                app.render();
             },
             deckDelete: (id) => { if (confirm('Delete this deck and all its cards?')) { deckStore.remove(id); state.fcCurrentDeck = null; app.render(); } },
             deckOpen: (id) => { state.fcCurrentDeck = id; state.fcFlipped = false; app.render(); },
@@ -3104,6 +3457,11 @@
                             <div class="text-center p-4 bg-stone-50 dark:bg-stone-800 rounded-2xl"><div class="text-2xl font-serif font-bold text-orange-600">${state.rankEvidence.diagnosticsCompleted || 0}</div><div class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mt-1">Diagnostics</div></div>
                             <div class="text-center p-4 bg-purple-50 dark:bg-purple-900/20 rounded-2xl"><div class="text-2xl font-serif font-bold text-purple-600">${state.yetMoments.length}</div><div class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mt-1">YET Moments</div></div>
                         </div>
+                    </div>
+                    <div class="bg-black border border-[#39FF14]/20 rounded-[2.5rem] p-10 shadow-sm">
+                        <h3 class="text-lg font-bold mb-1 tracking-widest uppercase" style="color:#39FF14;font-family:'Share Tech Mono',monospace;">⬡ Clearance Badges</h3>
+                        <p class="text-sm mb-5" style="color:#555;">Achievements earned through actions in the Mainframe. Each badge is proof of what you have done.</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${badgeEngine.getBadgeHTML()}</div>
                     </div>
                     <div class="bg-white dark:bg-[#292524] rounded-[2.5rem] p-10 border border-stone-100 dark:border-stone-800 shadow-sm">
                         <h3 class="text-lg font-serif font-bold mb-2">👫 Study Buddy</h3>
