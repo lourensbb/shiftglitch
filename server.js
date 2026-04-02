@@ -476,7 +476,7 @@ app.post('/api/paypal-checkout', requireAuth, checkoutLimiter, async (req, res) 
   }
 });
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== 'production' && !process.env.PAYFAST_MERCHANT_ID) {
   app.post('/api/dev/set-tier', requireAuth, async (req, res) => {
     const { tier } = req.body;
     if (!['free', 'pro'].includes(tier)) return res.status(400).json({ error: 'tier must be "free" or "pro"' });
@@ -639,7 +639,7 @@ app.post('/api/squad/leave', requireAuth, async (req, res) => {
   }
 });
 
-app.get('/api/squad', requireAuth, async (req, res) => {
+app.get('/api/squad', requireAuth, requirePro, async (req, res) => {
   try {
     const squad = await getUserSquad(req.session.userId);
     if (!squad) return res.json({ squad: null });
@@ -674,7 +674,7 @@ app.get('/api/squad', requireAuth, async (req, res) => {
   }
 });
 
-app.post('/api/squad/ping', requireAuth, async (req, res) => {
+app.post('/api/squad/ping', requireAuth, requirePro, async (req, res) => {
   try {
     await updateSquadLastActive(req.session.userId);
     res.json({ ok: true });
