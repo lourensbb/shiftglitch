@@ -621,6 +621,12 @@ async function completeEscapeRun(userId, runId) {
   );
   if (!cur.length) return null;
   const run = cur[0];
+  // All 6 exploits must be completed (no corrupted/incomplete)
+  if (!run.exploit_1 || !run.exploit_2 || !run.exploit_3 || !run.exploit_4 || !run.exploit_5 || !run.exploit_6) {
+    const err = new Error('NOT_ALL_EXPLOITS_COMPLETE');
+    err.code = 'NOT_ALL_EXPLOITS_COMPLETE';
+    throw err;
+  }
   const archived = run.debrief_archived || [];
   if (run.debrief_text) {
     archived.push({ runNumber: run.run_number, text: run.debrief_text, completedAt: new Date().toISOString() });

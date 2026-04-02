@@ -625,6 +625,9 @@ app.post('/api/escape-runs/:id/complete', requireAuth, async (req, res) => {
     if (!run) return res.status(404).json({ error: 'Run not found' });
     res.json({ run });
   } catch (err) {
+    if (err.code === 'NOT_ALL_EXPLOITS_COMPLETE') {
+      return res.status(400).json({ error: 'All 6 exploits must be completed before claiming Domain Clearance.' });
+    }
     console.error('/api/escape-runs/complete error:', err);
     res.status(500).json({ error: 'Failed to complete escape run' });
   }

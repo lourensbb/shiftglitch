@@ -1771,7 +1771,11 @@
                     const res = await fetch('/api/escape-runs/' + id + '/complete', {
                         method: 'POST', credentials: 'same-origin'
                     });
-                    if (!res.ok) return;
+                    if (!res.ok) {
+                        const errData = await res.json().catch(() => ({}));
+                        app.showNotification(errData.error || 'Cannot complete run — ensure all exploits are done.');
+                        return;
+                    }
                     const data = await res.json();
                     const idx = this.runs.findIndex(r => r.id === id);
                     if (idx >= 0) this.runs[idx] = data.run;
@@ -1815,29 +1819,37 @@
                 const done = run[exploitKey];
                 const corrupted = this._isCorrupted(run, exploitKey);
                 const prevDone = this._prevDone(run, exploitKey);
-                if (corrupted && done) return 'corrupted';
+                if (corrupted && !done) return 'corrupted';
                 if (done && !corrupted) return 'done';
+                if (done && corrupted) return 'done';
                 if (!prevDone) return 'locked';
                 return 'active';
+            },
+
+            _clearRollbackFlag(run, exploitKey) {
+                const idx = ESCAPE_EXPLOITS.findIndex(e => e.key === exploitKey);
+                return run.rollback_flags & ~(1 << idx);
             },
 
             onBlurtComplete(wordCount) {
                 const activeRuns = this.runs.filter(r => !this._allExploitsDone(r));
                 activeRuns.forEach(run => {
                     if (!run.exploit_1) return;
-                    if (!run.exploit_2) {
-                        const patch = { exploit_2: true };
-                        if (wordCount >= 200) {
-                            const newFlags = run.shortcut_flags | (1 << 1);
-                            patch.shortcut_flags = newFlags;
-                        }
-                        this.updateRun(run.id, patch).then(updated => {
-                            if (updated && wordCount >= 200) {
-                                setTimeout(() => SysInterrupt.show('shortcut-signal', { domain: run.domain_name, exploit: 'INTEGRITY CHECK' }), 800);
-                            }
-                        });
-                        app.showNotification('INTEGRITY CHECK marked complete on run: ' + run.domain_name);
+                    const status2 = this._getStatus(run, 'exploit_2');
+                    if (status2 === 'done') return;
+                    const patch = { exploit_2: true };
+                    if (this._isCorrupted(run, 'exploit_2')) {
+                        patch.rollback_flags = this._clearRollbackFlag(run, 'exploit_2');
                     }
+                    if (wordCount >= 200) {
+                        patch.shortcut_flags = run.shortcut_flags | (1 << 1);
+                    }
+                    this.updateRun(run.id, patch).then(updated => {
+                        if (updated && wordCount >= 200) {
+                            setTimeout(() => SysInterrupt.show('shortcut-signal', { domain: run.domain_name, exploit: 'INTEGRITY CHECK' }), 800);
+                        }
+                    });
+                    app.showNotification('INTEGRITY CHECK marked complete on run: ' + run.domain_name);
                 });
             },
 
@@ -1846,20 +1858,23 @@
                 const activeRuns = this.runs.filter(r => !this._allExploitsDone(r));
                 activeRuns.forEach(run => {
                     if (!run.exploit_3) return;
-                    if (!run.exploit_4) {
-                        const patch = { exploit_4: true };
-                        if (pct >= 90) patch.shortcut_flags = run.shortcut_flags | (1 << 3);
-                        this.updateRun(run.id, patch).then(updated => {
-                            if (updated && pct >= 90) {
-                                setTimeout(() => SysInterrupt.show('shortcut-signal', { domain: run.domain_name, exploit: 'PATTERN RECOGNITION' }), 800);
-                                if ((state.rankEvidence.rollbackPenalty || 0) > 0) {
-                                    state.rankEvidence.rollbackPenalty--;
-                                    rankEngine.save();
-                                }
-                            }
-                        });
-                        app.showNotification('PATTERN RECOGNITION marked complete on run: ' + run.domain_name);
+                    const status4 = this._getStatus(run, 'exploit_4');
+                    if (status4 === 'done') return;
+                    const patch = { exploit_4: true };
+                    if (this._isCorrupted(run, 'exploit_4')) {
+                        patch.rollback_flags = this._clearRollbackFlag(run, 'exploit_4');
                     }
+                    if (pct >= 90) patch.shortcut_flags = run.shortcut_flags | (1 << 3);
+                    this.updateRun(run.id, patch).then(updated => {
+                        if (updated && pct >= 90) {
+                            setTimeout(() => SysInterrupt.show('shortcut-signal', { domain: run.domain_name, exploit: 'PATTERN RECOGNITION' }), 800);
+                            if ((state.rankEvidence.rollbackPenalty || 0) > 0) {
+                                state.rankEvidence.rollbackPenalty--;
+                                rankEngine.save();
+                            }
+                        }
+                    });
+                    app.showNotification('PATTERN RECOGNITION marked complete on run: ' + run.domain_name);
                 });
             },
 
@@ -1871,8 +1886,14 @@
                 if (pct < 80) return;
                 const activeRuns = this.runs.filter(r => !this._allExploitsDone(r));
                 activeRuns.forEach(run => {
-                    if (!run.exploit_2 || run.exploit_3) return;
-                    this.updateRun(run.id, { exploit_3: true });
+                    if (!run.exploit_2) return;
+                    const status3 = this._getStatus(run, 'exploit_3');
+                    if (status3 === 'done') return;
+                    const patch = { exploit_3: true };
+                    if (this._isCorrupted(run, 'exploit_3')) {
+                        patch.rollback_flags = this._clearRollbackFlag(run, 'exploit_3');
+                    }
+                    this.updateRun(run.id, patch);
                     app.showNotification('SHARD REINFORCEMENT complete on run: ' + run.domain_name);
                 });
             },
@@ -1889,7 +1910,12 @@
                     app.showNotification('You need a deck with 10+ Data Shards first. Go to Data Shards.');
                     return;
                 }
-                this.updateRun(runId, { exploit_1: true });
+                const patch = { exploit_1: true };
+                const curRun = this.runs.find(r => r.id === runId);
+                if (curRun && this._isCorrupted(curRun, 'exploit_1')) {
+                    patch.rollback_flags = this._clearRollbackFlag(curRun, 'exploit_1');
+                }
+                this.updateRun(runId, patch);
             },
 
             saveNodes(runId) {
@@ -1898,7 +1924,12 @@
                 const inputs = container.querySelectorAll('.er-node-input');
                 const nodes = Array.from(inputs).map(i => i.value.trim()).filter(Boolean);
                 if (nodes.length < 5) { app.showNotification('Add at least 5 nodes to complete Neural Mapping.'); return; }
-                this.updateRun(runId, { nodes, exploit_5: true });
+                const run = this.runs.find(r => r.id === runId);
+                const patch = { nodes, exploit_5: true };
+                if (run && this._isCorrupted(run, 'exploit_5')) {
+                    patch.rollback_flags = this._clearRollbackFlag(run, 'exploit_5');
+                }
+                this.updateRun(runId, patch);
             },
 
             saveDebrief(runId) {
@@ -1907,7 +1938,12 @@
                 const text = ta.value.trim();
                 const words = text.split(/\s+/).filter(Boolean).length;
                 if (words < 50) { app.showNotification('After Action Report must be 50+ words (' + words + ' written).'); return; }
-                this.updateRun(runId, { debrief_text: text, exploit_6: true });
+                const run6 = this.runs.find(r => r.id === runId);
+                const patch6 = { debrief_text: text, exploit_6: true };
+                if (run6 && this._isCorrupted(run6, 'exploit_6')) {
+                    patch6.rollback_flags = this._clearRollbackFlag(run6, 'exploit_6');
+                }
+                this.updateRun(runId, patch6);
             },
 
             _checkDomainStaleness() {
@@ -2343,6 +2379,7 @@
                 state.fcFlipped = false;
                 if (state.fcStudyIndex >= state.fcStudyQueue.length) {
                     app.showNotification('Study session complete!');
+                    escapeRunEngine.onDeckStudyComplete(card.deckId);
                     state.view = 'decks'; state.fcCurrentDeck = card.deckId;
                 }
                 app.render();
