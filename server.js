@@ -20,9 +20,9 @@ async function requirePro(req, res, next) {
 }
 
 async function sendWelcomeEmail(gamertag, email) {
-  const key = process.env.RESEND_API_KEY;
+  const key = process.env.RESEND_SG_KEY || process.env.RESEND_API_KEY;
   if (!key) {
-    console.warn('[email] RESEND_API_KEY is not set — welcome email skipped for:', email);
+    console.warn('[email] No Resend key set (RESEND_SG_KEY or RESEND_API_KEY) — welcome email skipped for:', email);
     return;
   }
   const html = `
