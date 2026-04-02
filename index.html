@@ -1249,7 +1249,7 @@
                 if (ev.pomodorosCompleted === 1) this._tryUnlock('first-exploit');
                 if (streak >= 7 && !this.isUnlocked('streak-7')) this._tryUnlock('streak-7');
                 else if (streak >= 3 && !this.isUnlocked('streak-3')) this._tryUnlock('streak-3');
-                if (streak === 3 || streak === 7) setTimeout(() => SysInterrupt.show('streak-signal', { streak }), 1200);
+                if (streak === 3 || streak === 7 || streak === 14) setTimeout(() => SysInterrupt.show('streak-signal', { streak }), 1200);
                 if (localStorage.getItem('sg_rollback_recovery_needed')) {
                     localStorage.removeItem('sg_rollback_recovery_needed');
                     if (!this.isUnlocked('survived-rollback')) {
@@ -1322,12 +1322,13 @@
                     }
                 }
                 if (!sessionStorage.getItem('sg_warden_session')) {
+                    const wardenDelay = (5 + Math.random() * 10) * 60 * 1000;
                     setTimeout(() => {
                         if (!sessionStorage.getItem('sg_warden_session')) {
                             sessionStorage.setItem('sg_warden_session', '1');
                             this.show('warden', {});
                         }
-                    }, 5 * 60 * 1000);
+                    }, wardenDelay);
                 }
             },
             _checkScheduler() {
@@ -1346,7 +1347,6 @@
                         const daysSince = Math.round((new Date(today) - new Date(sorted[0])) / 86400000);
                         if (daysSince >= 3) {
                             this._loadDone = true;
-                            if (!badgeEngine.isUnlocked('survived-rollback')) badgeEngine.unlock('survived-rollback');
                             setTimeout(() => this.show('coherence-failure', { days: daysSince }), 2000);
                             return true;
                         }
@@ -1388,6 +1388,9 @@
                 requestAnimationFrame(() => requestAnimationFrame(() => {
                     overlay.classList.add('si-visible');
                     if (type === 'recall-sprint') {
+                        const deckTitles = (state.fcDecks || []).map(d => d.title).filter(Boolean);
+                        const topic = payload.deckTitle || (deckTitles.length > 0 ? deckTitles[Math.floor(Math.random()*deckTitles.length)] : null);
+                        window['_si_'+id+'_topic'] = topic;
                         setTimeout(() => this.launchRecallSprint(id), 600);
                     } else if (type === 'pattern-lock') {
                         const colors = ['#FF4444','#39FF14','#4488FF','#FF00FF'];
@@ -1477,11 +1480,16 @@
                     '<button onclick="SysInterrupt.dismiss(\''+id+'\')" style="background:#FF8800;color:#000;border:none;padding:10px 28px;font-family:inherit;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-weight:bold;border-radius:4px;">JACK OUT</button></div>';
             },
             _recallSprintHTML(id) {
+                const topic = window['_si_'+id+'_topic'];
+                const topicLine = topic
+                    ? '<p style="color:#FF8800;font-size:12px;letter-spacing:1px;margin-bottom:4px;text-transform:uppercase;">TOPIC: <strong>'+topic+'</strong></p>'
+                    : '';
+                const placeholder = topic ? 'Everything you know about ' + topic + ' — go...' : 'Start typing — no looking back...';
                 return '<div class="si-header" style="border-color:#FF8800"><span style="color:#FF8800;font-size:18px;">⏱</span><span style="color:#FF8800;font-size:13px;letter-spacing:2px;margin-left:6px;">RECALL SPRINT — ACTIVE</span>' +
                     '<span id="'+id+'-timer" style="margin-left:auto;color:#fff;font-size:18px;font-weight:bold;">60</span></div>' +
                     '<div style="height:3px;background:#111;"><div id="'+id+'-bar" style="height:100%;background:#FF8800;width:100%;transition:width 1s linear;"></div></div>' +
-                    '<div class="si-body"><p style="color:#777;font-size:12px;letter-spacing:1px;margin-bottom:12px;">DUMP EVERYTHING you know about your current topic. No notes. Pure recall. Go.</p>' +
-                    '<textarea id="'+id+'-text" placeholder="Start typing — no looking back..." style="width:100%;height:140px;background:#0a0a0a;border:1px solid #333;color:#eee;padding:12px;font-family:inherit;font-size:13px;resize:none;outline:none;border-radius:4px;box-sizing:border-box;"></textarea>' +
+                    '<div class="si-body">'+topicLine+'<p style="color:#777;font-size:12px;letter-spacing:1px;margin-bottom:12px;">DUMP EVERYTHING you know. No notes. Pure recall. 60 seconds. Go.</p>' +
+                    '<textarea id="'+id+'-text" placeholder="'+placeholder+'" style="width:100%;height:140px;background:#0a0a0a;border:1px solid #333;color:#eee;padding:12px;font-family:inherit;font-size:13px;resize:none;outline:none;border-radius:4px;box-sizing:border-box;"></textarea>' +
                     '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;"><span id="'+id+'-wc" style="color:#444;font-size:11px;letter-spacing:1px;">0 words</span>' +
                     '<button onclick="SysInterrupt.submitRecallSprint(\''+id+'\')" style="background:#FF8800;color:#000;border:none;padding:8px 20px;font-family:inherit;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-weight:bold;">SUBMIT</button></div></div>';
             },
@@ -1549,10 +1557,10 @@
                 if (type === 'system-rollback') {
                     color='#FF0000'; glow='rgba(255,0,0,0.3)';
                     innerHTML = '<div class="si-header" style="border-color:'+color+'"><span style="color:'+color+';font-size:20px;">⛔</span><span style="color:'+color+';font-size:13px;letter-spacing:2px;margin-left:8px;">SYSTEM ROLLBACK INITIATED</span></div>' +
-                        '<div class="si-body"><div style="color:'+color+';font-size:11px;letter-spacing:2px;margin-bottom:14px;">// CRITICAL — '+payload.days+' DAY DISCONNECT LOGGED</div>' +
-                        '<p style="color:#ccc;font-size:14px;line-height:1.8;margin-bottom:14px;">The Mainframe has initiated a <strong style="color:'+color+';">forced rollback</strong>. A '+payload.days+'-day disconnect has caused critical neural decay.</p>' +
-                        '<p style="color:#666;font-size:12px;line-height:1.8;margin-bottom:14px;">Your last clearance point is at risk. You must re-earn it through active sessions before the system purges it from your record.</p>' +
-                        '<div style="background:#1a0000;border:1px solid '+color+';padding:14px;border-radius:4px;margin-bottom:4px;"><div style="color:'+color+';font-size:10px;letter-spacing:2px;margin-bottom:6px;">RECOVERY PROTOCOL</div><p style="color:#aaa;font-size:12px;line-height:1.7;margin:0;">Run three consecutive sessions within the next 72 hours to stabilise your clearance. No shortcuts. No exceptions.</p></div></div>' +
+                        '<div class="si-body"><div style="color:'+color+';font-size:11px;letter-spacing:2px;margin-bottom:14px;">// CRITICAL — WARDEN-INITIATED ROLLBACK LOGGED</div>' +
+                        '<p style="color:#ccc;font-size:14px;line-height:1.8;margin-bottom:14px;">The Warden has initiated a <strong style="color:'+color+';">forced rollback</strong>. One clearance point has been stripped from your record.</p>' +
+                        '<p style="color:#666;font-size:12px;line-height:1.8;margin-bottom:14px;">The Mainframe does not tolerate stagnation. You must re-complete one exploit before your progress is restored.</p>' +
+                        '<div style="background:#1a0000;border:1px solid '+color+';padding:14px;border-radius:4px;margin-bottom:4px;"><div style="color:'+color+';font-size:10px;letter-spacing:2px;margin-bottom:6px;">RECOVERY PROTOCOL</div><p style="color:#aaa;font-size:12px;line-height:1.7;margin:0;">Complete one Focus Session or Recall Sprint to re-earn your clearance point. No shortcuts. No exceptions.</p></div></div>' +
                         '<div class="si-footer" style="justify-content:center;"><button onclick="SysInterrupt.acknowledgeRollback(\''+id+'\')" style="background:'+color+';color:#fff;border:none;padding:12px 36px;font-family:inherit;font-size:11px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;font-weight:bold;border-radius:4px;width:100%;">ACKNOWLEDGE ROLLBACK</button></div>';
                 } else if (type === 'memory-degradation') {
                     color='#FF8800'; glow='rgba(255,136,0,0.2)';
@@ -1603,7 +1611,7 @@
                     innerHTML = '<div class="si-header" style="border-color:'+color+'"><span style="color:'+color+';font-size:18px;">🔥</span><span style="color:'+color+';font-size:13px;letter-spacing:2px;margin-left:8px;">STREAK SIGNAL DETECTED</span></div>' +
                         '<div class="si-body" style="text-align:center;"><div style="font-size:60px;font-weight:bold;color:'+color+';line-height:1;">'+payload.streak+'</div>' +
                         '<div style="color:#555;font-size:11px;letter-spacing:3px;margin:6px 0 20px;">DAY STREAK</div>' +
-                        '<p style="color:#aaa;font-size:13px;line-height:1.8;">'+(payload.streak>=7?'Seven consecutive sessions. The Mainframe is taking notice.':'Three sessions in a row. Consistency is how NPCs become Glitch Techs.')+'</p></div>' +
+                        '<p style="color:#aaa;font-size:13px;line-height:1.8;">'+(payload.streak>=14?'Fourteen sessions without breaking. The Mainframe does not know what to do with you.':payload.streak>=7?'Seven consecutive sessions. The Mainframe is taking notice.':'Three sessions in a row. Consistency is how NPCs become Glitch Techs.')+'</p></div>' +
                         '<div class="si-footer"><button onclick="SysInterrupt.dismiss(\''+id+'\')" style="background:'+color+';color:#000;border:none;padding:10px 36px;font-family:inherit;font-size:11px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;font-weight:bold;border-radius:4px;">ACKNOWLEDGED</button></div>';
                 } else if (type === 'achievement') {
                     const bdg = badgeEngine.DEFS[payload.badgeId] || {icon:'⚡',name:'ACHIEVEMENT',desc:'Unlocked'};
