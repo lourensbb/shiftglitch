@@ -55,7 +55,7 @@ async function sendWelcomeEmail(gamertag, email) {
             <tr>
               <td style="padding:20px 40px;border-top:1px solid rgba(57,255,20,0.06);">
                 <div style="font-family:'Courier New',monospace;font-size:9px;color:#1a1a1a;letter-spacing:1px;">
-                  SHIFTGLITCH SYSTEMS — THE STUDY OS FOR UK STUDENTS<br>
+                  SHIFTGLITCH SYSTEMS — THE STUDY OS FOR STUDENTS<br>
                   shiftglitch.replit.app — &copy; 2026 Lourens Breytenbach
                 </div>
               </td>
