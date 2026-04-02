@@ -71,7 +71,7 @@ async function sendWelcomeEmail(gamertag, email) {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        from: 'ShiftGlitch <access@shiftglitch.app>',
+        from: 'ShiftGlitch <onboarding@resend.dev>',
         to: [email],
         subject: '[ ACCESS REQUESTED ] — ShiftGlitch Mainframe',
         html
