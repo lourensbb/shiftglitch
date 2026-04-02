@@ -459,22 +459,55 @@
                     <li><span class="check">✓</span> Export all data (JSON)</li>
                 </ul>
                 <div class="pack-grid" aria-label="Choose a Pro pack">
-                    <button class="pack-btn" aria-label="Buy 1 month for R99" onclick="startPayfast('1m')">
-                        <span class="pack-label">1 Month</span>
-                        <span class="pack-price">R99</span>
-                        <span class="pack-sub">30 days Pro</span>
-                    </button>
-                    <button class="pack-btn pack-featured" aria-label="Buy 3 months for R249" onclick="startPayfast('3m')">
-                        <span class="pack-badge">BEST VALUE</span>
-                        <span class="pack-label">3 Months</span>
-                        <span class="pack-price">R249</span>
-                        <span class="pack-sub">90 days Pro</span>
-                    </button>
-                    <button class="pack-btn" aria-label="Buy 12 months for R799" onclick="startPayfast('12m')">
-                        <span class="pack-label">12 Months</span>
-                        <span class="pack-price">R799</span>
-                        <span class="pack-sub">365 days Pro</span>
-                    </button>
+                    <form name="pf_1m" action="https://payment.payfast.io/eng/process" method="post" onsubmit="return checkAuth(event)">
+                        <input type="hidden" name="cmd" value="_paynow">
+                        <input type="hidden" name="receiver" value="10010820">
+                        <input type="hidden" name="return_url" value="https://shiftglitch.replit.app/pricing?success=1&provider=payfast&pack=1m">
+                        <input type="hidden" name="cancel_url" value="https://shiftglitch.replit.app/pricing?cancelled=1">
+                        <input type="hidden" name="notify_url" value="https://shiftglitch.replit.app/api/payfast-itn">
+                        <input type="hidden" name="amount" value="99.00">
+                        <input type="hidden" name="item_name" value="Netrunner Pro 1 Month">
+                        <input type="hidden" name="item_description" value="ShiftGlitch Pro access for 30 days">
+                        <input type="hidden" name="custom_str1" value="">
+                        <button type="submit" class="pack-btn" aria-label="Buy 1 month for R99">
+                            <span class="pack-label">1 Month</span>
+                            <span class="pack-price">R99</span>
+                            <span class="pack-sub">30 days Pro</span>
+                        </button>
+                    </form>
+                    <form name="pf_3m" action="https://payment.payfast.io/eng/process" method="post" onsubmit="return checkAuth(event)">
+                        <input type="hidden" name="cmd" value="_paynow">
+                        <input type="hidden" name="receiver" value="10010820">
+                        <input type="hidden" name="return_url" value="https://shiftglitch.replit.app/pricing?success=1&provider=payfast&pack=3m">
+                        <input type="hidden" name="cancel_url" value="https://shiftglitch.replit.app/pricing?cancelled=1">
+                        <input type="hidden" name="notify_url" value="https://shiftglitch.replit.app/api/payfast-itn">
+                        <input type="hidden" name="amount" value="249.00">
+                        <input type="hidden" name="item_name" value="Netrunner Pro 3 Months">
+                        <input type="hidden" name="item_description" value="ShiftGlitch Pro access for 90 days">
+                        <input type="hidden" name="custom_str1" value="">
+                        <button type="submit" class="pack-btn pack-featured" aria-label="Buy 3 months for R249">
+                            <span class="pack-badge">BEST VALUE</span>
+                            <span class="pack-label">3 Months</span>
+                            <span class="pack-price">R249</span>
+                            <span class="pack-sub">90 days Pro</span>
+                        </button>
+                    </form>
+                    <form name="pf_12m" action="https://payment.payfast.io/eng/process" method="post" onsubmit="return checkAuth(event)">
+                        <input type="hidden" name="cmd" value="_paynow">
+                        <input type="hidden" name="receiver" value="10010820">
+                        <input type="hidden" name="return_url" value="https://shiftglitch.replit.app/pricing?success=1&provider=payfast&pack=12m">
+                        <input type="hidden" name="cancel_url" value="https://shiftglitch.replit.app/pricing?cancelled=1">
+                        <input type="hidden" name="notify_url" value="https://shiftglitch.replit.app/api/payfast-itn">
+                        <input type="hidden" name="amount" value="799.00">
+                        <input type="hidden" name="item_name" value="Netrunner Pro 12 Months">
+                        <input type="hidden" name="item_description" value="ShiftGlitch Pro access for 365 days">
+                        <input type="hidden" name="custom_str1" value="">
+                        <button type="submit" class="pack-btn" aria-label="Buy 12 months for R799">
+                            <span class="pack-label">12 Months</span>
+                            <span class="pack-price">R799</span>
+                            <span class="pack-sub">365 days Pro</span>
+                        </button>
+                    </form>
                 </div>
                 <p class="pack-note">Paid via PayFast · ZAR · South Africa</p>
             </div>
@@ -574,6 +607,7 @@
             display: grid; grid-template-columns: repeat(3, 1fr);
             gap: 0.6rem; margin-top: 0.25rem;
         }
+        .pack-grid form { display: contents; }
         .pack-btn {
             position: relative;
             display: flex; flex-direction: column; align-items: center;
@@ -653,46 +687,34 @@
             toastTimer = setTimeout(() => el.classList.remove('visible'), duration);
         }
 
-        function setPackBtnsDisabled(state) {
-            document.querySelectorAll('.pack-btn').forEach(b => b.disabled = state);
+        let currentUserId = null;
+
+        async function loadUserId() {
+            try {
+                const res = await fetch('/api/me', { credentials: 'same-origin' });
+                if (res.ok) {
+                    const data = await res.json();
+                    currentUserId = data.id || data.userId || null;
+                    if (currentUserId) {
+                        document.querySelectorAll('input[name="custom_str1"]').forEach(el => {
+                            el.value = currentUserId;
+                        });
+                    }
+                }
+            } catch (e) {}
         }
 
-        async function startPayfast(pack) {
-            setPackBtnsDisabled(true);
-            try {
-                const res = await fetch('/api/payfast-checkout', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'same-origin',
-                    body: JSON.stringify({ pack })
-                });
-                if (res.status === 401) {
-                    showToast('// jack in first — login required to purchase', 'info', 5000);
-                    setTimeout(() => window.location.href = '/login', 1800);
-                    setPackBtnsDisabled(false);
-                    return;
-                }
-                const data = await res.json();
-                if (!res.ok) {
-                    showToast('// ' + (data.error || 'PayFast error — try again'), 'error');
-                    setPackBtnsDisabled(false);
-                    return;
-                }
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = data.action;
-                Object.entries(data.fields).forEach(([k, v]) => {
-                    const input = document.createElement('input');
-                    input.type = 'hidden'; input.name = k; input.value = v;
-                    form.appendChild(input);
-                });
-                document.body.appendChild(form);
-                form.submit();
-            } catch (e) {
-                showToast('// network error — check connection', 'error');
-                setPackBtnsDisabled(false);
+        function checkAuth(event) {
+            if (!currentUserId) {
+                event.preventDefault();
+                showToast('// jack in first — login required to purchase', 'info', 5000);
+                setTimeout(() => window.location.href = '/login', 1800);
+                return false;
             }
+            return true;
         }
+
+        loadUserId();
 
         (function handleUrlParams() {
             const params = new URLSearchParams(window.location.search);

@@ -153,19 +153,8 @@ app.get('/api/health', (req, res) => {
 app.post('/api/payfast-itn', express.urlencoded({ extended: false }), async (req, res) => {
   try {
     const data = req.body;
-    if (!data || !data.m_payment_id) {
-      console.warn('[payfast-itn] Missing m_payment_id');
-      return res.status(400).end();
-    }
-    const expectedMerchantId = process.env.PAYFAST_MERCHANT_ID;
-    if (!expectedMerchantId) {
-      console.warn('[payfast-itn] PAYFAST_MERCHANT_ID not set — ignoring ITN');
-      return res.status(200).end();
-    }
-    if (String(data.merchant_id) !== String(expectedMerchantId)) {
-      console.warn(`[payfast-itn] Merchant ID mismatch: got ${data.merchant_id}`);
-      return res.status(400).end();
-    }
+    console.log('[payfast-itn] Received:', JSON.stringify(data));
+
     const pfHost = PAYFAST_HOST;
     const validationRes = await fetch(`https://${pfHost}/eng/query/validate`, {
       method: 'POST',
@@ -177,29 +166,34 @@ app.post('/api/payfast-itn', express.urlencoded({ extended: false }), async (req
       console.warn('[payfast-itn] PayFast validation returned:', validation);
       return res.status(400).end();
     }
+
     if (data.payment_status !== 'COMPLETE') {
       console.log('[payfast-itn] Non-COMPLETE status, ignoring:', data.payment_status);
       return res.status(200).end();
     }
-    const userId = data.m_payment_id.split('_')[0];
+
+    const userId = (data.custom_str1 || '').trim() || (data.m_payment_id || '').split('_')[0];
     if (!userId) {
-      console.warn('[payfast-itn] Could not parse userId from m_payment_id:', data.m_payment_id);
+      console.warn('[payfast-itn] Could not identify user — no custom_str1 or m_payment_id');
       return res.status(400).end();
     }
+
     const grossAmount = parseFloat(data.amount_gross || '0');
     const matchedPack = Object.values(PAYFAST_PACKS).find(p => Math.abs(parseFloat(p.amount) - grossAmount) < 1.0);
     if (!matchedPack) {
       console.warn(`[payfast-itn] Unrecognised amount R${grossAmount} — no matching pack`);
       return res.status(400).end();
     }
+
     const itemName = data.item_name || '';
     if (!itemName.toLowerCase().includes('netrunner pro')) {
       console.warn(`[payfast-itn] Unexpected item_name: "${itemName}" — ignoring`);
       return res.status(400).end();
     }
+
     const expiresAt = new Date(Date.now() + matchedPack.days * 24 * 60 * 60 * 1000);
-    await updateMembershipTier(userId, 'pro', `payfast_${data.pf_payment_id || data.m_payment_id}`, expiresAt);
-    console.log(`[payfast-itn] User ${userId} upgraded to pro for ${matchedPack.days} days (R${grossAmount}, "${itemName}") — expires ${expiresAt.toISOString().slice(0,10)}`);
+    await updateMembershipTier(userId, 'pro', `payfast_${data.pf_payment_id || data.m_payment_id || Date.now()}`, expiresAt);
+    console.log(`[payfast-itn] User ${userId} upgraded to pro for ${matchedPack.days} days (R${grossAmount}) — expires ${expiresAt.toISOString().slice(0,10)}`);
     return res.status(200).end();
   } catch (err) {
     console.error('[payfast-itn] Error:', err.message);

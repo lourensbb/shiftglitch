@@ -76,9 +76,16 @@ An Express.js v5 server manages authentication, session handling, static file se
 - Gemini API (gemini-2.0-flash)
 - Open Trivia Database
 - Google Fonts
-- PayFast (ZAR subscriptions, South Africa)
-- PayPal (USD subscriptions, international)
+- PayFast (ZAR one-time packs, South Africa) — receiver 10010820
 - Resend (transactional email)
+
+## Payment Model
+Three one-time purchase packs (no subscriptions, no auto-renewal):
+- 1 Month — R99 / 30 days Pro
+- 3 Months — R249 / 90 days Pro
+- 12 Months — R799 / 365 days Pro
+
+PayFast "Pay Now" forms post directly to `https://payment.payfast.io/eng/process`. The logged-in user's ID is injected into `custom_str1` by client-side JS before submission. The ITN handler at `/api/payfast-itn` reads `custom_str1` to identify which user to upgrade and sets `pro_expires_at` in the DB.
 
 ## Environment Variables (Replit Secrets)
 
@@ -87,21 +94,13 @@ An Express.js v5 server manages authentication, session handling, static file se
 | `RESEND_API_KEY` | Yes | Resend API key for welcome emails |
 | `RESEND_FROM_ADDRESS` | No | Sender address, e.g. `ShiftGlitch <admin@shiftglitch.com>` |
 | `GEMINI_API_KEY` | No | Server-side Gemini API key (users can also BYOK) |
-| `PAYFAST_MERCHANT_ID` | For PayFast | From PayFast merchant dashboard |
-| `PAYFAST_MERCHANT_KEY` | For PayFast | From PayFast merchant dashboard |
-| `PAYFAST_PASSPHRASE` | Required in prod | PayFast security passphrase (checkout blocked if missing in production) |
-| `PAYFAST_SANDBOX` | No | Set `true` for PayFast sandbox testing |
-| `PAYFAST_MONTHLY_ZAR` | No | Monthly Pro price in ZAR (default: `179.99`) |
-| `PAYFAST_ANNUAL_ZAR` | No | Annual Pro price in ZAR (default: `1349.99`) |
-| `PAYPAL_CLIENT_ID` | For PayPal | From PayPal developer dashboard |
-| `PAYPAL_CLIENT_SECRET` | For PayPal | From PayPal developer dashboard |
-| `PAYPAL_WEBHOOK_ID` | For PayPal | Webhook ID from PayPal dashboard (required for signature verification) |
-| `PAYPAL_MONTHLY_PLAN_ID` | For PayPal | Monthly subscription plan ID from PayPal dashboard |
-| `PAYPAL_ANNUAL_PLAN_ID` | For PayPal | Annual subscription plan ID from PayPal dashboard |
-| `PAYPAL_SANDBOX` | No | Set `false` for live PayPal (default is sandbox) |
+| `PAYFAST_MERCHANT_ID` | Yes | From PayFast merchant dashboard (used by server for reference) |
+| `PAYFAST_MERCHANT_KEY` | Yes | From PayFast merchant dashboard |
+| `PAYFAST_PASSPHRASE` | Yes | PayFast Salt Passphrase from Account Info tab |
+| `PAYFAST_SANDBOX` | No | Set `true` to point ITN validation at sandbox.payfast.co.za |
 
 ## Payment Webhook Setup
 
-**PayFast:** Set notify URL to `https://<your-domain>/api/payfast-itn`
-
-**PayPal:** Add webhook for `https://<your-domain>/api/paypal-webhook` in the PayPal developer dashboard. Subscribe to: `BILLING.SUBSCRIPTION.ACTIVATED`, `BILLING.SUBSCRIPTION.CANCELLED`, `BILLING.SUBSCRIPTION.EXPIRED`, `BILLING.SUBSCRIPTION.SUSPENDED`, `PAYMENT.SALE.REFUNDED`. Copy the Webhook ID into `PAYPAL_WEBHOOK_ID`.
+**PayFast ITN:** `https://shiftglitch.replit.app/api/payfast-itn`
+- Validates with PayFast's `/eng/query/validate` endpoint
+- Reads `custom_str1` for user ID, matches amount to pack, sets `pro_expires_at`
