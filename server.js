@@ -33,48 +33,48 @@ async function sendWelcomeEmail(gamertag, email) {
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Access Requested — ShiftGlitch</title>
     </head>
-    <body style="margin:0;padding:0;background:#050505;font-family:'Courier New',monospace;">
-      <table width="100%" cellpadding="0" cellspacing="0" style="background:#050505;padding:40px 20px;">
+    <body style="margin:0;padding:0;background:#0a0a0a;font-family:'Courier New',monospace;">
+      <table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0a;padding:40px 20px;">
         <tr><td align="center">
-          <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;border:1px solid rgba(57,255,20,0.2);background:#080808;">
+          <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;border:1px solid #39FF14;background:#111;">
             <tr>
-              <td style="padding:0;background:#000;border-bottom:2px solid #39FF14;">
+              <td style="padding:0;background:#000;border-bottom:3px solid #39FF14;">
                 <div style="padding:30px 40px;">
-                  <div style="font-family:'Courier New',monospace;font-size:10px;color:rgba(57,255,20,0.4);letter-spacing:3px;text-transform:uppercase;margin-bottom:8px;">// SHIFTGLITCH SYSTEMS — MAINFRAME NOTIFICATION</div>
-                  <div style="font-family:'Courier New',monospace;font-size:40px;color:#fff;letter-spacing:4px;font-weight:bold;line-height:1;">SHIFTGLITCH</div>
+                  <div style="font-family:'Courier New',monospace;font-size:13px;color:#39FF14;letter-spacing:3px;text-transform:uppercase;margin-bottom:8px;">// SHIFTGLITCH SYSTEMS — MAINFRAME NOTIFICATION</div>
+                  <div style="font-family:'Courier New',monospace;font-size:42px;color:#fff;letter-spacing:4px;font-weight:bold;line-height:1;">SHIFTGLITCH</div>
                 </div>
               </td>
             </tr>
             <tr>
               <td style="padding:40px;">
-                <div style="font-family:'Courier New',monospace;font-size:11px;color:#FF0000;letter-spacing:2px;text-transform:uppercase;margin-bottom:20px;">[ INCOMING TRANSMISSION — PRIORITY ALPHA ]</div>
-                <div style="font-family:'Courier New',monospace;font-size:26px;color:#39FF14;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;text-shadow:0 0 20px rgba(57,255,20,0.4);">ACCESS REQUESTED.</div>
-                <div style="font-family:'Courier New',monospace;font-size:12px;color:rgba(57,255,20,0.5);letter-spacing:1px;margin-bottom:30px;">OPERATIVE: ${gamertag.toUpperCase()}</div>
-                <p style="font-family:'Courier New',monospace;font-size:13px;color:#666;line-height:1.8;margin:0 0 20px;">
+                <div style="font-family:'Courier New',monospace;font-size:14px;color:#ff4444;letter-spacing:2px;text-transform:uppercase;margin-bottom:20px;">[ INCOMING TRANSMISSION — PRIORITY ALPHA ]</div>
+                <div style="font-family:'Courier New',monospace;font-size:30px;color:#39FF14;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;">ACCESS REQUESTED.</div>
+                <div style="font-family:'Courier New',monospace;font-size:15px;color:#39FF14;letter-spacing:1px;margin-bottom:30px;">OPERATIVE: ${gamertag.toUpperCase()}</div>
+                <p style="font-family:'Courier New',monospace;font-size:15px;color:#cccccc;line-height:1.9;margin:0 0 20px;">
                   Comm-link registered in the mainframe.<br>
                   Your request for system access has been logged.
                 </p>
-                <p style="font-family:'Courier New',monospace;font-size:13px;color:#555;line-height:1.8;margin:0 0 30px;">
+                <p style="font-family:'Courier New',monospace;font-size:15px;color:#aaaaaa;line-height:1.9;margin:0 0 30px;">
                   We are running a controlled rollout — letting in new Netrunners in batches.
                   When your slot opens, you will receive a second transmission with your access credentials.
                 </p>
-                <div style="background:rgba(57,255,20,0.04);border:1px solid rgba(57,255,20,0.12);padding:20px;margin-bottom:30px;">
-                  <div style="font-family:'Courier New',monospace;font-size:10px;color:rgba(57,255,20,0.4);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;">// WHILE YOU WAIT</div>
-                  <div style="font-family:'Courier New',monospace;font-size:12px;color:#555;line-height:2;">
-                    &gt; Try the demo at shiftglitch.replit.app/demo<br>
-                    &gt; View pricing at shiftglitch.replit.app/pricing<br>
-                    &gt; Teachers: shiftglitch.replit.app/teacher
+                <div style="background:#1a1a1a;border:1px solid #39FF14;padding:24px;margin-bottom:30px;">
+                  <div style="font-family:'Courier New',monospace;font-size:13px;color:#39FF14;letter-spacing:2px;text-transform:uppercase;margin-bottom:14px;">// WHILE YOU WAIT</div>
+                  <div style="font-family:'Courier New',monospace;font-size:14px;color:#aaaaaa;line-height:2.2;">
+                    &gt; Try the demo at <a href="https://shiftglitch.replit.app/demo" style="color:#39FF14;">shiftglitch.replit.app/demo</a><br>
+                    &gt; View pricing at <a href="https://shiftglitch.replit.app/pricing" style="color:#39FF14;">shiftglitch.replit.app/pricing</a><br>
+                    &gt; Teachers: <a href="https://shiftglitch.replit.app/teacher" style="color:#39FF14;">shiftglitch.replit.app/teacher</a>
                   </div>
                 </div>
-                <div style="font-family:'Courier New',monospace;font-size:10px;color:#222;letter-spacing:1px;">
+                <div style="font-family:'Courier New',monospace;font-size:13px;color:#777;letter-spacing:1px;line-height:1.8;">
                   End-to-end encrypted. We do not sell your data.<br>
-                  You were added as: ${email}
+                  You were added as: <span style="color:#aaa;">${email}</span>
                 </div>
               </td>
             </tr>
             <tr>
-              <td style="padding:20px 40px;border-top:1px solid rgba(57,255,20,0.06);">
-                <div style="font-family:'Courier New',monospace;font-size:9px;color:#1a1a1a;letter-spacing:1px;">
+              <td style="padding:20px 40px;border-top:1px solid #222;">
+                <div style="font-family:'Courier New',monospace;font-size:12px;color:#555;letter-spacing:1px;">
                   SHIFTGLITCH SYSTEMS — THE STUDY OS FOR STUDENTS<br>
                   shiftglitch.replit.app — &copy; 2026 Lourens Breytenbach
                 </div>
