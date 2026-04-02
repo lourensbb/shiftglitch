@@ -912,7 +912,8 @@
             load() {
                 try {
                     const d = JSON.parse(localStorage.getItem('sg_rank') || '{}');
-                    state.rank = d.rank || 'NPC';
+                    const loadedRank = d.rank || 'NPC';
+                    state.rank = RANKS.includes(loadedRank) ? loadedRank : 'NPC';
                     state.rankEvidence = d.rankEvidence || { blurtsCompleted: 0, governorBreakdowns: 0, cardsAdvanced: 0, activeDays: 0, pomodorosCompleted: 0, diagnosticsCompleted: 0, lastActiveDate: '', activeDateLog: [] };
                     if (!state.rankEvidence.activeDateLog) state.rankEvidence.activeDateLog = [];
                     if (state.rankEvidence.diagnosticsCompleted === undefined) state.rankEvidence.diagnosticsCompleted = 0;
@@ -1002,12 +1003,14 @@
             },
             getNextRank() {
                 const idx = RANKS.indexOf(state.rank);
+                if (idx === -1) return RANKS[1];
                 return idx < RANKS.length - 1 ? RANKS[idx + 1] : null;
             },
             getProgress() {
                 const next = this.getNextRank();
                 if (!next) return null;
                 const reqs = RANK_REQUIREMENTS[next];
+                if (!reqs) return null;
                 const ev = state.rankEvidence;
                 return {
                     nextRank: next,
@@ -1505,8 +1508,10 @@
                 try {
                     const savedNotes = localStorage.getItem('cornellNotes');
                     if (state.view === 'dashboard') {
-                        container.innerHTML = app.getDashboardHTML(savedNotes);
-                        app.renderCharts();
+                        let dashHTML;
+                        try { dashHTML = app.getDashboardHTML(savedNotes); } catch(dashErr) { throw new Error('getDashboardHTML: ' + dashErr.message); }
+                        container.innerHTML = dashHTML;
+                        try { app.renderCharts(); } catch(chartErr) { console.warn('Chart render skipped:', chartErr.message); }
                         if (!state._dashboardDataLoaded) { app.loadUserData(); state._dashboardDataLoaded = true; }
                         app.updateTimerUI();
                     } else if (state.view === 'explore') {
@@ -1548,7 +1553,7 @@
                     rankEngine.updateNavRank();
                 } catch (err) {
                     console.error('Render error:', err);
-                    container.innerHTML = '<div class="text-center py-20"><h2 class="text-2xl font-serif font-bold text-red-600 mb-4">Something went wrong</h2><p class="text-stone-500 mb-6">An error occurred while loading this view.</p><button onclick="app.navTo(\'dashboard\')" class="bg-orange-600 text-white px-6 py-3 rounded-xl font-bold text-sm uppercase tracking-widest">Go to Dashboard</button></div>';
+                    container.innerHTML = '<div class="text-center py-20"><h2 class="text-2xl font-serif font-bold text-red-600 mb-4">Something went wrong</h2><p class="text-stone-500 mb-6">An error occurred while loading this view.</p><p class="text-xs text-stone-400 mb-6 font-mono">' + (err && err.message ? err.message : String(err)) + '</p><button onclick="app.navTo(\'dashboard\')" class="bg-orange-600 text-white px-6 py-3 rounded-xl font-bold text-sm uppercase tracking-widest">Go to Dashboard</button></div>';
                 }
             },
 
