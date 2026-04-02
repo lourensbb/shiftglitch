@@ -105,6 +105,26 @@ async function ensureSchema() {
         views BIGINT NOT NULL DEFAULT 0,
         PRIMARY KEY (page)
       );
+      CREATE TABLE IF NOT EXISTS escape_runs (
+        id SERIAL PRIMARY KEY,
+        user_id VARCHAR NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        domain_name VARCHAR(200) NOT NULL,
+        run_number INTEGER NOT NULL DEFAULT 1,
+        exploit_1 BOOLEAN NOT NULL DEFAULT FALSE,
+        exploit_2 BOOLEAN NOT NULL DEFAULT FALSE,
+        exploit_3 BOOLEAN NOT NULL DEFAULT FALSE,
+        exploit_4 BOOLEAN NOT NULL DEFAULT FALSE,
+        exploit_5 BOOLEAN NOT NULL DEFAULT FALSE,
+        exploit_6 BOOLEAN NOT NULL DEFAULT FALSE,
+        shortcut_flags INTEGER NOT NULL DEFAULT 0,
+        rollback_flags INTEGER NOT NULL DEFAULT 0,
+        nodes JSONB DEFAULT '[]'::jsonb,
+        debrief_text TEXT,
+        debrief_archived JSONB DEFAULT '[]'::jsonb,
+        last_activity_at TIMESTAMP DEFAULT NOW(),
+        completed_at TIMESTAMP,
+        created_at TIMESTAMP DEFAULT NOW()
+      );
     `);
     console.log('[auth] DB schema ready');
   } catch (err) {
@@ -558,4 +578,70 @@ async function setUserBadges(userId, badges) {
   }
 }
 
-module.exports = { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, updateGamertag, getUserGamertag, updateMembershipTier, checkAndExpireUser, getUserByPaymentRef, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount, getUserBadges, setUserBadges };
+async function getEscapeRuns(userId) {
+  const { rows } = await pool.query(
+    'SELECT * FROM escape_runs WHERE user_id = $1 ORDER BY created_at DESC',
+    [userId]
+  );
+  return rows;
+}
+
+async function createEscapeRun(userId, domainName) {
+  const { rows } = await pool.query(
+    `INSERT INTO escape_runs (user_id, domain_name, last_activity_at)
+     VALUES ($1, $2, NOW()) RETURNING *`,
+    [userId, domainName.trim().slice(0, 200)]
+  );
+  return rows[0];
+}
+
+async function updateEscapeRun(userId, runId, patch) {
+  const allowed = ['exploit_1','exploit_2','exploit_3','exploit_4','exploit_5','exploit_6',
+                   'shortcut_flags','rollback_flags','nodes','debrief_text'];
+  const sets = [];
+  const vals = [userId, runId];
+  for (const key of allowed) {
+    if (patch[key] !== undefined) {
+      vals.push(key === 'nodes' ? JSON.stringify(patch[key]) : patch[key]);
+      sets.push(`${key} = $${vals.length}${key === 'nodes' ? '::jsonb' : ''}`);
+    }
+  }
+  if (sets.length === 0) return null;
+  sets.push('last_activity_at = NOW()');
+  const { rows } = await pool.query(
+    `UPDATE escape_runs SET ${sets.join(', ')} WHERE user_id = $1 AND id = $2 RETURNING *`,
+    vals
+  );
+  return rows[0] || null;
+}
+
+async function completeEscapeRun(userId, runId) {
+  const { rows: cur } = await pool.query(
+    'SELECT * FROM escape_runs WHERE user_id = $1 AND id = $2', [userId, runId]
+  );
+  if (!cur.length) return null;
+  const run = cur[0];
+  const archived = run.debrief_archived || [];
+  if (run.debrief_text) {
+    archived.push({ runNumber: run.run_number, text: run.debrief_text, completedAt: new Date().toISOString() });
+  }
+  const { rows } = await pool.query(
+    `UPDATE escape_runs SET
+       completed_at = NOW(), last_activity_at = NOW(),
+       exploit_1 = FALSE, exploit_2 = FALSE, exploit_3 = FALSE,
+       exploit_4 = FALSE, exploit_5 = FALSE, exploit_6 = FALSE,
+       shortcut_flags = 0, rollback_flags = 0,
+       nodes = '[]'::jsonb, debrief_text = NULL,
+       debrief_archived = $3::jsonb,
+       run_number = run_number + 1
+     WHERE user_id = $1 AND id = $2 RETURNING *`,
+    [userId, runId, JSON.stringify(archived)]
+  );
+  return rows[0] || null;
+}
+
+async function deleteEscapeRun(userId, runId) {
+  await pool.query('DELETE FROM escape_runs WHERE user_id = $1 AND id = $2', [userId, runId]);
+}
+
+module.exports = { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, updateGamertag, getUserGamertag, updateMembershipTier, checkAndExpireUser, getUserByPaymentRef, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount, getUserBadges, setUserBadges, getEscapeRuns, createEscapeRun, updateEscapeRun, completeEscapeRun, deleteEscapeRun };

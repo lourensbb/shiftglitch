@@ -3,7 +3,7 @@ const path = require('path');
 const crypto = require('crypto');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-const { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, getUserGamertag, updateGamertag, updateMembershipTier, checkAndExpireUser, getUserByPaymentRef, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount, getUserBadges, setUserBadges } = require('./auth');
+const { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, getUserGamertag, updateGamertag, updateMembershipTier, checkAndExpireUser, getUserByPaymentRef, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount, getUserBadges, setUserBadges, getEscapeRuns, createEscapeRun, updateEscapeRun, completeEscapeRun, deleteEscapeRun } = require('./auth');
 
 async function requirePro(req, res, next) {
   try {
@@ -577,6 +577,68 @@ app.post('/api/squad/ping', requireAuth, requirePro, async (req, res) => {
     res.json({ ok: true });
   } catch (err) {
     res.status(500).json({ error: 'Ping failed' });
+  }
+});
+
+app.get('/api/escape-runs', requireAuth, async (req, res) => {
+  try {
+    const runs = await getEscapeRuns(req.session.userId);
+    res.json({ runs });
+  } catch (err) {
+    console.error('/api/escape-runs GET error:', err);
+    res.status(500).json({ error: 'Failed to load escape runs' });
+  }
+});
+
+app.post('/api/escape-runs', requireAuth, async (req, res) => {
+  try {
+    const { domainName } = req.body;
+    if (!domainName || typeof domainName !== 'string' || !domainName.trim()) {
+      return res.status(400).json({ error: 'Domain name required' });
+    }
+    const run = await createEscapeRun(req.session.userId, domainName);
+    res.json({ run });
+  } catch (err) {
+    console.error('/api/escape-runs POST error:', err);
+    res.status(500).json({ error: 'Failed to create escape run' });
+  }
+});
+
+app.patch('/api/escape-runs/:id', requireAuth, async (req, res) => {
+  try {
+    const runId = parseInt(req.params.id, 10);
+    if (!runId) return res.status(400).json({ error: 'Invalid run ID' });
+    const run = await updateEscapeRun(req.session.userId, runId, req.body);
+    if (!run) return res.status(404).json({ error: 'Run not found' });
+    res.json({ run });
+  } catch (err) {
+    console.error('/api/escape-runs PATCH error:', err);
+    res.status(500).json({ error: 'Failed to update escape run' });
+  }
+});
+
+app.post('/api/escape-runs/:id/complete', requireAuth, async (req, res) => {
+  try {
+    const runId = parseInt(req.params.id, 10);
+    if (!runId) return res.status(400).json({ error: 'Invalid run ID' });
+    const run = await completeEscapeRun(req.session.userId, runId);
+    if (!run) return res.status(404).json({ error: 'Run not found' });
+    res.json({ run });
+  } catch (err) {
+    console.error('/api/escape-runs/complete error:', err);
+    res.status(500).json({ error: 'Failed to complete escape run' });
+  }
+});
+
+app.delete('/api/escape-runs/:id', requireAuth, async (req, res) => {
+  try {
+    const runId = parseInt(req.params.id, 10);
+    if (!runId) return res.status(400).json({ error: 'Invalid run ID' });
+    await deleteEscapeRun(req.session.userId, runId);
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('/api/escape-runs DELETE error:', err);
+    res.status(500).json({ error: 'Failed to delete escape run' });
   }
 });
 
