@@ -87,6 +87,9 @@ async function sendWelcomeEmail(gamertag, email) {
     </html>
   `;
   const fromAddress = process.env.RESEND_FROM_ADDRESS || 'ShiftGlitch <onboarding@resend.dev>';
+  if (!process.env.RESEND_FROM_ADDRESS) {
+    console.warn('[email] WARNING: RESEND_FROM_ADDRESS not set — using shared onboarding@resend.dev test address. Emails will only deliver to verified addresses in your Resend account. Set RESEND_FROM_ADDRESS to a verified domain to send to anyone.');
+  }
   console.log(`[email] Sending welcome email to ${email} via sender: ${fromAddress}`);
   try {
     const res = await fetch('https://api.resend.com/emails', {
