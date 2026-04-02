@@ -4,7 +4,10 @@ const { getSessionMiddleware, setupAuthRoutes, requireAuth, getUserGamertag, upd
 
 async function sendWelcomeEmail(gamertag, email) {
   const key = process.env.RESEND_API_KEY;
-  if (!key) return;
+  if (!key) {
+    console.warn('[email] RESEND_API_KEY is not set — welcome email skipped for:', email);
+    return;
+  }
   const html = `
     <!DOCTYPE html>
     <html>
