@@ -31,7 +31,7 @@ async function sendWelcomeEmail(gamertag, email) {
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Access Requested — ShiftGlitch</title>
+      <title>You're In — ShiftGlitch</title>
     </head>
     <body style="margin:0;padding:0;background:#0a0a0a;font-family:'Courier New',monospace;">
       <table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0a;padding:40px 20px;">
@@ -40,43 +40,59 @@ async function sendWelcomeEmail(gamertag, email) {
             <tr>
               <td style="padding:0;background:#000;border-bottom:3px solid #39FF14;">
                 <div style="padding:30px 40px;">
-                  <div style="font-family:'Courier New',monospace;font-size:13px;color:#39FF14;letter-spacing:3px;text-transform:uppercase;margin-bottom:8px;">// SHIFTGLITCH SYSTEMS — MAINFRAME NOTIFICATION</div>
+                  <div style="font-family:'Courier New',monospace;font-size:13px;color:#39FF14;letter-spacing:3px;text-transform:uppercase;margin-bottom:8px;">// SHIFTGLITCH SYSTEMS — MAINFRAME TRANSMISSION</div>
                   <div style="font-family:'Courier New',monospace;font-size:42px;color:#fff;letter-spacing:4px;font-weight:bold;line-height:1;">SHIFTGLITCH</div>
                 </div>
               </td>
             </tr>
             <tr>
               <td style="padding:40px;">
-                <div style="font-family:'Courier New',monospace;font-size:14px;color:#ff4444;letter-spacing:2px;text-transform:uppercase;margin-bottom:20px;">[ INCOMING TRANSMISSION — PRIORITY ALPHA ]</div>
-                <div style="font-family:'Courier New',monospace;font-size:30px;color:#39FF14;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;">ACCESS REQUESTED.</div>
-                <div style="font-family:'Courier New',monospace;font-size:15px;color:#39FF14;letter-spacing:1px;margin-bottom:30px;">OPERATIVE: ${gamertag.toUpperCase()}</div>
-                <p style="font-family:'Courier New',monospace;font-size:15px;color:#cccccc;line-height:1.9;margin:0 0 20px;">
-                  Comm-link registered in the mainframe.<br>
-                  Your request for system access has been logged.
+                <div style="font-family:'Courier New',monospace;font-size:14px;color:#ff4444;letter-spacing:2px;text-transform:uppercase;margin-bottom:20px;">[ MAINFRAME ACCESS GRANTED ]</div>
+                <div style="font-family:'Courier New',monospace;font-size:30px;color:#39FF14;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">OPERATIVE: ${gamertag.toUpperCase()}</div>
+                <div style="font-family:'Courier New',monospace;font-size:14px;color:#888;letter-spacing:1px;margin-bottom:30px;">STATUS: NPC — Clearance Level 0 of 5</div>
+                <p style="font-family:'Courier New',monospace;font-size:15px;color:#cccccc;line-height:1.9;margin:0 0 16px;">
+                  You have been jacked into the Mainframe.
                 </p>
                 <p style="font-family:'Courier New',monospace;font-size:15px;color:#aaaaaa;line-height:1.9;margin:0 0 30px;">
-                  We are running a controlled rollout — letting in new Netrunners in batches.
-                  When your slot opens, you will receive a second transmission with your access credentials.
+                  The Mainframe is the school system — exams, deadlines, grades.<br>
+                  Right now, it controls you. Your mission is to master the system<br>
+                  and earn your way to <span style="color:#FF00FF;">System Admin</span> status.
                 </p>
-                <div style="background:#1a1a1a;border:1px solid #39FF14;padding:24px;margin-bottom:30px;">
-                  <div style="font-family:'Courier New',monospace;font-size:13px;color:#39FF14;letter-spacing:2px;text-transform:uppercase;margin-bottom:14px;">// WHILE YOU WAIT</div>
-                  <div style="font-family:'Courier New',monospace;font-size:14px;color:#aaaaaa;line-height:2.2;">
-                    &gt; Try the demo at <a href="https://shiftglitch.replit.app/demo" style="color:#39FF14;">shiftglitch.replit.app/demo</a><br>
-                    &gt; View pricing at <a href="https://shiftglitch.replit.app/pricing" style="color:#39FF14;">shiftglitch.replit.app/pricing</a><br>
-                    &gt; Teachers: <a href="https://shiftglitch.replit.app/teacher" style="color:#39FF14;">shiftglitch.replit.app/teacher</a>
+                <div style="background:#1a1a1a;border:1px solid #39FF14;padding:24px;margin-bottom:28px;">
+                  <div style="font-family:'Courier New',monospace;font-size:13px;color:#39FF14;letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;">// YOUR FIRST MISSION — DO THESE NOW</div>
+                  <div style="font-family:'Courier New',monospace;font-size:14px;color:#aaaaaa;line-height:2.4;">
+                    <span style="color:#39FF14;">&gt;</span> Go to ShiftGlitch and click <span style="color:#fff;">START HERE</span><br>
+                    <span style="color:#39FF14;">&gt;</span> Set your <span style="color:#fff;">gamertag</span> in Settings<br>
+                    <span style="color:#39FF14;">&gt;</span> Add your <span style="color:#fff;">exam dates</span> in Mission Control<br>
+                    <span style="color:#39FF14;">&gt;</span> Read the <span style="color:#fff;">Q&amp;A in The Vault</span> — learn how to study<br>
+                    <span style="color:#39FF14;">&gt;</span> Complete your first <span style="color:#fff;">25-minute Focus Session</span>
                   </div>
                 </div>
-                <div style="font-family:'Courier New',monospace;font-size:13px;color:#777;letter-spacing:1px;line-height:1.8;">
-                  End-to-end encrypted. We do not sell your data.<br>
-                  You were added as: <span style="color:#aaa;">${email}</span>
+                <div style="background:#0d0d1a;border:1px solid rgba(255,0,255,0.3);padding:24px;margin-bottom:28px;">
+                  <div style="font-family:'Courier New',monospace;font-size:13px;color:#FF00FF;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;">// YOUR RANK PROGRESSION — THE ESCAPE ROUTE</div>
+                  <div style="font-family:'Courier New',monospace;font-size:13px;color:#aaaaaa;line-height:2.2;">
+                    <span style="color:#666;">◈ NPC</span> → <span style="color:#3a7a3a;">◉ Script Kiddie</span> → <span style="color:#8A2BE2;">⬡ Glitch Tech</span> → <span style="color:#39FF14;">◬ Netrunner</span> → <span style="color:#FF00FF;">✦ System Admin</span>
+                  </div>
+                  <p style="font-family:'Courier New',monospace;font-size:13px;color:#777;line-height:1.9;margin:12px 0 0;">
+                    Rank up by completing focus sessions, mastering flashcards,<br>
+                    running BrainDumps, and finishing Diagnostic missions.<br>
+                    Ranks are earned. They cannot be bought.
+                  </p>
+                </div>
+                <div style="text-align:center;margin-bottom:28px;">
+                  <a href="https://shiftglitch.replit.app/app" style="display:inline-block;background:#39FF14;color:#000;font-family:'Courier New',monospace;font-size:16px;font-weight:bold;letter-spacing:3px;text-transform:uppercase;padding:16px 40px;text-decoration:none;">JACK IN NOW →</a>
+                </div>
+                <div style="font-family:'Courier New',monospace;font-size:13px;color:#555;letter-spacing:1px;line-height:1.8;border-top:1px solid #222;padding-top:20px;">
+                  Free account. No spam. No data sold.<br>
+                  Logged as: <span style="color:#777;">${email}</span><br>
+                  Questions: <a href="mailto:admin@shiftglitch.com" style="color:#39FF14;">admin@shiftglitch.com</a>
                 </div>
               </td>
             </tr>
             <tr>
-              <td style="padding:20px 40px;border-top:1px solid #222;">
-                <div style="font-family:'Courier New',monospace;font-size:12px;color:#555;letter-spacing:1px;">
-                  SHIFTGLITCH SYSTEMS — THE STUDY OS FOR STUDENTS<br>
-                  shiftglitch.replit.app — &copy; 2026 Lourens Breytenbach
+              <td style="padding:16px 40px;border-top:1px solid #1a1a1a;">
+                <div style="font-family:'Courier New',monospace;font-size:11px;color:#444;letter-spacing:1px;">
+                  SHIFTGLITCH — THE STUDY OS FOR STUDENTS &copy; 2026 Lourens Breytenbach
                 </div>
               </td>
             </tr>
@@ -98,7 +114,7 @@ async function sendWelcomeEmail(gamertag, email) {
       body: JSON.stringify({
         from: fromAddress,
         to: [email],
-        subject: '[ ACCESS REQUESTED ] — ShiftGlitch Mainframe',
+        subject: '[ ACCESS GRANTED ] — Welcome to the ShiftGlitch Mainframe',
         html
       })
     });
