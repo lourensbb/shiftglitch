@@ -30,3 +30,9 @@ id = "INh4lxRSzvBqJTKc4kjLA"
 uri = "file://replit.md"
 type = "text"
 title = "replit.md — architecture reference & project memory"
+
+[[outputs]]
+id = "EyoVGR2k7Ff5bDKT3YEK1"
+uri = "file://attached_assets/QUALITY_EVALUATION_ShiftGlitch_Completed.md"
+type = "text"
+title = "ShiftGlitch — Quality Control Evaluation (Completed)"
