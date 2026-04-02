@@ -296,7 +296,7 @@
             <button onclick="app.navTo('dashboard')" class="block w-full text-left px-4 py-3 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Mission</button>
             <button onclick="app.navTo('explore')" class="block w-full text-left px-4 py-3 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Vault</button>
             <button onclick="app.navTo('decks')" class="block w-full text-left px-4 py-3 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Data Shards</button>
-            <div class="px-4 pt-3 pb-1 text-[10px] font-bold text-[#39FF14]/30 uppercase tracking-widest">Tools</div>
+            <div class="px-4 pt-3 pb-1 text-xs font-bold text-[#39FF14]/80 uppercase tracking-widest">Tools</div>
             <button onclick="app.navTo('blurt')" class="block w-full text-left px-4 py-3 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">BrainDump.exe</button>
             <button onclick="app.navTo('babel')" class="block w-full text-left px-4 py-3 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Jargon Decoder</button>
             <button onclick="app.navTo('quiz')" class="block w-full text-left px-4 py-3 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Boss Fight</button>
@@ -456,17 +456,17 @@
         <div class="flex items-center justify-between px-6 py-3 border-b border-[#39FF14]/10">
             <button onclick="app.closeSwipeHUD()" class="text-[#39FF14]/40 hover:text-[#39FF14] text-sm font-mono uppercase tracking-widest">← EXIT</button>
             <span id="swipe-counter" class="text-[#39FF14]/50 text-xs font-mono uppercase tracking-widest">0 / 0</span>
-            <div id="swipe-box-badge" class="text-[10px] font-bold text-[#39FF14]/40 uppercase tracking-widest">Box 1</div>
+            <div id="swipe-box-badge" class="text-xs font-bold text-[#39FF14]/80 uppercase tracking-widest">Box 1</div>
         </div>
         <div class="flex-1 flex flex-col items-center justify-center px-6 py-4 relative overflow-hidden select-none">
-            <div class="absolute top-4 left-0 right-0 flex justify-center gap-8 text-[10px] font-mono text-[#39FF14]/20 uppercase tracking-widest pointer-events-none">
+            <div class="absolute top-4 left-0 right-0 flex justify-center gap-8 text-xs font-mono text-[#39FF14]/70 uppercase tracking-widest pointer-events-none">
                 <span>↑ Next/Skip</span>
                 <span>↓ Previous</span>
             </div>
             <div id="swipe-card-wrap" class="sg-swipe-wrap w-full max-w-sm cursor-pointer" ontouchstart="app.swipeTouchStart(event)" ontouchend="app.swipeTouchEnd(event)" onmousedown="app.swipeMouseDown(event)">
                 <div id="swipe-card-inner" class="bg-black border border-[#39FF14]/30 p-8 min-h-[280px] flex flex-col items-center justify-center text-center shadow-[0_0_30px_rgba(57,255,20,0.06)]" onclick="app.swipeFlip()">
                     <div id="swipe-card-face" class="text-white text-xl font-bold leading-relaxed"></div>
-                    <div id="swipe-card-label" class="text-[#39FF14]/30 text-xs uppercase tracking-widest mt-4 font-mono">TAP TO REVEAL</div>
+                    <div id="swipe-card-label" class="text-[#39FF14] text-sm font-bold uppercase tracking-widest mt-4 font-mono">TAP TO REVEAL</div>
                 </div>
             </div>
         </div>
@@ -477,9 +477,9 @@
             <button onclick="app.swipeGrade('got')" class="flex-1 border border-[#39FF14]/40 text-[#39FF14]/70 hover:text-[#39FF14] hover:border-[#39FF14] py-3 font-bold text-[10px] uppercase tracking-widest font-mono transition-colors">[ GOT IT ]</button>
         </div>
         <div class="flex gap-3 px-4 pb-6 pt-2 border-t border-[#39FF14]/10">
-            <button id="swipe-back-btn" onclick="app.swipeBack()" class="border border-[#39FF14]/20 text-[#39FF14]/30 hover:text-[#39FF14]/60 hover:border-[#39FF14]/40 px-5 py-3 font-bold text-[10px] uppercase tracking-widest font-mono transition-colors">← PREV</button>
-            <div class="flex-1 text-center text-[10px] font-mono text-[#39FF14]/20 uppercase tracking-widest self-center" id="swipe-flip-hint">Tap card to reveal answer</div>
-            <div class="px-5 py-3 text-[10px] font-mono text-[#39FF14]/15 uppercase tracking-widest self-center">↑ Skip &nbsp; ↓ Back</div>
+            <button id="swipe-back-btn" onclick="app.swipeBack()" class="border border-[#39FF14]/50 text-[#39FF14]/80 hover:text-[#39FF14] hover:border-[#39FF14] px-5 py-3 font-bold text-xs uppercase tracking-widest font-mono transition-colors">← PREV</button>
+            <div class="flex-1 text-center text-xs font-mono text-[#39FF14]/70 uppercase tracking-widest self-center" id="swipe-flip-hint">Tap card to reveal answer</div>
+            <div class="px-5 py-3 text-xs font-mono text-[#39FF14]/70 uppercase tracking-widest self-center">↑ Skip &nbsp; ↓ Back</div>
         </div>
     </div>
 
@@ -2166,7 +2166,7 @@
                                 <button onclick="app.squadJoin()" class="px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest text-black transition-all" style="background:#39FF14;">JOIN</button>
                             </div>
                         </div>
-                        <p class="text-xs text-[#39FF14]/20 font-mono text-center">// max 4 operatives per squad</p>
+                        <p class="text-sm text-[#39FF14]/80 font-mono text-center font-bold">// max 4 operatives per squad</p>
                     </div>
                     `}
                 </div>`;
@@ -2205,7 +2205,7 @@
                                 <span class="text-lg">${rankIcons[m.rankTier] || '👾'}</span>
                                 <div class="flex-1 min-w-0">
                                     <div class="text-sm font-bold ${nameColor} uppercase tracking-wide truncate">${esc(m.gamertag)}${meBadge}${afkBadge}</div>
-                                    <div class="text-[10px] text-[#39FF14]/30 truncate">last active: ${lastActiveStr}</div>
+                                    <div class="text-xs text-[#39FF14]/80 truncate">last active: ${lastActiveStr}</div>
                                 </div>
                                 <span class="text-xs text-[#39FF14]/50 hidden sm:block flex-shrink-0">${m.rankTier}</span>
                                 <span class="text-sm font-bold text-[#39FF14]/70 tabular-nums flex-shrink-0">🔥 ${m.streak}</span>
@@ -2223,7 +2223,7 @@
                                         <div class="text-[10px] font-bold uppercase tracking-widest text-[#8A2BE2]/50">SQUAD STREAK</div>
                                     </div>
                                 </div>
-                                <div class="text-xs text-[#39FF14]/30 font-mono">// squad streak = lowest individual streak — one weak link drops it</div>
+                                <div class="text-sm text-[#39FF14]/80 font-mono font-bold">// squad streak = lowest individual streak — one weak link drops it</div>
                             </div>
                             ${roastHTML}
                             <div class="space-y-2">${memberRows}</div>
@@ -2304,21 +2304,21 @@
                 <div class="animate-fade-in max-w-4xl mx-auto space-y-8">
                     <div class="text-center mb-8">
                         <h1 class="text-5xl font-serif font-bold mb-2" style="color:#FF00FF;text-shadow:0 0 20px rgba(255,0,255,0.4);">LEADERBOARD</h1>
-                        <p class="text-[#39FF14]/50 font-mono text-sm">// global focus score rankings</p>
+                        <p class="text-[#39FF14] font-mono text-base font-bold">// global focus score rankings</p>
                     </div>
-                    <div class="bg-black border border-[#FF00FF]/20 rounded-2xl p-5 mb-2">
-                        <p class="text-xs font-bold text-[#FF00FF]/70 uppercase tracking-widest mb-2">FOCUS SCORE FORMULA</p>
-                        <p class="font-mono text-[#39FF14] text-sm">(Pomodoros × 10) + (Streak × 25) + (Cards Mastered × 2) + (Blurts × 15)</p>
-                        <p class="text-xs text-[#39FF14]/40 mt-1 font-mono">// syncs after every focus session</p>
+                    <div class="bg-black border border-[#FF00FF]/40 rounded-2xl p-5 mb-2">
+                        <p class="text-sm font-bold text-[#FF00FF] uppercase tracking-widest mb-2">FOCUS SCORE FORMULA</p>
+                        <p class="font-mono text-[#39FF14] text-base">(Pomodoros × 10) + (Streak × 25) + (Cards Mastered × 2) + (Blurts × 15)</p>
+                        <p class="text-sm text-[#39FF14]/80 mt-1 font-mono">// syncs after every focus session</p>
                     </div>
                     <div id="leaderboard-loading" class="text-center py-16">
-                        <p class="font-mono text-[#39FF14]/40 text-sm animate-pulse">// loading signal...</p>
+                        <p class="font-mono text-[#39FF14] text-lg font-bold animate-pulse">// loading signal...</p>
                     </div>
                     <div id="leaderboard-content" class="hidden space-y-2"></div>
                     <div id="leaderboard-my-row" class="hidden"></div>
                     <div id="leaderboard-empty" class="hidden text-center py-16">
-                        <p class="font-mono text-[#39FF14]/30 text-sm">// no operatives on the board yet</p>
-                        <p class="font-mono text-[#39FF14]/20 text-xs mt-2">// complete a focus session to appear</p>
+                        <p class="font-mono text-[#39FF14] text-xl font-bold mb-3">// no operatives on the board yet</p>
+                        <p class="font-mono text-[#39FF14]/80 text-base mt-2">// complete a focus session to appear</p>
                     </div>
                 </div>`,
 
@@ -2346,13 +2346,13 @@
                         const nameColor = isMe ? 'text-[#FF00FF]' : 'text-[#39FF14]';
                         const scoreColor = isMe ? 'text-[#FF00FF]' : 'text-[#39FF14]/80';
                         return `<div class="flex items-center gap-3 border ${border} rounded-xl px-4 py-3 font-mono transition-all ${isMe ? 'ring-1 ring-[#FF00FF]/30' : ''}">
-                            <span class="w-10 text-center text-sm font-bold text-[#39FF14]/40">${medalFor(entry.rank)}</span>
+                            <span class="w-10 text-center text-base font-bold text-[#39FF14]">${medalFor(entry.rank)}</span>
                             <span class="text-lg flex-shrink-0">${rankIcons[entry.rankTier] || '👾'}</span>
-                            <span class="flex-1 text-sm font-bold ${nameColor} uppercase tracking-wide truncate">${esc(entry.gamertag)}${isMe ? ' <span class="text-[10px] text-[#FF00FF]/60 normal-case">[you]</span>' : ''}</span>
-                            <span class="text-xs text-[#39FF14]/40 hidden sm:block">🍅 ${entry.pomodoros}</span>
-                            <span class="text-xs text-[#39FF14]/40 hidden sm:block">📚 ${entry.cardsMastered}</span>
-                            <span class="text-xs text-[#39FF14]/40 hidden sm:block">🧠 ${entry.blurts}</span>
-                            <span class="text-sm font-bold ${scoreColor} ml-2 tabular-nums">${entry.focusScore.toLocaleString()}</span>
+                            <span class="flex-1 text-base font-bold ${nameColor} uppercase tracking-wide truncate">${esc(entry.gamertag)}${isMe ? ' <span class="text-xs text-[#FF00FF] normal-case">[you]</span>' : ''}</span>
+                            <span class="text-sm text-[#39FF14]/80 hidden sm:block">🍅 ${entry.pomodoros}</span>
+                            <span class="text-sm text-[#39FF14]/80 hidden sm:block">📚 ${entry.cardsMastered}</span>
+                            <span class="text-sm text-[#39FF14]/80 hidden sm:block">🧠 ${entry.blurts}</span>
+                            <span class="text-base font-bold ${scoreColor} ml-2 tabular-nums">${entry.focusScore.toLocaleString()}</span>
                         </div>`;
                     };
 
