@@ -158,14 +158,46 @@ async function getPaypalToken() {
 app.post('/api/paypal-webhook', express.json(), async (req, res) => {
   res.status(200).end();
   try {
+    const webhookId = process.env.PAYPAL_WEBHOOK_ID;
+    if (!webhookId) {
+      console.warn('[paypal-webhook] PAYPAL_WEBHOOK_ID not set — cannot verify, ignoring event');
+      return;
+    }
     const event = req.body;
     if (!event || !event.event_type) return;
-    if (event.event_type === 'BILLING.SUBSCRIPTION.ACTIVATED' || event.event_type === 'PAYMENT.SALE.COMPLETED') {
+
+    const auth = await getPaypalToken();
+    if (!auth) {
+      console.warn('[paypal-webhook] PayPal credentials not set — cannot verify, ignoring event');
+      return;
+    }
+    const verifyRes = await fetch(`${auth.base}/v1/notifications/verify-webhook-signature`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${auth.token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        auth_algo:        req.headers['paypal-auth-algo'],
+        cert_url:         req.headers['paypal-cert-url'],
+        transmission_id:  req.headers['paypal-transmission-id'],
+        transmission_sig: req.headers['paypal-transmission-sig'],
+        transmission_time:req.headers['paypal-transmission-time'],
+        webhook_id:       webhookId,
+        webhook_event:    event
+      })
+    });
+    const verifyData = await verifyRes.json();
+    if (!verifyRes.ok || verifyData.verification_status !== 'SUCCESS') {
+      console.warn('[paypal-webhook] Signature verification failed:', verifyData.verification_status || verifyData);
+      return;
+    }
+
+    if (event.event_type === 'BILLING.SUBSCRIPTION.ACTIVATED') {
       const sub = event.resource;
-      const userId = sub && (sub.custom_id || (sub.billing_agreement_id));
+      const userId = sub && sub.custom_id;
       if (userId) {
-        await updateMembershipTier(userId, 'pro', `paypal_${sub.id || sub.billing_agreement_id}`);
-        console.log(`[paypal-webhook] User ${userId} upgraded to pro via ${event.event_type}`);
+        await updateMembershipTier(userId, 'pro', `paypal_${sub.id}`);
+        console.log(`[paypal-webhook] User ${userId} upgraded to pro`);
+      } else {
+        console.warn('[paypal-webhook] No custom_id on ACTIVATED event — cannot identify user');
       }
     } else if (event.event_type === 'BILLING.SUBSCRIPTION.CANCELLED' || event.event_type === 'BILLING.SUBSCRIPTION.EXPIRED') {
       const sub = event.resource;
@@ -174,6 +206,8 @@ app.post('/api/paypal-webhook', express.json(), async (req, res) => {
         await updateMembershipTier(userId, 'free', null);
         console.log(`[paypal-webhook] User ${userId} downgraded to free via ${event.event_type}`);
       }
+    } else {
+      console.log('[paypal-webhook] Unhandled event type:', event.event_type);
     }
   } catch (err) {
     console.error('[paypal-webhook] Error:', err.message);
