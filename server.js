@@ -119,18 +119,21 @@ const PAYFAST_ANNUAL_ZAR  = process.env.PAYFAST_ANNUAL_ZAR  || '1349.99';
 const app = express();
 
 app.post('/api/payfast-itn', express.urlencoded({ extended: false }), async (req, res) => {
-  res.status(200).end();
   try {
     const data = req.body;
-    if (!data || !data.m_payment_id) { console.warn('[payfast-itn] Missing m_payment_id'); return; }
-
-    const expectedMerchantId = process.env.PAYFAST_MERCHANT_ID;
-    if (!expectedMerchantId) { console.warn('[payfast-itn] PAYFAST_MERCHANT_ID not set — ignoring ITN'); return; }
-    if (data.merchant_id !== expectedMerchantId) {
-      console.warn(`[payfast-itn] Merchant ID mismatch: got ${data.merchant_id}, expected ${expectedMerchantId}`);
-      return;
+    if (!data || !data.m_payment_id) {
+      console.warn('[payfast-itn] Missing m_payment_id');
+      return res.status(400).end();
     }
-
+    const expectedMerchantId = process.env.PAYFAST_MERCHANT_ID;
+    if (!expectedMerchantId) {
+      console.warn('[payfast-itn] PAYFAST_MERCHANT_ID not set — ignoring ITN');
+      return res.status(200).end();
+    }
+    if (data.merchant_id !== expectedMerchantId) {
+      console.warn(`[payfast-itn] Merchant ID mismatch: got ${data.merchant_id}`);
+      return res.status(400).end();
+    }
     const pfHost = PAYFAST_SANDBOX ? 'sandbox.payfast.co.za' : 'www.payfast.co.za';
     const validationRes = await fetch(`https://${pfHost}/eng/query/validate`, {
       method: 'POST',
@@ -138,42 +141,43 @@ app.post('/api/payfast-itn', express.urlencoded({ extended: false }), async (req
       body: new URLSearchParams(data).toString()
     });
     const validation = await validationRes.text();
-    if (validation !== 'VALID') { console.warn('[payfast-itn] PayFast validation returned:', validation); return; }
-
+    if (validation !== 'VALID') {
+      console.warn('[payfast-itn] PayFast validation returned:', validation);
+      return res.status(400).end();
+    }
     const userId = data.m_payment_id.split('_')[0];
-    if (!userId) { console.warn('[payfast-itn] Could not parse userId from m_payment_id:', data.m_payment_id); return; }
-
+    if (!userId) {
+      console.warn('[payfast-itn] Could not parse userId from m_payment_id:', data.m_payment_id);
+      return res.status(400).end();
+    }
     if (data.payment_status === 'CANCELLED' || data.payment_status === 'FAILED') {
       await updateMembershipTier(userId, 'free', null);
       console.log(`[payfast-itn] User ${userId} downgraded to free — status: ${data.payment_status}`);
-      return;
+      return res.status(200).end();
     }
-
     if (data.payment_status !== 'COMPLETE') {
       console.log('[payfast-itn] Skipping status:', data.payment_status);
-      return;
+      return res.status(200).end();
     }
-
     const grossAmount = parseFloat(data.amount_gross || '0');
     const expectedMonthly = parseFloat(PAYFAST_MONTHLY_ZAR);
     const expectedAnnual  = parseFloat(PAYFAST_ANNUAL_ZAR);
     const isValidAmount = Math.abs(grossAmount - expectedMonthly) < 1.0 || Math.abs(grossAmount - expectedAnnual) < 1.0;
     if (!isValidAmount) {
       console.warn(`[payfast-itn] Unexpected amount R${grossAmount} — expected R${expectedMonthly} or R${expectedAnnual}`);
-      return;
+      return res.status(400).end();
     }
-
     const itemName = data.item_name || '';
-    const isNetrunnerItem = itemName.toLowerCase().includes('netrunner pro');
-    if (!isNetrunnerItem) {
+    if (!itemName.toLowerCase().includes('netrunner pro')) {
       console.warn(`[payfast-itn] Unexpected item_name: "${itemName}" — ignoring`);
-      return;
+      return res.status(400).end();
     }
-
     await updateMembershipTier(userId, 'pro', `payfast_${data.pf_payment_id || data.m_payment_id}`);
     console.log(`[payfast-itn] User ${userId} upgraded to pro (R${grossAmount}, "${itemName}")`);
+    return res.status(200).end();
   } catch (err) {
     console.error('[payfast-itn] Error:', err.message);
+    return res.status(500).end();
   }
 });
 
@@ -192,38 +196,37 @@ async function getPaypalToken() {
 }
 
 app.post('/api/paypal-webhook', express.json(), async (req, res) => {
-  res.status(200).end();
   try {
     const webhookId = process.env.PAYPAL_WEBHOOK_ID;
     if (!webhookId) {
       console.warn('[paypal-webhook] PAYPAL_WEBHOOK_ID not set — cannot verify, ignoring event');
-      return;
+      return res.status(200).end();
     }
     const event = req.body;
-    if (!event || !event.event_type) return;
+    if (!event || !event.event_type) return res.status(400).end();
 
     const auth = await getPaypalToken();
     if (!auth) {
-      console.warn('[paypal-webhook] PayPal credentials not set — cannot verify, ignoring event');
-      return;
+      console.warn('[paypal-webhook] PayPal credentials not set — cannot verify');
+      return res.status(500).end();
     }
     const verifyRes = await fetch(`${auth.base}/v1/notifications/verify-webhook-signature`, {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${auth.token}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        auth_algo:        req.headers['paypal-auth-algo'],
-        cert_url:         req.headers['paypal-cert-url'],
-        transmission_id:  req.headers['paypal-transmission-id'],
-        transmission_sig: req.headers['paypal-transmission-sig'],
-        transmission_time:req.headers['paypal-transmission-time'],
-        webhook_id:       webhookId,
-        webhook_event:    event
+        auth_algo:         req.headers['paypal-auth-algo'],
+        cert_url:          req.headers['paypal-cert-url'],
+        transmission_id:   req.headers['paypal-transmission-id'],
+        transmission_sig:  req.headers['paypal-transmission-sig'],
+        transmission_time: req.headers['paypal-transmission-time'],
+        webhook_id:        webhookId,
+        webhook_event:     event
       })
     });
     const verifyData = await verifyRes.json();
     if (!verifyRes.ok || verifyData.verification_status !== 'SUCCESS') {
       console.warn('[paypal-webhook] Signature verification failed:', verifyData.verification_status || verifyData);
-      return;
+      return res.status(400).end();
     }
 
     const sub = event.resource || {};
@@ -257,8 +260,10 @@ app.post('/api/paypal-webhook', express.json(), async (req, res) => {
     } else {
       console.log('[paypal-webhook] Unhandled event type:', event.event_type);
     }
+    return res.status(200).end();
   } catch (err) {
     console.error('[paypal-webhook] Error:', err.message);
+    return res.status(500).end();
   }
 });
 
