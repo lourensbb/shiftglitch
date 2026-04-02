@@ -1,0 +1,29 @@
+The Sandbox
+The Payfast Sandbox is an exact code duplicate of the production site, available for running test transactions with.
+Any transactions made or actions performed on this system are isolated from the main production environment, while providing a realistic experience of your integration with Payfast, before going live.
+Using our Sandbox, you will be able to test your integration, once off payments and recurring payments, as well as receive ITNs, without any money changing hands.
+Sandbox URL
+https://sandbox.payfast.co.za 
+Getting started:
+To get started proceed to the above URL and enter your email address. The Sandbox dashboard has everything you need to test your integration. We recommend spending some time and familiarising yourself with the dashboard. There are helpful hints and tips to guide you on each page.
+Payment methods:
+The Sandbox allows you to test your integration without any money changing hands. The Sandbox makes use of a single payment method – a wallet with a substantially large dummy balance. While it is not possible to utilise the other payment methods in Sandbox, this will not affect your integration.
+Sandbox is simply a tool to test your integration, the actual payment screen can not be simulated while performing test transactions. The Sandbox does not make any connections to external systems (allowing all payments to be successful).
+Payment notifications:
+The Sandbox will only send payment notifications once. You can view all sent notifications by navigating to ITN (Instant transaction notification) in the Sandbox.
+Setting a passphrase:
+This is required for all subscription and tokenization payments. It is the ‘salt’ added to your parameter string before generating the signature. To add or change your passphrase, simply visit the Account Information Tab on the left hand side and enter or edit your passphrase in the ’Salt Passphrase’ input field.
+Integration tools:
+This section has been built to help you detect issues with your signature and assist where possible. The signature tool tests and evaluates a given parameter string and gives a result based on your input.
+Test your integration:
+This section was created to see what your signature should be with all your given variables. Fill out the form and click generate signature to allow Payfast to generate the correct signature for you and then submit to Payfast Sandbox. You will have the option to send through incorrect variables to see how we respond to certain variables.
+Sandbox limitations:
+The Sandbox does not make any connections to external systems (allowing all payments to be successful). Because the Sandbox makes use of Payfast's own personal buyer behind the scenes, all fields containing the party table will yield Test Buyer. This will not be the case when going live.
+Recurring Billing tools:
+Recurring Billing transactions require a passphrase to be set.
+
+Subscriptions and tokenization payments completed in Sandbox can be viewed on your Sandbox account. Just like on the Payfast merchant account, you will be able to cancel, charge, pause and edit subscriptions. For tokenization payments, you will be able to charge and cancel them.
+
+When editing a subscription you can change the amount, the number of cycles (payments), the next payment date and the frequency.
+
+The subscription token does not display in the Sandbox, so be sure to capture this from the ITN!

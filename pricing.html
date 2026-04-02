@@ -417,14 +417,6 @@
             If you are a school, one license covers every student.
         </p>
 
-        <div class="billing-toggle" aria-label="Billing period toggle">
-            <span class="toggle-label active" id="lbl-monthly">Monthly</span>
-            <div class="toggle-track" id="billing-toggle" role="switch" aria-checked="false" tabindex="0">
-                <div class="toggle-thumb"></div>
-            </div>
-            <span class="toggle-label inactive" id="lbl-annual">Annual</span>
-            <span class="save-badge">Save 35%</span>
-        </div>
 
         <div class="pricing-grid" role="list">
 
@@ -456,13 +448,7 @@
             <div class="plan-card featured" role="listitem" aria-label="Netrunner Pro plan">
                 <div class="plan-name">Netrunner Pro</div>
                 <div class="plan-tagline">// for serious revision</div>
-                <div class="plan-price">
-                    <span class="price-currency">$</span>
-                    <span class="price-amount" id="pro-price">9.99</span>
-                    <span class="price-period" id="pro-period">/month</span>
-                </div>
-                <div class="price-annual" id="pro-annual">$74.99/year — billed once (save $44.89)</div>
-                <div class="price-note" id="pro-note">Billed monthly. Cancel any time.</div>
+                <div class="price-note" style="margin-bottom:1.25rem;">One-time purchase. No subscription. Activates Pro for the chosen period.</div>
                 <ul class="features-list" aria-label="Pro plan features">
                     <li><span class="check">✓</span> Everything in Free</li>
                     <li><span class="check">✓</span> AI Mission Architect (unlimited)</li>
@@ -472,14 +458,25 @@
                     <li><span class="check">✓</span> Early access to beta modules</li>
                     <li><span class="check">✓</span> Export all data (JSON)</li>
                 </ul>
-                <div class="payment-btns">
-                    <button id="payfast-cta" class="plan-cta payfast-cta" aria-label="Pay with PayFast in ZAR" onclick="startPayfast()">
-                        PayFast <span class="pay-sub">ZAR · South Africa</span>
+                <div class="pack-grid" aria-label="Choose a Pro pack">
+                    <button class="pack-btn" aria-label="Buy 1 month for R99" onclick="startPayfast('1m')">
+                        <span class="pack-label">1 Month</span>
+                        <span class="pack-price">R99</span>
+                        <span class="pack-sub">30 days Pro</span>
                     </button>
-                    <button id="paypal-cta" class="plan-cta paypal-cta" aria-label="Pay with PayPal in USD" onclick="startPaypal()">
-                        PayPal <span class="pay-sub">USD · International</span>
+                    <button class="pack-btn pack-featured" aria-label="Buy 3 months for R249" onclick="startPayfast('3m')">
+                        <span class="pack-badge">BEST VALUE</span>
+                        <span class="pack-label">3 Months</span>
+                        <span class="pack-price">R249</span>
+                        <span class="pack-sub">90 days Pro</span>
+                    </button>
+                    <button class="pack-btn" aria-label="Buy 12 months for R799" onclick="startPayfast('12m')">
+                        <span class="pack-label">12 Months</span>
+                        <span class="pack-price">R799</span>
+                        <span class="pack-sub">365 days Pro</span>
                     </button>
                 </div>
+                <p class="pack-note">Paid via PayFast · ZAR · South Africa</p>
             </div>
 
             <!-- SCHOOL -->
@@ -552,8 +549,8 @@
                 <div class="faq-a">The AI study planning feature (Mission Architect) uses Google Gemini, which has real API costs. Pro pays for the AI infrastructure and supports continued development of the platform.</div>
             </div>
             <div class="faq-item">
-                <div class="faq-q">// Can I pay for Pro annually to save money?</div>
-                <div class="faq-a">Yes. Annual billing is $74.99/year — which works out to $6.25/month, saving you $44.89 compared to paying month-to-month. Toggle the billing switch above to see annual pricing.</div>
+                <div class="faq-q">// How does the one-time pack system work?</div>
+                <div class="faq-a">You pay once and Pro is activated for the duration of your pack — 30, 90, or 365 days. There is no subscription, no auto-renewal, and no surprise charges. When your pack expires your account returns to Free and you can top up again whenever you want.</div>
             </div>
             <div class="faq-item">
                 <div class="faq-q">// What does the School License cover exactly?</div>
@@ -573,12 +570,56 @@
     </main>
 
     <style>
-        .payment-btns { display: flex; flex-direction: column; gap: 0.6rem; margin-top: 0.5rem; }
-        .payfast-cta { background: #39FF14 !important; color: #050505 !important; border-color: #39FF14 !important; }
-        .payfast-cta:hover:not(:disabled) { background: #2bcc10 !important; }
-        .paypal-cta { background: transparent !important; color: #00AEEF !important; border: 1px solid #00AEEF !important; }
-        .paypal-cta:hover:not(:disabled) { background: rgba(0,174,239,0.08) !important; }
-        .pay-sub { display: block; font-size: 0.65rem; font-weight: 400; letter-spacing: 0.08em; margin-top: 0.15rem; opacity: 0.75; }
+        .pack-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 0.6rem; margin-top: 0.25rem;
+        }
+        .pack-btn {
+            position: relative;
+            display: flex; flex-direction: column; align-items: center;
+            padding: 0.85rem 0.5rem;
+            background: rgba(57,255,20,0.04);
+            border: 1px solid rgba(57,255,20,0.18);
+            cursor: pointer; transition: all 0.2s ease;
+            font-family: 'Share Tech Mono', monospace;
+        }
+        .pack-btn:hover:not(:disabled) {
+            background: rgba(57,255,20,0.1);
+            border-color: rgba(57,255,20,0.45);
+            box-shadow: 0 0 20px rgba(57,255,20,0.15);
+        }
+        .pack-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+        .pack-btn.pack-featured {
+            background: rgba(57,255,20,0.08);
+            border-color: rgba(57,255,20,0.4);
+        }
+        .pack-badge {
+            position: absolute; top: -10px; left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.6rem; letter-spacing: 0.12em;
+            background: #39FF14; color: #000;
+            padding: 0.1rem 0.4rem; white-space: nowrap;
+        }
+        .pack-label {
+            font-size: 0.75rem; letter-spacing: 0.08em;
+            text-transform: uppercase; color: rgba(57,255,20,0.7);
+            margin-bottom: 0.25rem;
+        }
+        .pack-price {
+            font-family: 'VT323', monospace;
+            font-size: 1.9rem; line-height: 1;
+            color: #39FF14; text-shadow: 0 0 20px rgba(57,255,20,0.3);
+        }
+        .pack-sub {
+            font-size: 0.65rem; letter-spacing: 0.06em;
+            color: #555; margin-top: 0.2rem;
+        }
+        .pack-note {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.72rem; color: #444;
+            letter-spacing: 0.04em; margin-top: 0.75rem;
+            text-align: center;
+        }
         .plan-cta:disabled { opacity: 0.5; cursor: not-allowed; }
         .toast {
             position: fixed; bottom: 2rem; left: 50%;
@@ -600,41 +641,6 @@
     <div id="page-toast" class="toast" role="status" aria-live="polite"></div>
 
     <script>
-        const toggle = document.getElementById('billing-toggle');
-        const proPrice  = document.getElementById('pro-price');
-        const proPeriod = document.getElementById('pro-period');
-        const proAnnual = document.getElementById('pro-annual');
-        const proNote   = document.getElementById('pro-note');
-        const lblM = document.getElementById('lbl-monthly');
-        const lblA = document.getElementById('lbl-annual');
-        let isAnnual = false;
-
-        function setAnnual(v) {
-            isAnnual = v;
-            toggle.classList.toggle('annual', v);
-            toggle.setAttribute('aria-checked', v ? 'true' : 'false');
-            lblM.classList.toggle('active', !v);
-            lblM.classList.toggle('inactive', v);
-            lblA.classList.toggle('active', v);
-            lblA.classList.toggle('inactive', !v);
-            if (v) {
-                proPrice.textContent  = '6.25';
-                proPeriod.textContent = '/month';
-                proAnnual.classList.add('visible');
-                proNote.textContent = 'Billed as $74.99/year. Cancel any time.';
-            } else {
-                proPrice.textContent  = '9.99';
-                proPeriod.textContent = '/month';
-                proAnnual.classList.remove('visible');
-                proNote.textContent = 'Billed monthly. Cancel any time.';
-            }
-        }
-
-        toggle.addEventListener('click', () => setAnnual(!isAnnual));
-        toggle.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setAnnual(!isAnnual); }
-        });
-
         let toastTimer = null;
         function showToast(msg, type = 'info', duration = 5000) {
             const el = document.getElementById('page-toast');
@@ -647,44 +653,29 @@
             toastTimer = setTimeout(() => el.classList.remove('visible'), duration);
         }
 
-        function setCtaLoading(id, loading, originalText) {
-            const btn = document.getElementById(id);
-            if (!btn) return;
-            btn.disabled = loading;
-            if (loading) btn.dataset.orig = btn.innerHTML;
-            else btn.innerHTML = btn.dataset.orig || originalText;
+        function setPackBtnsDisabled(state) {
+            document.querySelectorAll('.pack-btn').forEach(b => b.disabled = state);
         }
 
-        function disableAllCtAs(state) {
-            ['payfast-cta', 'paypal-cta'].forEach(id => {
-                const b = document.getElementById(id);
-                if (b) b.disabled = state;
-            });
-        }
-
-        async function startPayfast() {
-            disableAllCtAs(true);
-            const btn = document.getElementById('payfast-cta');
-            if (btn) { btn.dataset.orig = btn.innerHTML; btn.innerHTML = '// connecting...'; }
+        async function startPayfast(pack) {
+            setPackBtnsDisabled(true);
             try {
                 const res = await fetch('/api/payfast-checkout', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     credentials: 'same-origin',
-                    body: JSON.stringify({ plan: isAnnual ? 'annual' : 'monthly' })
+                    body: JSON.stringify({ pack })
                 });
                 if (res.status === 401) {
-                    showToast('// jack in first — login required', 'info', 5000);
+                    showToast('// jack in first — login required to purchase', 'info', 5000);
                     setTimeout(() => window.location.href = '/login', 1800);
-                    disableAllCtAs(false);
-                    if (btn) btn.innerHTML = btn.dataset.orig;
+                    setPackBtnsDisabled(false);
                     return;
                 }
                 const data = await res.json();
                 if (!res.ok) {
                     showToast('// ' + (data.error || 'PayFast error — try again'), 'error');
-                    disableAllCtAs(false);
-                    if (btn) btn.innerHTML = btn.dataset.orig;
+                    setPackBtnsDisabled(false);
                     return;
                 }
                 const form = document.createElement('form');
@@ -699,49 +690,17 @@
                 form.submit();
             } catch (e) {
                 showToast('// network error — check connection', 'error');
-                disableAllCtAs(false);
-                if (btn) btn.innerHTML = btn.dataset.orig;
-            }
-        }
-
-        async function startPaypal() {
-            disableAllCtAs(true);
-            const btn = document.getElementById('paypal-cta');
-            if (btn) { btn.dataset.orig = btn.innerHTML; btn.innerHTML = '// connecting...'; }
-            try {
-                const res = await fetch('/api/paypal-checkout', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'same-origin',
-                    body: JSON.stringify({ plan: isAnnual ? 'annual' : 'monthly' })
-                });
-                if (res.status === 401) {
-                    showToast('// jack in first — login required', 'info', 5000);
-                    setTimeout(() => window.location.href = '/login', 1800);
-                    disableAllCtAs(false);
-                    if (btn) btn.innerHTML = btn.dataset.orig;
-                    return;
-                }
-                const data = await res.json();
-                if (!res.ok || !data.url) {
-                    showToast('// ' + (data.error || 'PayPal error — try again'), 'error');
-                    disableAllCtAs(false);
-                    if (btn) btn.innerHTML = btn.dataset.orig;
-                    return;
-                }
-                window.location.href = data.url;
-            } catch (e) {
-                showToast('// network error — check connection', 'error');
-                disableAllCtAs(false);
-                if (btn) btn.innerHTML = btn.dataset.orig;
+                setPackBtnsDisabled(false);
             }
         }
 
         (function handleUrlParams() {
             const params = new URLSearchParams(window.location.search);
             if (params.get('success') === '1') {
-                const provider = params.get('provider') || '';
-                showToast('// payment received — NETRUNNER_PRO access granted. Welcome.', 'success', 8000);
+                const packLabels = { '1m': '30 days', '3m': '90 days', '12m': '365 days' };
+                const pack = params.get('pack') || '';
+                const duration = packLabels[pack] ? ` (${packLabels[pack]})` : '';
+                showToast(`// payment received — NETRUNNER_PRO access granted${duration}. Welcome.`, 'success', 10000);
                 window.history.replaceState({}, '', '/pricing');
             } else if (params.get('cancelled') === '1') {
                 showToast('// payment cancelled — no charge made', 'info', 5000);

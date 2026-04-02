@@ -51,6 +51,7 @@ async function ensureSchema() {
       ALTER TABLE users ADD COLUMN IF NOT EXISTS membership_tier VARCHAR NOT NULL DEFAULT 'free';
       ALTER TABLE users ADD COLUMN IF NOT EXISTS stripe_customer_id VARCHAR;
       ALTER TABLE users ADD COLUMN IF NOT EXISTS payment_ref VARCHAR;
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS pro_expires_at TIMESTAMP;
     `);
     await client.query(`
       UPDATE users SET payment_ref = stripe_customer_id WHERE payment_ref IS NULL AND stripe_customer_id IS NOT NULL
@@ -252,6 +253,7 @@ function setupAuthRoutes(app) {
       return res.status(401).json({ error: 'Not authenticated' });
     }
     try {
+      await checkAndExpireUser(req.session.userId);
       const user = await getUser(req.session.userId);
       if (!user) return res.status(401).json({ error: 'User not found' });
       const profile = req.session.userProfile || {};
@@ -262,7 +264,8 @@ function setupAuthRoutes(app) {
         lastName: user.last_name || profile.lastName,
         profileImageUrl: user.profile_image_url || profile.profileImageUrl,
         createdAt: user.created_at,
-        membershipTier: user.membership_tier || 'free'
+        membershipTier: user.membership_tier || 'free',
+        proExpiresAt: user.pro_expires_at || null
       });
     } catch (err) {
       console.error('/api/me error:', err);
@@ -288,14 +291,33 @@ async function updateGamertag(userId, gamertag) {
   );
 }
 
-async function updateMembershipTier(userId, tier, paymentRef = null) {
+async function updateMembershipTier(userId, tier, paymentRef = null, expiresAt = null) {
   const allowedTiers = ['free', 'pro'];
   if (!allowedTiers.includes(tier)) throw new Error('Invalid tier: ' + tier);
   await pool.query(
-    `UPDATE users SET membership_tier = $1, payment_ref = COALESCE($2, payment_ref), updated_at = NOW() WHERE id = $3`,
-    [tier, paymentRef, userId]
+    `UPDATE users SET
+       membership_tier = $1,
+       payment_ref = COALESCE($2, payment_ref),
+       pro_expires_at = $3,
+       updated_at = NOW()
+     WHERE id = $4`,
+    [tier, paymentRef, expiresAt, userId]
   );
-  console.log(`[membership] User ${userId} tier set to ${tier}`);
+  console.log(`[membership] User ${userId} tier set to ${tier}${expiresAt ? ' (expires ' + expiresAt.toISOString().slice(0,10) + ')' : ''}`);
+}
+
+async function checkAndExpireUser(userId) {
+  const { rows } = await pool.query(
+    `SELECT membership_tier, pro_expires_at FROM users WHERE id = $1`, [userId]
+  );
+  const user = rows[0];
+  if (!user) return;
+  if (user.membership_tier === 'pro' && user.pro_expires_at && new Date(user.pro_expires_at) < new Date()) {
+    await pool.query(
+      `UPDATE users SET membership_tier = 'free', updated_at = NOW() WHERE id = $1`, [userId]
+    );
+    console.log(`[membership] User ${userId} Pro expired — downgraded to free`);
+  }
 }
 
 async function getUserByPaymentRef(ref) {
@@ -516,4 +538,4 @@ async function getWaitlistCount() {
   return parseInt(res.rows[0].count, 10);
 }
 
-module.exports = { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, updateGamertag, getUserGamertag, updateMembershipTier, getUserByPaymentRef, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount };
+module.exports = { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, updateGamertag, getUserGamertag, updateMembershipTier, checkAndExpireUser, getUserByPaymentRef, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount };

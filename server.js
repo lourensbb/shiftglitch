@@ -3,10 +3,11 @@ const path = require('path');
 const crypto = require('crypto');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-const { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, getUserGamertag, updateGamertag, updateMembershipTier, getUserByPaymentRef, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount } = require('./auth');
+const { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, getUserGamertag, updateGamertag, updateMembershipTier, checkAndExpireUser, getUserByPaymentRef, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount } = require('./auth');
 
 async function requirePro(req, res, next) {
   try {
+    await checkAndExpireUser(req.session.userId);
     const user = await getUser(req.session.userId);
     if (!user || user.membership_tier !== 'pro') {
       return res.status(403).json({ error: 'PRO_REQUIRED', message: 'Upgrade to Netrunner Pro to access this feature.' });
@@ -128,8 +129,12 @@ function payfastSignature(data, passphrase) {
 
 const PAYFAST_SANDBOX = process.env.PAYFAST_SANDBOX === 'true';
 const PAYFAST_HOST = PAYFAST_SANDBOX ? 'sandbox.payfast.co.za' : 'www.payfast.co.za';
-const PAYFAST_MONTHLY_ZAR = process.env.PAYFAST_MONTHLY_ZAR || '179.99';
-const PAYFAST_ANNUAL_ZAR  = process.env.PAYFAST_ANNUAL_ZAR  || '1349.99';
+
+const PAYFAST_PACKS = {
+  '1m':  { amount: '99.00',  days: 30,  label: 'Netrunner Pro 1 Month'  },
+  '3m':  { amount: '249.00', days: 90,  label: 'Netrunner Pro 3 Months' },
+  '12m': { amount: '799.00', days: 365, label: 'Netrunner Pro 12 Months' }
+};
 
 const app = express();
 
@@ -157,11 +162,11 @@ app.post('/api/payfast-itn', express.urlencoded({ extended: false }), async (req
       console.warn('[payfast-itn] PAYFAST_MERCHANT_ID not set — ignoring ITN');
       return res.status(200).end();
     }
-    if (data.merchant_id !== expectedMerchantId) {
+    if (String(data.merchant_id) !== String(expectedMerchantId)) {
       console.warn(`[payfast-itn] Merchant ID mismatch: got ${data.merchant_id}`);
       return res.status(400).end();
     }
-    const pfHost = PAYFAST_SANDBOX ? 'sandbox.payfast.co.za' : 'www.payfast.co.za';
+    const pfHost = PAYFAST_HOST;
     const validationRes = await fetch(`https://${pfHost}/eng/query/validate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -172,26 +177,19 @@ app.post('/api/payfast-itn', express.urlencoded({ extended: false }), async (req
       console.warn('[payfast-itn] PayFast validation returned:', validation);
       return res.status(400).end();
     }
+    if (data.payment_status !== 'COMPLETE') {
+      console.log('[payfast-itn] Non-COMPLETE status, ignoring:', data.payment_status);
+      return res.status(200).end();
+    }
     const userId = data.m_payment_id.split('_')[0];
     if (!userId) {
       console.warn('[payfast-itn] Could not parse userId from m_payment_id:', data.m_payment_id);
       return res.status(400).end();
     }
-    if (data.payment_status === 'CANCELLED' || data.payment_status === 'FAILED') {
-      await updateMembershipTier(userId, 'free', null);
-      console.log(`[payfast-itn] User ${userId} downgraded to free — status: ${data.payment_status}`);
-      return res.status(200).end();
-    }
-    if (data.payment_status !== 'COMPLETE') {
-      console.log('[payfast-itn] Skipping status:', data.payment_status);
-      return res.status(200).end();
-    }
     const grossAmount = parseFloat(data.amount_gross || '0');
-    const expectedMonthly = parseFloat(PAYFAST_MONTHLY_ZAR);
-    const expectedAnnual  = parseFloat(PAYFAST_ANNUAL_ZAR);
-    const isValidAmount = Math.abs(grossAmount - expectedMonthly) < 1.0 || Math.abs(grossAmount - expectedAnnual) < 1.0;
-    if (!isValidAmount) {
-      console.warn(`[payfast-itn] Unexpected amount R${grossAmount} — expected R${expectedMonthly} or R${expectedAnnual}`);
+    const matchedPack = Object.values(PAYFAST_PACKS).find(p => Math.abs(parseFloat(p.amount) - grossAmount) < 1.0);
+    if (!matchedPack) {
+      console.warn(`[payfast-itn] Unrecognised amount R${grossAmount} — no matching pack`);
       return res.status(400).end();
     }
     const itemName = data.item_name || '';
@@ -199,8 +197,9 @@ app.post('/api/payfast-itn', express.urlencoded({ extended: false }), async (req
       console.warn(`[payfast-itn] Unexpected item_name: "${itemName}" — ignoring`);
       return res.status(400).end();
     }
-    await updateMembershipTier(userId, 'pro', `payfast_${data.pf_payment_id || data.m_payment_id}`);
-    console.log(`[payfast-itn] User ${userId} upgraded to pro (R${grossAmount}, "${itemName}")`);
+    const expiresAt = new Date(Date.now() + matchedPack.days * 24 * 60 * 60 * 1000);
+    await updateMembershipTier(userId, 'pro', `payfast_${data.pf_payment_id || data.m_payment_id}`, expiresAt);
+    console.log(`[payfast-itn] User ${userId} upgraded to pro for ${matchedPack.days} days (R${grossAmount}, "${itemName}") — expires ${expiresAt.toISOString().slice(0,10)}`);
     return res.status(200).end();
   } catch (err) {
     console.error('[payfast-itn] Error:', err.message);
@@ -208,91 +207,6 @@ app.post('/api/payfast-itn', express.urlencoded({ extended: false }), async (req
   }
 });
 
-async function getPaypalToken() {
-  const clientId = process.env.PAYPAL_CLIENT_ID;
-  const secret = process.env.PAYPAL_CLIENT_SECRET;
-  if (!clientId || !secret) return null;
-  const base = process.env.PAYPAL_SANDBOX === 'false' ? 'https://api-m.paypal.com' : 'https://api-m.sandbox.paypal.com';
-  const res = await fetch(`${base}/v1/oauth2/token`, {
-    method: 'POST',
-    headers: { 'Authorization': `Basic ${Buffer.from(`${clientId}:${secret}`).toString('base64')}`, 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: 'grant_type=client_credentials'
-  });
-  const data = await res.json();
-  return res.ok ? { token: data.access_token, base } : null;
-}
-
-app.post('/api/paypal-webhook', express.json(), async (req, res) => {
-  try {
-    const webhookId = process.env.PAYPAL_WEBHOOK_ID;
-    if (!webhookId) {
-      console.warn('[paypal-webhook] PAYPAL_WEBHOOK_ID not set — cannot verify, ignoring event');
-      return res.status(200).end();
-    }
-    const event = req.body;
-    if (!event || !event.event_type) return res.status(400).end();
-
-    const auth = await getPaypalToken();
-    if (!auth) {
-      console.warn('[paypal-webhook] PayPal credentials not set — cannot verify');
-      return res.status(500).end();
-    }
-    const verifyRes = await fetch(`${auth.base}/v1/notifications/verify-webhook-signature`, {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${auth.token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        auth_algo:         req.headers['paypal-auth-algo'],
-        cert_url:          req.headers['paypal-cert-url'],
-        transmission_id:   req.headers['paypal-transmission-id'],
-        transmission_sig:  req.headers['paypal-transmission-sig'],
-        transmission_time: req.headers['paypal-transmission-time'],
-        webhook_id:        webhookId,
-        webhook_event:     event
-      })
-    });
-    const verifyData = await verifyRes.json();
-    if (!verifyRes.ok || verifyData.verification_status !== 'SUCCESS') {
-      console.warn('[paypal-webhook] Signature verification failed:', verifyData.verification_status || verifyData);
-      return res.status(400).end();
-    }
-
-    const sub = event.resource || {};
-    const DOWNGRADE_EVENTS = [
-      'BILLING.SUBSCRIPTION.CANCELLED',
-      'BILLING.SUBSCRIPTION.EXPIRED',
-      'BILLING.SUBSCRIPTION.SUSPENDED',
-      'PAYMENT.SALE.REFUNDED'
-    ];
-
-    if (event.event_type === 'BILLING.SUBSCRIPTION.ACTIVATED') {
-      const userId = sub.custom_id;
-      if (userId) {
-        await updateMembershipTier(userId, 'pro', `paypal_${sub.id}`);
-        console.log(`[paypal-webhook] User ${userId} upgraded to pro (sub: ${sub.id})`);
-      } else {
-        console.warn('[paypal-webhook] No custom_id on ACTIVATED event — cannot identify user');
-      }
-    } else if (DOWNGRADE_EVENTS.includes(event.event_type)) {
-      let userId = sub.custom_id;
-      if (!userId && sub.id) {
-        const found = await getUserByPaymentRef(`paypal_${sub.id}`);
-        if (found) userId = found.id;
-      }
-      if (userId) {
-        await updateMembershipTier(userId, 'free', null);
-        console.log(`[paypal-webhook] User ${userId} downgraded to free via ${event.event_type}`);
-      } else {
-        console.warn(`[paypal-webhook] Could not resolve user for downgrade event: ${event.event_type}`);
-      }
-    } else {
-      console.log('[paypal-webhook] Unhandled event type:', event.event_type);
-    }
-    return res.status(200).end();
-  } catch (err) {
-    console.error('[paypal-webhook] Error:', err.message);
-    return res.status(500).end();
-  }
-});
 
 app.use(express.json());
 
@@ -389,92 +303,38 @@ app.post('/api/payfast-checkout', requireAuth, checkoutLimiter, async (req, res)
   const merchantId  = process.env.PAYFAST_MERCHANT_ID;
   const merchantKey = process.env.PAYFAST_MERCHANT_KEY;
   if (!merchantId || !merchantKey) {
-    console.warn('[payfast] PAYFAST_MERCHANT_ID or PAYFAST_MERCHANT_KEY not set');
-    return res.status(503).json({ error: 'PayFast not configured yet. Email admin@shiftglitch.com for help.' });
+    console.warn('[payfast] Credentials not set');
+    return res.status(503).json({ error: 'PayFast not configured. Email admin@shiftglitch.com for help.' });
   }
   if (!process.env.PAYFAST_PASSPHRASE && !PAYFAST_SANDBOX) {
-    console.error('[payfast] PAYFAST_PASSPHRASE is required in production — checkout blocked for security');
+    console.error('[payfast] PAYFAST_PASSPHRASE required in production');
     return res.status(503).json({ error: 'Payment gateway misconfiguration. Contact admin@shiftglitch.com.' });
   }
-  const { plan } = req.body;
-  if (!plan || !['monthly', 'annual'].includes(plan)) {
-    return res.status(400).json({ error: 'Plan must be "monthly" or "annual".' });
+  const { pack } = req.body;
+  if (!pack || !PAYFAST_PACKS[pack]) {
+    return res.status(400).json({ error: 'Pack must be "1m", "3m", or "12m".' });
   }
+  const selected = PAYFAST_PACKS[pack];
   const userId = req.session.userId;
   const baseUrl = getBaseUrl(req);
   const passphrase = process.env.PAYFAST_PASSPHRASE || '';
-  const amount = plan === 'annual' ? PAYFAST_ANNUAL_ZAR : PAYFAST_MONTHLY_ZAR;
   const mPaymentId = `${userId}_${Date.now()}`;
-  const today = new Date().toISOString().slice(0, 10);
   const fields = {
-    merchant_id:       merchantId,
-    merchant_key:      merchantKey,
-    return_url:        `${baseUrl}/pricing?success=1&provider=payfast`,
-    cancel_url:        `${baseUrl}/pricing?cancelled=1`,
-    notify_url:        `${baseUrl}/api/payfast-itn`,
-    m_payment_id:      mPaymentId,
-    amount:            amount,
-    item_name:         plan === 'annual' ? 'Netrunner Pro Annual' : 'Netrunner Pro Monthly',
-    subscription_type: '1',
-    billing_date:      today,
-    recurring_amount:  amount,
-    frequency:         plan === 'annual' ? '6' : '3',
-    cycles:            '0'
+    merchant_id:  merchantId,
+    merchant_key: merchantKey,
+    return_url:   `${baseUrl}/pricing?success=1&provider=payfast&pack=${pack}`,
+    cancel_url:   `${baseUrl}/pricing?cancelled=1`,
+    notify_url:   `${baseUrl}/api/payfast-itn`,
+    m_payment_id: mPaymentId,
+    amount:       selected.amount,
+    item_name:    selected.label
   };
   fields.signature = payfastSignature(fields, passphrase);
   const action = `https://${PAYFAST_HOST}/eng/process`;
-  console.log(`[payfast] Checkout initiated for user ${userId}, plan ${plan}`);
+  console.log(`[payfast] Checkout for user ${userId}, pack ${pack} (R${selected.amount})`);
   res.json({ action, fields });
 });
 
-app.post('/api/paypal-checkout', requireAuth, checkoutLimiter, async (req, res) => {
-  const auth = await getPaypalToken();
-  if (!auth) {
-    console.warn('[paypal] PAYPAL_CLIENT_ID or PAYPAL_CLIENT_SECRET not set');
-    return res.status(503).json({ error: 'PayPal not configured yet. Email admin@shiftglitch.com for help.' });
-  }
-  const { plan } = req.body;
-  if (!plan || !['monthly', 'annual'].includes(plan)) {
-    return res.status(400).json({ error: 'Plan must be "monthly" or "annual".' });
-  }
-  const planId = plan === 'annual'
-    ? process.env.PAYPAL_ANNUAL_PLAN_ID
-    : process.env.PAYPAL_MONTHLY_PLAN_ID;
-  if (!planId) {
-    console.error(`[paypal] Plan ID env var not set for plan: ${plan}`);
-    return res.status(503).json({ error: 'PayPal plan not configured. Email admin@shiftglitch.com.' });
-  }
-  const userId = req.session.userId;
-  const baseUrl = getBaseUrl(req);
-  try {
-    const subRes = await fetch(`${auth.base}/v1/billing/subscriptions`, {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${auth.token}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
-      body: JSON.stringify({
-        plan_id: planId,
-        custom_id: userId,
-        application_context: {
-          brand_name: 'ShiftGlitch',
-          user_action: 'SUBSCRIBE_NOW',
-          return_url: `${baseUrl}/pricing?success=1&provider=paypal`,
-          cancel_url: `${baseUrl}/pricing?cancelled=1`
-        }
-      })
-    });
-    const sub = await subRes.json();
-    if (!subRes.ok) {
-      console.error('[paypal] Subscription create error:', JSON.stringify(sub));
-      return res.status(500).json({ error: 'Failed to create PayPal subscription. Try again.' });
-    }
-    const approvalLink = (sub.links || []).find(l => l.rel === 'approve');
-    if (!approvalLink) return res.status(500).json({ error: 'No PayPal approval URL returned.' });
-    console.log(`[paypal] Subscription created for user ${userId}: ${sub.id}`);
-    res.json({ url: approvalLink.href });
-  } catch (err) {
-    console.error('[paypal] Error:', err.message);
-    res.status(500).json({ error: 'PayPal checkout failed. Try again.' });
-  }
-});
 
 if (process.env.NODE_ENV !== 'production' && !process.env.PAYFAST_MERCHANT_ID) {
   app.post('/api/dev/set-tier', requireAuth, async (req, res) => {
