@@ -1093,6 +1093,7 @@
                 const reqs = RANK_REQUIREMENTS[nextRank];
                 if (!reqs) return;
                 const ev = state.rankEvidence;
+                if ((ev.rollbackPenalty || 0) > 0) return;
                 const met = ev.blurtsCompleted >= reqs.blurtsCompleted &&
                             ev.governorBreakdowns >= reqs.governorBreakdowns &&
                             ev.cardsAdvanced >= reqs.cardsAdvanced &&
@@ -1252,6 +1253,10 @@
                 if (streak === 3 || streak === 7 || streak === 14) setTimeout(() => SysInterrupt.show('streak-signal', { streak }), 1200);
                 if (localStorage.getItem('sg_rollback_recovery_needed')) {
                     localStorage.removeItem('sg_rollback_recovery_needed');
+                    if ((state.rankEvidence.rollbackPenalty || 0) > 0) {
+                        state.rankEvidence.rollbackPenalty--;
+                        rankEngine.save();
+                    }
                     if (!this.isUnlocked('survived-rollback')) {
                         this._tryUnlock('survived-rollback');
                     } else {
@@ -1470,6 +1475,11 @@
                 } catch(e) {}
                 if (localStorage.getItem('sg_rollback_recovery_needed')) {
                     localStorage.removeItem('sg_rollback_recovery_needed');
+                    if ((state.rankEvidence.rollbackPenalty || 0) > 0) {
+                        state.rankEvidence.rollbackPenalty--;
+                        rankEngine.save();
+                    }
+                    if (!badgeEngine.isUnlocked('survived-rollback')) badgeEngine._tryUnlock('survived-rollback');
                 }
                 const boxEl = document.getElementById(id+'-box');
                 if (boxEl) boxEl.innerHTML = '<div class="si-body" style="text-align:center;padding:40px 24px;">' +
@@ -1550,6 +1560,8 @@
             acknowledgeRollback(id) {
                 localStorage.setItem('sg_rollback_ack', new Date().toISOString());
                 localStorage.setItem('sg_rollback_recovery_needed', '1');
+                state.rankEvidence.rollbackPenalty = (state.rankEvidence.rollbackPenalty || 0) + 1;
+                rankEngine.save();
                 this.dismiss(id);
             },
             _buildHTML(type, payload, id) {
