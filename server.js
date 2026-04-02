@@ -69,20 +69,25 @@ async function sendWelcomeEmail(gamertag, email) {
     </body>
     </html>
   `;
+  const fromAddress = process.env.RESEND_FROM_ADDRESS || 'ShiftGlitch <onboarding@resend.dev>';
+  console.log(`[email] Sending welcome email to ${email} via sender: ${fromAddress}`);
   try {
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        from: 'ShiftGlitch <onboarding@resend.dev>',
+        from: fromAddress,
         to: [email],
         subject: '[ ACCESS REQUESTED ] — ShiftGlitch Mainframe',
         html
       })
     });
     if (!res.ok) {
-      const err = await res.text();
-      console.error('[email] Resend error:', err);
+      const errBody = await res.text();
+      console.error(`[email] Resend API error (${res.status}):`, errBody);
+    } else {
+      const data = await res.json();
+      console.log('[email] Welcome email sent successfully. Resend ID:', data.id);
     }
   } catch (err) {
     console.error('[email] Failed to send welcome email:', err.message);
