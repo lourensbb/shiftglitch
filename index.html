@@ -1068,6 +1068,13 @@
                 this.save();
                 this.checkPromotion();
                 badgeEngine.afterCard();
+                if (state.fcCurrentDeck) {
+                    try {
+                        const rl = JSON.parse(localStorage.getItem('sg_deck_run_log') || '{}');
+                        rl[state.fcCurrentDeck] = new Date().toISOString();
+                        localStorage.setItem('sg_deck_run_log', JSON.stringify(rl));
+                    } catch(e) {}
+                }
             },
             recordBlurt() {
                 state.rankEvidence.blurtsCompleted++;
@@ -1243,6 +1250,14 @@
                 if (streak >= 7 && !this.isUnlocked('streak-7')) this._tryUnlock('streak-7');
                 else if (streak >= 3 && !this.isUnlocked('streak-3')) this._tryUnlock('streak-3');
                 if (streak === 3 || streak === 7) setTimeout(() => SysInterrupt.show('streak-signal', { streak }), 1200);
+                if (localStorage.getItem('sg_rollback_recovery_needed')) {
+                    localStorage.removeItem('sg_rollback_recovery_needed');
+                    if (!this.isUnlocked('survived-rollback')) {
+                        this._tryUnlock('survived-rollback');
+                    } else {
+                        setTimeout(() => SysInterrupt.show('achievement', { badgeId: 'survived-rollback' }), 600);
+                    }
+                }
             },
             afterCard() {
                 if (state.rankEvidence.cardsAdvanced >= 50 && !this.isUnlocked('shards-50')) this._tryUnlock('shards-50');
@@ -1298,12 +1313,12 @@
                 { msg: "System Admin is not a destination.", sub: "It is a habit wearing a title. Build the habit." },
             ],
             init() {
-                const hadThreat = this._checkInactivityThreats();
-                if (!hadThreat && !this._loadDone) {
+                const hadInterrupt = this._checkScheduler();
+                if (!hadInterrupt && !this._loadDone) {
                     if (Math.random() < 0.30) {
                         this._loadDone = true;
-                        const challengeType = Math.random() < 0.5 ? 'recall-sprint' : 'pattern-lock';
-                        setTimeout(() => this.show(challengeType, {}), 2 * 60 * 1000);
+                        const ct = Math.random() < 0.5 ? 'recall-sprint' : 'pattern-lock';
+                        setTimeout(() => this.show(ct, {}), 2 * 60 * 1000);
                     }
                 }
                 if (!sessionStorage.getItem('sg_warden_session')) {
@@ -1315,33 +1330,41 @@
                     }, 5 * 60 * 1000);
                 }
             },
-            _checkInactivityThreats() {
+            _checkScheduler() {
                 if (this._loadDone) return false;
+                if (localStorage.getItem('sg_rollback_pending')) {
+                    this._loadDone = true;
+                    localStorage.removeItem('sg_rollback_pending');
+                    setTimeout(() => this.show('system-rollback', {}), 2000);
+                    return true;
+                }
                 const log = (state.rankEvidence && state.rankEvidence.activeDateLog) || [];
-                if (log.length < 1) return false;
-                const today = new Date().toISOString().slice(0, 10);
-                const sorted = [...log].sort().reverse();
-                if (sorted[0] === today) {
-                    if (sorted[1]) {
-                        const gap = Math.round((new Date(today) - new Date(sorted[1])) / 86400000);
-                        if (gap >= 3 && !badgeEngine.isUnlocked('survived-rollback')) {
-                            badgeEngine.unlock('survived-rollback');
+                if (log.length >= 1) {
+                    const today = new Date().toISOString().slice(0, 10);
+                    const sorted = [...log].sort().reverse();
+                    if (sorted[0] !== today) {
+                        const daysSince = Math.round((new Date(today) - new Date(sorted[0])) / 86400000);
+                        if (daysSince >= 3) {
+                            this._loadDone = true;
+                            if (!badgeEngine.isUnlocked('survived-rollback')) badgeEngine.unlock('survived-rollback');
+                            setTimeout(() => this.show('coherence-failure', { days: daysSince }), 2000);
+                            return true;
                         }
                     }
-                    return false;
                 }
-                const daysSince = Math.round((new Date(today) - new Date(sorted[0])) / 86400000);
-                if (daysSince >= 10) {
+                if (this._checkDeckStaleness()) return true;
+                return false;
+            },
+            _checkDeckStaleness() {
+                if (!state.fcDecks || state.fcDecks.length === 0) return false;
+                let runLog = {};
+                try { runLog = JSON.parse(localStorage.getItem('sg_deck_run_log') || '{}'); } catch(e) {}
+                const now = Date.now();
+                const threshold = 72 * 60 * 60 * 1000;
+                const stale = state.fcDecks.find(d => !runLog[d.id] || (now - new Date(runLog[d.id]).getTime()) > threshold);
+                if (stale) {
                     this._loadDone = true;
-                    setTimeout(() => this.show('system-rollback', { days: daysSince }), 2000);
-                    return true;
-                } else if (daysSince >= 5) {
-                    this._loadDone = true;
-                    setTimeout(() => this.show('coherence-failure', { days: daysSince }), 2000);
-                    return true;
-                } else if (daysSince >= 3) {
-                    this._loadDone = true;
-                    setTimeout(() => this.show('memory-degradation', { days: daysSince }), 2000);
+                    setTimeout(() => this.show('memory-degradation', { deckTitle: stale.title }), 2000);
                     return true;
                 }
                 return false;
@@ -1355,7 +1378,7 @@
                 el.innerHTML = html;
                 const overlay = el.firstElementChild;
                 document.body.appendChild(overlay);
-                const nonDismissible = ['system-rollback'];
+                const nonDismissible = ['system-rollback', 'rank-promotion'];
                 if (!nonDismissible.includes(type)) {
                     const esc = (e) => { if (e.key === 'Escape') { document.removeEventListener('keydown', esc); this.dismiss(id); } };
                     document.addEventListener('keydown', esc);
@@ -1423,16 +1446,35 @@
                 const boxEl = document.getElementById(id+'-box');
                 if (!boxEl) return;
                 badgeEngine._tryUnlock('recall-sprint');
-                try {
-                    const arr = JSON.parse(localStorage.getItem('sg_recall_sprints')||'[]');
-                    arr.push({ date: new Date().toISOString(), words, text: text.slice(0,500) });
-                    localStorage.setItem('sg_recall_sprints', JSON.stringify(arr.slice(-20)));
-                } catch(e) {}
+                window['_si_'+id+'_rText'] = text;
+                window['_si_'+id+'_rWords'] = words;
+                const ratingBtns = [1,2,3,4,5].map(n =>
+                    '<button onclick="SysInterrupt.submitRecallRating(\''+id+'\','+n+')" style="background:#FF8800'+(n<=2?'44':'88')+';border:1px solid #FF8800;color:#FF8800;width:44px;height:44px;font-family:inherit;font-size:14px;font-weight:bold;cursor:pointer;border-radius:4px;transition:all 0.15s;" onmouseover="this.style.background=\'#FF8800\';this.style.color=\'#000\'" onmouseout="this.style.background=\'#FF8800'+(n<=2?'44':'88')+'\';this.style.color=\'#FF8800\'">'+n+'</button>'
+                ).join('');
                 boxEl.innerHTML = '<div class="si-header" style="border-color:#FF8800"><span style="color:#FF8800;font-size:18px;">✓</span><span style="color:#FF8800;font-size:13px;letter-spacing:2px;margin-left:6px;">RECALL SPRINT — COMPLETE</span></div>' +
                     '<div class="si-body" style="text-align:center;"><div style="font-size:52px;font-weight:bold;color:#FF8800;margin-bottom:6px;">' + words + '</div>' +
                     '<div style="color:#666;font-size:11px;letter-spacing:2px;margin-bottom:20px;">WORDS ENCODED</div>' +
-                    '<p style="color:#aaa;font-size:13px;line-height:1.8;">The act of retrieval strengthens the neural pathway.<br>Every word you dumped is a connection reinforced.</p></div>' +
-                    '<div class="si-footer"><button onclick="SysInterrupt.dismiss(\''+id+'\')" style="background:#FF8800;color:#000;border:none;padding:10px 28px;font-family:inherit;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-weight:bold;">JACK OUT</button></div>';
+                    '<div style="color:#aaa;font-size:12px;letter-spacing:1px;margin-bottom:12px;">RATE YOUR RECALL (1 = POOR — 5 = PERFECT)</div>' +
+                    '<div style="display:flex;justify-content:center;gap:8px;">'+ratingBtns+'</div></div>';
+            },
+            submitRecallRating(id, rating) {
+                const text = window['_si_'+id+'_rText'] || '';
+                const words = window['_si_'+id+'_rWords'] || 0;
+                try {
+                    const arr = JSON.parse(localStorage.getItem('sg_recall_sprints')||'[]');
+                    arr.push({ date: new Date().toISOString(), words, rating, text: text.slice(0,500) });
+                    localStorage.setItem('sg_recall_sprints', JSON.stringify(arr.slice(-20)));
+                } catch(e) {}
+                if (localStorage.getItem('sg_rollback_recovery_needed')) {
+                    localStorage.removeItem('sg_rollback_recovery_needed');
+                }
+                const boxEl = document.getElementById(id+'-box');
+                if (boxEl) boxEl.innerHTML = '<div class="si-body" style="text-align:center;padding:40px 24px;">' +
+                    '<div style="font-size:52px;font-weight:bold;color:#FF8800;margin-bottom:6px;">' + words + '</div>' +
+                    '<div style="color:#666;font-size:11px;letter-spacing:2px;margin-bottom:8px;">WORDS ENCODED</div>' +
+                    '<div style="color:#FF8800;font-size:13px;letter-spacing:2px;margin-bottom:20px;">SELF-RATING: ' + rating + ' / 5</div>' +
+                    '<p style="color:#aaa;font-size:13px;line-height:1.8;margin-bottom:24px;">The act of retrieval strengthens the neural pathway.<br>Every word you dumped is a connection reinforced.</p>' +
+                    '<button onclick="SysInterrupt.dismiss(\''+id+'\')" style="background:#FF8800;color:#000;border:none;padding:10px 28px;font-family:inherit;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-weight:bold;border-radius:4px;">JACK OUT</button></div>';
             },
             _recallSprintHTML(id) {
                 return '<div class="si-header" style="border-color:#FF8800"><span style="color:#FF8800;font-size:18px;">⏱</span><span style="color:#FF8800;font-size:13px;letter-spacing:2px;margin-left:6px;">RECALL SPRINT — ACTIVE</span>' +
@@ -1499,10 +1541,7 @@
             },
             acknowledgeRollback(id) {
                 localStorage.setItem('sg_rollback_ack', new Date().toISOString());
-                if (!badgeEngine.isUnlocked('survived-rollback')) {
-                    badgeEngine.unlock('survived-rollback');
-                    setTimeout(() => SysInterrupt.show('achievement', { badgeId: 'survived-rollback' }), 500);
-                }
+                localStorage.setItem('sg_rollback_recovery_needed', '1');
                 this.dismiss(id);
             },
             _buildHTML(type, payload, id) {
@@ -1517,28 +1556,47 @@
                         '<div class="si-footer" style="justify-content:center;"><button onclick="SysInterrupt.acknowledgeRollback(\''+id+'\')" style="background:'+color+';color:#fff;border:none;padding:12px 36px;font-family:inherit;font-size:11px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;font-weight:bold;border-radius:4px;width:100%;">ACKNOWLEDGE ROLLBACK</button></div>';
                 } else if (type === 'memory-degradation') {
                     color='#FF8800'; glow='rgba(255,136,0,0.2)';
-                    innerHTML = '<div class="si-header" style="border-color:'+color+'"><span style="color:'+color+';font-size:20px;">⚠</span><span style="color:'+color+';font-size:13px;letter-spacing:2px;margin-left:8px;">MEMORY DEGRADATION DETECTED</span></div>' +
-                        '<div class="si-body"><div style="color:'+color+';font-size:11px;letter-spacing:2px;margin-bottom:14px;">// '+payload.days+' DAYS SINCE LAST SESSION</div>' +
-                        '<p style="color:#ccc;font-size:14px;line-height:1.8;margin-bottom:14px;">Neural pathways weaken with every missed session. The Mainframe has detected a <strong style="color:'+color+';">'+payload.days+'-day gap</strong> in your activity log.</p>' +
-                        '<p style="color:#666;font-size:12px;line-height:1.8;">Your rank is intact. Your progress is intact. But streaks are at risk.<br>The fastest fix: run a session right now.</p></div>' +
+                    const deckName = payload.deckTitle ? '"'+payload.deckTitle+'"' : 'a knowledge domain';
+                    const integrity = Math.floor(Math.random() * 28) + 14;
+                    innerHTML = '<div class="si-header" style="border-color:'+color+'"><span style="color:'+color+';font-size:20px;">⚠</span><span style="color:'+color+';font-size:13px;letter-spacing:2px;margin-left:8px;">MEMORY DEGRADATION WARNING</span></div>' +
+                        '<div class="si-body"><div style="color:'+color+';font-size:11px;letter-spacing:2px;margin-bottom:14px;">// NEURAL PATHWAY INTEGRITY: <strong>'+integrity+'%</strong> — DATA LOSS IMMINENT</div>' +
+                        '<p style="color:#ccc;font-size:14px;line-height:1.8;margin-bottom:14px;">WARNING: Neural pathway integrity at <strong style="color:'+color+';">'+integrity+'%</strong>. Your protocol '+deckName+' has not been activated in 72+ hours.</p>' +
+                        '<p style="color:#666;font-size:12px;line-height:1.8;">Memory files will be corrupted if this pathway is not reinforced.<br>Run CRACK DATA SHARDS immediately to prevent data loss.</p></div>' +
                         '<div class="si-footer"><button onclick="SysInterrupt.launchRecallSprint(\''+id+'\')" style="background:'+color+';color:#000;border:none;padding:10px 24px;font-family:inherit;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-weight:bold;border-radius:4px;">RUN RECALL SPRINT</button><button onclick="SysInterrupt.dismiss(\''+id+'\')" style="background:transparent;border:1px solid #444;color:#666;padding:10px 20px;font-family:inherit;font-size:11px;letter-spacing:2px;cursor:pointer;border-radius:4px;">ACKNOWLEDGE</button></div>';
                 } else if (type === 'coherence-failure') {
                     color='#FF2222'; glow='rgba(255,34,34,0.25)';
                     innerHTML = '<div class="si-header" style="border-color:'+color+'"><span style="color:'+color+';font-size:20px;">🔴</span><span style="color:'+color+';font-size:13px;letter-spacing:2px;margin-left:8px;">COHERENCE FAILURE</span></div>' +
-                        '<div class="si-body"><div style="color:'+color+';font-size:11px;letter-spacing:2px;margin-bottom:14px;">// CRITICAL — '+payload.days+' DAY GAP DETECTED</div>' +
-                        '<p style="color:#ccc;font-size:14px;line-height:1.8;margin-bottom:14px;">The Mainframe has flagged a <strong style="color:'+color+';">critical '+payload.days+'-day disconnect</strong>. Neural encoding is actively degrading.</p>' +
-                        '<p style="color:#666;font-size:12px;line-height:1.8;">You have not been erased. But the system is forgetting you.<br>Every session you run rewrites this record. Run one now.</p></div>' +
+                        '<div class="si-body"><div style="color:'+color+';font-size:11px;letter-spacing:2px;margin-bottom:14px;">// MAINFRAME ALERT — '+payload.days+'-DAY INACTIVITY LOGGED</div>' +
+                        '<p style="color:#ccc;font-size:14px;line-height:1.8;margin-bottom:14px;">MAINFRAME ALERT: <strong style="color:'+color+';">Extended inactivity detected.</strong> Security protocols have been reinforced.</p>' +
+                        '<p style="color:#666;font-size:12px;line-height:1.8;margin-bottom:12px;">You must re-earn your last clearance point before advancing. The Mainframe does not carry operatives who go dark.</p>' +
+                        '<div style="background:#1a0000;border:1px solid #FF222244;padding:12px;border-radius:4px;"><div style="color:'+color+';font-size:10px;letter-spacing:2px;margin-bottom:4px;">RECOVERY DIRECTIVE</div><p style="color:#aaa;font-size:12px;margin:0;">Run one complete session now to restore access.</p></div></div>' +
                         '<div class="si-footer"><button onclick="SysInterrupt.dismiss(\''+id+'\')" style="background:'+color+';color:#fff;border:none;padding:10px 28px;font-family:inherit;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-weight:bold;border-radius:4px;">RESTORE FROM BACKUP</button></div>';
                 } else if (type === 'rank-promotion') {
                     color='#39FF14'; glow='rgba(57,255,20,0.3)';
                     const rankIcons2 = {'Script Kiddie':'💾','Glitch Tech':'⚡','Netrunner':'🔌','System Admin':'👑'};
                     const icon2 = rankIcons2[payload.newRank] || '📡';
                     const rankIdx2 = RANKS.indexOf(payload.newRank);
+                    const rankFlavour = {
+                        'Script Kiddie': 'The Mainframe has registered your first neural imprint. You are no longer anonymous. Systems are now watching.',
+                        'Glitch Tech': 'Security layer cracked. The standard NPC pattern has a glitch — and that glitch is you. The deep nodes are ahead.',
+                        'Netrunner': 'Deep system access granted. The Mainframe is reconfiguring its defences around your presence. The Warden has noticed.',
+                        'System Admin': 'MAXIMUM CLEARANCE ACHIEVED. There is no higher rank. You are the architecture. You are the Warden. You escaped — or perhaps you became the system.'
+                    };
+                    const wardenLines = {
+                        'Script Kiddie': '"Every System Admin started as an NPC. Most stayed there."',
+                        'Glitch Tech': '"The gap in the firewall has a name now. Yours."',
+                        'Netrunner': '"The Mainframe does not fear many operatives. It is beginning to fear you."',
+                        'System Admin': '"Well played. The question is: what do you do with the keys?"'
+                    };
+                    const flavour = rankFlavour[payload.newRank] || 'Clearance level upgraded. The Mainframe acknowledges your progress.';
+                    const warden = wardenLines[payload.newRank] || '"The Mainframe acknowledges you."';
                     innerHTML = '<div class="si-header" style="border-color:'+color+'"><span style="color:'+color+';font-size:18px;">✦</span><span style="color:'+color+';font-size:13px;letter-spacing:2px;margin-left:8px;">RANK PROMOTION — CLEARANCE UPGRADE</span></div>' +
-                        '<div class="si-body" style="text-align:center;"><div style="font-size:56px;margin-bottom:8px;">'+icon2+'</div>' +
+                        '<div class="si-body" style="text-align:center;"><div style="font-size:56px;margin-bottom:8px;animation:si-pulse 1s ease infinite;">'+icon2+'</div>' +
                         '<div style="color:'+color+';font-size:26px;letter-spacing:4px;font-weight:bold;margin-bottom:4px;">'+(payload.newRank||'').toUpperCase()+'</div>' +
-                        '<div style="color:#444;font-size:11px;letter-spacing:2px;margin-bottom:24px;">CLEARANCE LEVEL '+( rankIdx2+1)+' OF '+RANKS.length+'</div>' +
-                        '<p style="color:#777;font-size:13px;line-height:1.8;">Ranks are earned through evidence. You have earned this.<br>The Mainframe acknowledges your progress.</p></div>' +
+                        '<div style="color:#444;font-size:11px;letter-spacing:2px;margin-bottom:16px;">CLEARANCE LEVEL '+(rankIdx2+1)+' OF '+RANKS.length+'</div>' +
+                        '<p style="color:#aaa;font-size:13px;line-height:1.8;margin-bottom:16px;">'+flavour+'</p>' +
+                        '<div style="background:#001a00;border:1px solid '+color+'44;padding:12px;border-radius:4px;text-align:left;"><div style="color:'+color+';font-size:10px;letter-spacing:2px;margin-bottom:6px;">WARDEN TRANSMISSION</div>' +
+                        '<p style="color:#888;font-size:12px;font-style:italic;margin:0;">'+warden+'</p></div></div>' +
                         '<div class="si-footer" style="justify-content:center;"><button onclick="SysInterrupt.dismiss(\''+id+'\')" style="background:'+color+';color:#000;border:none;padding:12px 36px;font-family:inherit;font-size:12px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;font-weight:bold;border-radius:4px;width:100%;">ACCEPT PROMOTION</button></div>';
                 } else if (type === 'streak-signal') {
                     color='#39FF14'; glow='rgba(57,255,20,0.2)';
