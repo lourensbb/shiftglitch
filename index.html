@@ -1234,15 +1234,15 @@
                 const ev = state.rankEvidence;
                 const streak = rankEngine.getStreak();
                 const rankIdx = RANKS.indexOf(state.rank);
-                if (ev.pomodorosCompleted >= 1) this.unlock('first-exploit');
-                if (streak >= 3) this.unlock('streak-3');
-                if (streak >= 7) this.unlock('streak-7');
-                if (state.rank !== 'NPC') this.unlock('first-rank-up');
-                if (rankIdx >= RANKS.indexOf('Glitch Tech')) this.unlock('reached-glitch-tech');
-                if (rankIdx >= RANKS.indexOf('Netrunner')) this.unlock('reached-netrunner');
-                if (state.rank === 'System Admin') this.unlock('reached-system-admin');
-                if (ev.cardsAdvanced >= 50) this.unlock('shards-50');
-                if (state.fcDecks && state.fcDecks.length >= 1) this.unlock('domain-mapped');
+                if (ev.pomodorosCompleted >= 1) this._tryUnlock('first-exploit');
+                if (streak >= 3) this._tryUnlock('streak-3');
+                if (streak >= 7) this._tryUnlock('streak-7');
+                if (state.rank !== 'NPC') this._tryUnlock('first-rank-up');
+                if (rankIdx >= RANKS.indexOf('Glitch Tech')) this._tryUnlock('reached-glitch-tech');
+                if (rankIdx >= RANKS.indexOf('Netrunner')) this._tryUnlock('reached-netrunner');
+                if (state.rank === 'System Admin') this._tryUnlock('reached-system-admin');
+                if (ev.cardsAdvanced >= 50) this._tryUnlock('shards-50');
+                if (state.fcDecks && state.fcDecks.length >= 1) this._tryUnlock('domain-mapped');
             },
             afterPomodoro() {
                 const ev = state.rankEvidence;
@@ -1352,6 +1352,9 @@
                         const daysSince = Math.round((new Date(today) - new Date(sorted[0])) / 86400000);
                         if (daysSince >= 3) {
                             this._loadDone = true;
+                            state.rankEvidence.rollbackPenalty = (state.rankEvidence.rollbackPenalty || 0) + 1;
+                            localStorage.setItem('sg_rollback_recovery_needed', '1');
+                            rankEngine.save();
                             setTimeout(() => this.show('coherence-failure', { days: daysSince }), 2000);
                             return true;
                         }
@@ -1575,7 +1578,7 @@
                         '<div style="background:#1a0000;border:1px solid '+color+';padding:14px;border-radius:4px;margin-bottom:4px;"><div style="color:'+color+';font-size:10px;letter-spacing:2px;margin-bottom:6px;">RECOVERY PROTOCOL</div><p style="color:#aaa;font-size:12px;line-height:1.7;margin:0;">Complete one Focus Session or Recall Sprint to re-earn your clearance point. No shortcuts. No exceptions.</p></div></div>' +
                         '<div class="si-footer" style="justify-content:center;"><button onclick="SysInterrupt.acknowledgeRollback(\''+id+'\')" style="background:'+color+';color:#fff;border:none;padding:12px 36px;font-family:inherit;font-size:11px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;font-weight:bold;border-radius:4px;width:100%;">ACKNOWLEDGE ROLLBACK</button></div>';
                 } else if (type === 'memory-degradation') {
-                    color='#FF8800'; glow='rgba(255,136,0,0.2)';
+                    color='#FF2222'; glow='rgba(255,34,34,0.2)';
                     const deckName = payload.deckTitle ? '"'+payload.deckTitle+'"' : 'a knowledge domain';
                     const integrity = Math.floor(Math.random() * 28) + 14;
                     innerHTML = '<div class="si-header" style="border-color:'+color+'"><span style="color:'+color+';font-size:20px;">⚠</span><span style="color:'+color+';font-size:13px;letter-spacing:2px;margin-left:8px;">MEMORY DEGRADATION WARNING</span></div>' +
