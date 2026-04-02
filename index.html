@@ -1340,7 +1340,6 @@
                 if (this._loadDone) return false;
                 if (localStorage.getItem('sg_rollback_pending')) {
                     this._loadDone = true;
-                    localStorage.removeItem('sg_rollback_pending');
                     setTimeout(() => this.show('system-rollback', {}), 2000);
                     return true;
                 }
@@ -1352,9 +1351,11 @@
                         const daysSince = Math.round((new Date(today) - new Date(sorted[0])) / 86400000);
                         if (daysSince >= 3) {
                             this._loadDone = true;
-                            state.rankEvidence.rollbackPenalty = (state.rankEvidence.rollbackPenalty || 0) + 1;
-                            localStorage.setItem('sg_rollback_recovery_needed', '1');
-                            rankEngine.save();
+                            if (!localStorage.getItem('sg_rollback_recovery_needed')) {
+                                state.rankEvidence.rollbackPenalty = (state.rankEvidence.rollbackPenalty || 0) + 1;
+                                localStorage.setItem('sg_rollback_recovery_needed', '1');
+                                rankEngine.save();
+                            }
                             setTimeout(() => this.show('coherence-failure', { days: daysSince }), 2000);
                             return true;
                         }
@@ -1369,7 +1370,7 @@
                 try { runLog = JSON.parse(localStorage.getItem('sg_deck_run_log') || '{}'); } catch(e) {}
                 const now = Date.now();
                 const threshold = 72 * 60 * 60 * 1000;
-                const stale = state.fcDecks.find(d => !runLog[d.id] || (now - new Date(runLog[d.id]).getTime()) > threshold);
+                const stale = state.fcDecks.find(d => runLog[d.id] && (now - new Date(runLog[d.id]).getTime()) > threshold);
                 if (stale) {
                     this._loadDone = true;
                     setTimeout(() => this.show('memory-degradation', { deckTitle: stale.title }), 2000);
@@ -1561,10 +1562,13 @@
                 }
             },
             acknowledgeRollback(id) {
+                localStorage.removeItem('sg_rollback_pending');
                 localStorage.setItem('sg_rollback_ack', new Date().toISOString());
-                localStorage.setItem('sg_rollback_recovery_needed', '1');
-                state.rankEvidence.rollbackPenalty = (state.rankEvidence.rollbackPenalty || 0) + 1;
-                rankEngine.save();
+                if (!localStorage.getItem('sg_rollback_recovery_needed')) {
+                    state.rankEvidence.rollbackPenalty = (state.rankEvidence.rollbackPenalty || 0) + 1;
+                    rankEngine.save();
+                    localStorage.setItem('sg_rollback_recovery_needed', '1');
+                }
                 this.dismiss(id);
             },
             _buildHTML(type, payload, id) {
