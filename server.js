@@ -140,7 +140,19 @@ app.post('/api/payfast-itn', express.urlencoded({ extended: false }), async (req
     const validation = await validationRes.text();
     if (validation !== 'VALID') { console.warn('[payfast-itn] PayFast validation returned:', validation); return; }
 
-    if (data.payment_status !== 'COMPLETE') { console.log('[payfast-itn] Skipping non-COMPLETE status:', data.payment_status); return; }
+    const userId = data.m_payment_id.split('_')[0];
+    if (!userId) { console.warn('[payfast-itn] Could not parse userId from m_payment_id:', data.m_payment_id); return; }
+
+    if (data.payment_status === 'CANCELLED' || data.payment_status === 'FAILED') {
+      await updateMembershipTier(userId, 'free', null);
+      console.log(`[payfast-itn] User ${userId} downgraded to free — status: ${data.payment_status}`);
+      return;
+    }
+
+    if (data.payment_status !== 'COMPLETE') {
+      console.log('[payfast-itn] Skipping status:', data.payment_status);
+      return;
+    }
 
     const grossAmount = parseFloat(data.amount_gross || '0');
     const expectedMonthly = parseFloat(PAYFAST_MONTHLY_ZAR);
@@ -158,8 +170,6 @@ app.post('/api/payfast-itn', express.urlencoded({ extended: false }), async (req
       return;
     }
 
-    const userId = data.m_payment_id.split('_')[0];
-    if (!userId) { console.warn('[payfast-itn] Could not parse userId from m_payment_id:', data.m_payment_id); return; }
     await updateMembershipTier(userId, 'pro', `payfast_${data.pf_payment_id || data.m_payment_id}`);
     console.log(`[payfast-itn] User ${userId} upgraded to pro (R${grossAmount}, "${itemName}")`);
   } catch (err) {
@@ -216,21 +226,33 @@ app.post('/api/paypal-webhook', express.json(), async (req, res) => {
       return;
     }
 
+    const sub = event.resource || {};
+    const DOWNGRADE_EVENTS = [
+      'BILLING.SUBSCRIPTION.CANCELLED',
+      'BILLING.SUBSCRIPTION.EXPIRED',
+      'BILLING.SUBSCRIPTION.SUSPENDED',
+      'PAYMENT.SALE.REFUNDED'
+    ];
+
     if (event.event_type === 'BILLING.SUBSCRIPTION.ACTIVATED') {
-      const sub = event.resource;
-      const userId = sub && sub.custom_id;
+      const userId = sub.custom_id;
       if (userId) {
         await updateMembershipTier(userId, 'pro', `paypal_${sub.id}`);
-        console.log(`[paypal-webhook] User ${userId} upgraded to pro`);
+        console.log(`[paypal-webhook] User ${userId} upgraded to pro (sub: ${sub.id})`);
       } else {
         console.warn('[paypal-webhook] No custom_id on ACTIVATED event — cannot identify user');
       }
-    } else if (event.event_type === 'BILLING.SUBSCRIPTION.CANCELLED' || event.event_type === 'BILLING.SUBSCRIPTION.EXPIRED') {
-      const sub = event.resource;
-      const userId = sub && sub.custom_id;
+    } else if (DOWNGRADE_EVENTS.includes(event.event_type)) {
+      let userId = sub.custom_id;
+      if (!userId && sub.id) {
+        const found = await getUserByPaymentRef(`paypal_${sub.id}`);
+        if (found) userId = found.id;
+      }
       if (userId) {
         await updateMembershipTier(userId, 'free', null);
         console.log(`[paypal-webhook] User ${userId} downgraded to free via ${event.event_type}`);
+      } else {
+        console.warn(`[paypal-webhook] Could not resolve user for downgrade event: ${event.event_type}`);
       }
     } else {
       console.log('[paypal-webhook] Unhandled event type:', event.event_type);
