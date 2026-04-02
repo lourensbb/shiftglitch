@@ -284,18 +284,18 @@ async function updateGamertag(userId, gamertag) {
   );
 }
 
-async function updateMembershipTier(userId, tier, stripeCustomerId = null) {
+async function updateMembershipTier(userId, tier, paymentRef = null) {
   const allowedTiers = ['free', 'pro'];
   if (!allowedTiers.includes(tier)) throw new Error('Invalid tier: ' + tier);
   await pool.query(
     `UPDATE users SET membership_tier = $1, stripe_customer_id = COALESCE($2, stripe_customer_id), updated_at = NOW() WHERE id = $3`,
-    [tier, stripeCustomerId, userId]
+    [tier, paymentRef, userId]
   );
   console.log(`[membership] User ${userId} tier set to ${tier}`);
 }
 
-async function getUserByStripeCustomerId(stripeCustomerId) {
-  const { rows } = await pool.query('SELECT * FROM users WHERE stripe_customer_id = $1', [stripeCustomerId]);
+async function getUserByPaymentRef(ref) {
+  const { rows } = await pool.query('SELECT * FROM users WHERE stripe_customer_id = $1', [ref]);
   return rows[0] || null;
 }
 
@@ -512,4 +512,4 @@ async function getWaitlistCount() {
   return parseInt(res.rows[0].count, 10);
 }
 
-module.exports = { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, updateGamertag, getUserGamertag, updateMembershipTier, getUserByStripeCustomerId, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount };
+module.exports = { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, updateGamertag, getUserGamertag, updateMembershipTier, getUserByPaymentRef, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount };

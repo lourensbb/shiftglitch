@@ -472,7 +472,14 @@
                     <li><span class="check">✓</span> Early access to beta modules</li>
                     <li><span class="check">✓</span> Export all data (JSON)</li>
                 </ul>
-                <button id="pro-cta" class="plan-cta" aria-label="Upgrade to Netrunner Pro" onclick="startCheckout()">Get Pro →</button>
+                <div class="payment-btns">
+                    <button id="payfast-cta" class="plan-cta payfast-cta" aria-label="Pay with PayFast in ZAR" onclick="startPayfast()">
+                        PayFast <span class="pay-sub">ZAR · South Africa</span>
+                    </button>
+                    <button id="paypal-cta" class="plan-cta paypal-cta" aria-label="Pay with PayPal in USD" onclick="startPaypal()">
+                        PayPal <span class="pay-sub">USD · International</span>
+                    </button>
+                </div>
             </div>
 
             <!-- SCHOOL -->
@@ -494,7 +501,7 @@
                     <li><span class="check">✓</span> Setup walkthrough call included</li>
                     <li><span class="check">✓</span> Formal invoice for finance department</li>
                 </ul>
-                <a href="mailto:schools@shiftglitch.app?subject=School%20License%20Enquiry" class="plan-cta" aria-label="Contact for school pricing">Contact Us →</a>
+                <a href="mailto:admin@shiftglitch.com?subject=School%20License%20Enquiry" class="plan-cta" aria-label="Contact for school pricing">Contact Us →</a>
             </div>
 
         </div>
@@ -554,7 +561,7 @@
             </div>
             <div class="faq-item">
                 <div class="faq-q">// How do I get an invoice for my school's finance department?</div>
-                <div class="faq-a">Email us at schools@shiftglitch.app with your school name and address. We will send a formal invoice. Most schools process payment within 5–10 working days.</div>
+                <div class="faq-a">Email us at admin@shiftglitch.com with your school name and address. We will send a formal invoice. Most schools process payment within 5–10 working days.</div>
             </div>
             <div class="faq-item">
                 <div class="faq-q">// Can I try the app before paying for anything?</div>
@@ -566,6 +573,13 @@
     </main>
 
     <style>
+        .payment-btns { display: flex; flex-direction: column; gap: 0.6rem; margin-top: 0.5rem; }
+        .payfast-cta { background: #39FF14 !important; color: #050505 !important; border-color: #39FF14 !important; }
+        .payfast-cta:hover:not(:disabled) { background: #2bcc10 !important; }
+        .paypal-cta { background: transparent !important; color: #00AEEF !important; border: 1px solid #00AEEF !important; }
+        .paypal-cta:hover:not(:disabled) { background: rgba(0,174,239,0.08) !important; }
+        .pay-sub { display: block; font-size: 0.65rem; font-weight: 400; letter-spacing: 0.08em; margin-top: 0.15rem; opacity: 0.75; }
+        .plan-cta:disabled { opacity: 0.5; cursor: not-allowed; }
         .toast {
             position: fixed; bottom: 2rem; left: 50%;
             transform: translateX(-50%);
@@ -575,12 +589,12 @@
             border: 1px solid;
             z-index: 999; pointer-events: none;
             opacity: 0; transition: opacity 0.35s ease;
+            white-space: nowrap;
         }
         .toast.visible { opacity: 1; }
         .toast.success { background: rgba(57,255,20,0.08); color: var(--green); border-color: rgba(57,255,20,0.3); }
         .toast.error   { background: rgba(255,50,50,0.08); color: #FF4444; border-color: rgba(255,50,50,0.3); }
         .toast.info    { background: rgba(255,255,255,0.04); color: #aaa; border-color: rgba(255,255,255,0.12); }
-        .plan-cta:disabled { opacity: 0.6; cursor: not-allowed; }
     </style>
 
     <div id="page-toast" class="toast" role="status" aria-live="polite"></div>
@@ -633,45 +647,104 @@
             toastTimer = setTimeout(() => el.classList.remove('visible'), duration);
         }
 
-        async function startCheckout() {
-            const btn = document.getElementById('pro-cta');
-            if (btn.disabled) return;
-            btn.disabled = true;
-            btn.textContent = '// redirecting...';
+        function setCtaLoading(id, loading, originalText) {
+            const btn = document.getElementById(id);
+            if (!btn) return;
+            btn.disabled = loading;
+            if (loading) btn.dataset.orig = btn.innerHTML;
+            else btn.innerHTML = btn.dataset.orig || originalText;
+        }
+
+        function disableAllCtAs(state) {
+            ['payfast-cta', 'paypal-cta'].forEach(id => {
+                const b = document.getElementById(id);
+                if (b) b.disabled = state;
+            });
+        }
+
+        async function startPayfast() {
+            disableAllCtAs(true);
+            const btn = document.getElementById('payfast-cta');
+            if (btn) { btn.dataset.orig = btn.innerHTML; btn.innerHTML = '// connecting...'; }
             try {
-                const res = await fetch('/api/create-checkout-session', {
+                const res = await fetch('/api/payfast-checkout', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     credentials: 'same-origin',
                     body: JSON.stringify({ plan: isAnnual ? 'annual' : 'monthly' })
                 });
-                const data = await res.json();
                 if (res.status === 401) {
-                    showToast('// you need to be logged in first — jack in at /login', 'info', 6000);
-                    setTimeout(() => window.location.href = '/login', 2000);
+                    showToast('// jack in first — login required', 'info', 5000);
+                    setTimeout(() => window.location.href = '/login', 1800);
+                    disableAllCtAs(false);
+                    if (btn) btn.innerHTML = btn.dataset.orig;
                     return;
                 }
+                const data = await res.json();
+                if (!res.ok) {
+                    showToast('// ' + (data.error || 'PayFast error — try again'), 'error');
+                    disableAllCtAs(false);
+                    if (btn) btn.innerHTML = btn.dataset.orig;
+                    return;
+                }
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = data.action;
+                Object.entries(data.fields).forEach(([k, v]) => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden'; input.name = k; input.value = v;
+                    form.appendChild(input);
+                });
+                document.body.appendChild(form);
+                form.submit();
+            } catch (e) {
+                showToast('// network error — check connection', 'error');
+                disableAllCtAs(false);
+                if (btn) btn.innerHTML = btn.dataset.orig;
+            }
+        }
+
+        async function startPaypal() {
+            disableAllCtAs(true);
+            const btn = document.getElementById('paypal-cta');
+            if (btn) { btn.dataset.orig = btn.innerHTML; btn.innerHTML = '// connecting...'; }
+            try {
+                const res = await fetch('/api/paypal-checkout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ plan: isAnnual ? 'annual' : 'monthly' })
+                });
+                if (res.status === 401) {
+                    showToast('// jack in first — login required', 'info', 5000);
+                    setTimeout(() => window.location.href = '/login', 1800);
+                    disableAllCtAs(false);
+                    if (btn) btn.innerHTML = btn.dataset.orig;
+                    return;
+                }
+                const data = await res.json();
                 if (!res.ok || !data.url) {
-                    showToast('// ' + (data.error || 'checkout failed — try again'), 'error');
-                    btn.disabled = false;
-                    btn.textContent = 'Get Pro →';
+                    showToast('// ' + (data.error || 'PayPal error — try again'), 'error');
+                    disableAllCtAs(false);
+                    if (btn) btn.innerHTML = btn.dataset.orig;
                     return;
                 }
                 window.location.href = data.url;
             } catch (e) {
-                showToast('// network error — check connection and retry', 'error');
-                btn.disabled = false;
-                btn.textContent = 'Get Pro →';
+                showToast('// network error — check connection', 'error');
+                disableAllCtAs(false);
+                if (btn) btn.innerHTML = btn.dataset.orig;
             }
         }
 
         (function handleUrlParams() {
             const params = new URLSearchParams(window.location.search);
             if (params.get('success') === '1') {
-                showToast('// upgrade complete — NETRUNNER_PRO access granted. Welcome.', 'success', 8000);
+                const provider = params.get('provider') || '';
+                showToast('// payment received — NETRUNNER_PRO access granted. Welcome.', 'success', 8000);
                 window.history.replaceState({}, '', '/pricing');
             } else if (params.get('cancelled') === '1') {
-                showToast('// checkout cancelled — no charge made', 'info', 5000);
+                showToast('// payment cancelled — no charge made', 'info', 5000);
                 window.history.replaceState({}, '', '/pricing');
             }
         })();

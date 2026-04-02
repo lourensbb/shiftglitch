@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
-const { getSessionMiddleware, setupAuthRoutes, requireAuth, getUserGamertag, updateGamertag, updateMembershipTier, getUserByStripeCustomerId, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount } = require('./auth');
+const crypto = require('crypto');
+const { getSessionMiddleware, setupAuthRoutes, requireAuth, getUserGamertag, updateGamertag, updateMembershipTier, getUserByPaymentRef, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount } = require('./auth');
 
 async function sendWelcomeEmail(gamertag, email) {
   const key = process.env.RESEND_API_KEY;
@@ -94,65 +95,89 @@ async function sendWelcomeEmail(gamertag, email) {
   }
 }
 
-function getStripe() {
-  const key = process.env.STRIPE_SECRET_KEY;
-  if (!key) return null;
-  return require('stripe')(key);
+function getBaseUrl(req) {
+  const host = (process.env.REPLIT_DOMAINS || process.env.REPLIT_DEV_DOMAIN || req.get('x-forwarded-host') || req.hostname).split(',')[0].trim();
+  return `https://${host}`;
 }
+
+function payfastSignature(data, passphrase) {
+  const pfOutput = Object.keys(data).sort()
+    .filter(k => data[k] !== '' && data[k] !== undefined && data[k] !== null)
+    .map(k => `${k}=${encodeURIComponent(String(data[k]).trim()).replace(/%20/g, '+')}`)
+    .join('&');
+  const str = passphrase
+    ? `${pfOutput}&passphrase=${encodeURIComponent(passphrase.trim()).replace(/%20/g, '+')}`
+    : pfOutput;
+  return crypto.createHash('md5').update(str).digest('hex');
+}
+
+const PAYFAST_SANDBOX = process.env.PAYFAST_SANDBOX === 'true';
+const PAYFAST_HOST = PAYFAST_SANDBOX ? 'sandbox.payfast.co.za' : 'www.payfast.co.za';
+const PAYFAST_MONTHLY_ZAR = process.env.PAYFAST_MONTHLY_ZAR || '179.99';
+const PAYFAST_ANNUAL_ZAR  = process.env.PAYFAST_ANNUAL_ZAR  || '1349.99';
 
 const app = express();
 
-app.post('/api/stripe-webhook', express.raw({ type: 'application/json' }), async (req, res) => {
-  const stripe = getStripe();
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-  if (!stripe || !webhookSecret) {
-    console.warn('[stripe] Webhook received but STRIPE_SECRET_KEY or STRIPE_WEBHOOK_SECRET not set — skipping');
-    return res.json({ received: true });
-  }
-  let event;
+app.post('/api/payfast-itn', express.urlencoded({ extended: false }), async (req, res) => {
+  res.status(200).end();
   try {
-    event = stripe.webhooks.constructEvent(req.body, req.headers['stripe-signature'], webhookSecret);
+    const data = req.body;
+    if (!data || !data.m_payment_id) { console.warn('[payfast-itn] Missing m_payment_id'); return; }
+    const pfHost = PAYFAST_SANDBOX ? 'sandbox.payfast.co.za' : 'www.payfast.co.za';
+    const validationRes = await fetch(`https://${pfHost}/eng/query/validate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams(data).toString()
+    });
+    const validation = await validationRes.text();
+    if (validation !== 'VALID') { console.warn('[payfast-itn] Validation failed:', validation); return; }
+    if (data.payment_status !== 'COMPLETE') { console.log('[payfast-itn] Non-complete status:', data.payment_status); return; }
+    const userId = data.m_payment_id.split('_')[0];
+    if (!userId) { console.warn('[payfast-itn] Could not parse userId from m_payment_id:', data.m_payment_id); return; }
+    await updateMembershipTier(userId, 'pro', `payfast_${data.pf_payment_id || data.m_payment_id}`);
+    console.log(`[payfast-itn] User ${userId} upgraded to pro`);
   } catch (err) {
-    console.error('[stripe] Webhook signature verification failed:', err.message);
-    return res.status(400).send(`Webhook Error: ${err.message}`);
+    console.error('[payfast-itn] Error:', err.message);
   }
+});
+
+async function getPaypalToken() {
+  const clientId = process.env.PAYPAL_CLIENT_ID;
+  const secret = process.env.PAYPAL_CLIENT_SECRET;
+  if (!clientId || !secret) return null;
+  const base = process.env.PAYPAL_SANDBOX === 'false' ? 'https://api-m.paypal.com' : 'https://api-m.sandbox.paypal.com';
+  const res = await fetch(`${base}/v1/oauth2/token`, {
+    method: 'POST',
+    headers: { 'Authorization': `Basic ${Buffer.from(`${clientId}:${secret}`).toString('base64')}`, 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: 'grant_type=client_credentials'
+  });
+  const data = await res.json();
+  return res.ok ? { token: data.access_token, base } : null;
+}
+
+app.post('/api/paypal-webhook', express.json(), async (req, res) => {
+  res.status(200).end();
   try {
-    if (event.type === 'checkout.session.completed') {
-      const session = event.data.object;
-      const userId = session.metadata && session.metadata.userId;
-      const customerId = session.customer;
+    const event = req.body;
+    if (!event || !event.event_type) return;
+    if (event.event_type === 'BILLING.SUBSCRIPTION.ACTIVATED' || event.event_type === 'PAYMENT.SALE.COMPLETED') {
+      const sub = event.resource;
+      const userId = sub && (sub.custom_id || (sub.billing_agreement_id));
       if (userId) {
-        await updateMembershipTier(userId, 'pro', customerId);
-        console.log(`[stripe] checkout.session.completed — user ${userId} upgraded to pro`);
-      } else if (customerId) {
-        const user = await getUserByStripeCustomerId(customerId);
-        if (user) {
-          await updateMembershipTier(user.id, 'pro', customerId);
-          console.log(`[stripe] checkout.session.completed — customer ${customerId} upgraded to pro`);
-        } else {
-          console.warn('[stripe] No user found for customer:', customerId);
-        }
+        await updateMembershipTier(userId, 'pro', `paypal_${sub.id || sub.billing_agreement_id}`);
+        console.log(`[paypal-webhook] User ${userId} upgraded to pro via ${event.event_type}`);
       }
-    } else if (event.type === 'customer.subscription.deleted') {
-      const sub = event.data.object;
-      const customerId = sub.customer;
-      if (customerId) {
-        const user = await getUserByStripeCustomerId(customerId);
-        if (user) {
-          await updateMembershipTier(user.id, 'free', null);
-          console.log(`[stripe] customer.subscription.deleted — user ${user.id} downgraded to free`);
-        }
+    } else if (event.event_type === 'BILLING.SUBSCRIPTION.CANCELLED' || event.event_type === 'BILLING.SUBSCRIPTION.EXPIRED') {
+      const sub = event.resource;
+      const userId = sub && sub.custom_id;
+      if (userId) {
+        await updateMembershipTier(userId, 'free', null);
+        console.log(`[paypal-webhook] User ${userId} downgraded to free via ${event.event_type}`);
       }
-    } else if (event.type === 'invoice.payment_failed') {
-      console.log('[stripe] invoice.payment_failed — no action taken (subscription remains until Stripe cancels)');
-    } else {
-      console.log('[stripe] Unhandled event type:', event.type);
     }
   } catch (err) {
-    console.error('[stripe] Error handling webhook event:', err.message);
-    return res.status(500).json({ error: 'Webhook handler error' });
+    console.error('[paypal-webhook] Error:', err.message);
   }
-  res.json({ received: true });
 });
 
 app.use(express.json());
@@ -238,42 +263,90 @@ app.get('/api/stats', async (req, res) => {
   }
 });
 
-app.post('/api/create-checkout-session', requireAuth, async (req, res) => {
-  const stripe = getStripe();
-  if (!stripe) {
-    console.warn('[stripe] STRIPE_SECRET_KEY not set — checkout unavailable');
-    return res.status(503).json({ error: 'Payments not configured yet. Please contact support.' });
+app.post('/api/payfast-checkout', requireAuth, async (req, res) => {
+  const merchantId  = process.env.PAYFAST_MERCHANT_ID;
+  const merchantKey = process.env.PAYFAST_MERCHANT_KEY;
+  if (!merchantId || !merchantKey) {
+    console.warn('[payfast] PAYFAST_MERCHANT_ID or PAYFAST_MERCHANT_KEY not set');
+    return res.status(503).json({ error: 'PayFast not configured yet. Email admin@shiftglitch.com for help.' });
   }
   const { plan } = req.body;
   if (!plan || !['monthly', 'annual'].includes(plan)) {
-    return res.status(400).json({ error: 'Invalid plan. Must be "monthly" or "annual".' });
-  }
-  const monthlyPriceId = process.env.STRIPE_MONTHLY_PRICE_ID;
-  const annualPriceId = process.env.STRIPE_ANNUAL_PRICE_ID;
-  const priceId = plan === 'annual' ? annualPriceId : monthlyPriceId;
-  if (!priceId) {
-    console.error(`[stripe] Price ID env var not set for plan: ${plan}`);
-    return res.status(503).json({ error: 'Pricing not configured. Contact support.' });
+    return res.status(400).json({ error: 'Plan must be "monthly" or "annual".' });
   }
   const userId = req.session.userId;
-  const host = (process.env.REPLIT_DOMAINS || process.env.REPLIT_DEV_DOMAIN || req.get('x-forwarded-host') || req.hostname).split(',')[0].trim();
-  const baseUrl = `https://${host}`;
+  const baseUrl = getBaseUrl(req);
+  const passphrase = process.env.PAYFAST_PASSPHRASE || '';
+  const amount = plan === 'annual' ? PAYFAST_ANNUAL_ZAR : PAYFAST_MONTHLY_ZAR;
+  const mPaymentId = `${userId}_${Date.now()}`;
+  const today = new Date().toISOString().slice(0, 10);
+  const fields = {
+    merchant_id:       merchantId,
+    merchant_key:      merchantKey,
+    return_url:        `${baseUrl}/pricing?success=1&provider=payfast`,
+    cancel_url:        `${baseUrl}/pricing?cancelled=1`,
+    notify_url:        `${baseUrl}/api/payfast-itn`,
+    m_payment_id:      mPaymentId,
+    amount:            amount,
+    item_name:         plan === 'annual' ? 'Netrunner Pro Annual' : 'Netrunner Pro Monthly',
+    subscription_type: '1',
+    billing_date:      today,
+    recurring_amount:  amount,
+    frequency:         plan === 'annual' ? '6' : '3',
+    cycles:            '0'
+  };
+  fields.signature = payfastSignature(fields, passphrase);
+  const action = `https://${PAYFAST_HOST}/eng/process`;
+  console.log(`[payfast] Checkout initiated for user ${userId}, plan ${plan}`);
+  res.json({ action, fields });
+});
+
+app.post('/api/paypal-checkout', requireAuth, async (req, res) => {
+  const auth = await getPaypalToken();
+  if (!auth) {
+    console.warn('[paypal] PAYPAL_CLIENT_ID or PAYPAL_CLIENT_SECRET not set');
+    return res.status(503).json({ error: 'PayPal not configured yet. Email admin@shiftglitch.com for help.' });
+  }
+  const { plan } = req.body;
+  if (!plan || !['monthly', 'annual'].includes(plan)) {
+    return res.status(400).json({ error: 'Plan must be "monthly" or "annual".' });
+  }
+  const planId = plan === 'annual'
+    ? process.env.PAYPAL_ANNUAL_PLAN_ID
+    : process.env.PAYPAL_MONTHLY_PLAN_ID;
+  if (!planId) {
+    console.error(`[paypal] Plan ID env var not set for plan: ${plan}`);
+    return res.status(503).json({ error: 'PayPal plan not configured. Email admin@shiftglitch.com.' });
+  }
+  const userId = req.session.userId;
+  const baseUrl = getBaseUrl(req);
   try {
-    const session = await stripe.checkout.sessions.create({
-      mode: 'subscription',
-      line_items: [{ price: priceId, quantity: 1 }],
-      metadata: { userId },
-      success_url: `${baseUrl}/pricing?success=1&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${baseUrl}/pricing?cancelled=1`,
-      allow_promotion_codes: true,
-      billing_address_collection: 'auto',
-      subscription_data: { metadata: { userId } }
+    const subRes = await fetch(`${auth.base}/v1/billing/subscriptions`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${auth.token}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+      body: JSON.stringify({
+        plan_id: planId,
+        custom_id: userId,
+        application_context: {
+          brand_name: 'ShiftGlitch',
+          user_action: 'SUBSCRIBE_NOW',
+          return_url: `${baseUrl}/pricing?success=1&provider=paypal`,
+          cancel_url: `${baseUrl}/pricing?cancelled=1`
+        }
+      })
     });
-    console.log(`[stripe] Checkout session created for user ${userId}: ${session.id}`);
-    res.json({ url: session.url });
+    const sub = await subRes.json();
+    if (!subRes.ok) {
+      console.error('[paypal] Subscription create error:', JSON.stringify(sub));
+      return res.status(500).json({ error: 'Failed to create PayPal subscription. Try again.' });
+    }
+    const approvalLink = (sub.links || []).find(l => l.rel === 'approve');
+    if (!approvalLink) return res.status(500).json({ error: 'No PayPal approval URL returned.' });
+    console.log(`[paypal] Subscription created for user ${userId}: ${sub.id}`);
+    res.json({ url: approvalLink.href });
   } catch (err) {
-    console.error('[stripe] Failed to create checkout session:', err.message);
-    res.status(500).json({ error: 'Failed to start checkout. Please try again.' });
+    console.error('[paypal] Error:', err.message);
+    res.status(500).json({ error: 'PayPal checkout failed. Try again.' });
   }
 });
 
