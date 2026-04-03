@@ -1173,6 +1173,7 @@
                     state.rank = nextRank;
                     this.save();
                     this.updateNavRank();
+                    if (consistencyBonus) localStorage.removeItem('sg_consistency_bonus_active');
                     SysInterrupt.show('rank-promotion', { newRank: nextRank });
                     const _rankBadgeMap = { 'Glitch Tech': 'reached-glitch-tech', 'Netrunner': 'reached-netrunner', 'System Admin': 'reached-system-admin' };
                     if (_rankBadgeMap[nextRank]) setTimeout(() => badgeEngine._tryUnlock(_rankBadgeMap[nextRank]), 2500);
@@ -1464,10 +1465,9 @@
                 { mode:'adversary', msg: "Every operative I have ever flagged for clearance revocation had one thing in common.", sub: "They were comfortable. Are you comfortable?" },
             ],
             _getWardenMode() {
-                const log = (state.rankEvidence && state.rankEvidence.activeDateLog) || [];
                 const today = new Date().toISOString().slice(0,10);
-                const sorted = [...log].sort().reverse();
-                const daysSinceLast = sorted.length > 0 ? Math.round((new Date(today) - new Date(sorted[0])) / 86400000) : 99;
+                const lastActive = this._preLoginLastActive;
+                const daysSinceLast = lastActive ? Math.round((new Date(today) - new Date(lastActive)) / 86400000) : 0;
                 const streak = rankEngine.getStreak ? rankEngine.getStreak() : 0;
                 const poms = state.rankEvidence ? state.rankEvidence.pomodorosCompleted : 0;
                 if (daysSinceLast >= 3) return 'adversary';
@@ -1483,7 +1483,8 @@
                 if (wlog.length > 30) wlog = wlog.slice(0, 30);
                 localStorage.setItem('sg_warden_log', JSON.stringify(wlog));
             },
-            init() {
+            init(preLoginLastActive) {
+                this._preLoginLastActive = preLoginLastActive || null;
                 this._runSnakesAndLadders();
                 const hadInterrupt = this._checkScheduler();
                 if (!hadInterrupt && !this._loadDone) {
@@ -1543,10 +1544,7 @@
                 }
             },
             _checkClearanceStripSnake() {
-                const log = (state.rankEvidence && state.rankEvidence.activeDateLog) || [];
-                if (!log.length) return;
-                const sorted = [...log].sort().reverse();
-                const lastKnownActive = sorted[0];
+                const lastKnownActive = this._preLoginLastActive;
                 if (!lastKnownActive) return;
                 const today = new Date().toISOString().slice(0,10);
                 if (lastKnownActive >= today) return;
@@ -1715,15 +1713,19 @@
                     }
                 }, 420);
             },
+            _TRAP_MODULE_IDS: ['speed-run','mistake-vault','teach-it','dual-coding','concept-mapper','chunking','interleave','memory-palace','mindmap','shadow-protocol'],
+            _TRAP_MODULE_NAMES: { 'speed-run':'SPEED RUN','mistake-vault':'MISTAKE VAULT','teach-it':'TEACH IT','dual-coding':'DUAL CODING STATION','concept-mapper':'CONCEPT MAPPER','chunking':'CHUNKING ENGINE','interleave':'THE INTERLEAVE','memory-palace':'MEMORY PALACE','mindmap':'MIND MAP PROTOCOL','shadow-protocol':'SHADOW PROTOCOL' },
             _activateTrap(id) {
                 const lockUntil = Date.now() + 2 * 60 * 60 * 1000;
-                localStorage.setItem('sg_warden_trap_lock', String(lockUntil));
-                this._logWarden('Warden trap accepted. Pipeline locked for 2 hours.', 'Operative confirmed trap accepted — decision logged.', 'adversary');
+                const moduleId = this._TRAP_MODULE_IDS[Math.floor(Math.random() * this._TRAP_MODULE_IDS.length)];
+                const moduleName = this._TRAP_MODULE_NAMES[moduleId] || moduleId;
+                localStorage.setItem('sg_warden_trap_lock', JSON.stringify({ moduleId, lockUntil }));
+                this._logWarden('Warden trap accepted. Module locked for 2 hours.', 'Operative confirmed trap accepted — '+moduleName+' restricted.', 'adversary');
                 this._addClearanceEvent({ type: 'snake', label: "WARDEN'S TRAP", delta: -1 });
                 const el = document.getElementById(id);
                 if (el) {
                     const box = el.querySelector('.si-box');
-                    if (box) box.innerHTML = '<div id="'+id+'-box"><div class="si-header" style="border-color:#FF2222"><span style="color:#FF2222;font-size:18px;">◈</span><span style="color:#FF2222;font-size:13px;letter-spacing:2px;margin-left:8px;">TRAP ACTIVATED</span></div><div class="si-body" style="text-align:center;"><div style="font-size:48px;margin-bottom:12px;">🔒</div><div style="color:#FF2222;font-size:16px;font-weight:bold;letter-spacing:2px;margin-bottom:8px;">PIPELINE LOCKED</div><p style="color:#aaa;font-size:13px;line-height:1.8;">There was no boost. You accepted a Warden trap. Module access is restricted for 2 hours. The Mainframe logged your decision.</p></div><div class="si-footer" style="justify-content:center;"><button onclick="SysInterrupt.dismiss(\''+id+'\')" style="background:#FF2222;color:#fff;border:none;padding:10px 28px;font-family:inherit;font-size:11px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;font-weight:bold;border-radius:4px;width:100%;">ACKNOWLEDGED</button></div></div>';
+                    if (box) box.innerHTML = '<div id="'+id+'-box"><div class="si-header" style="border-color:#FF2222"><span style="color:#FF2222;font-size:18px;">◈</span><span style="color:#FF2222;font-size:13px;letter-spacing:2px;margin-left:8px;">TRAP ACTIVATED</span></div><div class="si-body" style="text-align:center;"><div style="font-size:48px;margin-bottom:12px;">🔒</div><div style="color:#FF2222;font-size:16px;font-weight:bold;letter-spacing:2px;margin-bottom:8px;">MODULE LOCKED</div><p style="color:#aaa;font-size:13px;line-height:1.8;">There was no boost. You accepted a Warden trap. <strong style="color:#FF2222;">'+moduleName+'</strong> is restricted for 2 hours. The Mainframe logged your decision.</p></div><div class="si-footer" style="justify-content:center;"><button onclick="SysInterrupt.dismiss(\''+id+'\')" style="background:#FF2222;color:#fff;border:none;padding:10px 28px;font-family:inherit;font-size:11px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;font-weight:bold;border-radius:4px;width:100%;">ACKNOWLEDGED</button></div></div>';
                 }
             },
             _scheduleWardenTrap() {
@@ -1739,8 +1741,24 @@
                 setTimeout(() => { if (!this._active) this.show('warden-trap', {}); }, delay);
             },
             isTrapLocked(moduleId) {
-                const lock = parseInt(localStorage.getItem('sg_warden_trap_lock') || '0', 10);
-                return lock > Date.now();
+                const raw = localStorage.getItem('sg_warden_trap_lock');
+                if (!raw) return false;
+                let lock;
+                try { lock = JSON.parse(raw); } catch(e) { return false; }
+                if (!lock || typeof lock !== 'object') return false;
+                if (lock.lockUntil <= Date.now()) { localStorage.removeItem('sg_warden_trap_lock'); return false; }
+                if (moduleId && lock.moduleId !== moduleId) return false;
+                return true;
+            },
+            getTrapLockedModuleId() {
+                const raw = localStorage.getItem('sg_warden_trap_lock');
+                if (!raw) return null;
+                try { const lock = JSON.parse(raw); return (lock && lock.lockUntil > Date.now()) ? lock.moduleId : null; } catch(e) { return null; }
+            },
+            getTrapLockExpiry() {
+                const raw = localStorage.getItem('sg_warden_trap_lock');
+                if (!raw) return 0;
+                try { const lock = JSON.parse(raw); return lock && lock.lockUntil ? lock.lockUntil : 0; } catch(e) { return 0; }
             },
             launchRecallSprint(id) {
                 const boxEl = document.getElementById(id+'-box');
@@ -2557,8 +2575,14 @@
 
                 deckStore.load(); cardStore.load(); pomodoroStore.load(); blurtStore.load(); eisenhowerStore.load(); todoStore.load(); mcqStore.load(); recalStore.load(); babelStore.load(); yetStore.load(); examStore.load(); learningStore.load();
                 state.burnedCount = parseInt(localStorage.getItem('sg_burned') || '0', 10);
-                rankEngine.load(); rankEngine.trackActiveDay(); rankEngine.updateNavRank();
-                badgeEngine.load(); await badgeEngine.loadFromServer(); badgeEngine.checkOnLoad(); SysInterrupt.init();
+                rankEngine.load();
+                const _preLoginLastActive = (() => {
+                    const log = (state.rankEvidence && state.rankEvidence.activeDateLog) || [];
+                    if (!log.length) return null;
+                    return [...log].sort().reverse()[0];
+                })();
+                rankEngine.trackActiveDay(); rankEngine.updateNavRank();
+                badgeEngine.load(); await badgeEngine.loadFromServer(); badgeEngine.checkOnLoad(); SysInterrupt.init(_preLoginLastActive);
 
                 const djTodoText = 'Complete the Diagnostics Journey';
                 if (!state.missionTodos.some(t => t.text === djTodoText)) {
@@ -4648,7 +4672,8 @@
                         let wlog = [];
                         try { wlog = JSON.parse(localStorage.getItem('sg_warden_log') || '[]'); } catch(e) {}
                         const trapLocked = SysInterrupt.isTrapLocked ? SysInterrupt.isTrapLocked() : false;
-                        const trapLockUntil = parseInt(localStorage.getItem('sg_warden_trap_lock') || '0', 10);
+                        const trapLockUntil = (SysInterrupt.getTrapLockExpiry ? SysInterrupt.getTrapLockExpiry() : 0);
+                        const trapLockedModule = (SysInterrupt.getTrapLockedModuleId ? SysInterrupt.getTrapLockedModuleId() : null);
                         const trapMinLeft = trapLocked ? Math.ceil((trapLockUntil - Date.now()) / 60000) : 0;
                         const streak = rankEngine.getStreak ? rankEngine.getStreak() : 0;
                         const consistencyActive = SysInterrupt.hasConsistencyBonus ? SysInterrupt.hasConsistencyBonus() : false;
@@ -4672,7 +4697,7 @@
                             '<div style="background:#0d0d0d;border:1px solid #FF00FF22;padding:14px;border-radius:8px;text-align:center;"><div style="color:#FF00FF;font-size:22px;font-weight:bold;font-family:\'Share Tech Mono\',monospace;">'+(totalDelta >= 0 ? '+' : '')+totalDelta+'</div><div style="color:#555;font-size:9px;letter-spacing:2px;margin-top:4px;">NET WARDEN DELTA</div></div>' +
                             '<div style="background:#0d0d0d;border:1px solid #FF00FF22;padding:14px;border-radius:8px;text-align:center;"><div style="color:#FF00FF;font-size:22px;font-weight:bold;font-family:\'Share Tech Mono\',monospace;">'+(rankIdx+1)+' / '+RANKS.length+'</div><div style="color:#555;font-size:9px;letter-spacing:2px;margin-top:4px;">RANK TIER</div></div>' +
                             '</div>' +
-                            (trapLocked ? '<div style="background:#1a0000;border:1px solid #FF222266;padding:12px 16px;border-radius:8px;margin-bottom:14px;"><span style="color:#FF2222;font-size:11px;letter-spacing:2px;font-weight:bold;">🔒 WARDEN\'S TRAP ACTIVE — '+trapMinLeft+' MIN REMAINING</span><div style="color:#888;font-size:11px;margin-top:4px;">Module access restricted until trap expires.</div></div>' : '') +
+                            (trapLocked ? '<div style="background:#1a0000;border:1px solid #FF222266;padding:12px 16px;border-radius:8px;margin-bottom:14px;"><span style="color:#FF2222;font-size:11px;letter-spacing:2px;font-weight:bold;">🔒 WARDEN\'S TRAP ACTIVE — '+trapMinLeft+' MIN REMAINING</span><div style="color:#888;font-size:11px;margin-top:4px;">'+(trapLockedModule ? trapLockedModule.toUpperCase()+' module is restricted until the trap expires.' : 'One module restricted until trap expires.')+'</div></div>' : '') +
                             (consistencyActive ? '<div style="background:#1a001a;border:1px solid #FF00FF44;padding:12px 16px;border-radius:8px;margin-bottom:14px;"><span style="color:#FF00FF;font-size:11px;letter-spacing:2px;font-weight:bold;">▲ CONSISTENCY LADDER ACTIVE — '+streak+'-DAY STREAK</span><div style="color:#888;font-size:11px;margin-top:4px;">Rank thresholds reduced by 10%.</div></div>' : '') +
                             (lastFive.length > 0 ? '<div style="margin-bottom:16px;"><div style="color:#555;font-size:10px;letter-spacing:2px;margin-bottom:6px;">RECENT CLEARANCE MOVEMENT</div><div style="display:flex;align-items:center;gap:4px;">'+movementArrows+'<span style="color:#333;font-size:10px;letter-spacing:1px;margin-left:8px;">(last '+lastFive.length+' events)</span></div></div>' : '') +
                             (snakeEvents.length > 0 ? '<div style="margin-bottom:14px;"><div style="color:#FF4444;font-size:10px;letter-spacing:2px;margin-bottom:6px;">ACTIVE SETBACKS (SNAKES)</div><div style="display:flex;flex-direction:column;gap:6px;">' + snakeEvents.map(e => '<div style="background:#1a0000;border-left:3px solid #FF4444;padding:8px 12px;border-radius:0 4px 4px 0;"><div style="color:#FF4444;font-size:11px;font-weight:bold;letter-spacing:1px;">'+e.label+' ('+e.delta+')</div>'+(e.domain ? '<div style="color:#666;font-size:10px;">'+e.domain.toUpperCase()+'</div>' : '')+'<div style="color:#444;font-size:10px;">'+formatTs(e.ts)+'</div></div>').join('') + '</div></div>' : '') +
@@ -5168,16 +5193,16 @@
             _cemLocked(minRankIdx) {
                 return this._cemRankIdx() < minRankIdx;
             },
-            _cemTrapLocked() {
-                return (typeof SysInterrupt !== 'undefined' && SysInterrupt.isTrapLocked) ? SysInterrupt.isTrapLocked() : false;
+            _cemTrapLocked(moduleKey) {
+                return (typeof SysInterrupt !== 'undefined' && SysInterrupt.isTrapLocked) ? SysInterrupt.isTrapLocked(moduleKey) : false;
             },
-            _cemTrapLockedBanner() {
-                const lockUntil = parseInt(localStorage.getItem('sg_warden_trap_lock') || '0', 10);
+            _cemTrapLockedBanner(moduleKey) {
+                const lockUntil = (typeof SysInterrupt !== 'undefined' && SysInterrupt.getTrapLockExpiry) ? SysInterrupt.getTrapLockExpiry() : 0;
                 const minLeft = Math.max(0, Math.ceil((lockUntil - Date.now()) / 60000));
                 return `<div style="text-align:center;padding:4rem 1rem;border:2px dashed #FF222244;max-width:520px;margin:3rem auto;background:#0d0000;">
-                    <div style="font-family:'VT323',monospace;font-size:2.5rem;color:#FF2222;letter-spacing:0.1em;margin-bottom:0.5rem;">🔒 PIPELINE LOCKED</div>
+                    <div style="font-family:'VT323',monospace;font-size:2.5rem;color:#FF2222;letter-spacing:0.1em;margin-bottom:0.5rem;">🔒 MODULE LOCKED</div>
                     <div style="font-family:'Share Tech Mono',monospace;font-size:0.85rem;color:#FF2222;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:1.5rem;">WARDEN'S TRAP — ${minLeft} MIN REMAINING</div>
-                    <div style="color:#666;font-size:0.9rem;line-height:1.6;max-width:360px;margin:0 auto;">You accepted a Warden trap. All cognitive exploit modules are locked until the timer expires. The Mainframe logged your decision.</div>
+                    <div style="color:#666;font-size:0.9rem;line-height:1.6;max-width:360px;margin:0 auto;">You accepted a Warden trap. This cognitive exploit module is locked until the timer expires. The Mainframe logged your decision.</div>
                     <button onclick="app.navTo('rank')" class="cem-btn" style="margin-top:1.5rem;border-color:#FF2222;color:#FF2222;">VIEW OPERATIVE STATUS</button>
                 </div>`;
             },
@@ -5219,7 +5244,7 @@
 
             /* ─── 1. SPEED RUN ─── */
             getSpeedRunHTML() {
-                if (this._cemTrapLocked()) return this._cemPageShell('SPEED RUN','Timed Recall Sprint','',this._cemTrapLockedBanner());
+                if (this._cemTrapLocked('speed-run')) return this._cemPageShell('SPEED RUN','Timed Recall Sprint','',this._cemTrapLockedBanner('speed-run'));
                 const sessions = JSON.parse(localStorage.getItem('sg_speed_run') || '[]');
                 const content = `
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem;">
@@ -5339,7 +5364,7 @@
 
             /* ─── 2. MISTAKE VAULT ─── */
             getMistakeVaultHTML() {
-                if (this._cemTrapLocked()) return this._cemPageShell('MISTAKE VAULT','Error Analysis','',this._cemTrapLockedBanner());
+                if (this._cemTrapLocked('mistake-vault')) return this._cemPageShell('MISTAKE VAULT','Error Analysis','',this._cemTrapLockedBanner('mistake-vault'));
                 if (this._cemLocked(1)) return this._cemPageShell('MISTAKE VAULT','Error Analysis','',this._cemLockedBanner('SCRIPT KIDDIE'));
                 const entries = JSON.parse(localStorage.getItem('sg_mistake_vault')||'[]');
                 const FAILURE_MODES = ['Blanked','Misread','Knew it wrong','Couldn\'t retrieve','Partial recall','Guessed'];
@@ -5399,7 +5424,7 @@
 
             /* ─── 3. TEACH IT ─── */
             getTeachItHTML() {
-                if (this._cemTrapLocked()) return this._cemPageShell('TEACH IT','Protégé Effect / Feynman Protocol','',this._cemTrapLockedBanner());
+                if (this._cemTrapLocked('teach-it')) return this._cemPageShell('TEACH IT','Protégé Effect / Feynman Protocol','',this._cemTrapLockedBanner('teach-it'));
                 if (this._cemLocked(1)) return this._cemPageShell('TEACH IT','Protégé Effect / Feynman Protocol','',this._cemLockedBanner('SCRIPT KIDDIE'));
                 const sessions = JSON.parse(localStorage.getItem('sg_teach_it')||'[]');
                 const phase = state.teachItPhase||'list';
@@ -5502,7 +5527,7 @@
 
             /* ─── 4. CONCEPT MAPPER ─── */
             getConceptMapperHTML() {
-                if (this._cemTrapLocked()) return this._cemPageShell('CONCEPT MAPPER','Elaborative Interrogation','',this._cemTrapLockedBanner());
+                if (this._cemTrapLocked('concept-mapper')) return this._cemPageShell('CONCEPT MAPPER','Elaborative Interrogation','',this._cemTrapLockedBanner('concept-mapper'));
                 if (this._cemLocked(2)) return this._cemPageShell('CONCEPT MAPPER','Elaborative Interrogation','',this._cemLockedBanner('GLITCH TECH'));
                 const sessions = JSON.parse(localStorage.getItem('sg_concept_mapper')||'[]');
                 const PROBES = [
@@ -5591,7 +5616,7 @@
 
             /* ─── 3. CHUNKING ENGINE (NPC+ / free) ─── */
             getChunkingHTML() {
-                if (this._cemTrapLocked()) return this._cemPageShell('CHUNKING ENGINE','Cognitive Load Reduction','',this._cemTrapLockedBanner());
+                if (this._cemTrapLocked('chunking')) return this._cemPageShell('CHUNKING ENGINE','Cognitive Load Reduction','',this._cemTrapLockedBanner('chunking'));
                 // Module 3 — NPC+ (free), no lock
                 const chunks = JSON.parse(localStorage.getItem('sg_chunking')||'[]');
                 const phase = state.chunkPhase||'list';
@@ -5730,7 +5755,7 @@
 
             /* ─── 8. THE INTERLEAVE (Glitch Tech+) ─── */
             getInterleaveHTML() {
-                if (this._cemTrapLocked()) return this._cemPageShell('THE INTERLEAVE','Interleaving Practice','',this._cemTrapLockedBanner());
+                if (this._cemTrapLocked('interleave')) return this._cemPageShell('THE INTERLEAVE','Interleaving Practice','',this._cemTrapLockedBanner('interleave'));
                 if (this._cemLocked(2)) return this._cemPageShell('THE INTERLEAVE','Interleaving Practice','',this._cemLockedBanner('GLITCH TECH'));
                 const sessions = JSON.parse(localStorage.getItem('sg_interleave')||'[]');
                 const running = state.ilRunning||false;
@@ -5840,7 +5865,7 @@
 
             /* ─── 1. MEMORY PALACE (NPC+ / free) ─── */
             getMemoryPalaceHTML() {
-                if (this._cemTrapLocked()) return this._cemPageShell('MEMORY PALACE','Method of Loci','',this._cemTrapLockedBanner());
+                if (this._cemTrapLocked('memory-palace')) return this._cemPageShell('MEMORY PALACE','Method of Loci','',this._cemTrapLockedBanner('memory-palace'));
                 // Module 1 — NPC+ (free), no lock
                 const palaces = JSON.parse(localStorage.getItem('sg_memory_palace')||'[]');
                 const phase = state.mpPhase||'list';
@@ -5993,7 +6018,7 @@
 
             /* ─── 2. MIND MAP PROTOCOL (NPC+ / free) ─── */
             getMindMapHTML() {
-                if (this._cemTrapLocked()) return this._cemPageShell('MIND MAP PROTOCOL','Visual Organisation','',this._cemTrapLockedBanner());
+                if (this._cemTrapLocked('mindmap')) return this._cemPageShell('MIND MAP PROTOCOL','Visual Organisation','',this._cemTrapLockedBanner('mindmap'));
                 // Module 2 — NPC+ (free), no lock
                 const maps = JSON.parse(localStorage.getItem('sg_mindmap')||'[]');
                 const phase = state.mmPhase||'list';
@@ -6165,7 +6190,7 @@
 
             /* ─── 7. DUAL CODING STATION (Script Kiddie+) ─── */
             getDualCodingHTML() {
-                if (this._cemTrapLocked()) return this._cemPageShell('DUAL CODING STATION','Dual Coding Theory','',this._cemTrapLockedBanner());
+                if (this._cemTrapLocked('dual-coding')) return this._cemPageShell('DUAL CODING STATION','Dual Coding Theory','',this._cemTrapLockedBanner('dual-coding'));
                 if (this._cemLocked(1)) return this._cemPageShell('DUAL CODING STATION','Dual Coding Theory','',this._cemLockedBanner('SCRIPT KIDDIE'));
                 const sessions = JSON.parse(localStorage.getItem('sg_dual_coding')||'[]');
                 const phase = state.dcPhase||'list';
@@ -6282,7 +6307,7 @@
 
             /* ─── 10. SHADOW PROTOCOL (Glitch Tech+) ─── */
             getShadowProtocolHTML() {
-                if (this._cemTrapLocked()) return this._cemPageShell('SHADOW PROTOCOL','Cornell Note Enhancement','',this._cemTrapLockedBanner());
+                if (this._cemTrapLocked('shadow-protocol')) return this._cemPageShell('SHADOW PROTOCOL','Cornell Note Enhancement','',this._cemTrapLockedBanner('shadow-protocol'));
                 if (this._cemLocked(2)) return this._cemPageShell('SHADOW PROTOCOL','Cornell Note Enhancement','',this._cemLockedBanner('GLITCH TECH'));
                 const notes = JSON.parse(localStorage.getItem('sg_shadow_protocol')||'[]');
                 const phase = state.spPhase||'list';
