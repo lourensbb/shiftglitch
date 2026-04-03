@@ -5957,8 +5957,6 @@
                     const missed = state.spShadowMissed||{};
                     const done = Object.keys(revealed).length + Object.keys(missed).length;
                     const total = note.cues.length;
-                    const timedMode = state.spTimedMode !== false;
-                    const activeCue = state.spActiveCue !== undefined ? state.spActiveCue : (done < total ? parseInt(Object.keys({...revealed,...missed}).sort((a,b)=>+a-+b).at(-1)||'-1')+1 : -1);
                     const allDone = done===total;
                     // Find the first unanswered cue index
                     let nextCue = -1;
