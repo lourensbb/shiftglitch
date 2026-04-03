@@ -21,13 +21,16 @@ It is designed for teenagers who are serious about their results, parents who wa
 5. [The MCQ Diagnostic Missions](#5-the-mcq-diagnostic-missions)
 6. [Teen-Focused Design](#6-teen-focused-design)
 7. [The Teacher Dashboard](#7-the-teacher-dashboard)
-8. [AI Study Planning — Mission Architect](#8-ai-study-planning--mission-architect)
-9. [Data, Privacy and Storage](#9-data-privacy-and-storage)
-10. [Getting Started — Setup Guide](#10-getting-started--setup-guide)
-11. [Hosting Options](#11-hosting-options)
-12. [Customisation Guide](#12-customisation-guide)
-13. [Technical Architecture](#13-technical-architecture)
-14. [File Reference](#14-file-reference)
+8. [Social Features](#8-social-features)
+9. [AI Study Planning — Mission Architect](#9-ai-study-planning--mission-architect)
+10. [Payment Model](#10-payment-model)
+11. [Data, Privacy and Storage](#11-data-privacy-and-storage)
+12. [Getting Started — Setup Guide](#12-getting-started--setup-guide)
+13. [Hosting Options](#13-hosting-options)
+14. [Customisation Guide](#14-customisation-guide)
+15. [Technical Architecture](#15-technical-architecture)
+16. [File Reference](#16-file-reference)
+17. [Coming Soon](#17-coming-soon)
 
 ---
 
@@ -117,7 +120,7 @@ ShiftGlitch's flashcard system implements the Leitner 5-box spaced repetition me
   - **Not Yet** — same as Again, but triggers the YET Growth Shield mindset reframe
   - **Got It** — the card advances to the next box
 
-A visual orbit indicator shows each card's stability level. Box 5 cards are considered mastered. Cards in higher boxes are reviewed less frequently.
+A visual orbit indicator shows each card's stability level. Box 5 cards are considered mastered.
 
 **Rank contribution:** Every time a card advances to a higher box, that counts as one `cardsAdvanced` evidence point.
 
@@ -136,7 +139,7 @@ The Blurting Method is a structured implementation of free recall — one of the
 | **3. Blurt** | Student puts notes away and writes everything they can recall again |
 | **4. Compare** | Student compares their blurt against the original notes to identify gaps |
 
-Sessions are saved with the topic title, recall attempt text, and identified gaps. Review count tracks how many times a student has returned to the same topic.
+Sessions are saved with the topic title, recall attempt text, and identified gaps.
 
 **Rank contribution:** Each completed blurt session counts as one `blurtsCompleted` evidence point.
 
@@ -146,15 +149,13 @@ Sessions are saved with the topic title, recall attempt text, and identified gap
 
 The Mission Architect uses Google's Gemini AI model to generate personalised, structured study plans. The student inputs their subject, exam date, available study time, and any specific concerns. The AI returns a multi-week plan with specific daily tasks, technique recommendations, and topic priorities.
 
-The AI key is **Bring Your Own Key (BYOK)** — each user enters their own Google Gemini API key in Settings. The key is stored in their browser only and never sent to any external server. If no user key is set, the app falls back to a server-side proxy using the operator's key.
+The AI key is **Bring Your Own Key (BYOK)** — each user enters their own Google Gemini API key in Settings. If no user key is configured, ShiftGlitch falls back to a server-side proxy using the operator's key (set via environment variable `GEMINI_API_KEY`).
 
 ---
 
 ### MCQ Diagnostics
 
-A 100-question multiple-choice knowledge assessment split across 5 thematic missions. This is not a general trivia quiz — every question is directly tied to the learning science and study methods that ShiftGlitch is built on. Students are expected to learn the theory, not just the tools.
-
-Full mission breakdown in [Section 5](#5-the-mcq-diagnostic-missions).
+A 100-question multiple-choice knowledge assessment split across 5 thematic missions. This is not a general trivia quiz — every question is directly tied to the learning science and study methods that ShiftGlitch is built on. Full mission breakdown in [Section 5](#5-the-mcq-diagnostic-missions).
 
 ---
 
@@ -162,9 +163,7 @@ Full mission breakdown in [Section 5](#5-the-mcq-diagnostic-missions).
 
 The Feynman Technique is the practice of explaining a concept as simply as possible — ideally to someone who knows nothing about it. If you cannot explain it simply, you do not understand it.
 
-The Babel Fish Metaphor Lab is ShiftGlitch's implementation of this technique. Students choose a concept, write a plain-language explanation, optionally add a "stupid doodle" (a rough diagram or sketch), and save the session. The act of constructing the explanation forces the student to identify where their understanding breaks down.
-
-Sessions are saved and reviewable. An optional doodle badge is awarded for including a visual element.
+The Babel Fish Metaphor Lab is ShiftGlitch's implementation of this technique. Students choose a concept, write a plain-language explanation, optionally add a "stupid doodle" (a rough diagram or sketch), and save the session. Sessions are saved and reviewable.
 
 ---
 
@@ -172,8 +171,8 @@ Sessions are saved and reviewable. An optional doodle badge is awarded for inclu
 
 Two anti-procrastination tools in one panel:
 
-- **Stealth Mode** — removes all distractions from the student's workspace by hiding everything except the essential study surface. Designed for students who get distracted by their own screen clutter.
-- **Entry Rocket** — a micro-commitment tool. The student writes one very small, very specific starting action (e.g. "Open my notebook to page 12"). The act of committing to the smallest possible step bypasses the psychological resistance of starting.
+- **Stealth Mode** — breaks the task into tiny micro-steps to reduce the psychological weight of starting
+- **Entry Rocket** — a micro-commitment tool: the student writes the one smallest possible starting action. The act of committing to the smallest step bypasses the psychological resistance of beginning.
 
 ---
 
@@ -183,13 +182,13 @@ A mindset intervention tool based on Carol Dweck's growth mindset research. When
 
 *"I don't understand photosynthesis"* → *"I don't understand photosynthesis **yet**."*
 
-The tool is triggered in two ways: directly from the Yet Growth Shield page (for any concept the student wants to work through), or automatically when a student taps **Not Yet** on a flashcard. The concept is logged with a date. Students can review their full "yet" history.
+The tool is triggered directly from the Yet Growth Shield page or automatically when a student taps **Not Yet** on a flashcard. The concept is logged with a date.
 
 ---
 
 ### Eisenhower Matrix
 
-An interactive task prioritisation tool based on the Eisenhower Decision Matrix — the productivity framework attributed to Dwight D. Eisenhower and popularised by Stephen Covey in *The 7 Habits of Highly Effective People*.
+An interactive task prioritisation tool based on the Eisenhower Decision Matrix.
 
 Students place tasks into one of four quadrants:
 
@@ -229,6 +228,24 @@ A dedicated Stats page provides visualisations and session history:
 
 ---
 
+### Leaderboard
+
+A global Focus Score ranking backed by PostgreSQL. Users compete by gamertag (set in Settings). Score syncs automatically after every Pomodoro session. Top 50 shown; the caller's row is always visible even if outside the top 50.
+
+**Score formula:** (Pomodoros × 10) + (Streak × 25) + (Cards Mastered × 2) + (Blurts × 15)
+
+*Requires a logged-in Replit account.*
+
+---
+
+### Squad Mode
+
+Async co-op study groups of up to 4 users. Create or join a squad with a 6-character invite code. The squad streak is the minimum individual streak across all members — one weak link drops it. An AFK roast message appears for members inactive 24+ hours. Members can leave; the squad dissolves when all leave.
+
+*Requires a logged-in Replit account.*
+
+---
+
 ## 5. The MCQ Diagnostic Missions
 
 100 questions. 5 missions. Every question tied to the science of learning.
@@ -241,13 +258,12 @@ A dedicated Stats page provides visualisations and session history:
 | 4 | Avoid the Black Holes | Systems & Tactics | Procrastination science, backward planning, focus zones, weekly review, ABCDE prioritisation, mock testing, batching, MoSCoW method | 20 |
 | 5 | Life Support & Hero State | Wellbeing & Mastery | Sleep and memory consolidation, box breathing, anxiety reappraisal, nutrition for cognitive performance, growth mindset, the Yet Game, exercise and learning | 20 |
 
-**Access:** All five missions are accessible at any time — there is no sequential lock. Missions can be retried. Each submission (including retries) increments the `diagnosticsCompleted` rank evidence counter.
+**Access:** All five missions are accessible at any time — there is no sequential lock. Missions can be retried. Each submission increments the `diagnosticsCompleted` rank evidence counter.
 
 **After each mission:**
 - Individual answers are reviewed with correct/incorrect feedback
 - Knowledge gaps (topics with incorrect answers) are saved and flagged
 - A reflection prompt invites the student to write about what they plan to do with the result
-- The student's best score per mission is retained for display
 
 ---
 
@@ -299,7 +315,6 @@ No data passes through any server. Everything happens in the teacher's browser.
 
 **Students Needing Attention**
 - Auto-flagged list of students with fewer than 5 sessions or zero blurts recorded
-- Designed to surface struggling or disengaged students before they fall too far behind
 
 **Student Roster**
 - Full sortable table: name, rank, sessions, total focus time, flashcards advanced, blurts, active days
@@ -312,21 +327,36 @@ No data passes through any server. Everything happens in the teacher's browser.
 
 ### Printable Progress Reports
 
-Each student profile includes a **Print Progress Report** button. This generates a clean, printer-friendly summary:
-- Student name and current rank
-- Rank evidence bars with current vs. required values for every criterion
-- Activity stats (sessions, focus time, active days)
-- Technique usage breakdown
-
-These reports are designed for parent-teacher conferences, student check-ins, and school reporting requirements.
+Each student profile includes a **Print Progress Report** button. This generates a clean, printer-friendly summary designed for parent-teacher conferences, student check-ins, and school reporting requirements.
 
 ---
 
-## 8. AI Study Planning — Mission Architect
+## 8. Social Features
+
+### Study Buddy System
+
+Generate a compact base64 code containing your rank and stats. Share the code with a friend via any messaging platform. When your friend pastes your code on their Rank page, they see a side-by-side comparison of stats — not a competition, but a genuine social motivator.
+
+### Shareable Progress Report
+
+Generate a URL containing encoded rank and evidence data. When anyone opens that URL — a parent, a teacher, a coach — they see an orange banner displaying the student's rank and evidence summary. No account required on the recipient's end.
+
+### Leaderboard
+
+A global Focus Score leaderboard backed by PostgreSQL. Users compete by gamertag. Designed to channel competitive motivation in a direction that rewards genuine study behaviour, not gaming the system.
+
+### Squad Mode
+
+Create or join a study squad of up to 4 users with a 6-character invite code. Squad streaks are collaborative — the squad's streak is only as strong as its most inactive member. AFK roast messages fire for members who haven't studied in 24+ hours. The social cost of skipping is real.
+
+---
+
+## 9. AI Study Planning — Mission Architect
 
 The Mission Architect is the AI-powered module that generates a structured, personalised study plan. It is powered by Google Gemini (model: `gemini-2.0-flash`).
 
 ### How It Works
+
 The student fills in a brief:
 - Subject or topic
 - Exam or deadline date
@@ -338,8 +368,6 @@ The Mission Architect sends this to the Gemini API and returns a structured week
 
 ### API Key Setup (BYOK)
 
-ShiftGlitch uses a Bring Your Own Key (BYOK) model. Each user sets up their own Google API key:
-
 1. Go to [Google AI Studio](https://aistudio.google.com/apikey)
 2. Sign in with your Google account
 3. Click **"Create API Key"**
@@ -350,13 +378,41 @@ If no user key is configured, ShiftGlitch falls back to a server-side proxy usin
 
 ---
 
-## 9. Data, Privacy and Storage
+## 10. Payment Model
+
+ShiftGlitch's core tools are free — and always will be. No paywall has ever been placed in front of the rank system, the flashcards, the blurting method, the MCQ diagnostics, or the teacher dashboard.
+
+### Tiers
+
+| Tier | Price | Who It's For |
+|------|-------|-------------|
+| **Free** | Free forever | Individual students — all core study tools, full rank progression, teacher dashboard |
+| **Netrunner Pro** | R99/month or R799/year (ZAR) | Students who want AI study planning and Squad Mode |
+| **School License** | Contact for pricing | Schools, tutoring centres, and academies |
+
+### Payment Providers
+
+- **PayFast** — South African rand (ZAR) transactions. One-time purchase packs (1 month / 3 months / 12 months). No auto-renewal.
+- **PayPal** — International (non-ZAR) transactions.
+
+### What Pro Unlocks
+
+- Mission Architect AI study planning (unlimited)
+- Squad Mode co-op study groups
+- Unlimited leaderboard sync
+
+All rank progression, all study tools, and the full teacher dashboard remain free regardless of tier.
+
+---
+
+## 11. Data, Privacy and Storage
 
 ### Where Data Lives
 
 All student data is stored in the browser's `localStorage`. No data is sent to any external server unless:
 - The student explicitly configures Firebase (for cross-device sync)
 - The student uses the Mission Architect (which sends only the study brief text to the Gemini API)
+- The student logs in with Replit Auth (which stores user profile data in PostgreSQL for leaderboard and squad features)
 
 ### localStorage Key Reference
 
@@ -384,22 +440,24 @@ From the Stats page → Data Management:
 
 - **Full JSON Export** — downloads all `localStorage` data as a single `.json` file (excluding the Gemini key for security)
 - **Import** — restores all data from a previously exported file; overwrites current data
-- **Export for Teacher** — same as Full Export but prompts for the student's name and embeds it in the file; designed for classroom data collection
+- **Export for Teacher** — same as Full Export but prompts for the student's name; designed for classroom data collection
 
 ### Privacy Notes
 
 - The Gemini API key is excluded from all exports — it is never transmitted or shared
-- No user account is required to use ShiftGlitch
+- No user account is required to use the core tools of ShiftGlitch
 - Firebase is entirely optional; without it, nothing leaves the browser
 - The app functions fully offline with no network connection
+- Replit Auth is only required for leaderboard and squad features
 
 ---
 
-## 10. Getting Started — Setup Guide
+## 12. Getting Started — Setup Guide
 
 ### Prerequisites
-- Node.js installed (v16 or higher recommended)
+- Node.js installed (v18 or higher recommended)
 - A modern browser (Chrome, Firefox, Edge, Safari)
+- A Replit account (required for auth, leaderboard, and squad features)
 
 ### Step 1: Install Dependencies
 
@@ -407,29 +465,30 @@ From the Stats page → Data Management:
 npm install
 ```
 
-### Step 2: Start the Server
+### Step 2: Set Environment Variables
+
+In Replit, use the Secrets panel. On other platforms, use your preferred environment variable method.
+
+**Required:**
+- `DATABASE_URL` — PostgreSQL connection string (auto-set by Replit Database integration)
+- `SESSION_SECRET` — a random secret string for signing session cookies
+
+**Optional:**
+- `GEMINI_API_KEY` — server-side Gemini API fallback
+- `RESEND_API_KEY` — for welcome emails on waitlist signups
+- `PAYFAST_MERCHANT_ID`, `PAYFAST_MERCHANT_KEY`, `PAYFAST_PASSPHRASE` — for PayFast payments
+
+### Step 3: Start the Server
 
 ```bash
 node server.js
 ```
 
-The server starts on port 5000 by default. Open your browser and go to `http://localhost:5000`.
+The server starts on port 5000 by default. Open your browser and go to `http://localhost:5000` (or use the Replit preview URL).
 
-### Step 3: (Optional) Configure the Server-Side Gemini Key
+### Step 4: (Optional) Configure Firebase Cloud Sync
 
-If you want to provide a fallback Gemini API key for users who have not set their own, set the environment variable:
-
-```
-GEMINI_API_KEY=your-api-key-here
-```
-
-On Replit, this is set in the Secrets panel. On other platforms, use your preferred environment variable method.
-
-If this variable is not set, the Mission Architect will only work for users who have entered their own API key in Settings.
-
-### Step 4: (Optional) Set Up Firebase Cloud Sync
-
-Firebase enables cross-device sync for Cornell Notes and rank data. It is not required for any other features.
+Firebase enables cross-device sync for Cornell Notes.
 
 1. Go to [Firebase Console](https://console.firebase.google.com/) and create a project
 2. In **Project Settings** → **Your apps**, click the web icon (`</>`)
@@ -451,42 +510,45 @@ var SG_FIREBASE_CONFIG = {
 6. In Firebase Console → **Firestore Database** → create a database (start in test mode)
 7. Restart the server and reload ShiftGlitch — Settings will confirm "Connected"
 
-Without `config.js` configured, ShiftGlitch detects the placeholder values and runs silently in offline-only mode. No error is shown to the user.
+Without `config.js` configured, ShiftGlitch detects the placeholder values and runs silently in offline-only mode.
 
 ### Step 5: Share with Students
 
-Share your deployment URL with students. They visit the URL in any browser, and the app is immediately functional — no download, no account, no sign-up required.
+Share your deployment URL with students. They visit the URL in any browser, and the app is immediately functional — no download, no account required for the core tools.
 
 ---
 
-## 11. Hosting Options
+## 13. Hosting Options
 
 ### Replit (Recommended for Getting Started)
-The app is pre-configured for Replit deployment. Start the `node server.js` workflow and share the Replit URL. Replit's Deployments feature provides a persistent production URL.
+The app is pre-configured for Replit deployment. Start the `node server.js` workflow and share the Replit URL. Replit's Deployments feature provides a persistent production URL with full authentication, database, and payment integration support.
 
 ### Run Locally (Development)
 ```bash
 npm install
 node server.js
 ```
-Open `http://localhost:5000`
+Open `http://localhost:5000`. Note: Replit Auth requires the Replit environment and will not work in local development.
 
 ### Host on Any Node.js Server
-Deploy `server.js` to any platform that supports Node.js — Railway, Render, Fly.io, DigitalOcean App Platform, AWS, etc. Ensure `GEMINI_API_KEY` is set as an environment variable if you want the server-side AI fallback.
+Deploy `server.js` to any platform that supports Node.js — Railway, Render, Fly.io, DigitalOcean App Platform, AWS, etc. Ensure all required environment variables are set.
 
 ### Host as Static Files (No Server)
-ShiftGlitch is primarily a client-side application. The Express server is only needed for:
+ShiftGlitch is primarily a client-side application. The Express server is needed for:
 - Serving static files
+- Replit Auth and user accounts
 - The server-side Gemini API proxy fallback
+- Leaderboard and squad data
+- PayFast payment processing
 
-If you host the HTML files on Netlify, Vercel, or GitHub Pages, the app will work fully — but the server-side AI proxy will not be available. Students can still use the Mission Architect by entering their own API key in Settings.
+If you host the HTML files on Netlify, Vercel, or GitHub Pages, the core study tools will work fully — but auth-dependent features (leaderboard, squad, pro subscription) will not be available. Students can still use the Mission Architect by entering their own API key in Settings.
 
 ### Open Directly in a Browser
-For completely offline use, open `index.html` directly in any modern browser. All features work except the server-side AI proxy.
+For completely offline use, open `index.html` directly in any modern browser. All features except server-dependent features work normally.
 
 ---
 
-## 12. Customisation Guide
+## 14. Customisation Guide
 
 ### Rebranding
 - **App name:** Search for `ShiftGlitch` in `index.html` to replace all instances
@@ -494,8 +556,8 @@ For completely offline use, open `index.html` directly in any modern browser. Al
 - **Nav bar label:** The primary `<h1>` and logo text near the top of `<body>`
 
 ### Visual Appearance
-- **Accent colour:** All interactive elements use Tailwind's `orange-600`. A global find-and-replace of `orange-600` (and `orange-500`, `orange-700`) with another Tailwind colour class will re-theme the app. Confirm `orange-50`, `orange-100`, `orange-200`, `orange-800`, `orange-900` background tints are also updated for full consistency.
-- **Dark mode:** Dark mode is enabled by default. This is controlled in the Tailwind config block at the top of `index.html` (`darkMode: 'class'`) and by reading `sg_theme` from `localStorage` on app init.
+- **Accent colour:** All interactive elements use Tailwind's `orange-600`. A global find-and-replace of `orange-600` (and `orange-500`, `orange-700`) with another Tailwind colour class will re-theme the app.
+- **Dark mode:** Dark mode is enabled by default. Controlled by `darkMode: 'class'` in the Tailwind config block at the top of `index.html` and by reading `sg_theme` from `localStorage` on app init.
 
 ### Content
 - **Motivational quotes:** Edit the `STUDY_QUOTES` array in the JavaScript section of `index.html`
@@ -507,7 +569,7 @@ Rank requirements are defined in the `RANK_REQUIREMENTS` object in `index.html`.
 
 ---
 
-## 13. Technical Architecture
+## 15. Technical Architecture
 
 ### Overview
 
@@ -516,44 +578,50 @@ Rank requirements are defined in the `RANK_REQUIREMENTS` object in `index.html`.
 | Frontend | Single-page application — all in `index.html` |
 | Styling | Tailwind CSS via CDN (class-based dark mode) |
 | Charts | Chart.js via CDN |
-| Backend | Express.js v5 — static files + Gemini API proxy |
+| Backend | Express.js v5 — static files, auth, API endpoints |
 | Primary storage | Browser `localStorage` |
 | Optional cloud | Firebase Firestore (anonymous auth) |
+| Database | PostgreSQL (users, sessions, leaderboard, squads, payments) |
+| Auth | Replit Auth (OpenID Connect via `openid-client` v6) |
 | AI | Google Gemini API (`gemini-2.0-flash`) |
+| Email | Resend (transactional email for waitlist welcome) |
+| Payments | PayFast (ZAR) + PayPal (international) |
 | External data | Open Trivia Database (Quiz Arena only) |
 
 ### Design Decisions
 
 **No build system.** All dependencies are loaded via CDN. There is no Webpack, Vite, or TypeScript. The entire frontend is a single HTML file. This makes the app trivially easy to host, modify, fork, and debug.
 
-**Offline-first.** The app is fully functional with zero network connectivity. `localStorage` is the primary data store. Network features (Firebase sync, Gemini AI, quiz trivia) degrade gracefully when unavailable — the app does not error, it simply disables those features.
+**Offline-first.** The app is fully functional with zero network connectivity for the core study tools. Network features degrade gracefully when unavailable.
 
-**Monolithic frontend.** `index.html` is approximately 2,800 lines. This is an intentional trade-off for simplicity of deployment and modification. There is no component system, no module bundler, and no framework overhead.
+**Monolithic frontend.** `index.html` is approximately 2,800 lines. This is an intentional trade-off for simplicity of deployment and modification.
 
-**BYOK AI model.** The Gemini API key model protects the operator from unexpected API costs while keeping the AI feature genuinely useful. Students who want full AI access set up their own key via Google AI Studio.
+**BYOK AI model.** The Gemini API key model protects the operator from unexpected API costs while keeping the AI feature genuinely useful.
 
-**Firebase as a progressive enhancement.** Firebase is not initialised unless `config.js` contains real credentials. The app detects placeholder values at startup and silently falls back to offline mode. No Firebase SDK calls are made in offline mode.
+**Firebase as a progressive enhancement.** Firebase is not initialised unless `config.js` contains real credentials. The app detects placeholder values at startup and silently falls back to offline mode.
 
-**Security.** All user-generated content rendered to the DOM passes through the `esc()` utility function, which escapes HTML entities to prevent XSS attacks. The Gemini API key is excluded from data exports.
+**Security.** All user-generated content rendered to the DOM passes through the `esc()` utility function, which escapes HTML entities to prevent XSS attacks. Helmet middleware adds security headers. Rate limiting protects API endpoints.
 
 ### Server Routes
 
 | Route | Method | Auth | Description |
 |-------|--------|------|-------------|
-| `/` | GET | None | Landing page (`landing.html`) |
-| `/waitlist` | GET | None | Waitlist signup (`waitlist.html`) |
-| `/pricing` | GET | None | Pricing page (`pricing.html`) |
-| `/demo` | GET | None | Demo (`demo.html`) |
-| `/teacher` | GET | None | Teacher Dashboard (`teacher.html`) |
-| `/login` | GET | None | Login page (`login.html`) |
-| `/app` | GET | Required | Full app (`index.html`) |
-| `/api/waitlist` | POST | None | Save waitlist lead + send welcome email |
+| `/` | GET | None | Landing page |
+| `/waitlist` | GET | None | Waitlist signup |
+| `/pricing` | GET | None | Pricing page |
+| `/demo` | GET | None | Demo |
+| `/teacher` | GET | None | Teacher Dashboard |
+| `/login` | GET | None | Login page |
+| `/auth/callback` | GET | None | Replit OAuth callback |
+| `/app` | GET | Required | Full app |
+| `/api/waitlist` | POST | None | Save waitlist lead + send email |
 | `/api/stats` | GET | None | Page view counts and waitlist size |
 | `/api/gemini` | POST | None | Gemini API proxy |
 | `/api/leaderboard` | GET | Required | Global leaderboard |
 | `/api/leaderboard/sync` | POST | Required | Sync focus stats |
 | `/api/settings/gamertag` | GET/POST | Required | Get/update gamertag |
 | `/api/squad` | GET/POST | Required | Squad management |
+| `/api/payfast-itn` | POST | None | PayFast payment notification |
 
 All routes use `no-cache` headers to ensure students always receive the latest version.
 
@@ -561,20 +629,26 @@ All routes use `no-cache` headers to ensure students always receive the latest v
 
 | Variable | Required | Purpose |
 |----------|----------|---------|
+| `DATABASE_URL` | Yes | PostgreSQL connection string (auto-set by Replit DB integration) |
+| `SESSION_SECRET` | Yes | Secret for signing session cookies |
 | `GEMINI_API_KEY` | Optional | Server-side Gemini API proxy. If not set, the proxy endpoint returns an error; BYOK still works. |
-| `RESEND_API_KEY` | Optional | Sends a welcome email to new waitlist signups via Resend. If not set, signups are saved to the DB but no email is sent. Get a free key at resend.com. |
-| `DATABASE_URL` | Required | PostgreSQL connection string (auto-set by Replit DB integration). |
-| `PORT` | Optional | Server port (default: 5000). |
+| `RESEND_API_KEY` | Optional | Sends a welcome email to new waitlist signups via Resend. |
+| `RESEND_FROM_ADDRESS` | Optional | Sender address for Resend emails. |
+| `PAYFAST_MERCHANT_ID` | Payments | PayFast merchant ID |
+| `PAYFAST_MERCHANT_KEY` | Payments | PayFast merchant key |
+| `PAYFAST_PASSPHRASE` | Payments | PayFast salt passphrase |
+| `PAYFAST_SANDBOX` | Optional | Set `true` for PayFast sandbox mode |
+| `PORT` | Optional | Server port (default: 5000) |
 
 ---
 
-## 14. File Reference
+## 16. File Reference
 
 | File | Description |
 |------|-------------|
 | `index.html` | The complete ShiftGlitch application — all student-facing features (~2,800 lines) |
-| `landing.html` | Public landing page — boot animation, product sections, SEO, conversion CTA |
-| `pricing.html` | Pricing page — Free / Pro / School tiers with feature comparison and FAQ |
+| `landing.html` | Public landing page — boot animation, product sections, SEO, waitlist CTA |
+| `pricing.html` | Pricing page — Free / Pro / School tiers with feature comparison, FAQ, and checkout |
 | `waitlist.html` | Waitlist signup — captures gamertag + email, sends welcome email |
 | `demo.html` | Limited demo version — subset of features, no rank progression |
 | `teacher.html` | Teacher Dashboard — classroom data import and reporting |
@@ -586,12 +660,42 @@ All routes use `no-cache` headers to ensure students always receive the latest v
 | `package.json` | Node.js project manifest and dependencies |
 | `robots.txt` | Search engine crawl instructions |
 | `sitemap.xml` | XML sitemap for all public pages |
-| `PRO-INSTRUCTIONS.md` | Full teacher and classroom usage guide |
-| `MARKETING_PLAN.md` | Comprehensive go-to-market strategy, SEO plan, channel strategy, and pricing rationale |
 | `README.md` | This file — the comprehensive product and setup guide |
-| `REPORT.md` | Definitive app report: full module inventory, data schemas, rank rules, and user guide |
-| `JOURNAL.md` | Design philosophy, product story, and marketing narrative |
-| `revamp_vision.md` | Commercial evolution vision — the next phase of the product |
+| `REPORT.md` | Definitive app report: full module inventory, data schemas, API routes, and user guide |
+| `JOURNAL.md` | Design philosophy, product story, and brand narrative |
+| `PLANNING_EBOOK.md` | Readable product roadmap — the next four planned development phases |
+| `MARKETING_PLAN.md` | Comprehensive go-to-market strategy, SEO plan, channel strategy, and pricing rationale |
+| `replit.md` | Technical architecture overview, environment variable reference, and developer notes |
+| `revamp_vision.md` | Commercial evolution vision — the next generation of the product |
+
+---
+
+## 17. Coming Soon
+
+The following features are planned for the next four development phases. Full specification for each is available in `PLANNING_EBOOK.md`.
+
+### SYSTEM INTERRUPT Engine (Coming Soon)
+A dramatic event system that makes the Mainframe feel alive. Unexpected overlays fire at key moments: threat interrupts when cognitive protocols haven't been run in 72+ hours, challenge interrupts (60-second Recall Sprint, Pattern Lock mini-game), reward interrupts for rank promotion with cinematic ceremony, and Warden interrupts — messages from a mysterious entity that speaks to the player. Combined with a 12-badge achievement system.
+
+### Repeatable Escape Run System (Coming Soon)
+Replace the START HERE checklist with a repeatable adventure loop. Each Escape Run is named after a knowledge domain the student chooses. Six ordered exploits must be completed in sequence: loading a flashcard deck, completing a recall protocol, reinforcing cards to Box 3+, completing a Boss Fight challenge, building a Mind Map or Memory Palace, and writing an After Action Report. Completing all six awards Domain Clearance — and the run resets immediately for another pass.
+
+### 10 New Cognitive Exploit Modules (Coming Soon)
+Ten new study tools, each implementing a distinct evidence-based technique:
+
+1. **Memory Palace** — Method of Loci for durable spatial encoding
+2. **Mind Map Protocol** — Node-and-branch concept mapping
+3. **Chunking Engine** — Working memory optimisation through grouping
+4. **Speed Run** — Timed recall under pressure
+5. **Mistake Vault** — Error analysis and metacognitive tagging
+6. **Teach It** — Feynman Protocol for deep consolidation
+7. **Dual Coding Station** — Verbal + visual dual representation
+8. **The Interleave** — Multi-domain session cycling
+9. **Concept Mapper** — Elaborative interrogation
+10. **Shadow Protocol** — Cornell Note active retrieval enhancement
+
+### The Warden + Non-Linear Progression (Coming Soon)
+The Warden is the personality of the Mainframe — a mysterious, semi-hostile entity that monitors the student's progress and actively interferes with their escape. A library of 40+ handwritten messages across three modes (Observer, Guide, Adversary) fires once per session. Combined with a Snakes and Ladders non-linear progression system: extended inactivity triggers rollbacks; exceptional performance triggers shortcuts; hidden easter eggs reward curiosity.
 
 ---
 
