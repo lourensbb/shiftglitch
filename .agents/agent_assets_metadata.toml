@@ -42,3 +42,9 @@ id = "F51pQsYlXsLql_GHNFhWB"
 uri = "file://shiftglitch-package.zip"
 type = "unspecified"
 title = "shiftglitch-package.zip — Updated documentation bundle"
+
+[[outputs]]
+id = "auDz-JonUoF3Q4dYVkBeK"
+uri = "file://SHIFTGLITCH_QUICK_MARKETPLAN.md"
+type = "text"
+title = "ShiftGlitch Quick Marketing Plan — 17 Tactics"
