@@ -331,9 +331,9 @@
                             <button onclick="app.navTo('diagnostic')" class="nav-btn block w-full text-left px-4 py-2.5 text-xs font-bold tracking-widest uppercase text-[#39FF14]/50 hover:text-[#39FF14] hover:bg-[#39FF14]/5 transition-colors">Exploit Missions</button>
                             <div style="border-top:1px solid rgba(57,255,20,0.1);margin:4px 0;padding:4px 16px 2px;font-family:'Share Tech Mono',monospace;font-size:9px;color:#39FF14;letter-spacing:0.15em;opacity:0.6;">— COGNITIVE PROTOCOLS —</div>
                             <button onclick="app.navTo('speed-run')" class="nav-btn block w-full text-left px-4 py-2 text-xs font-bold tracking-widest uppercase text-[#39FF14]/50 hover:text-[#39FF14] hover:bg-[#39FF14]/5 transition-colors">Speed Run</button>
-                            <button onclick="app.navTo('mistake-vault')" class="nav-btn block w-full text-left px-4 py-2 text-xs font-bold tracking-widest uppercase text-[#39FF14]/50 hover:text-[#39FF14] hover:bg-[#39FF14]/5 transition-colors">Mistake Vault</button>
-                            <button onclick="app.navTo('teach-it')" class="nav-btn block w-full text-left px-4 py-2 text-xs font-bold tracking-widest uppercase text-[#39FF14]/50 hover:text-[#39FF14] hover:bg-[#39FF14]/5 transition-colors">Teach It</button>
-                            <button onclick="app.navTo('concept-mapper')" class="nav-btn block w-full text-left px-4 py-2 text-xs font-bold tracking-widest uppercase text-[#39FF14]/50 hover:text-[#39FF14] hover:bg-[#39FF14]/5 transition-colors">Concept Mapper</button>
+                            <button id="nav-mistake-vault-desktop" onclick="app.navTo('mistake-vault')" class="nav-btn block w-full text-left px-4 py-2 text-xs font-bold tracking-widest uppercase text-[#39FF14]/50 hover:text-[#39FF14] hover:bg-[#39FF14]/5 transition-colors">Mistake Vault</button>
+                            <button id="nav-teach-it-desktop" onclick="app.navTo('teach-it')" class="nav-btn block w-full text-left px-4 py-2 text-xs font-bold tracking-widest uppercase text-[#39FF14]/50 hover:text-[#39FF14] hover:bg-[#39FF14]/5 transition-colors">Teach It</button>
+                            <button id="nav-concept-mapper-desktop" onclick="app.navTo('concept-mapper')" class="nav-btn block w-full text-left px-4 py-2 text-xs font-bold tracking-widest uppercase text-[#39FF14]/50 hover:text-[#39FF14] hover:bg-[#39FF14]/5 transition-colors">Concept Mapper</button>
                             <button id="nav-chunking-desktop" onclick="app.navTo('chunking')" class="nav-btn block w-full text-left px-4 py-2 text-xs font-bold tracking-widest uppercase text-[#39FF14]/50 hover:text-[#39FF14] hover:bg-[#39FF14]/5 transition-colors">Chunking Engine</button>
                             <button id="nav-interleave-desktop" onclick="app.navTo('interleave')" class="nav-btn block w-full text-left px-4 py-2 text-xs font-bold tracking-widest uppercase text-[#39FF14]/50 hover:text-[#39FF14] hover:bg-[#39FF14]/5 transition-colors">The Interleave</button>
                             <button id="nav-memory-palace-desktop" onclick="app.navTo('memory-palace')" class="nav-btn block w-full text-left px-4 py-2 text-xs font-bold tracking-widest uppercase text-[#39FF14]/50 hover:text-[#39FF14] hover:bg-[#39FF14]/5 transition-colors">Memory Palace</button>
@@ -375,9 +375,9 @@
             <button onclick="app.navTo('diagnostic')" class="block w-full text-left px-4 py-3 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Exploit Missions</button>
             <div class="px-4 pt-2 pb-1 text-[9px] font-bold text-[#39FF14]/40 uppercase tracking-widest font-mono">— Cognitive Protocols —</div>
             <button onclick="app.navTo('speed-run')" class="block w-full text-left px-4 py-2.5 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Speed Run</button>
-            <button onclick="app.navTo('mistake-vault')" class="block w-full text-left px-4 py-2.5 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Mistake Vault</button>
-            <button onclick="app.navTo('teach-it')" class="block w-full text-left px-4 py-2.5 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Teach It</button>
-            <button onclick="app.navTo('concept-mapper')" class="block w-full text-left px-4 py-2.5 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Concept Mapper</button>
+            <button id="nav-mistake-vault-mobile" onclick="app.navTo('mistake-vault')" class="block w-full text-left px-4 py-2.5 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Mistake Vault</button>
+            <button id="nav-teach-it-mobile" onclick="app.navTo('teach-it')" class="block w-full text-left px-4 py-2.5 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Teach It</button>
+            <button id="nav-concept-mapper-mobile" onclick="app.navTo('concept-mapper')" class="block w-full text-left px-4 py-2.5 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Concept Mapper</button>
             <button id="nav-chunking-mobile" onclick="app.navTo('chunking')" class="block w-full text-left px-4 py-2.5 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Chunking Engine</button>
             <button id="nav-interleave-mobile" onclick="app.navTo('interleave')" class="block w-full text-left px-4 py-2.5 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">The Interleave</button>
             <button id="nav-memory-palace-mobile" onclick="app.navTo('memory-palace')" class="block w-full text-left px-4 py-2.5 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Memory Palace</button>
@@ -1185,16 +1185,20 @@
             },
             _updateCemNav() {
                 const idx = this._cemRankIdx ? this._cemRankIdx() : RANKS.indexOf(state.rank);
-                const skLocked = idx < 1;
-                const gtLocked = idx < 2;
-                const skNames = { chunking:'Chunking Engine', interleave:'The Interleave', 'memory-palace':'Memory Palace' };
-                const gtNames = { mindmap:'Mind Map Protocol', 'dual-coding':'Dual Coding Station', 'shadow-protocol':'Shadow Protocol' };
+                const skLocked = idx < 1; // Script Kiddie+ required
+                const gtLocked = idx < 2; // Glitch Tech+ required
+                // Spec module numbering: 1-4=NPC+, 5-7=Script Kiddie+, 8-10=Glitch Tech+
+                // 1=Memory Palace, 2=Mind Map, 3=Chunking, 4=Speed Run (all NPC+)
+                // 5=Mistake Vault, 6=Teach It, 7=Dual Coding (Script Kiddie+)
+                // 8=The Interleave, 9=Concept Mapper, 10=Shadow Protocol (Glitch Tech+)
+                const skNames = { 'mistake-vault':'Mistake Vault', 'teach-it':'Teach It', 'dual-coding':'Dual Coding Station' };
+                const gtNames = { interleave:'The Interleave', 'concept-mapper':'Concept Mapper', 'shadow-protocol':'Shadow Protocol' };
                 ['desktop','mobile'].forEach(device => {
                     Object.entries(skNames).forEach(([id, label]) => {
                         const btn = document.getElementById('nav-'+id+'-'+device);
                         if (!btn) return;
                         if (skLocked) {
-                            btn.innerHTML = label + ' <span style="display:block;font-size:8px;color:#FF4444;letter-spacing:0.08em;font-style:normal;opacity:0.7;">▲ SCRIPT KIDDIE</span>';
+                            btn.innerHTML = label + '<span style="display:block;font-size:8px;color:#FF4444;letter-spacing:0.08em;font-style:normal;opacity:0.8;margin-top:1px;">CLEARANCE REQUIRED — LEVEL 2</span>';
                             btn.style.opacity = '0.45';
                             btn.style.cursor = 'not-allowed';
                             btn.style.color = '#666';
@@ -1213,7 +1217,7 @@
                         const btn = document.getElementById('nav-'+id+'-'+device);
                         if (!btn) return;
                         if (gtLocked) {
-                            btn.innerHTML = label + ' <span style="display:block;font-size:8px;color:#FF4444;letter-spacing:0.08em;font-style:normal;opacity:0.7;">▲ GLITCH TECH</span>';
+                            btn.innerHTML = label + '<span style="display:block;font-size:8px;color:#FF4444;letter-spacing:0.08em;font-style:normal;opacity:0.8;margin-top:1px;">CLEARANCE REQUIRED — LEVEL 3</span>';
                             btn.style.opacity = '0.45';
                             btn.style.cursor = 'not-allowed';
                             btn.style.color = '#666';
@@ -4989,6 +4993,7 @@
 
             /* ─── 2. MISTAKE VAULT ─── */
             getMistakeVaultHTML() {
+                if (this._cemLocked(1)) return this._cemPageShell('MISTAKE VAULT','Error Analysis','',this._cemLockedBanner('SCRIPT KIDDIE'));
                 const entries = JSON.parse(localStorage.getItem('sg_mistake_vault')||'[]');
                 const FAILURE_MODES = ['Blanked','Misread','Knew it wrong','Couldn\'t retrieve','Partial recall','Guessed'];
                 const content = `
@@ -5042,6 +5047,7 @@
 
             /* ─── 3. TEACH IT ─── */
             getTeachItHTML() {
+                if (this._cemLocked(1)) return this._cemPageShell('TEACH IT','Protégé Effect / Feynman Protocol','',this._cemLockedBanner('SCRIPT KIDDIE'));
                 const sessions = JSON.parse(localStorage.getItem('sg_teach_it')||'[]');
                 const phase = state.teachItPhase||'list';
                 if (phase === 'write') {
@@ -5123,6 +5129,7 @@
 
             /* ─── 4. CONCEPT MAPPER ─── */
             getConceptMapperHTML() {
+                if (this._cemLocked(2)) return this._cemPageShell('CONCEPT MAPPER','Elaborative Interrogation','',this._cemLockedBanner('GLITCH TECH'));
                 const sessions = JSON.parse(localStorage.getItem('sg_concept_mapper')||'[]');
                 const PROBES = [
                     'Why does this happen?',
@@ -5210,7 +5217,7 @@
 
             /* ─── 5. CHUNKING ENGINE (Script Kiddie+) ─── */
             getChunkingHTML() {
-                if (this._cemLocked(1)) return this._cemPageShell('CHUNKING ENGINE','Chunking Technique','',this._cemLockedBanner('SCRIPT KIDDIE'));
+                // Modules 1-4 are NPC+ (free) — no lock
                 const chunks = JSON.parse(localStorage.getItem('sg_chunking')||'[]');
                 const phase = state.chunkPhase||'list';
                 if (phase==='build') {
@@ -5348,7 +5355,7 @@
 
             /* ─── 6. THE INTERLEAVE (Script Kiddie+) ─── */
             getInterleaveHTML() {
-                if (this._cemLocked(1)) return this._cemPageShell('THE INTERLEAVE','Interleaving Practice','',this._cemLockedBanner('SCRIPT KIDDIE'));
+                if (this._cemLocked(2)) return this._cemPageShell('THE INTERLEAVE','Interleaving Practice','',this._cemLockedBanner('GLITCH TECH'));
                 const sessions = JSON.parse(localStorage.getItem('sg_interleave')||'[]');
                 const running = state.ilRunning||false;
                 const content = `
@@ -5440,7 +5447,7 @@
 
             /* ─── 7. MEMORY PALACE (Script Kiddie+) ─── */
             getMemoryPalaceHTML() {
-                if (this._cemLocked(1)) return this._cemPageShell('MEMORY PALACE','Method of Loci','',this._cemLockedBanner('SCRIPT KIDDIE'));
+                // Memory Palace is module 1 — NPC+ (free), no lock
                 const palaces = JSON.parse(localStorage.getItem('sg_memory_palace')||'[]');
                 const phase = state.mpPhase||'list';
                 if (phase==='build') {
@@ -5577,7 +5584,7 @@
 
             /* ─── 8. MIND MAP PROTOCOL (Glitch Tech+) ─── */
             getMindMapHTML() {
-                if (this._cemLocked(2)) return this._cemPageShell('MIND MAP PROTOCOL','Concept Mapping','',this._cemLockedBanner('GLITCH TECH'));
+                // Mind Map Protocol is module 2 — NPC+ (free), no lock
                 const maps = JSON.parse(localStorage.getItem('sg_mindmap')||'[]');
                 const phase = state.mmPhase||'list';
                 if (phase==='build') {
@@ -5712,7 +5719,7 @@
 
             /* ─── 9. DUAL CODING STATION (Glitch Tech+) ─── */
             getDualCodingHTML() {
-                if (this._cemLocked(2)) return this._cemPageShell('DUAL CODING STATION','Dual Coding Theory','',this._cemLockedBanner('GLITCH TECH'));
+                if (this._cemLocked(1)) return this._cemPageShell('DUAL CODING STATION','Dual Coding Theory','',this._cemLockedBanner('SCRIPT KIDDIE'));
                 const sessions = JSON.parse(localStorage.getItem('sg_dual_coding')||'[]');
                 const phase = state.dcPhase||'list';
                 if (phase==='create') {
