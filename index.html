@@ -1470,8 +1470,13 @@
                 const daysSinceLast = lastActive ? Math.round((new Date(today) - new Date(lastActive)) / 86400000) : 0;
                 const streak = rankEngine.getStreak ? rankEngine.getStreak() : 0;
                 const poms = state.rankEvidence ? state.rankEvidence.pomodorosCompleted : 0;
+                const rankIdx = RANKS.indexOf(state.rank || 'NPC');
+                const milestones = [5, 10, 20, 50, 100];
+                const atMilestone = milestones.some(m => poms === m || poms === m + 1);
                 if (daysSinceLast >= 3) return 'adversary';
+                if (atMilestone) return 'observer';
                 if (streak >= 5 || poms >= 20) return 'guide';
+                if (rankIdx >= 2 && Math.random() < 0.15) return 'observer';
                 if (Math.random() < 0.3) return 'adversary';
                 if (Math.random() < 0.5) return 'guide';
                 return 'observer';
@@ -1536,7 +1541,7 @@
                             const ex = ESCAPE_EXPLOITS.find(e => e.key === corrupt);
                             escapeRunEngine.updateRun(run.id, { [corrupt]: false }).catch(()=>{});
                             setTimeout(() => this.show('domain-rollback', { domain: run.domain_name, exploit: ex ? ex.label : corrupt }), 4000);
-                            this._addClearanceEvent({ type: 'snake', label: 'MEMORY WIPE', delta: -1, domain: run.domain_name });
+                            this._addClearanceEvent({ type: 'snake', label: 'MEMORY WIPE', delta: 0, domain: run.domain_name });
                         }
                         break;
                     }
@@ -4711,7 +4716,8 @@
                             '</div>' +
                             (wlog.length > 0 ? '<div style="background:#080808;border:1px solid #FF00FF22;border-radius:2rem;padding:2.5rem;margin-top:2rem;">' +
                                 '<h3 style="color:#FF00FF;font-family:\'Share Tech Mono\',monospace;font-size:1rem;font-weight:bold;letter-spacing:3px;text-transform:uppercase;margin-bottom:4px;">◈ WARDEN TRANSMISSION LOG</h3>' +
-                                '<p style="color:#444;font-size:0.8rem;margin-bottom:1.5rem;letter-spacing:1px;">Chronological record of all Warden messages received this session and prior. Classified.</p>' +
+                                '<p style="color:#444;font-size:0.8rem;margin-bottom:0.25rem;letter-spacing:1px;">Record of all Warden transmissions received this operative profile. Classified.</p>' +
+                                '<div style="color:#333;font-size:9px;letter-spacing:2px;text-transform:uppercase;margin-bottom:1.25rem;">Latest first</div>' +
                                 '<div style="display:flex;flex-direction:column;gap:10px;">' +
                                 wlog.slice(0,10).map(entry => {
                                     const modeColor = entry.mode === 'adversary' ? '#FF4444' : entry.mode === 'guide' ? '#FF00FF' : '#888';
