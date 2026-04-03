@@ -131,6 +131,7 @@ async function ensureSchema() {
       ALTER TABLE escape_runs ADD COLUMN IF NOT EXISTS shortcut_bonus INTEGER NOT NULL DEFAULT 0;
       ALTER TABLE escape_runs ADD COLUMN IF NOT EXISTS rollback_applied_at TIMESTAMP;
       ALTER TABLE escape_runs DROP COLUMN IF EXISTS debrief_archived;
+      ALTER TABLE escape_runs ADD COLUMN IF NOT EXISTS cem_modules_used JSONB DEFAULT '[]'::jsonb;
     `);
     console.log('[auth] DB schema ready');
   } catch (err) {
@@ -610,7 +611,7 @@ async function createEscapeRun(userId, domainName) {
 
 async function updateEscapeRun(userId, runId, patch) {
   const allowed = ['exploit_1','exploit_2','exploit_3','exploit_4','exploit_5','exploit_6',
-                   'shortcut_flags','rollback_flags','shortcut_bonus','nodes','debrief_text','linked_deck_id'];
+                   'shortcut_flags','rollback_flags','shortcut_bonus','nodes','debrief_text','linked_deck_id','cem_modules_used'];
   // Server-side sequential enforcement: only allow setting exploit_N to true if exploit_{N-1} is already true
   const { rows: cur } = await pool.query(
     'SELECT * FROM escape_runs WHERE user_id = $1 AND id = $2 AND completed_at IS NULL', [userId, runId]
@@ -628,10 +629,11 @@ async function updateEscapeRun(userId, runId, patch) {
   }
   const sets = [];
   const vals = [userId, runId];
+  const jsonbFields = new Set(['nodes', 'cem_modules_used']);
   for (const key of allowed) {
     if (patch[key] !== undefined) {
-      vals.push(key === 'nodes' ? JSON.stringify(patch[key]) : patch[key]);
-      sets.push(`${key} = $${vals.length}${key === 'nodes' ? '::jsonb' : ''}`);
+      vals.push(jsonbFields.has(key) ? JSON.stringify(patch[key]) : patch[key]);
+      sets.push(`${key} = $${vals.length}${jsonbFields.has(key) ? '::jsonb' : ''}`);
     }
   }
   if (sets.length === 0) return null;

@@ -4886,6 +4886,16 @@
                 if (!state.rankEvidence.cemModulesUsed) state.rankEvidence.cemModulesUsed = {};
                 state.rankEvidence.cemModulesUsed[moduleId] = (state.rankEvidence.cemModulesUsed[moduleId]||0) + 1;
                 rankEngine.save();
+                // Also record CEM module use on all active Escape Runs as supplementary telemetry.
+                // This ensures every module is wired into Escape Run tracking per Task #17 spec.
+                const activeRuns = (escapeRunEngine.runs||[]).filter(r=>!r.completed_at);
+                for (const run of activeRuns) {
+                    const prev = Array.isArray(run.cem_modules_used) ? run.cem_modules_used : [];
+                    const updated = prev.includes(moduleId) ? prev : [...prev, moduleId];
+                    if (updated.length !== prev.length) {
+                        escapeRunEngine.updateRun(run.id, { cem_modules_used: updated });
+                    }
+                }
             },
 
             /* ─── 1. SPEED RUN ─── */
