@@ -4849,25 +4849,11 @@
                 state.babelPhase = 'list';
                 app.render();
             },
-            /* ====================================================
-               COGNITIVE EXPLOIT MODULES — 10 New Protocols
-               ====================================================
-               Unlock gating (matches spec):
-               NPC+    (rank 0+): memory-palace, mindmap, chunking, speed-run (1-4)
-               SK+     (rank 1+): mistake-vault, teach-it, dual-coding (5-7)
-               GT+     (rank 2+): interleave, concept-mapper, shadow-protocol (8-10)
-
-               Escape Run exploit wiring (per Task #16 spec):
-               All 10 modules call cemTrackModuleUse() → rankEvidence.cemModulesUsed
-               Additionally, 3 modules wire directly into Escape Run exploit completion:
-               - Speed Run     → exploit_2 INTEGRITY CHECK  (via onBlurtComplete)
-               - Mind Map      → exploit_5 NEURAL MAPPING   (if 5+ nodes)
-               - Memory Palace → exploit_5 NEURAL MAPPING   (if 5+ stops) [per spec]
-               - Teach It      → exploit_6 DEBRIEF TRANSMISSION (if 50+ words)
-               Remaining 6 modules (Mistake Vault, Chunking, Dual Coding, Interleave,
-               Concept Mapper, Shadow Protocol) contribute to rank evidence only —
-               the Escape Run has no exploit slots that semantically match these.
-            ==================================================== */
+            /* ─── COGNITIVE EXPLOIT MODULES ───
+               Gating: NPC+(1-4) SK+(5-7) GT+(8-10)
+               Exploit wiring: SpeedRun→exploit_2, MindMap/MemPalace→exploit_5, TeachIt→exploit_6
+               All 10 modules also fire cemTrackModuleUse() → rankEvidence.cemModulesUsed
+            ─────────────────────────────────── */
 
             _cemRankIdx() {
                 const RANK_ORDER = ['NPC','Script Kiddie','Glitch Tech','Netrunner','System Admin'];
@@ -5606,7 +5592,7 @@
                 if (stops.length >= 5 && typeof escapeRunEngine !== 'undefined') {
                     const eligible = escapeRunEngine._pickRunForExploit('exploit_5', 'exploit_4');
                     if (eligible) {
-                        const nodes = [state.mpBuilding.name, ...stops.map(s=>s.label||s.name||s)].filter(Boolean);
+                        const nodes = [state.mpBuilding.name, ...stops.map(s=>typeof s==='object'?(s.location||s.label||s.name||''):String(s))].filter(Boolean);
                         const patch = { nodes: nodes.slice(0,20), exploit_5: true };
                         if (escapeRunEngine._isCorrupted(eligible, 'exploit_5')) patch.rollback_flags = escapeRunEngine._clearRollbackFlag(eligible, 'exploit_5');
                         escapeRunEngine.updateRun(eligible.id, patch);
@@ -5652,24 +5638,30 @@
                             <button onclick="app.mmBack()" style="background:none;border:none;color:#39FF14;font-size:1.4rem;cursor:pointer;">&larr;</button>
                             <h1 style="font-family:'VT323',monospace;font-size:2.8rem;color:#fff;text-transform:uppercase;">MIND MAP PROTOCOL</h1>
                         </div>
+                        <div style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:#444;margin-bottom:0.75rem;letter-spacing:0.08em;">
+                            KEYBOARD: Enter → add branch · Tab → add sub-idea · Shift+Delete → remove node
+                        </div>
                         <div id="mm-tree-container" style="margin-bottom:1.25rem;">
                             <div class="cem-card">
                                 <div class="cem-header">ROOT CONCEPT</div>
-                                <input id="mm-root" class="cem-input" placeholder="Central concept..." value="${esc(tree.root)}">
+                                <input id="mm-root" class="cem-input" placeholder="Central concept..." value="${esc(tree.root)}"
+                                    onkeydown="app.mmKeyRoot(event)">
                             </div>
                             <div id="mm-branches" style="margin-top:0.75rem;">
                                 ${(tree.branches||[]).map((b,bi)=>`
                                 <div class="cem-card" style="border-color:rgba(57,255,20,0.25);margin-bottom:0.5rem;">
                                     <div style="display:flex;gap:0.75rem;align-items:center;margin-bottom:0.5rem;">
                                         <div style="color:#39FF14;font-family:'Share Tech Mono',monospace;font-size:0.7rem;letter-spacing:0.1em;">BRANCH ${bi+1}</div>
-                                        <input id="mm-branch-${bi}" class="cem-input" style="flex:1;" placeholder="Branch idea..." value="${esc(b.label)}">
+                                        <input id="mm-branch-${bi}" class="cem-input" style="flex:1;" placeholder="Branch idea..." value="${esc(b.label)}"
+                                            onkeydown="app.mmKeyBranch(event,${bi})">
                                         <button onclick="app.mmRemoveBranch(${bi})" style="background:none;border:none;color:#333;cursor:pointer;font-size:1.1rem;">&times;</button>
                                     </div>
                                     <div style="padding-left:1.5rem;">
                                         ${(b.subs||[]).map((s,si)=>`
                                         <div style="display:flex;gap:0.5rem;align-items:center;margin-bottom:0.35rem;">
                                             <div style="color:#555;font-size:0.7rem;font-family:'Share Tech Mono',monospace;">↳</div>
-                                            <input id="mm-sub-${bi}-${si}" class="cem-input" style="flex:1;" placeholder="Sub-idea..." value="${esc(s)}">
+                                            <input id="mm-sub-${bi}-${si}" class="cem-input" style="flex:1;" placeholder="Sub-idea..." value="${esc(s)}"
+                                                onkeydown="app.mmKeySub(event,${bi},${si})">
                                             <button onclick="app.mmRemoveSub(${bi},${si})" style="background:none;border:none;color:#333;cursor:pointer;font-size:0.9rem;">&times;</button>
                                         </div>`).join('')}
                                         <button onclick="app.mmAddSub(${bi})" class="cem-btn" style="font-size:0.6rem;padding:0.25rem 0.65rem;margin-top:0.25rem;border-color:#333;color:#444;">+ SUB-IDEA</button>
@@ -5711,6 +5703,19 @@
             mindMapInit() {},
             mmNew() { state.mmPhase='build'; state.mmTree={ root:'', branches:[] }; state.mmEditId=null; app.render(); },
             mmBack() { state.mmPhase='list'; app.render(); },
+            mmKeyRoot(e) {
+                if (e.key === 'Enter') { e.preventDefault(); this._mmSyncTree(); this.mmAddBranch(); setTimeout(()=>{ const el = document.getElementById('mm-branch-'+(state.mmTree.branches.length-1)); if(el) el.focus(); },50); }
+            },
+            mmKeyBranch(e, bi) {
+                if (e.key === 'Enter') { e.preventDefault(); this._mmSyncTree(); this.mmAddBranch(); setTimeout(()=>{ const el = document.getElementById('mm-branch-'+(state.mmTree.branches.length-1)); if(el) el.focus(); },50); }
+                if (e.key === 'Tab') { e.preventDefault(); this._mmSyncTree(); this.mmAddSub(bi); setTimeout(()=>{ const subs = state.mmTree.branches[bi].subs||[]; const el = document.getElementById('mm-sub-'+bi+'-'+(subs.length-1)); if(el) el.focus(); },50); }
+                if (e.key === 'Delete' && e.shiftKey) { e.preventDefault(); this.mmRemoveBranch(bi); }
+            },
+            mmKeySub(e, bi, si) {
+                if (e.key === 'Enter') { e.preventDefault(); this._mmSyncTree(); this.mmAddSub(bi); setTimeout(()=>{ const subs = state.mmTree.branches[bi].subs||[]; const el = document.getElementById('mm-sub-'+bi+'-'+(subs.length-1)); if(el) el.focus(); },50); }
+                if (e.key === 'Tab') { e.preventDefault(); this._mmSyncTree(); this.mmAddBranch(); setTimeout(()=>{ const el = document.getElementById('mm-branch-'+(state.mmTree.branches.length-1)); if(el) el.focus(); },50); }
+                if (e.key === 'Delete' && e.shiftKey) { e.preventDefault(); this.mmRemoveSub(bi, si); }
+            },
             mmLoad(id) {
                 const maps = JSON.parse(localStorage.getItem('sg_mindmap')||'[]');
                 const m = maps.find(x=>x.id===id);
@@ -5994,8 +5999,9 @@
                     </div>`;
                 }
                 const content = `
-                    <div style="text-align:center;margin-bottom:1.5rem;">
+                    <div style="text-align:center;margin-bottom:1.5rem;display:flex;justify-content:center;gap:0.75rem;flex-wrap:wrap;">
                         <button onclick="app.spNew()" class="cem-btn" style="background:#39FF14;color:#000;font-size:0.9rem;padding:0.75rem 2rem;">+ NEW SHADOW NOTE</button>
+                        <button onclick="app.spImportMissionNotes()" class="cem-btn" style="font-size:0.8rem;padding:0.75rem 1.5rem;border-color:#8A2BE2;color:#8A2BE2;">⬡ IMPORT FROM MISSION NOTES</button>
                     </div>
                     <div>
                         <div class="cem-header" style="color:#888;margin-bottom:0.75rem;">NOTES (${notes.length})</div>
@@ -6018,6 +6024,21 @@
                 return this._cemPageShell('SHADOW PROTOCOL','Cornell Note Enhancement','Converting linear notes into an active retrieval exercise multiplies their value — passive re-reading produces far less durable encoding than prompted recall.',content);
             },
             spNew() { state.spPhase='create'; state.spTitle=''; state.spCues=[{cue:'',data:''}]; app.render(); },
+            spImportMissionNotes() {
+                const html = localStorage.getItem('cornellNotes') || '';
+                if (!html || html.length < 10) { app.showNotification('No Mission Notes found. Add notes on the Dashboard first.'); return; }
+                const tmp = document.createElement('div');
+                tmp.innerHTML = html;
+                const text = tmp.textContent || tmp.innerText || '';
+                const lines = text.split(/\n/).map(l=>l.trim()).filter(l=>l.length > 0 && l !== 'Start taking notes here...');
+                if (lines.length === 0) { app.showNotification('Mission Notes appear empty. Add content first.'); return; }
+                const cues = lines.map(line => ({ cue: line.slice(0, 60).trim(), data: line }));
+                state.spPhase = 'create';
+                state.spTitle = 'Mission Notes — ' + new Date().toLocaleDateString();
+                state.spCues = cues;
+                app.showNotification('Mission Notes imported. Edit cues and data before saving.');
+                app.render();
+            },
             spBack() { state.spPhase='list'; app.render(); },
             spAddCue() {
                 const cues = this._spSyncCues();
