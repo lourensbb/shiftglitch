@@ -1161,12 +1161,14 @@
                 if (!reqs) return;
                 const ev = state.rankEvidence;
                 if ((ev.rollbackPenalty || 0) > 0) return;
-                const met = ev.blurtsCompleted >= reqs.blurtsCompleted &&
-                            ev.governorBreakdowns >= reqs.governorBreakdowns &&
-                            ev.cardsAdvanced >= reqs.cardsAdvanced &&
-                            ev.activeDays >= reqs.activeDays &&
-                            ev.pomodorosCompleted >= reqs.pomodorosCompleted &&
-                            (ev.diagnosticsCompleted || 0) >= reqs.diagnosticsCompleted;
+                const consistencyBonus = (typeof SysInterrupt !== 'undefined' && SysInterrupt.hasConsistencyBonus) ? SysInterrupt.hasConsistencyBonus() : false;
+                const thresholdMult = consistencyBonus ? 0.9 : 1.0;
+                const met = ev.blurtsCompleted >= Math.ceil(reqs.blurtsCompleted * thresholdMult) &&
+                            ev.governorBreakdowns >= Math.ceil(reqs.governorBreakdowns * thresholdMult) &&
+                            ev.cardsAdvanced >= Math.ceil(reqs.cardsAdvanced * thresholdMult) &&
+                            ev.activeDays >= Math.ceil(reqs.activeDays * thresholdMult) &&
+                            ev.pomodorosCompleted >= Math.ceil(reqs.pomodorosCompleted * thresholdMult) &&
+                            (ev.diagnosticsCompleted || 0) >= Math.ceil(reqs.diagnosticsCompleted * thresholdMult);
                 if (met) {
                     state.rank = nextRank;
                     this.save();
@@ -1245,15 +1247,18 @@
                 const reqs = RANK_REQUIREMENTS[next];
                 if (!reqs) return null;
                 const ev = state.rankEvidence;
+                const consistencyBonus = (typeof SysInterrupt !== 'undefined' && SysInterrupt.hasConsistencyBonus) ? SysInterrupt.hasConsistencyBonus() : false;
+                const tm = consistencyBonus ? 0.9 : 1.0;
                 return {
                     nextRank: next,
+                    consistencyBonusActive: consistencyBonus,
                     requirements: [
-                        { label: 'Blurt Sessions', current: ev.blurtsCompleted, required: reqs.blurtsCompleted },
-                        { label: 'Governor Breakdowns', current: ev.governorBreakdowns, required: reqs.governorBreakdowns },
-                        { label: 'Cards Studied', current: ev.cardsAdvanced, required: reqs.cardsAdvanced },
-                        { label: 'Diagnostics Completed', current: ev.diagnosticsCompleted || 0, required: reqs.diagnosticsCompleted },
-                        { label: 'Active Days', current: ev.activeDays, required: reqs.activeDays },
-                        { label: 'Focus Sessions', current: ev.pomodorosCompleted, required: reqs.pomodorosCompleted },
+                        { label: 'Blurt Sessions', current: ev.blurtsCompleted, required: Math.ceil(reqs.blurtsCompleted * tm) },
+                        { label: 'Governor Breakdowns', current: ev.governorBreakdowns, required: Math.ceil(reqs.governorBreakdowns * tm) },
+                        { label: 'Cards Studied', current: ev.cardsAdvanced, required: Math.ceil(reqs.cardsAdvanced * tm) },
+                        { label: 'Diagnostics Completed', current: ev.diagnosticsCompleted || 0, required: Math.ceil(reqs.diagnosticsCompleted * tm) },
+                        { label: 'Active Days', current: ev.activeDays, required: Math.ceil(reqs.activeDays * tm) },
+                        { label: 'Focus Sessions', current: ev.pomodorosCompleted, required: Math.ceil(reqs.pomodorosCompleted * tm) },
                     ]
                 };
             },
@@ -1540,14 +1545,17 @@
             _checkClearanceStripSnake() {
                 const log = (state.rankEvidence && state.rankEvidence.activeDateLog) || [];
                 if (!log.length) return;
-                const today = new Date().toISOString().slice(0,10);
                 const sorted = [...log].sort().reverse();
-                const daysSince = Math.round((new Date(today) - new Date(sorted[0])) / 86400000);
+                const lastKnownActive = sorted[0];
+                if (!lastKnownActive) return;
+                const today = new Date().toISOString().slice(0,10);
+                if (lastKnownActive >= today) return;
+                const daysSince = Math.round((new Date(today) - new Date(lastKnownActive)) / 86400000);
                 if (daysSince < 10) return;
                 const lastStrip = parseInt(localStorage.getItem('sg_clearance_strip_last') || '0', 10);
-                const stripDay = new Date(today).getTime();
-                if (stripDay - lastStrip < 10 * 24 * 60 * 60 * 1000) return;
-                localStorage.setItem('sg_clearance_strip_last', String(stripDay));
+                const nowMs = Date.now();
+                if (nowMs - lastStrip < 10 * 24 * 60 * 60 * 1000) return;
+                localStorage.setItem('sg_clearance_strip_last', String(nowMs));
                 if (state.rankEvidence && state.rankEvidence.rollbackPenalty !== undefined) {
                     state.rankEvidence.rollbackPenalty = (state.rankEvidence.rollbackPenalty || 0) + 1;
                     rankEngine.save();
@@ -1559,7 +1567,7 @@
                 const seen = sessionStorage.getItem('sg_hidden_node_session');
                 if (seen) return;
                 if (Math.random() > 0.05) return;
-                sessionStorage.setItem('sg_hidden_node_session', '1');
+                sessionStorage.setItem('sg_hidden_node_session', 'pending');
                 const bonusMsgs = [
                     { msg: "You found a hidden node. The Mainframe was not expecting this.", sub: "+CLEARANCE BONUS: DISCOVERY LOGGED" },
                     { msg: "ACCESS NODE UNLOCKED. This transmission does not exist.", sub: "Your clearance has been quietly increased." },
@@ -1568,21 +1576,38 @@
                     { msg: "You were not supposed to see this. Now you have.", sub: "The Mainframe does not forget discoverers." },
                 ];
                 const pick = bonusMsgs[Math.floor(Math.random() * bonusMsgs.length)];
-                this._addClearanceEvent({ type: 'ladder', label: 'HIDDEN NODE', delta: 1 });
-                if (state.rankEvidence) { state.rankEvidence.rollbackPenalty = Math.max(0, (state.rankEvidence.rollbackPenalty || 0) - 1); rankEngine.save(); }
-                setTimeout(() => this.show('warden-hidden-node', { msg: pick.msg, sub: pick.sub }), 90000 + Math.random() * 120000);
+                const delay = 60000 + Math.random() * 120000;
+                setTimeout(() => {
+                    if (sessionStorage.getItem('sg_hidden_node_session') !== 'pending') return;
+                    const nodeEl = document.createElement('div');
+                    nodeEl.id = 'sg-hidden-node';
+                    nodeEl.title = '◈';
+                    nodeEl.style.cssText = 'position:fixed;bottom:'+(Math.random()*30+10)+'%;right:'+(Math.random()*5+1)+'px;width:6px;height:6px;background:#FF00FF22;border:1px solid #FF00FF44;border-radius:50%;cursor:pointer;z-index:8000;transition:all 0.3s;animation:si-pulse 3s ease infinite;';
+                    nodeEl.onclick = () => {
+                        sessionStorage.setItem('sg_hidden_node_session', 'claimed');
+                        nodeEl.remove();
+                        this._addClearanceEvent({ type: 'ladder', label: 'HIDDEN NODE', delta: 1 });
+                        if (state.rankEvidence) { state.rankEvidence.rollbackPenalty = Math.max(0, (state.rankEvidence.rollbackPenalty || 0) - 1); rankEngine.save(); }
+                        this.show('warden-hidden-node', { msg: pick.msg, sub: pick.sub });
+                    };
+                    document.body.appendChild(nodeEl);
+                    setTimeout(() => { if (nodeEl.parentNode) nodeEl.remove(); }, 120000);
+                }, delay);
             },
             _checkConsistencyLadder() {
                 const streak = rankEngine.getStreak ? rankEngine.getStreak() : 0;
                 if (streak < 7) return;
                 const lastBonus = parseInt(localStorage.getItem('sg_consistency_ladder_at') || '0', 10);
-                const today = new Date().toISOString().slice(0,10);
-                const todayMs = new Date(today).getTime();
-                if (todayMs - lastBonus < 7 * 24 * 60 * 60 * 1000) return;
-                localStorage.setItem('sg_consistency_ladder_at', String(todayMs));
+                const nowMs = Date.now();
+                if (nowMs - lastBonus < 7 * 24 * 60 * 60 * 1000) return;
+                localStorage.setItem('sg_consistency_ladder_at', String(nowMs));
+                localStorage.setItem('sg_consistency_bonus_active', '1');
                 this._addClearanceEvent({ type: 'ladder', label: 'CONSISTENCY LADDER', delta: 2, streak });
                 if (state.rankEvidence) { state.rankEvidence.rollbackPenalty = Math.max(0, (state.rankEvidence.rollbackPenalty || 0) - 1); rankEngine.save(); }
                 setTimeout(() => this.show('warden-consistency-ladder', { streak }), 8000);
+            },
+            hasConsistencyBonus() {
+                return !!localStorage.getItem('sg_consistency_bonus_active');
             },
             triggerPerformanceShortcut(exploit, domain) {
                 const lastBonus = parseInt(localStorage.getItem('sg_perf_shortcut_at') || '0', 10);
@@ -1693,7 +1718,7 @@
             _activateTrap(id) {
                 const lockUntil = Date.now() + 2 * 60 * 60 * 1000;
                 localStorage.setItem('sg_warden_trap_lock', String(lockUntil));
-                this._logWarden('Warden trap accepted by operative.', '2-hour module lock applied.', 'adversary');
+                this._logWarden('Warden trap accepted. Pipeline locked for 2 hours.', 'Operative confirmed trap accepted — decision logged.', 'adversary');
                 this._addClearanceEvent({ type: 'snake', label: "WARDEN'S TRAP", delta: -1 });
                 const el = document.getElementById(id);
                 if (el) {
@@ -1702,11 +1727,15 @@
                 }
             },
             _scheduleWardenTrap() {
-                const lastTrap = parseInt(localStorage.getItem('sg_warden_trap_shown') || '0', 10);
-                if (Date.now() - lastTrap < 48 * 60 * 60 * 1000) return;
-                if (Math.random() > 0.15) return;
+                const totalSessions = (state.rankEvidence && state.rankEvidence.pomodorosCompleted) || 0;
+                const lastTrapSession = parseInt(localStorage.getItem('sg_warden_trap_session') || '0', 10);
+                const nextTrapAt = lastTrapSession + 5 + Math.floor(Math.random() * 3);
+                if (totalSessions < nextTrapAt) return;
+                const lastTrapTs = parseInt(localStorage.getItem('sg_warden_trap_shown') || '0', 10);
+                if (Date.now() - lastTrapTs < 24 * 60 * 60 * 1000) return;
+                localStorage.setItem('sg_warden_trap_session', String(totalSessions));
                 localStorage.setItem('sg_warden_trap_shown', String(Date.now()));
-                const delay = (20 + Math.random() * 40) * 60 * 1000;
+                const delay = (15 + Math.random() * 30) * 60 * 1000;
                 setTimeout(() => { if (!this._active) this.show('warden-trap', {}); }, delay);
             },
             isTrapLocked(moduleId) {
@@ -4622,19 +4651,29 @@
                         const trapLockUntil = parseInt(localStorage.getItem('sg_warden_trap_lock') || '0', 10);
                         const trapMinLeft = trapLocked ? Math.ceil((trapLockUntil - Date.now()) / 60000) : 0;
                         const streak = rankEngine.getStreak ? rankEngine.getStreak() : 0;
+                        const consistencyActive = SysInterrupt.hasConsistencyBonus ? SysInterrupt.hasConsistencyBonus() : false;
                         const snakeEvents = clearanceEvents.filter(e => e.type === 'snake').slice(0,3);
                         const ladderEvents = clearanceEvents.filter(e => e.type === 'ladder').slice(0,3);
                         const lastFive = clearanceEvents.slice(0,5);
                         const movementArrows = lastFive.map(e => e.type === 'ladder' ? '<span style="color:#FF00FF;font-size:14px;font-weight:bold;">↑</span>' : '<span style="color:#FF2222;font-size:14px;font-weight:bold;">↓</span>').join('&nbsp;');
+                        const totalDelta = clearanceEvents.reduce((s, e) => s + (e.delta || 0), 0);
+                        const baseScore = (state.rankEvidence ? (state.rankEvidence.pomodorosCompleted * 10 + state.rankEvidence.blurtsCompleted * 15 + state.rankEvidence.cardsAdvanced * 2 + (streak * 25)) : 0);
+                        const clearanceScore = Math.max(0, baseScore + totalDelta * 20);
+                        const rankIdx = RANKS.indexOf(state.rank);
                         const formatTs = (ts) => {
                             const d = new Date(ts);
                             return d.toLocaleDateString('en-ZA', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
                         };
                         return '<div style="background:#000;border:1px solid #FF00FF44;border-radius:2rem;padding:2.5rem;">' +
                             '<h3 style="color:#FF00FF;font-family:\'Share Tech Mono\',monospace;font-size:1rem;font-weight:bold;letter-spacing:3px;text-transform:uppercase;margin-bottom:4px;">◈ OPERATIVE STATUS BOARD</h3>' +
-                            '<p style="color:#444;font-size:0.8rem;margin-bottom:1.5rem;letter-spacing:1px;">Warden surveillance log — clearance events, active traps, streak bonuses.</p>' +
+                            '<p style="color:#444;font-size:0.8rem;margin-bottom:1.5rem;letter-spacing:1px;">Warden surveillance log — clearance score, active traps, streak bonuses.</p>' +
+                            '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px;">' +
+                            '<div style="background:#0d0d0d;border:1px solid #FF00FF22;padding:14px;border-radius:8px;text-align:center;"><div style="color:#FF00FF;font-size:22px;font-weight:bold;font-family:\'Share Tech Mono\',monospace;">'+clearanceScore+'</div><div style="color:#555;font-size:9px;letter-spacing:2px;margin-top:4px;">CLEARANCE SCORE</div></div>' +
+                            '<div style="background:#0d0d0d;border:1px solid #FF00FF22;padding:14px;border-radius:8px;text-align:center;"><div style="color:#FF00FF;font-size:22px;font-weight:bold;font-family:\'Share Tech Mono\',monospace;">'+(totalDelta >= 0 ? '+' : '')+totalDelta+'</div><div style="color:#555;font-size:9px;letter-spacing:2px;margin-top:4px;">NET WARDEN DELTA</div></div>' +
+                            '<div style="background:#0d0d0d;border:1px solid #FF00FF22;padding:14px;border-radius:8px;text-align:center;"><div style="color:#FF00FF;font-size:22px;font-weight:bold;font-family:\'Share Tech Mono\',monospace;">'+(rankIdx+1)+' / '+RANKS.length+'</div><div style="color:#555;font-size:9px;letter-spacing:2px;margin-top:4px;">RANK TIER</div></div>' +
+                            '</div>' +
                             (trapLocked ? '<div style="background:#1a0000;border:1px solid #FF222266;padding:12px 16px;border-radius:8px;margin-bottom:14px;"><span style="color:#FF2222;font-size:11px;letter-spacing:2px;font-weight:bold;">🔒 WARDEN\'S TRAP ACTIVE — '+trapMinLeft+' MIN REMAINING</span><div style="color:#888;font-size:11px;margin-top:4px;">Module access restricted until trap expires.</div></div>' : '') +
-                            (streak >= 7 ? '<div style="background:#1a001a;border:1px solid #FF00FF44;padding:12px 16px;border-radius:8px;margin-bottom:14px;"><span style="color:#FF00FF;font-size:11px;letter-spacing:2px;font-weight:bold;">▲ CONSISTENCY LADDER ACTIVE — '+streak+'-DAY STREAK</span><div style="color:#888;font-size:11px;margin-top:4px;">Rank threshold reduction in effect.</div></div>' : '') +
+                            (consistencyActive ? '<div style="background:#1a001a;border:1px solid #FF00FF44;padding:12px 16px;border-radius:8px;margin-bottom:14px;"><span style="color:#FF00FF;font-size:11px;letter-spacing:2px;font-weight:bold;">▲ CONSISTENCY LADDER ACTIVE — '+streak+'-DAY STREAK</span><div style="color:#888;font-size:11px;margin-top:4px;">Rank thresholds reduced by 10%.</div></div>' : '') +
                             (lastFive.length > 0 ? '<div style="margin-bottom:16px;"><div style="color:#555;font-size:10px;letter-spacing:2px;margin-bottom:6px;">RECENT CLEARANCE MOVEMENT</div><div style="display:flex;align-items:center;gap:4px;">'+movementArrows+'<span style="color:#333;font-size:10px;letter-spacing:1px;margin-left:8px;">(last '+lastFive.length+' events)</span></div></div>' : '') +
                             (snakeEvents.length > 0 ? '<div style="margin-bottom:14px;"><div style="color:#FF4444;font-size:10px;letter-spacing:2px;margin-bottom:6px;">ACTIVE SETBACKS (SNAKES)</div><div style="display:flex;flex-direction:column;gap:6px;">' + snakeEvents.map(e => '<div style="background:#1a0000;border-left:3px solid #FF4444;padding:8px 12px;border-radius:0 4px 4px 0;"><div style="color:#FF4444;font-size:11px;font-weight:bold;letter-spacing:1px;">'+e.label+' ('+e.delta+')</div>'+(e.domain ? '<div style="color:#666;font-size:10px;">'+e.domain.toUpperCase()+'</div>' : '')+'<div style="color:#444;font-size:10px;">'+formatTs(e.ts)+'</div></div>').join('') + '</div></div>' : '') +
                             (ladderEvents.length > 0 ? '<div><div style="color:#FF00FF;font-size:10px;letter-spacing:2px;margin-bottom:6px;">ACTIVE BONUSES (LADDERS)</div><div style="display:flex;flex-direction:column;gap:6px;">' + ladderEvents.map(e => '<div style="background:#1a001a;border-left:3px solid #FF00FF;padding:8px 12px;border-radius:0 4px 4px 0;"><div style="color:#FF00FF;font-size:11px;font-weight:bold;letter-spacing:1px;">'+e.label+' (+'+e.delta+')</div>'+(e.domain ? '<div style="color:#666;font-size:10px;">'+e.domain.toUpperCase()+'</div>' : '')+'<div style="color:#444;font-size:10px;">'+formatTs(e.ts)+'</div></div>').join('') + '</div></div>' : '') +
@@ -5129,6 +5168,19 @@
             _cemLocked(minRankIdx) {
                 return this._cemRankIdx() < minRankIdx;
             },
+            _cemTrapLocked() {
+                return (typeof SysInterrupt !== 'undefined' && SysInterrupt.isTrapLocked) ? SysInterrupt.isTrapLocked() : false;
+            },
+            _cemTrapLockedBanner() {
+                const lockUntil = parseInt(localStorage.getItem('sg_warden_trap_lock') || '0', 10);
+                const minLeft = Math.max(0, Math.ceil((lockUntil - Date.now()) / 60000));
+                return `<div style="text-align:center;padding:4rem 1rem;border:2px dashed #FF222244;max-width:520px;margin:3rem auto;background:#0d0000;">
+                    <div style="font-family:'VT323',monospace;font-size:2.5rem;color:#FF2222;letter-spacing:0.1em;margin-bottom:0.5rem;">🔒 PIPELINE LOCKED</div>
+                    <div style="font-family:'Share Tech Mono',monospace;font-size:0.85rem;color:#FF2222;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:1.5rem;">WARDEN'S TRAP — ${minLeft} MIN REMAINING</div>
+                    <div style="color:#666;font-size:0.9rem;line-height:1.6;max-width:360px;margin:0 auto;">You accepted a Warden trap. All cognitive exploit modules are locked until the timer expires. The Mainframe logged your decision.</div>
+                    <button onclick="app.navTo('rank')" class="cem-btn" style="margin-top:1.5rem;border-color:#FF2222;color:#FF2222;">VIEW OPERATIVE STATUS</button>
+                </div>`;
+            },
             _cemLockedBanner(rankName) {
                 return `<div style="text-align:center;padding:4rem 1rem;border:2px dashed #222;max-width:520px;margin:3rem auto;">
                     <div style="font-family:'VT323',monospace;font-size:2.5rem;color:#FF2222;letter-spacing:0.1em;margin-bottom:0.5rem;">ACCESS DENIED</div>
@@ -5167,6 +5219,7 @@
 
             /* ─── 1. SPEED RUN ─── */
             getSpeedRunHTML() {
+                if (this._cemTrapLocked()) return this._cemPageShell('SPEED RUN','Timed Recall Sprint','',this._cemTrapLockedBanner());
                 const sessions = JSON.parse(localStorage.getItem('sg_speed_run') || '[]');
                 const content = `
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem;">
@@ -5286,6 +5339,7 @@
 
             /* ─── 2. MISTAKE VAULT ─── */
             getMistakeVaultHTML() {
+                if (this._cemTrapLocked()) return this._cemPageShell('MISTAKE VAULT','Error Analysis','',this._cemTrapLockedBanner());
                 if (this._cemLocked(1)) return this._cemPageShell('MISTAKE VAULT','Error Analysis','',this._cemLockedBanner('SCRIPT KIDDIE'));
                 const entries = JSON.parse(localStorage.getItem('sg_mistake_vault')||'[]');
                 const FAILURE_MODES = ['Blanked','Misread','Knew it wrong','Couldn\'t retrieve','Partial recall','Guessed'];
@@ -5345,6 +5399,7 @@
 
             /* ─── 3. TEACH IT ─── */
             getTeachItHTML() {
+                if (this._cemTrapLocked()) return this._cemPageShell('TEACH IT','Protégé Effect / Feynman Protocol','',this._cemTrapLockedBanner());
                 if (this._cemLocked(1)) return this._cemPageShell('TEACH IT','Protégé Effect / Feynman Protocol','',this._cemLockedBanner('SCRIPT KIDDIE'));
                 const sessions = JSON.parse(localStorage.getItem('sg_teach_it')||'[]');
                 const phase = state.teachItPhase||'list';
@@ -5447,6 +5502,7 @@
 
             /* ─── 4. CONCEPT MAPPER ─── */
             getConceptMapperHTML() {
+                if (this._cemTrapLocked()) return this._cemPageShell('CONCEPT MAPPER','Elaborative Interrogation','',this._cemTrapLockedBanner());
                 if (this._cemLocked(2)) return this._cemPageShell('CONCEPT MAPPER','Elaborative Interrogation','',this._cemLockedBanner('GLITCH TECH'));
                 const sessions = JSON.parse(localStorage.getItem('sg_concept_mapper')||'[]');
                 const PROBES = [
@@ -5535,6 +5591,7 @@
 
             /* ─── 3. CHUNKING ENGINE (NPC+ / free) ─── */
             getChunkingHTML() {
+                if (this._cemTrapLocked()) return this._cemPageShell('CHUNKING ENGINE','Cognitive Load Reduction','',this._cemTrapLockedBanner());
                 // Module 3 — NPC+ (free), no lock
                 const chunks = JSON.parse(localStorage.getItem('sg_chunking')||'[]');
                 const phase = state.chunkPhase||'list';
@@ -5673,6 +5730,7 @@
 
             /* ─── 8. THE INTERLEAVE (Glitch Tech+) ─── */
             getInterleaveHTML() {
+                if (this._cemTrapLocked()) return this._cemPageShell('THE INTERLEAVE','Interleaving Practice','',this._cemTrapLockedBanner());
                 if (this._cemLocked(2)) return this._cemPageShell('THE INTERLEAVE','Interleaving Practice','',this._cemLockedBanner('GLITCH TECH'));
                 const sessions = JSON.parse(localStorage.getItem('sg_interleave')||'[]');
                 const running = state.ilRunning||false;
@@ -5782,6 +5840,7 @@
 
             /* ─── 1. MEMORY PALACE (NPC+ / free) ─── */
             getMemoryPalaceHTML() {
+                if (this._cemTrapLocked()) return this._cemPageShell('MEMORY PALACE','Method of Loci','',this._cemTrapLockedBanner());
                 // Module 1 — NPC+ (free), no lock
                 const palaces = JSON.parse(localStorage.getItem('sg_memory_palace')||'[]');
                 const phase = state.mpPhase||'list';
@@ -5934,6 +5993,7 @@
 
             /* ─── 2. MIND MAP PROTOCOL (NPC+ / free) ─── */
             getMindMapHTML() {
+                if (this._cemTrapLocked()) return this._cemPageShell('MIND MAP PROTOCOL','Visual Organisation','',this._cemTrapLockedBanner());
                 // Module 2 — NPC+ (free), no lock
                 const maps = JSON.parse(localStorage.getItem('sg_mindmap')||'[]');
                 const phase = state.mmPhase||'list';
@@ -6105,6 +6165,7 @@
 
             /* ─── 7. DUAL CODING STATION (Script Kiddie+) ─── */
             getDualCodingHTML() {
+                if (this._cemTrapLocked()) return this._cemPageShell('DUAL CODING STATION','Dual Coding Theory','',this._cemTrapLockedBanner());
                 if (this._cemLocked(1)) return this._cemPageShell('DUAL CODING STATION','Dual Coding Theory','',this._cemLockedBanner('SCRIPT KIDDIE'));
                 const sessions = JSON.parse(localStorage.getItem('sg_dual_coding')||'[]');
                 const phase = state.dcPhase||'list';
@@ -6221,6 +6282,7 @@
 
             /* ─── 10. SHADOW PROTOCOL (Glitch Tech+) ─── */
             getShadowProtocolHTML() {
+                if (this._cemTrapLocked()) return this._cemPageShell('SHADOW PROTOCOL','Cornell Note Enhancement','',this._cemTrapLockedBanner());
                 if (this._cemLocked(2)) return this._cemPageShell('SHADOW PROTOCOL','Cornell Note Enhancement','',this._cemLockedBanner('GLITCH TECH'));
                 const notes = JSON.parse(localStorage.getItem('sg_shadow_protocol')||'[]');
                 const phase = state.spPhase||'list';
