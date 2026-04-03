@@ -4856,6 +4856,17 @@
                NPC+    (rank 0+): memory-palace, mindmap, chunking, speed-run (1-4)
                SK+     (rank 1+): mistake-vault, teach-it, dual-coding (5-7)
                GT+     (rank 2+): interleave, concept-mapper, shadow-protocol (8-10)
+
+               Escape Run exploit wiring (per Task #16 spec):
+               All 10 modules call cemTrackModuleUse() → rankEvidence.cemModulesUsed
+               Additionally, 3 modules wire directly into Escape Run exploit completion:
+               - Speed Run     → exploit_2 INTEGRITY CHECK  (via onBlurtComplete)
+               - Mind Map      → exploit_5 NEURAL MAPPING   (if 5+ nodes)
+               - Memory Palace → exploit_5 NEURAL MAPPING   (if 5+ stops) [per spec]
+               - Teach It      → exploit_6 DEBRIEF TRANSMISSION (if 50+ words)
+               Remaining 6 modules (Mistake Vault, Chunking, Dual Coding, Interleave,
+               Concept Mapper, Shadow Protocol) contribute to rank evidence only —
+               the Escape Run has no exploit slots that semantically match these.
             ==================================================== */
 
             _cemRankIdx() {
@@ -4982,10 +4993,15 @@
             },
             speedRunRate(n) {
                 const missed = (document.getElementById('sr-missed')||{}).value || '';
+                const wordCount = state._srWordCount||0;
                 const sessions = JSON.parse(localStorage.getItem('sg_speed_run')||'[]');
-                sessions.push({ id: Date.now().toString(36), topic: state.srTopic||'', duration: state.srDuration||60, wordCount: state._srWordCount||0, rating: n, missed: missed.trim(), date: new Date().toISOString() });
+                sessions.push({ id: Date.now().toString(36), topic: state.srTopic||'', duration: state.srDuration||60, wordCount, rating: n, missed: missed.trim(), date: new Date().toISOString() });
                 localStorage.setItem('sg_speed_run', JSON.stringify(sessions));
                 app.cemTrackModuleUse('speed-run');
+                // Wire to Escape Run exploit_2 (INTEGRITY CHECK) — timed recall sprint is a recall output like a BrainDump
+                if (typeof escapeRunEngine !== 'undefined') {
+                    escapeRunEngine.onBlurtComplete(wordCount);
+                }
                 state.srTopic = '';
                 state._srRecall = '';
                 state._srWordCount = 0;
@@ -5581,12 +5597,27 @@
                 if (!name.trim()) { app.showNotification('Name the palace.'); return; }
                 if (state.mpBuilding.stops.length===0) { app.showNotification('Add at least one stop.'); return; }
                 state.mpBuilding.name = name.trim();
+                const stops = state.mpBuilding.stops;
                 const palaces = JSON.parse(localStorage.getItem('sg_memory_palace')||'[]');
-                palaces.push({ id: Date.now().toString(36), name: state.mpBuilding.name, stops: state.mpBuilding.stops, date: new Date().toISOString() });
+                palaces.push({ id: Date.now().toString(36), name: state.mpBuilding.name, stops, date: new Date().toISOString() });
                 localStorage.setItem('sg_memory_palace', JSON.stringify(palaces));
                 app.cemTrackModuleUse('memory-palace');
+                // Wire to Escape Run exploit_5 (NEURAL MAPPING) — Memory Palace with 5+ stops counts per Task #16 spec
+                if (stops.length >= 5 && typeof escapeRunEngine !== 'undefined') {
+                    const eligible = escapeRunEngine._pickRunForExploit('exploit_5', 'exploit_4');
+                    if (eligible) {
+                        const nodes = [state.mpBuilding.name, ...stops.map(s=>s.label||s.name||s)].filter(Boolean);
+                        const patch = { nodes: nodes.slice(0,20), exploit_5: true };
+                        if (escapeRunEngine._isCorrupted(eligible, 'exploit_5')) patch.rollback_flags = escapeRunEngine._clearRollbackFlag(eligible, 'exploit_5');
+                        escapeRunEngine.updateRun(eligible.id, patch);
+                        app.showNotification('Palace locked in. Neural Map exploit completed for active Escape Run.');
+                    } else {
+                        app.showNotification('Palace locked in.');
+                    }
+                } else {
+                    app.showNotification('Palace locked in.');
+                }
                 state.mpPhase='list';
-                app.showNotification('Palace locked in.');
                 app.render();
             },
             mpReview(id) {
