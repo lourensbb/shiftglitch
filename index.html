@@ -2381,7 +2381,10 @@
                     const map = { dashboard: 'Mission', explore: 'Vault', decks: 'Data Shards', quiz: 'Boss Fight', blurt: 'BrainDump.exe', babel: 'Jargon Decoder', matrix: 'Priority Grid', recal: 'Anti-Lag', diagnostic: 'Exploit Missions', 'escape-runs': '⬡ ESCAPE RUNS', rank: 'Rank', leaderboard: 'Board', squad: 'Squad', stats: 'Stats', settings: 'Settings' };
                     if (btn.textContent.trim().toUpperCase() === (map[tabId] || '').toUpperCase()) btn.classList.add('text-orange-600', 'font-bold');
                 });
-                const toolsViews = ['blurt','babel','quiz','matrix','recal','diagnostic'];
+                const toolsViews = ['blurt','babel','quiz','matrix','recal','diagnostic',
+                    'cem-speed-run','cem-mistake-vault','cem-teach-it','cem-concept-mapper',
+                    'cem-chunking','cem-interleave','cem-memory-palace','cem-mindmap',
+                    'cem-dual-coding','cem-shadow-protocol'];
                 const toolsBtn = document.querySelector('#tools-dropdown > button');
                 if (toolsBtn) {
                     if (toolsViews.includes(tabId)) { toolsBtn.classList.add('text-orange-600','font-bold'); }
