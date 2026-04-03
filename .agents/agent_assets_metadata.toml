@@ -36,3 +36,9 @@ id = "EyoVGR2k7Ff5bDKT3YEK1"
 uri = "file://attached_assets/QUALITY_EVALUATION_ShiftGlitch_Completed.md"
 type = "text"
 title = "ShiftGlitch — Quality Control Evaluation (Completed)"
+
+[[outputs]]
+id = "F51pQsYlXsLql_GHNFhWB"
+uri = "file://shiftglitch-package.zip"
+type = "unspecified"
+title = "shiftglitch-package.zip — Updated documentation bundle"
