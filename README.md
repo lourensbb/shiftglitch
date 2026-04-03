@@ -22,7 +22,7 @@ It is designed for teenagers who are serious about their results, parents who wa
 6. [Teen-Focused Design](#6-teen-focused-design)
 7. [The Teacher Dashboard](#7-the-teacher-dashboard)
 8. [Social Features](#8-social-features)
-9. [AI Study Planning — Mission Architect](#9-ai-study-planning--mission-architect)
+9. [The Operative Status Board](#9-the-operative-status-board)
 10. [Payment Model](#10-payment-model)
 11. [Data, Privacy and Storage](#11-data-privacy-and-storage)
 12. [Getting Started — Setup Guide](#12-getting-started--setup-guide)
@@ -69,24 +69,28 @@ The Teacher Dashboard (`/teacher`) is a separate, standalone page. Students expo
 
 ## 3. The Rank Progression System
 
-The rank system is the single authoritative spine of the ShiftGlitch experience. There are three ranks. Progression is permanent — once a rank is earned, it is never revoked. The requirement to advance is not a single task: all evidence criteria must be met simultaneously.
+The rank system is the single authoritative spine of the ShiftGlitch experience. There are five ranks. Progression is permanent — once a rank is earned, it is never revoked. The requirement to advance is not a single task: all evidence criteria must be met simultaneously.
 
 | Rank | Pomodoros | Blurts | Governor Breakdowns | Cards Advanced | Active Days | Diagnostics |
 |------|-----------|--------|---------------------|---------------|-------------|-------------|
-| **Space Cadet** | — | — | — | — | — | — |
-| **Second Officer** | 15 | 10 | 10 | 50 | 7 | 2 |
-| **Flight Commander** | 50 | 30 | 30 | 150 | 21 | 5 |
+| **NPC** | — | — | — | — | — | — |
+| **Script Kiddie** | 15 | 10 | 10 | 50 | 7 | 2 |
+| **Glitch Tech** | 40 | 25 | 20 | 120 | 20 | 5 |
+| **Netrunner** | 80 | 50 | 40 | 250 | 40 | 10 |
+| **System Admin** | 150 | 100 | 75 | 500 | 75 | 20 |
 
 **What each evidence type means:**
 
 - **Pomodoros Completed** — full 25-minute focus sessions completed using the Learning Governor
-- **Blurts Completed** — completed Blurting Method sessions (active recall from scratch)
-- **Governor Breakdowns** — times the student deliberately broke down a task when the Governor blocked them for repeating the same task 4 sessions in a row
+- **Blurts Completed** — completed BrainDump sessions (active recall from scratch)
+- **Governor Breakdowns** — times the operative deliberately broke down a task when the Governor blocked them for repeating the same knowledge domain 4 sessions in a row
 - **Cards Advanced** — Leitner flashcards promoted to a higher box (a measure of genuine retention, not just card creation)
 - **Active Days** — distinct calendar days with recorded study activity
-- **Diagnostics Completed** — MCQ Diagnostic mission submissions (missions can be retried; each submission counts)
+- **Diagnostics Completed** — Boss Fight MCQ mission submissions (missions can be retried; each submission counts)
 
-The rank badge is displayed in the navigation bar on every page. Rank evidence progress bars are visible on the Rank page, with a live breakdown of how far the student is from the next threshold.
+The rank badge is displayed in the navigation bar on every page. Rank evidence progress bars are visible on the Rank page, with a live breakdown of how far the operative is from the next threshold.
+
+Rank advancement can be accelerated by the Consistency Ladder bonus (7-day streak reduces all thresholds by 10%) and blocked by the Warden's Clearance Strip penalty (10+ day inactivity).
 
 ---
 
@@ -145,14 +149,6 @@ Sessions are saved with the topic title, recall attempt text, and identified gap
 
 ---
 
-### Mission Architect (AI Study Planner)
-
-The Mission Architect uses Google's Gemini AI model to generate personalised, structured study plans. The student inputs their subject, exam date, available study time, and any specific concerns. The AI returns a multi-week plan with specific daily tasks, technique recommendations, and topic priorities.
-
-The AI key is **Bring Your Own Key (BYOK)** — each user enters their own Google Gemini API key in Settings. If no user key is configured, ShiftGlitch falls back to a server-side proxy using the operator's key (set via environment variable `GEMINI_API_KEY`).
-
----
-
 ### MCQ Diagnostics
 
 A 100-question multiple-choice knowledge assessment split across 5 thematic missions. This is not a general trivia quiz — every question is directly tied to the learning science and study methods that ShiftGlitch is built on. Full mission breakdown in [Section 5](#5-the-mcq-diagnostic-missions).
@@ -205,13 +201,50 @@ Tasks can be added, moved between quadrants, and deleted. A reflection prompt en
 
 A structured digital note-taking panel based on the Cornell Note-Taking System developed at Cornell University. The panel is visible directly on the dashboard. Notes are auto-saved as the student types.
 
-Optional cloud sync via Firebase allows notes to persist across devices. Without Firebase, notes are saved in `localStorage`.
+Notes are saved in `localStorage` and persist across sessions on the same device.
 
 ---
 
-### Quiz Arena
+### System Interrupt Engine
 
-A standalone trivia game powered by the Open Trivia Database API. The Quiz Arena is entirely separate from the rank progression system — it is a low-stakes, informal tool for general knowledge. Performance in the Quiz Arena has no impact on rank evidence.
+A dramatic event system that makes the Mainframe feel alive. Full-screen overlays fire at key moments — threat interrupts when a deck hasn't been reviewed in 72+ hours, challenge interrupts (60-second Recall Sprint, Pattern Lock mini-game), reward interrupts for rank promotion, and Warden interrupts. Combined with 30+ achievement badges stored server-side.
+
+---
+
+### Repeatable Escape Run System
+
+The central game loop of the Mainframe experience. Name a knowledge domain, complete six ordered exploits in sequence, earn Domain Clearance — and run again with deeper encoding each time.
+
+Six exploits per run: Focus session (Learning Governor), flashcard deck link, BrainDump recall, Boss Fight (MCQ), Speed Run, After-Action debrief. Runs are stored server-side. The run history persists across sessions.
+
+---
+
+### 10 Cognitive Exploit Modules (CEM)
+
+Ten evidence-based study tools with rank gating. NPC+ operatives access the first four immediately. Script Kiddie+ unlocks the next three. Glitch Tech+ unlocks the final three.
+
+| Module | Rank Gate | Technique |
+|--------|-----------|-----------|
+| Memory Palace | NPC+ | Method of Loci — spatial encoding routes |
+| Mind Map Protocol | NPC+ | Node-and-branch concept mapping |
+| Chunking Engine | NPC+ | Working memory grouping |
+| Speed Run | NPC+ | Timed recall under pressure |
+| Mistake Vault | Script Kiddie+ | Error analysis + metacognitive tagging |
+| Teach It | Script Kiddie+ | Feynman Protocol for deep consolidation |
+| Dual Coding Station | Script Kiddie+ | Verbal + visual dual representation |
+| The Interleave | Glitch Tech+ | Multi-domain session cycling |
+| Concept Mapper | Glitch Tech+ | Elaborative interrogation |
+| Shadow Protocol | Glitch Tech+ | Cornell Note active retrieval enhancement |
+
+---
+
+### The Warden
+
+A persistent character entity that monitors the operative's behaviour and responds through the System Interrupt engine. Three modes: Observer (neutral reporting), Guide (supportive), Adversary (hostile interference). 47 handwritten messages. Fires once per session after 5 minutes.
+
+**Snakes (setbacks):** Memory Wipe (5+ day domain absence), Clearance Strip (10+ day inactivity blocks rank promotion), Warden's Trap (accepted shortcut locks a CEM module for 2 hours).
+
+**Ladders (bonuses):** Performance Shortcut (strong session → clearance boost), Consistency Ladder (7-day streak → 10% threshold reduction), Hidden Access Node (1-in-20 chance of a clickable easter egg appearing mid-session).
 
 ---
 
@@ -308,7 +341,7 @@ No data passes through any server. Everything happens in the teacher's browser.
 - Highest rank achieved in the class
 
 **Rank Distribution Chart**
-- Doughnut chart showing how many students are at Space Cadet, Second Officer, and Flight Commander
+- Doughnut chart showing rank distribution across NPC, Script Kiddie, Glitch Tech, Netrunner, and System Admin
 
 **Activity Comparison Chart**
 - Bar chart comparing session counts across all students
@@ -351,57 +384,58 @@ Create or join a study squad of up to 4 users with a 6-character invite code. Sq
 
 ---
 
-## 9. AI Study Planning — Mission Architect
+## 9. The Operative Status Board
 
-The Mission Architect is the AI-powered module that generates a structured, personalised study plan. It is powered by Google Gemini (model: `gemini-2.0-flash`).
+The Operative Status Board is the nerve centre of the Rank page. It surfaces the Warden's assessment of the operative's current standing in the Mainframe.
 
-### How It Works
+### What It Shows
 
-The student fills in a brief:
-- Subject or topic
-- Exam or deadline date
-- Daily study time available
-- Current level of confidence
-- Any specific concerns or weak areas
+- **Clearance Score** — net sum of all Snakes and Ladders events (clearance events logged in `sg_clearance_events`)
+- **Net Warden Delta** — the operative's score relative to 0 (positive = ahead, negative = behind)
+- **Rank Tier** — current position in the 5-rank chain
+- **Warden Transmission Log** — the last 30 Warden messages, shown newest-first, with timestamps
 
-The Mission Architect sends this to the Gemini API and returns a structured weekly plan with day-by-day tasks, technique recommendations, and priorities.
+### Clearance Events
 
-### API Key Setup (BYOK)
+All Snakes and Ladders activity is logged as clearance events with type, delta, timestamp, and label. These events feed into the Warden's assessment and are displayed in the Status Board.
 
-1. Go to [Google AI Studio](https://aistudio.google.com/apikey)
-2. Sign in with your Google account
-3. Click **"Create API Key"**
-4. In ShiftGlitch, click the settings gear icon and paste the key into the API Key field
-5. Click Save — the key is stored in the browser only and never leaves the device
-
-If no user key is configured, ShiftGlitch falls back to a server-side proxy using the operator's key (set via environment variable `GEMINI_API_KEY`).
+| Event | Type | Delta |
+|-------|------|-------|
+| Memory Wipe | Snake | 0 (run step reset) |
+| Clearance Strip | Snake | −2 |
+| Warden's Trap | Snake | −1 |
+| Performance Shortcut | Ladder | +3 |
+| Consistency Ladder | Ladder | +1 |
+| Hidden Access Node | Ladder | +2 |
 
 ---
 
 ## 10. Payment Model
 
-ShiftGlitch's core tools are free — and always will be. No paywall has ever been placed in front of the rank system, the flashcards, the blurting method, the MCQ diagnostics, or the teacher dashboard.
+ShiftGlitch's core tools are free — and always will be. No paywall has ever been placed in front of the rank system, the flashcards, the blurting method, the MCQ diagnostics, or the CEM modules.
 
 ### Tiers
 
 | Tier | Price | Who It's For |
 |------|-------|-------------|
-| **Free** | Free forever | Individual students — all core study tools, full rank progression, teacher dashboard |
-| **Netrunner Pro** | R99/month or R799/year (ZAR) | Students who want AI study planning and Squad Mode |
-| **School License** | Contact for pricing | Schools, tutoring centres, and academies |
+| **Free** | Free forever | All core study tools, full rank progression, first 4 CEM modules, leaderboard |
+| **Netrunner Pro — 1 Month** | R99 (ZAR) | Full access for 30 days |
+| **Netrunner Pro — 3 Months** | R249 (ZAR) | Full access for 90 days |
+| **Netrunner Pro — 12 Months** | R799 (ZAR) | Full access for 365 days |
+| **School License** | R499/year | Institutions, tutoring centres, and academies |
 
-### Payment Providers
+### Payment Provider
 
-- **PayFast** — South African rand (ZAR) transactions. One-time purchase packs (1 month / 3 months / 12 months). No auto-renewal.
-- **PayPal** — International (non-ZAR) transactions.
+**PayFast only** — South African rand (ZAR) transactions. One-time purchase packs — no auto-renewal. ITN (Instant Transaction Notification) handled at `/api/payfast-itn`.
 
 ### What Pro Unlocks
 
-- Mission Architect AI study planning (unlimited)
+- All 10 Cognitive Exploit Modules (including Glitch Tech-tier modules for operatives below that rank)
 - Squad Mode co-op study groups
 - Unlimited leaderboard sync
+- Priority support
 
-All rank progression, all study tools, and the full teacher dashboard remain free regardless of tier.
+All rank progression, all study tools, and the full rank evidence system remain free regardless of tier. Rank is earned by behaviour — it cannot be purchased.
 
 ---
 
@@ -409,19 +443,18 @@ All rank progression, all study tools, and the full teacher dashboard remain fre
 
 ### Where Data Lives
 
-All student data is stored in the browser's `localStorage`. No data is sent to any external server unless:
-- The student explicitly configures Firebase (for cross-device sync)
-- The student uses the Mission Architect (which sends only the study brief text to the Gemini API)
-- The student logs in with Replit Auth (which stores user profile data in PostgreSQL for leaderboard and squad features)
+All study data is stored in the browser's `localStorage`. Nothing leaves the device unless:
+- The operative logs in with Replit Auth (which stores user profile data in PostgreSQL for leaderboard, squad, and escape run features)
+- The operative completes a PayFast transaction (which sends payment confirmation to the PayFast ITN endpoint)
 
-### localStorage Key Reference
+### localStorage Key Reference (Study Tools)
 
 | Key | Stores |
 |-----|--------|
 | `sg_decks` | Flashcard deck metadata |
 | `sg_cards` | All card content and Leitner box positions |
 | `sg_pomodoro_log` | Pomodoro session history |
-| `sg_blurt` | Blurting method session records |
+| `sg_blurt` | BrainDump session records |
 | `sg_eisenhower` | Eisenhower Matrix tasks and reflections |
 | `sg_recal` | Dopamine Recalibrator session logs |
 | `sg_babel` | Babel Fish exercise records |
@@ -431,24 +464,33 @@ All student data is stored in the browser's `localStorage`. No data is sent to a
 | `sg_exams` | Exam countdown entries |
 | `sg_wil` | "What I Learned?" session log entries |
 | `sg_theme` | Theme preference (dark/light) |
-| `sg_gemini_key` | User's Gemini API key (BYOK; never exported) |
-| `cornellNotes` | Cornell Notes panel HTML content (legacy key) |
+
+**Warden / Progression keys:**
+
+| Key | Stores |
+|-----|--------|
+| `sg_clearance_events` | All Warden clearance events (snakes/ladders) |
+| `sg_warden_log` | Warden transmission log (30 entries max) |
+| `sg_warden_trap_lock` | `{moduleId, lockUntil}` — active trap state |
+| `sg_app_sessions` | Login count for trap cadence |
+| `sg_consistency_bonus_active` | Active flag for 10% threshold reduction |
+
+**CEM module keys:** `sg_memory_palace`, `sg_mindmap`, `sg_chunking`, `sg_speed_run`, `sg_mistake_vault`, `sg_teach_it`, `sg_dual_coding`, `sg_interleave`, `sg_concept_mapper`, `sg_shadow_protocol`
 
 ### Export and Import
 
 From the Stats page → Data Management:
 
-- **Full JSON Export** — downloads all `localStorage` data as a single `.json` file (excluding the Gemini key for security)
+- **Full JSON Export** — downloads all `localStorage` data as a single `.json` file
 - **Import** — restores all data from a previously exported file; overwrites current data
 - **Export for Teacher** — same as Full Export but prompts for the student's name; designed for classroom data collection
 
 ### Privacy Notes
 
-- The Gemini API key is excluded from all exports — it is never transmitted or shared
 - No user account is required to use the core tools of ShiftGlitch
-- Firebase is entirely optional; without it, nothing leaves the browser
+- All study data stays in the browser's `localStorage` — nothing is transmitted without login
 - The app functions fully offline with no network connection
-- Replit Auth is only required for leaderboard and squad features
+- Replit Auth is only required for leaderboard, squad, and escape run features
 
 ---
 
@@ -474,7 +516,6 @@ In Replit, use the Secrets panel. On other platforms, use your preferred environ
 - `SESSION_SECRET` — a random secret string for signing session cookies
 
 **Optional:**
-- `GEMINI_API_KEY` — server-side Gemini API fallback
 - `RESEND_API_KEY` — for welcome emails on waitlist signups
 - `PAYFAST_MERCHANT_ID`, `PAYFAST_MERCHANT_KEY`, `PAYFAST_PASSPHRASE` — for PayFast payments
 
@@ -486,33 +527,7 @@ node server.js
 
 The server starts on port 5000 by default. Open your browser and go to `http://localhost:5000` (or use the Replit preview URL).
 
-### Step 4: (Optional) Configure Firebase Cloud Sync
-
-Firebase enables cross-device sync for Cornell Notes.
-
-1. Go to [Firebase Console](https://console.firebase.google.com/) and create a project
-2. In **Project Settings** → **Your apps**, click the web icon (`</>`)
-3. Register an app name and copy the config values
-4. Open `config.js` and replace the placeholder values:
-
-```javascript
-var SG_FIREBASE_CONFIG = {
-    apiKey:            "your-actual-api-key",
-    authDomain:        "your-project.firebaseapp.com",
-    projectId:         "your-project-id",
-    storageBucket:     "your-project.firebasestorage.app",
-    messagingSenderId: "123456789",
-    appId:             "1:123456789:web:abc123"
-};
-```
-
-5. In Firebase Console → **Authentication** → enable **Anonymous** sign-in
-6. In Firebase Console → **Firestore Database** → create a database (start in test mode)
-7. Restart the server and reload ShiftGlitch — Settings will confirm "Connected"
-
-Without `config.js` configured, ShiftGlitch detects the placeholder values and runs silently in offline-only mode.
-
-### Step 5: Share with Students
+### Step 4: Share with Operatives
 
 Share your deployment URL with students. They visit the URL in any browser, and the app is immediately functional — no download, no account required for the core tools.
 
@@ -537,11 +552,11 @@ Deploy `server.js` to any platform that supports Node.js — Railway, Render, Fl
 ShiftGlitch is primarily a client-side application. The Express server is needed for:
 - Serving static files
 - Replit Auth and user accounts
-- The server-side Gemini API proxy fallback
 - Leaderboard and squad data
+- Escape Run server-side storage
 - PayFast payment processing
 
-If you host the HTML files on Netlify, Vercel, or GitHub Pages, the core study tools will work fully — but auth-dependent features (leaderboard, squad, pro subscription) will not be available. Students can still use the Mission Architect by entering their own API key in Settings.
+If you host the HTML files on Netlify, Vercel, or GitHub Pages, the core study tools will work fully — but auth-dependent features (leaderboard, squad, escape runs, pro subscription) will not be available.
 
 ### Open Directly in a Browser
 For completely offline use, open `index.html` directly in any modern browser. All features except server-dependent features work normally.
@@ -561,8 +576,7 @@ For completely offline use, open `index.html` directly in any modern browser. Al
 
 ### Content
 - **Motivational quotes:** Edit the `STUDY_QUOTES` array in the JavaScript section of `index.html`
-- **Subject tags:** Edit the `<option>` elements in the subject dropdown (search for `timerSubject` in `index.html`)
-- **AI model:** Change the `AI_MODEL` constant at the top of the `<script>` block to use a different Gemini model version
+- **Knowledge domain tags:** Edit the `<option>` elements in the domain dropdown (search for `timerSubject` in `index.html`)
 
 ### Rank Thresholds
 Rank requirements are defined in the `RANK_REQUIREMENTS` object in `index.html`. Thresholds can be adjusted, though any change will affect all existing users on that deployment.
@@ -580,13 +594,10 @@ Rank requirements are defined in the `RANK_REQUIREMENTS` object in `index.html`.
 | Charts | Chart.js via CDN |
 | Backend | Express.js v5 — static files, auth, API endpoints |
 | Primary storage | Browser `localStorage` |
-| Optional cloud | Firebase Firestore (anonymous auth) |
-| Database | PostgreSQL (users, sessions, leaderboard, squads, payments) |
+| Database | PostgreSQL (users, sessions, leaderboard, squads, escape runs, badges) |
 | Auth | Replit Auth (OpenID Connect via `openid-client` v6) |
-| AI | Google Gemini API (`gemini-2.0-flash`) |
 | Email | Resend (transactional email for waitlist welcome) |
-| Payments | PayFast (ZAR) + PayPal (international) |
-| External data | Open Trivia Database (Quiz Arena only) |
+| Payments | PayFast (ZAR only — one-time packs) |
 
 ### Design Decisions
 
@@ -594,11 +605,7 @@ Rank requirements are defined in the `RANK_REQUIREMENTS` object in `index.html`.
 
 **Offline-first.** The app is fully functional with zero network connectivity for the core study tools. Network features degrade gracefully when unavailable.
 
-**Monolithic frontend.** `index.html` is approximately 2,800 lines. This is an intentional trade-off for simplicity of deployment and modification.
-
-**BYOK AI model.** The Gemini API key model protects the operator from unexpected API costs while keeping the AI feature genuinely useful.
-
-**Firebase as a progressive enhancement.** Firebase is not initialised unless `config.js` contains real credentials. The app detects placeholder values at startup and silently falls back to offline mode.
+**Monolithic frontend.** `index.html` is approximately 7,200 lines. This is an intentional trade-off for simplicity of deployment and modification — no build step, no module bundler, trivially forkable.
 
 **Security.** All user-generated content rendered to the DOM passes through the `esc()` utility function, which escapes HTML entities to prevent XSS attacks. Helmet middleware adds security headers. Rate limiting protects API endpoints.
 
@@ -616,11 +623,11 @@ Rank requirements are defined in the `RANK_REQUIREMENTS` object in `index.html`.
 | `/app` | GET | Required | Full app |
 | `/api/waitlist` | POST | None | Save waitlist lead + send email |
 | `/api/stats` | GET | None | Page view counts and waitlist size |
-| `/api/gemini` | POST | None | Gemini API proxy |
 | `/api/leaderboard` | GET | Required | Global leaderboard |
 | `/api/leaderboard/sync` | POST | Required | Sync focus stats |
 | `/api/settings/gamertag` | GET/POST | Required | Get/update gamertag |
 | `/api/squad` | GET/POST | Required | Squad management |
+| `/api/escape-runs` | GET/POST | Required | Escape run CRUD |
 | `/api/payfast-itn` | POST | None | PayFast payment notification |
 
 All routes use `no-cache` headers to ensure students always receive the latest version.
@@ -631,13 +638,11 @@ All routes use `no-cache` headers to ensure students always receive the latest v
 |----------|----------|---------|
 | `DATABASE_URL` | Yes | PostgreSQL connection string (auto-set by Replit DB integration) |
 | `SESSION_SECRET` | Yes | Secret for signing session cookies |
-| `GEMINI_API_KEY` | Optional | Server-side Gemini API proxy. If not set, the proxy endpoint returns an error; BYOK still works. |
 | `RESEND_API_KEY` | Optional | Sends a welcome email to new waitlist signups via Resend. |
-| `RESEND_FROM_ADDRESS` | Optional | Sender address for Resend emails. |
+| `RESEND_SG_KEY` | Optional | Secondary Resend sender key. |
 | `PAYFAST_MERCHANT_ID` | Payments | PayFast merchant ID |
 | `PAYFAST_MERCHANT_KEY` | Payments | PayFast merchant key |
 | `PAYFAST_PASSPHRASE` | Payments | PayFast salt passphrase |
-| `PAYFAST_SANDBOX` | Optional | Set `true` for PayFast sandbox mode |
 | `PORT` | Optional | Server port (default: 5000) |
 
 ---
@@ -646,57 +651,42 @@ All routes use `no-cache` headers to ensure students always receive the latest v
 
 | File | Description |
 |------|-------------|
-| `index.html` | The complete ShiftGlitch application — all student-facing features (~2,800 lines) |
+| `index.html` | The complete ShiftGlitch application — all operative-facing features (~7,200 lines) |
 | `landing.html` | Public landing page — boot animation, product sections, SEO, waitlist CTA |
-| `pricing.html` | Pricing page — Free / Pro / School tiers with feature comparison, FAQ, and checkout |
+| `pricing.html` | Pricing page — Free / Netrunner Pro / School tiers with feature comparison, FAQ, and checkout |
 | `waitlist.html` | Waitlist signup — captures gamertag + email, sends welcome email |
 | `demo.html` | Limited demo version — subset of features, no rank progression |
 | `teacher.html` | Teacher Dashboard — classroom data import and reporting |
 | `login.html` | Login page (Replit Auth) |
 | `server.js` | Express v5 server — all routes, analytics tracking, email, API endpoints |
 | `auth.js` | Authentication, session management, DB schema, data helpers |
-| `config.js` | Firebase configuration (edit to enable cloud sync) |
-| `config.example.js` | Blank Firebase config template for reference |
 | `package.json` | Node.js project manifest and dependencies |
 | `robots.txt` | Search engine crawl instructions |
 | `sitemap.xml` | XML sitemap for all public pages |
 | `README.md` | This file — the comprehensive product and setup guide |
-| `REPORT.md` | Definitive app report: full module inventory, data schemas, API routes, and user guide |
 | `JOURNAL.md` | Design philosophy, product story, and brand narrative |
-| `PLANNING_EBOOK.md` | Readable product roadmap — the next four planned development phases |
+| `PLANNING_EBOOK.md` | Completed development roadmap — all four phases now implemented |
 | `MARKETING_PLAN.md` | Comprehensive go-to-market strategy, SEO plan, channel strategy, and pricing rationale |
 | `replit.md` | Technical architecture overview, environment variable reference, and developer notes |
-| `revamp_vision.md` | Commercial evolution vision — the next generation of the product |
 
 ---
 
-## 17. Coming Soon
+## 17. What Has Been Built
 
-The following features are planned for the next four development phases. Full specification for each is available in `PLANNING_EBOOK.md`.
+All four planned development phases are now complete. The following features are live in the current codebase.
 
-### SYSTEM INTERRUPT Engine (Coming Soon)
-A dramatic event system that makes the Mainframe feel alive. Unexpected overlays fire at key moments: threat interrupts when cognitive protocols haven't been run in 72+ hours, challenge interrupts (60-second Recall Sprint, Pattern Lock mini-game), reward interrupts for rank promotion with cinematic ceremony, and Warden interrupts — messages from a mysterious entity that speaks to the player. Combined with a 12-badge achievement system.
+### SYSTEM INTERRUPT Engine — COMPLETE
+Full-screen overlays fire at key moments. Nine interrupt types covering threat, challenge, reward, and Warden events. 30+ server-side achievement badges. Recall Sprint (60-second timed recall) and Pattern Lock mini-game.
 
-### Repeatable Escape Run System (Coming Soon)
-Replace the START HERE checklist with a repeatable adventure loop. Each Escape Run is named after a knowledge domain the student chooses. Six ordered exploits must be completed in sequence: loading a flashcard deck, completing a recall protocol, reinforcing cards to Box 3+, completing a Boss Fight challenge, building a Mind Map or Memory Palace, and writing an After Action Report. Completing all six awards Domain Clearance — and the run resets immediately for another pass.
+### Repeatable Escape Run System — COMPLETE
+Server-side named domain runs with six ordered exploits. Domain Clearance system. Run history persists across sessions. Memory Wipe snake fires on 5+ day domain absence.
 
-### 10 New Cognitive Exploit Modules (Coming Soon)
-Ten new study tools, each implementing a distinct evidence-based technique:
+### 10 Cognitive Exploit Modules — COMPLETE
+All ten CEM modules implemented with rank gating. NPC+, Script Kiddie+, and Glitch Tech+ tier modules. Warden Trap integration locks a random module for 2 hours if the operative accepts the trap.
 
-1. **Memory Palace** — Method of Loci for durable spatial encoding
-2. **Mind Map Protocol** — Node-and-branch concept mapping
-3. **Chunking Engine** — Working memory optimisation through grouping
-4. **Speed Run** — Timed recall under pressure
-5. **Mistake Vault** — Error analysis and metacognitive tagging
-6. **Teach It** — Feynman Protocol for deep consolidation
-7. **Dual Coding Station** — Verbal + visual dual representation
-8. **The Interleave** — Multi-domain session cycling
-9. **Concept Mapper** — Elaborative interrogation
-10. **Shadow Protocol** — Cornell Note active retrieval enhancement
-
-### The Warden + Non-Linear Progression (Coming Soon)
-The Warden is the personality of the Mainframe — a mysterious, semi-hostile entity that monitors the student's progress and actively interferes with their escape. A library of 40+ handwritten messages across three modes (Observer, Guide, Adversary) fires once per session. Combined with a Snakes and Ladders non-linear progression system: extended inactivity triggers rollbacks; exceptional performance triggers shortcuts; hidden easter eggs reward curiosity.
+### The Warden + Snakes & Ladders — COMPLETE
+47 Warden messages across 3 modes. Three snakes (Memory Wipe, Clearance Strip, Warden's Trap). Three ladders (Performance Shortcut, Consistency Ladder, Hidden Access Node). Operative Status Board on Rank page shows Clearance Score, Warden Delta, and Transmission Log.
 
 ---
 
-*ShiftGlitch is a serious tool for serious students. Everything in it exists for a reason.*
+*ShiftGlitch is a serious tool for serious operatives. Everything in it exists for a reason.*

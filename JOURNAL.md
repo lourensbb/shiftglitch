@@ -32,7 +32,7 @@ ShiftGlitch began as an internal project — a tool built to address a specific,
 
 The rebranding to ShiftGlitch reflects that evolution. The name is memorable, distinctive, and unusual in the EdTech space — which is exactly the point. The study app that looks like it belongs in a hacking movie is not competing on generic flashcard features. It is competing on philosophy, on honesty, and on the quality of the experience it creates.
 
-The product has been through fourteen significant development phases, each adding depth to what is now a comprehensive learning platform. What started as a Pomodoro timer with a rank system is now a full-stack application with authentication, payments, a teacher dashboard, gamification, AI integration, leaderboards, squad features, and plans for a narrative escape engine that will turn the act of studying into something genuinely compelling.
+The product has been through eighteen significant development phases, each adding depth to what is now a genuinely immersive cognitive adventure platform. What started as a Pomodoro timer with a rank system is now a full-stack application with authentication, payments, a teacher dashboard, gamification, leaderboards, squad features, a repeatable Escape Run system, ten Cognitive Exploit Modules, a Warden character with 47 messages, and a non-linear Snakes and Ladders progression mechanic that makes the Mainframe feel hostile and alive.
 
 ---
 
@@ -116,13 +116,13 @@ The features in ShiftGlitch are not arbitrary. Each one is the result of a delib
 
 The most common approach to engagement in educational apps is gamification: give users points, levels, and streaks. The appeal is obvious — points are immediately satisfying. The problem is that points reward volume, not quality. A student could farm points by doing the easiest possible thing repeatedly. Points also create a perverse incentive: once you have enough of them, you stop.
 
-ShiftGlitch does not use points. It uses a rank system — Space Cadet, Second Officer, Flight Commander — based on demonstrated learning behaviours. Promotion requires a specific combination of effort across multiple methods: a minimum number of Pomodoro sessions, blurt completions, flashcard advances, active days, and diagnostic completions. A student who uses only one method — even obsessively — cannot advance. The system is designed to reward breadth and consistency.
+ShiftGlitch does not use points. It uses a rank system — NPC, Script Kiddie, Glitch Tech, Netrunner, System Admin — based on demonstrated learning behaviours. Promotion requires a specific combination of effort across multiple methods: a minimum number of focus sessions, BrainDump completions, flashcard advances, active days, and Boss Fight completions. An operative who uses only one method — even obsessively — cannot advance. The system is designed to reward breadth and consistency.
 
 Ranks are also permanent. Once earned, they cannot be lost. This is a deliberate departure from streak-based systems that punish users for missing a day. Real learning is not linear, and a system that removes earned status for a single missed session is more punitive than motivating.
 
 ### Offline First
 
-ShiftGlitch stores all data locally in the browser. Optional cloud synchronisation is available through Firebase for users who want to sync across devices, but the app is fully functional without it. The AI study planning feature uses a Bring Your Own Key model — users provide their own Gemini API key, which is stored only in their browser and never transmitted to any server other than Google's own. This is a privacy architecture choice: the app should not become a data business.
+ShiftGlitch stores all study data locally in the browser. Nothing leaves the device without a deliberate login action. Server-side storage (PostgreSQL) is only used for features that genuinely need it — leaderboard rankings, squad data, and escape run progress. This is a privacy architecture choice: the app should not become a data business.
 
 ### Why It Is Not a Game (But Is Becoming More Like One)
 
@@ -146,13 +146,11 @@ ShiftGlitch is free to use. The core tools — flashcards, Pomodoro timer, blurt
 
 The commercial model introduced in later development phases adds two premium tiers:
 
-**Netrunner Pro** — designed for individual students who want AI-powered features and Squad Mode. The Mission Architect, which generates personalised study plans via Google Gemini, requires a subscription or the student's own Gemini API key. Squad Mode, which allows collaborative study groups with shared streak tracking, is a Pro feature.
+**Netrunner Pro** — designed for individual operatives who want the full toolkit. Squad Mode, advanced CEM modules, and unlimited leaderboard sync. Three pack options: R99 (30 days), R249 (90 days), R799 (365 days). PayFast only — South African rand, one-time purchase, no auto-renewal.
 
-**School License** — designed for institutions that want to deploy ShiftGlitch class-wide with full Teacher Dashboard access, reporting tools, and school-wide leaderboards.
+**School License** — designed for institutions that want to deploy ShiftGlitch class-wide. R499 per year.
 
-The pricing was designed with a specific principle: the free tier must be genuinely good. A student on the free tier should be able to achieve Flight Commander rank, use every cognitive tool, and benefit fully from the learning science. The Pro tier enhances the experience; it does not gate the core value.
-
-Payment is processed via PayFast for South African rand transactions and PayPal for international users. Both are one-time purchases (monthly or annual packs), not auto-renewing subscriptions.
+The pricing was designed with a specific principle: the free tier must be genuinely good. An operative on the free tier can reach System Admin rank, access the first four CEM modules, complete all five Boss Fight missions, and use every core study tool. The Pro tier enhances the experience; it does not gate the core value. Rank is earned by behaviour — it cannot be purchased.
 
 ---
 
@@ -193,13 +191,15 @@ In one focused development phase, ten improvements were made specifically to add
 
 ## The Rank System in Detail
 
-The rank progression spine is the central motivational architecture of ShiftGlitch. Every student begins as a **Space Cadet** — a rank that is neither diminishing nor trivial.
+The rank progression spine is the central motivational architecture of ShiftGlitch. Every operative begins as an **NPC** — the system controls you. You are executing learned behaviours without understanding them. The arc of the game is the arc out of that condition.
 
-Promotion to **Second Officer** requires demonstrated consistency across six categories of learning behaviour: fifteen completed Pomodoro sessions, ten blurt sessions, ten governor breakdowns, fifty flashcard advances through the Leitner system, seven active study days, and completion of two diagnostic missions. No single category can be farmed.
+The five ranks are **NPC → Script Kiddie → Glitch Tech → Netrunner → System Admin**. Each rank name is deliberately chosen from hacker culture: you start as a nobody and work your way to owning the Mainframe. The ranks are not motivational cheerleading — they are an accurate description of your cognitive relationship to the material.
 
-**Flight Commander** is a genuine achievement. The thresholds are: fifty Pomodoro sessions, thirty blurt sessions, thirty governor breakdowns, one hundred and fifty flashcard advances, twenty-one active study days, and five diagnostic missions completed.
+Promotion to **Script Kiddie** requires fifteen Pomodoro sessions, ten BrainDump sessions, ten governor breakdowns, fifty flashcard advances, seven active days, and two Boss Fight completions. **Glitch Tech** escalates further. **Netrunner** requires sustained, broad engagement. **System Admin** is a genuine achievement — 150 focus sessions, 100 BrainDumps, 75 governor breakdowns, 500 cards advanced, 75 active days, and 20 Boss Fights.
 
-What makes this system work is the permanence of earned rank. Once a student is a Second Officer, they remain one. Every session of quality study is permanently banked. There is no streak to protect, no rank to lose. The system rewards cumulative effort rather than punishing inconsistency.
+What makes this system work is the permanence of earned rank. Once an operative is a Script Kiddie, they remain one. Every session of quality study is permanently banked. There is no streak to protect, no rank to lose. The system rewards cumulative effort rather than punishing inconsistency.
+
+The Warden adds a non-linear layer on top of this permanence. Rank itself is safe — but the *path* to the next rank is not. Extended inactivity (10+ days) triggers the Clearance Strip, blocking promotion until the penalty clears. Exceptional performance triggers shortcuts. The Mainframe is not neutral. It responds.
 
 ---
 
@@ -231,7 +231,7 @@ Fourteen significant development phases have produced the following capabilities
 The foundation of ShiftGlitch was laid across the first three phases. The core SPA architecture was established — a single HTML file with client-side routing, Tailwind CSS via CDN, localStorage as the primary data store. The Learning Governor (Pomodoro timer) was built with subject tagging. The Flashcard Decks module implemented the Leitner 5-box spaced repetition system. The Blurting Method was introduced as a guided 4-phase active recall exercise.
 
 ### Phase 4–5: The Progression System
-The rank system was conceived and built. Space Cadet, Second Officer, and Flight Commander. All six evidence categories. The permanent promotion mechanism. The evidence progress bars. The Stats page with Chart.js visualisations — scatter plots, doughnut charts, bar charts. The data export/import system for full data portability.
+The rank system was conceived and built. NPC, Script Kiddie, Glitch Tech, Netrunner, and System Admin. All six evidence categories. The permanent promotion mechanism. The evidence progress bars. The Stats page with Chart.js visualisations — scatter plots, doughnut charts, bar charts. The data export/import system for full data portability.
 
 ### Phase 6: The Diagnostic Engine
 The 100-question MCQ Diagnostics system — five missions of twenty questions each — covering the neuroscience of learning, study methods, thinkers and habits, systems and tactics, and wellbeing. Knowledge gap tracking. Reflective prompts. Rank integration.
@@ -243,38 +243,46 @@ Dark mode by default. Theme persistence. Phone-lock nudges. Subject tagging. The
 A full classroom management tool at `/teacher`. Drag-and-drop JSON import for class-wide data collection. Summary cards. Rank distribution doughnut chart. Activity bar chart. "Students Needing Attention" auto-flags. Sortable student roster. Individual student profiles with rank evidence bars. Printable progress reports.
 
 ### Phase 9–10: The Commercial Layer
-The rebrand from Synapse to ShiftGlitch. The landing page, pricing page, and waitlist system. Replit Auth integration (OpenID Connect). PostgreSQL session storage. Welcome emails via Resend. Payment integration via PayFast (South African rand, one-time packs). Leaderboard backed by PostgreSQL (global Focus Score rankings). Squad Mode (async co-op groups with shared streaks and AFK roast messages). `robots.txt` and `sitemap.xml` for SEO. Full meta tags and Open Graph / Twitter Card data.
+The rebrand from Synapse to ShiftGlitch. The landing page, pricing page, and waitlist system. Replit Auth integration (OpenID Connect). PostgreSQL session storage. Welcome emails via Resend. Payment integration via PayFast (South African rand, one-time packs: R99/R249/R799). Leaderboard backed by PostgreSQL (global Focus Score rankings). Squad Mode (async co-op groups with shared streaks and AFK roast messages). `robots.txt` and `sitemap.xml` for SEO. Full meta tags and Open Graph / Twitter Card data.
 
 ### Phase 11–12: Security and Polish
-The `helmet` middleware for security headers. Rate limiting on API endpoints. XSS protection via the `esc()` utility throughout the frontend. The `auth.js` module separating authentication, session, and database logic from the server. PayPal integration as an additional payment processor. The `MARKETING_PLAN.md` — a comprehensive go-to-market document covering SEO, channel strategy, pricing rationale, and the school B2B model.
+The `helmet` middleware for security headers. Rate limiting on API endpoints. XSS protection via the `esc()` utility throughout the frontend. The `auth.js` module separating authentication, session, and database logic from the server. The `MARKETING_PLAN.md` — a comprehensive go-to-market document covering SEO, channel strategy, pricing rationale, and the school B2B model.
 
 ### Phase 13: The Demo and Waitlist
 The `demo.html` limited feature preview. The `waitlist.html` lead capture page. The `/api/waitlist` endpoint with Resend integration. The `/api/stats` analytics endpoint. The `login.html` authentication entry point. Full public page structure with consistent SEO.
 
 ### Phase 14: Documentation Package
-The documentation you are reading now. `JOURNAL.md` expanded to cover the full product story. `REPORT.md` as the definitive technical and user reference. `README.md` updated with the full feature set and setup guide. `replit.md` updated with the current tech stack. `PLANNING_EBOOK.md` as a readable product roadmap for the next four planned development phases. All documents bundled into `shiftglitch-package.zip`.
+The documentation you are reading now. `JOURNAL.md` expanded to cover the full product story. `README.md` updated with the full feature set and setup guide. `replit.md` updated with the current tech stack. `PLANNING_EBOOK.md` as a readable product roadmap for the four development phases now complete.
+
+### Phase 15: The SYSTEM INTERRUPT Engine
+A dramatic event system that makes the Mainframe feel alive. Nine interrupt types firing at key moments — threat, challenge, reward, and Warden events. 30+ achievement badges stored server-side. Recall Sprint (60-second timed recall under pressure). Pattern Lock mini-game. Full-screen glitch overlays with scanline and colour-coded severity treatments. The Mainframe became proactive.
+
+### Phase 16: Repeatable Escape Run System
+The central game loop of the Mainframe experience. Named domain runs stored server-side in the `escape_runs` PostgreSQL table. Six ordered exploits per run: Focus session, flashcard deck link, BrainDump recall, Boss Fight, Speed Run, After-Action debrief. Domain Clearance on completion. Runs can be repeated, with increasing depth each time. Memory Wipe snake integrated — 5+ day domain absence corrupts an exploit.
+
+### Phase 17: Ten Cognitive Exploit Modules
+All ten CEM modules implemented and rank-gated. Four modules for all operatives (NPC+), three for Script Kiddie+, three for Glitch Tech+. Each implements a distinct evidence-based learning technique: Memory Palace, Mind Map Protocol, Chunking Engine, Speed Run, Mistake Vault, Teach It, Dual Coding Station, The Interleave, Concept Mapper, Shadow Protocol.
+
+### Phase 18: The Warden + Snakes & Ladders
+The Warden — a character entity with 47 handwritten messages across three modes (Observer, Guide, Adversary). Three snakes: Memory Wipe, Clearance Strip (blocks rank promotion after 10+ days inactive), Warden's Trap (accepted shortcut locks a random CEM module 2 hours). Three ladders: Performance Shortcut, Consistency Ladder (7-day streak → 10% threshold reduction), Hidden Access Node (1-in-20 easter egg). Operative Status Board on the Rank page.
 
 ---
 
-## The Gamification Engine (Planned)
+## The Gamification Engine — Complete
 
-The next phase of ShiftGlitch introduces the SYSTEM INTERRUPT engine — a dramatic event system that makes the Mainframe feel alive and hostile. The Mainframe is not a passive app waiting to be opened. It is a system that fires unexpected events at the player: threat interrupts when cognitive protocols haven't been run in 72 hours, challenge interrupts that test recall under time pressure, reward interrupts that celebrate rank progression with cinematic ceremony, and Warden interrupts — messages from a mysterious entity that speaks to the player at unpredictable moments.
-
-The SYSTEM INTERRUPT engine is what separates an adventure from a to-do list.
+The SYSTEM INTERRUPT engine is live. The Mainframe fires unexpected events at the operative across nine interrupt types: threat, coherence-failure, challenge, achievement, recall-sprint, pattern-lock, domain-clearance, rank-promotion, warden, warden-trap, and warden-clearance-strip. The app is no longer passive. It reaches out.
 
 ---
 
-## The Repeatable Escape Plan (Planned)
+## The Repeatable Escape Run System — Complete
 
-The Escape Run system replaces the current START HERE checklist with a repeatable adventure loop. Each Escape Run is named after a knowledge domain the student chooses — anything from chemistry to chess openings to a historical period. The run has six ordered exploits that must be completed in sequence: loading a flashcard deck, completing a recall protocol, reinforcing cards to Box 3+, completing a Boss Fight challenge, building a Mind Map or Memory Palace, and writing an After Action Report.
-
-Completing all six exploits awards Domain Clearance. The run can immediately be restarted on the same domain — all flags reset, but decks and previous debriefs remain. A student with three Domain Clearances on a single topic has genuinely encoded that information deeply. That is the product's core value.
+The Escape Run system is live. Named domain runs are stored server-side. Six ordered exploits must be completed in sequence. Domain Clearance fires a ceremony. The run resets immediately for another pass. An operative with three Domain Clearances on a single topic has genuinely encoded that information. The run count is a measure of mastery, not completion.
 
 ---
 
-## Ten New Cognitive Exploit Modules (Planned)
+## Ten Cognitive Exploit Modules — Complete
 
-The cognitive toolkit is expanding to include ten new modules, each implementing a distinct evidence-based technique:
+All ten CEM modules are live and rank-gated:
 
 1. **Memory Palace** — Method of Loci, using spatial memory for data retention
 2. **Mind Map Protocol** — Concept mapping to build connected knowledge schemas
@@ -287,17 +295,15 @@ The cognitive toolkit is expanding to include ten new modules, each implementing
 9. **Concept Mapper** — Elaborative interrogation to integrate new with existing knowledge
 10. **Shadow Protocol** — Cornell Note enhancement with timed cover-and-recall mode
 
-Modules unlock progressively based on rank — not to restrict access artificially, but because more advanced techniques require the foundational habits that lower-rank study builds.
+Modules unlock progressively based on rank. NPC+ can access the first four immediately. Script Kiddie+ unlocks the next three. Glitch Tech+ unlocks the final three.
 
 ---
 
-## The Warden (Planned)
+## The Warden — Complete
 
-The Warden is the personality of the Mainframe — a mysterious, semi-hostile entity that monitors the student's progress and actively interferes with their escape. Sometimes the Warden helps. Sometimes the Warden punishes. The player cannot predict which it will be.
+The Warden is live. 47 handwritten messages across three modes. The Warden fires once per session after 5 minutes — never triggered by a specific action. Observer mode when the operative is consistent. Guide mode when they're new or uncertain. Adversary mode when they've been absent.
 
-The Warden communicates exclusively through SYSTEM INTERRUPT panels in magenta — distinct from threat, challenge, and reward interrupts. A library of 40+ handwritten messages is sorted across three modes: Observer (neutral/cryptic), Guide (appears helpful), and Adversary (hostile). The Warden never explains what they are or why the operative is in the Mainframe. These are intentional mysteries.
-
-Combined with the Warden is the non-linear progression mechanic — Snakes and Ladders. Advancement is not purely upward. Extended inactivity triggers rollbacks. Exceptional performance triggers shortcuts. Hidden Access Nodes reward curiosity and attention. The operative can be sent back. They can also leap forward. This reflects how real learning works.
+The Snakes and Ladders mechanic is live. Advancement is not purely upward. The Clearance Strip blocks rank promotion after 10+ days inactive. The Warden's Trap locks a random CEM module for 2 hours. The Memory Wipe corrupts a run exploit after 5+ days away from a domain. Against this: the Performance Shortcut, the Consistency Ladder, and the Hidden Access Node. The Mainframe responds. The operative responds back.
 
 ---
 

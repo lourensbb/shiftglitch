@@ -2,23 +2,28 @@
 
 ## Overview
 
-ShiftGlitch is a full-stack, evidence-based study platform designed for teenagers (ages 13–19). It functions as a "study-methods operating system," guiding users through a rank progression system based on demonstrated learning behaviours rather than traditional experience points. The project provides a structured, serious learning environment with a distinctive cyberpunk aesthetic, supporting both offline functionality via `localStorage` and optional cloud synchronisation with Firebase.
+ShiftGlitch is a cyberpunk cognitive adventure platform by Lourens Breytenbach. Players are "jacked into the Mainframe" and master learning techniques as "exploits." It is a full-stack, evidence-based study platform that functions as a study-methods operating system — guiding users through a 5-rank progression system based on demonstrated learning behaviours.
 
-Key features include: Pomodoro timer (Learning Governor), active recall tools (Blurting Method, Flashcard Decks with Leitner spaced repetition), AI-powered study planning (Mission Architect via Gemini), Cornell notes, MCQ diagnostics, Eisenhower Matrix, Dopamine Recalibrator, YET Growth Shield, Babel Fish Feynman Lab, Quiz Arena, global leaderboard, Squad Mode co-op groups, Teacher Dashboard, payment integration (PayFast + PayPal), and waitlist/email onboarding.
+**Critical language rule:** Zero school/exam/teacher/homework language anywhere in the UI or docs. Use "knowledge domains" not "subjects."
+
+Key features: Learning Governor (Pomodoro), Flashcard Decks (Leitner), Blurting Method (BrainDump), MCQ Diagnostics (Boss Fights), 10 Cognitive Exploit Modules (CEM), Repeatable Escape Run system, System Interrupt engine, The Warden + Snakes & Ladders progression, Leaderboard, Squad Mode, PayFast ZAR payments, Resend email, PostgreSQL + Replit Auth.
+
+---
 
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
 
+---
+
 ## Product Philosophy
 
-- ShiftGlitch is NOT a gamified productivity app or trivia game
-- It is a structured, serious, cyberpunk-themed study-methods OS for teens
-- One single authoritative progression spine: the 3-rank system (Space Cadet → Second Officer → Flight Commander)
-- Ranks are permanent and irreversible (earned once, never revoked)
-- Progression is evidence-based, not XP-based — quality and consistency over volume
-- No monetisation should affect rank or provide learning advantages
-- The free tier must be genuinely useful — core tools are always free
+- ShiftGlitch is a structured, cyberpunk-themed study-methods OS
+- One authoritative progression spine: 5-rank system (NPC → Script Kiddie → Glitch Tech → Netrunner → System Admin)
+- Ranks are earned by behaviour, not time or purchases
+- Zero school/exam/teacher/homework language anywhere
+- The free tier must be genuinely useful — core tools always free
+- Monetisation never affects rank or provides learning advantages
 
 ---
 
@@ -26,135 +31,173 @@ Preferred communication style: Simple, everyday language.
 
 ### Frontend Architecture
 
-The application is a single-page application (SPA) utilising client-side routing, contained entirely in `index.html` (~2,800 lines). Visual identity: AMOLED black background, neon green, corrupted magenta, and cyber purple accents. Typography: VT323/Share Tech Mono for headers, Space Grotesk for body text.
+Single-page application (SPA) contained in `index.html` (~7,200 lines). Client-side routing. AMOLED black background (#000), neon green (#39FF14), magenta (#FF00FF), purple (#8A2BE2), orange (#FF8800). VT323/Share Tech Mono for headers, Space Grotesk for body text.
 
-- **Styling:** Tailwind CSS loaded via CDN, with `darkMode: 'class'` configured. Dark mode is the default on first load.
-- **Charts:** Chart.js via CDN — scatter (focus sessions), doughnut (technique distribution), bar (weekly activity).
-- **Firebase:** Firebase v11.6.1 SDK loaded via CDN. Initialised only when `config.js` contains real credentials — silently falls back to offline mode if credentials are placeholders.
-- **No build system:** No Webpack, Vite, TypeScript, or bundler.
+- **Styling:** Tailwind CSS via CDN (`darkMode: 'class'`). Dark mode always-on.
+- **Charts:** Chart.js via CDN.
+- **No Firebase.** No Gemini. No build system. No Webpack/Vite/TypeScript.
 
 ### Backend Architecture
 
-An Express.js v5 server (`server.js`) manages:
-- Static file serving for all HTML, JS, CSS, and asset files
-- Authentication via Replit Auth (OpenID Connect) via `auth.js`
-- Server-side session management via `express-session` + `connect-pg-simple`
-- Gemini API proxy for server-side key fallback
-- REST API endpoints: leaderboard, squad, waitlist, stats, payments
-- Security: `helmet` middleware (security headers), `express-rate-limit` (API protection)
+Express.js v5 server (`server.js`):
+- Static file serving
+- Replit Auth (OpenID Connect) via `auth.js`
+- Session management via `express-session` + `connect-pg-simple`
+- REST API: leaderboard, squad, waitlist, stats, PayFast ITN, escape runs
+- Security: `helmet` middleware, `express-rate-limit`
 
 **Authentication (`auth.js`):**
-- Replit Auth (OpenID Connect) implemented using `openid-client` v6
-- Sessions stored in PostgreSQL via `connect-pg-simple`
-- User data (id, email, names, profile image, timestamps) is `upserted` into a `users` table upon successful login
+- Replit Auth (OIDC) via `openid-client` v6
+- Sessions in PostgreSQL via `connect-pg-simple`
+- User data upserted into `users` table on login
 
 **Data Storage:**
-- Primary: `localStorage` for offline access, using the `sg_` prefix for all keys
-- A one-time migration routine runs on load to convert any data under the old `synapse_` prefix
-- Optional: Firebase Firestore (Cornell Notes and task checkboxes)
-- Server-side: PostgreSQL (users, sessions, leaderboard, squads, waitlist, payment records)
+- Primary: `localStorage` for all study data (offline-first), `sg_` key prefix
+- Server-side: PostgreSQL (users, sessions, leaderboard, squads, escape_runs)
 
 ---
 
 ## Key Features
 
-### Core Study Tools (Free)
-- **AI Study Planning (Mission Architect):** Gemini API-powered study plan generation. BYOK model for user-provided API keys stored client-side; server proxy fallback uses `GEMINI_API_KEY`.
-- **Learning Governor (Pomodoro):** 25-minute timer with subject tagging, phone-lock nudge, governor blocking after 4 consecutive same-task sessions, "What I Learned?" modal on completion.
-- **Flashcard Decks (Data Shards):** CRUD functionality with Leitner 5-box spaced repetition system. Visual orbit stability indicators. "Not Yet 🛡️" growth mindset button.
-- **Blurting Method (BrainDump):** 4-phase active recall technique with session persistence.
-- **Babel Fish Metaphor Lab (Feynman):** Plain-language explanation tool with optional doodle.
-- **Eisenhower Matrix:** Interactive task prioritisation with reflection prompts.
-- **Dopamine Recalibrator:** Anti-procrastination tools — Stealth Mode and Entry Rocket.
-- **YET Growth Shield:** Growth mindset reframing — "I don't know X yet."
-- **MCQ Diagnostics (Nav Check / Exploit Missions):** 100 questions across 5 missions covering learning science.
-- **Cornell Notes:** Auto-saved, optional Firebase-synced notes panel on the dashboard.
-- **Quiz Arena:** Open Trivia Database-powered trivia game (isolated from rank system).
-- **Exam Countdown Widget:** Dashboard sidebar showing days until exams; red at ≤ 7 days.
-- **Study Buddy System:** Base64-encoded rank+stats code for friend comparison.
-- **Shareable Progress Report:** URL with encoded stats for parents/teachers.
-- **Teacher Dashboard:** `/teacher` — class-wide data import, rank distribution, individual profiles, printable reports.
-- **Stats & Charts:** Scatter, doughnut, and bar charts; WIL log; data management.
+### The 5-Rank Progression System
 
-### Pro Features (Replit Auth Required)
-- **Leaderboard:** Global Focus Score rankings backed by PostgreSQL. Formula: (Pomodoros × 10) + (Streak × 25) + (Cards Mastered × 2) + (Blurts × 15). Top 50 shown; caller's row highlighted.
-- **Squad Mode:** Async co-op groups of up to 4 users with 6-char invite code. Squad streak = minimum individual streak. AFK roast after 24+ hours inactivity.
+| Rank | Icon | Meaning |
+|------|------|---------|
+| NPC | ◈ | Starting rank — the system controls you |
+| Script Kiddie | ◉ | You've learned some tricks |
+| Glitch Tech | ⬡ | You understand how the system works |
+| Netrunner | ◬ | Deep inside the system |
+| System Admin | ✦ | You own the Mainframe |
 
-### Rank System
-Three ranks: Space Cadet → Second Officer → Flight Commander.
+**Rank Requirements:**
 
-| Evidence | Second Officer | Flight Commander |
-|----------|--------------|----------------|
-| Pomodoros | 15 | 50 |
-| Blurts | 10 | 30 |
-| Governor Breakdowns | 10 | 30 |
-| Cards Advanced | 50 | 150 |
-| Active Days | 7 | 21 |
-| Diagnostics | 2 | 5 |
+| Evidence | Script Kiddie | Glitch Tech | Netrunner | System Admin |
+|----------|--------------|-------------|-----------|--------------|
+| Pomodoros | 15 | 40 | 80 | 150 |
+| Blurts | 10 | 25 | 50 | 100 |
+| Governor Breakdowns | 10 | 20 | 40 | 75 |
+| Cards Advanced | 50 | 120 | 250 | 500 |
+| Active Days | 7 | 20 | 40 | 75 |
+| Diagnostics | 2 | 5 | 10 | 20 |
+
+Promotion is evidence-based. `checkPromotion()` runs after every activity. `rollbackPenalty > 0` blocks promotion. Consistency Ladder bonus reduces thresholds by 10% (cleared after rank-up).
 
 ---
 
-## Key Design Decisions
+### Core Study Tools (All Free)
 
-- **CDN-based Dependencies:** No build system; frontend libraries are loaded via CDNs.
-- **Firebase as Optional:** Core functionality relies on `localStorage`, with Firebase as an optional cloud sync layer.
-- **Monolithic HTML:** All frontend code resides in `index.html`. Intentional trade-off for deployment simplicity.
-- **BYOK (Bring Your Own Key):** Users manage their own Gemini API keys, stored locally and used for direct browser-to-Google API calls when present.
-- **Evidence-based Progression:** Rank advancement is based on quality learning behaviours.
-- **Quiz Isolation:** The Quiz Arena is standalone and does not affect rank.
-- **Security:** `esc()` utility for XSS protection in all user-rendered content. `helmet` for security headers. `express-rate-limit` for API protection.
+- **Learning Governor (Pomodoro):** 25-min focus timer, knowledge domain tagging, governor blocking after 4 consecutive same-domain sessions, "What I Learned?" modal on completion. Sessions counted as `pomodorosCompleted` rank evidence.
+- **Flashcard Decks (Data Shards):** Leitner 5-box spaced repetition. `cardsAdvanced` rank evidence on box promotion. Not-Yet button with YET Growth Shield reframe.
+- **Blurting Method (BrainDump):** 4-phase active recall. Each completed session = `blurtsCompleted` evidence.
+- **MCQ Diagnostics (Boss Fights):** 100 questions / 5 missions covering learning science. Each submission = `diagnosticsCompleted` evidence.
+- **Babel Fish Metaphor Lab:** Feynman technique — plain-language explanation + optional doodle.
+- **Eisenhower Matrix:** Task prioritisation with reflection prompts.
+- **Dopamine Recalibrator:** Stealth Mode + Entry Rocket anti-procrastination tools.
+- **YET Growth Shield:** Growth mindset reframing log.
+- **Stats & Charts:** Scatter, doughnut, bar charts; WIL log; data export/import/teacher-export.
+
+### Leaderboard & Squad (Login Required)
+
+- **Leaderboard:** Global Focus Score rankings in PostgreSQL. Formula: `(Pomodoros × 10) + (Streak × 25) + (Cards × 2) + (Blurts × 15)`. Top 50 shown.
+- **Squad Mode:** Async co-op groups up to 4. 6-char invite codes. Squad streak = minimum member streak.
 
 ---
 
-## External Dependencies
+### System Interrupt Engine (Phase 15 — Complete)
 
-### NPM Packages
+Full-screen overlay event system. Nine interrupt types:
 
-| Package | Version | Purpose |
-|---------|---------|---------|
-| `express` | v5.2.1 | HTTP server framework |
-| `openid-client` | v6 | OIDC auth with Replit |
-| `express-session` | v1.19 | Server-side session management |
-| `connect-pg-simple` | latest | PostgreSQL session store |
-| `memoizee` | latest | OIDC config discovery caching |
-| `passport` | latest | Installed; auth uses openid-client directly |
-| `passport-openidconnect` | latest | Installed; auth uses openid-client directly |
-| `pg` | latest | Raw PostgreSQL queries |
-| `helmet` | latest | Security headers |
-| `express-rate-limit` | latest | API rate limiting |
+| Type | Colour | Trigger |
+|------|--------|---------|
+| `threat` | Red | Deck not reviewed 72h+ |
+| `coherence-failure` | Red | 3+ days inactivity |
+| `challenge` | Amber | Scheduled challenges |
+| `achievement` | Green | Badge/milestone |
+| `recall-sprint` | Orange | Timed recall challenge (60s) |
+| `pattern-lock` | Orange | Sequence memory challenge |
+| `domain-clearance` | Green | Escape Run completed |
+| `rank-promotion` | Magenta | Rank-up |
+| `warden` | Mode-coloured | Warden character message |
+| `warden-trap` | Magenta | Disguised shortcut trap |
+| `warden-clearance-strip` | Red | 10-day inactivity penalty |
 
-### CDN Dependencies (Frontend)
+`SysInterrupt` object with `show(type, payload)`, `dismiss(id)`, `_buildHTML()`, `_checkScheduler()`.
 
-- Tailwind CSS
-- Chart.js
-- Firebase v11.6.1 (App, Auth, Firestore)
+Badge engine: 30+ achievement badges tracked in server `user_badges` table.
 
-### External Services
+---
 
-| Service | Purpose |
-|---------|---------|
-| Google Gemini API (gemini-2.0-flash) | AI study plan generation |
-| Open Trivia Database | Quiz Arena questions (free, no key) |
-| Google Fonts | Typography (Inter, Lora) |
-| Firebase Firestore | Optional cross-device sync |
-| Replit Auth (OIDC) | User authentication |
-| PayFast | ZAR payment processing |
-| PayPal | International payment processing |
-| Resend | Transactional email (waitlist welcome) |
+### Repeatable Escape Run System (Phase 16 — Complete)
+
+Named knowledge domain runs stored server-side in `escape_runs` table (`cem_modules_used` JSONB).
+
+Each run has 6 ordered exploits:
+1. Focus session (Learning Governor)
+2. Flashcard deck link
+3. Neural map (BrainDump nodes)
+4. Boss Fight (MCQ)
+5. Speed Run exploit
+6. After-Action debrief
+
+Runs can be reset and repeated. `escapeRunEngine` manages CRUD via `/api/escape-runs`. Memory Wipe snake runs after `escapeRunEngine.load()` fires (not at boot).
+
+---
+
+### 10 Cognitive Exploit Modules — CEM (Phase 17 — Complete)
+
+Rank-gated modules in `index.html`. Checked via `_cemRankIdx()` and `_cemLocked(minRankIdx)`.
+
+| Module | Rank Gate | localStorage Key |
+|--------|-----------|-----------------|
+| Memory Palace | NPC+ (free) | `sg_memory_palace` |
+| Mind Map Protocol | NPC+ (free) | `sg_mindmap` |
+| Chunking Engine | NPC+ (free) | `sg_chunking` |
+| Speed Run | NPC+ (free) | `sg_speed_run` |
+| Mistake Vault | Script Kiddie+ | `sg_mistake_vault` |
+| Teach It | Script Kiddie+ | `sg_teach_it` |
+| Dual Coding Station | Script Kiddie+ | `sg_dual_coding` |
+| The Interleave | Glitch Tech+ | `sg_interleave` |
+| Concept Mapper | Glitch Tech+ | `sg_concept_mapper` |
+| Shadow Protocol | Glitch Tech+ | `sg_shadow_protocol` |
+
+Warden Trap also locks a single randomly-selected module for 2 hours (checked via `_cemTrapLocked(moduleKey)` per module).
+
+---
+
+### The Warden + Snakes & Ladders (Phase 18 — Complete)
+
+**The Warden** is a character that appears as a System Interrupt. Three modes: `observer`, `guide`, `adversary`. Mode selected by `_getWardenMode()` using pre-login last-active date snapshot (`_preLoginLastActive`).
+
+47 Warden messages (27 observer / 10 guide / 7 adversary / 3 trap).
+
+**Snakes (setbacks):**
+- **Memory Wipe:** 5+ day inactive domain → corrupt one completed exploit. Runs after `escapeRunEngine.load()`. Delta: 0 (run step reset only, no clearance score penalty).
+- **Clearance Strip:** 10+ day inactivity (using pre-login `_preLoginLastActive` date) → `rollbackPenalty++`, blocks promotion. Delta: -2.
+- **Warden's Trap:** Disguised shortcut offer. If accepted: randomly locks one CEM module for 2 hours. Stored as `{moduleId, lockUntil}` JSON in `sg_warden_trap_lock`. Delta: -1.
+
+**Ladders (bonuses):**
+- **Performance Shortcut:** BrainDump 200+ words + Boss Fight 90%+ + Speed Run 5/5 → immediate clearance event. Delta: +3.
+- **Consistency Ladder:** 7-day streak → `sg_consistency_bonus_active` flag → 10% threshold reduction in `checkPromotion()` and `getProgress()`. Cleared after rank-up.
+- **Hidden Access Node:** 1-in-20 sessions → clickable 6px magenta DOM dot injected after 60-180s delay. Delta: +2.
+
+**Operative Status Board** on Rank page: Clearance Score (computed), Net Warden Delta, Rank Tier. Warden Transmission Log (latest first). All clearance events in `sg_clearance_events`.
+
+**Warden Trap session cadence:** `sg_app_sessions` counter increments per login. Trap fires every 5-7 real app sessions (not pomodoro count).
 
 ---
 
 ## Payment Model
 
-Three one-time purchase packs (no subscriptions, no auto-renewal) via PayFast (ZAR):
+PayFast only (ZAR). One-time purchase packs — no auto-renewal.
 
 | Pack | Price | Duration |
 |------|-------|---------|
-| 1 Month | R99 | 30 days Pro |
-| 3 Months | R249 | 90 days Pro |
-| 12 Months | R799 | 365 days Pro |
+| 1 Month Pro | R99 | 30 days |
+| 3 Month Pro | R249 | 90 days |
+| 12 Month Pro | R799 | 365 days |
+| School License | R499/yr | Institution |
 
-PayFast "Pay Now" forms post directly to `https://payment.payfast.io/eng/process`. The logged-in user's ID is injected into `custom_str1` by client-side JS before submission. The ITN handler at `/api/payfast-itn` reads `custom_str1` to identify which user to upgrade and sets `pro_expires_at` in the DB.
+PayFast ITN handler at `/api/payfast-itn`. Reads `custom_str1` for user ID, sets `pro_expires_at` in DB.
 
 ---
 
@@ -162,13 +205,15 @@ PayFast "Pay Now" forms post directly to `https://payment.payfast.io/eng/process
 
 | Table | Purpose |
 |-------|---------|
-| `users` | User profile, gamertag, and `pro_expires_at` |
-| `sessions` | Express session storage (managed by `connect-pg-simple`) |
-| `leaderboard` | Focus Score rankings per user |
-| `squads` | Squad records with invite codes and streak |
-| `squad_members` | Squad membership and last ping timestamps |
-| `waitlist` | Email and gamertag for pre-launch signups |
-| `page_views` | Page view counts for analytics |
+| `users` | User profile, gamertag, `pro_expires_at` |
+| `sessions` | Express session storage |
+| `leaderboard` | Focus Score per user |
+| `squads` | Squad records + invite codes + streak |
+| `squad_members` | Membership + last ping timestamps |
+| `waitlist` | Email + gamertag for pre-launch signups |
+| `page_views` | Analytics |
+| `user_badges` | Earned achievement badges |
+| `escape_runs` | Named domain runs with exploit progress + `cem_modules_used` JSONB |
 
 ---
 
@@ -176,38 +221,103 @@ PayFast "Pay Now" forms post directly to `https://payment.payfast.io/eng/process
 
 | Variable | Required | Description |
 |---|---|---|
-| `DATABASE_URL` | Yes | PostgreSQL connection string (auto-set by Replit Database integration) |
-| `SESSION_SECRET` | Yes | Secret for signing session cookies |
-| `REPL_ID` | Yes (auto) | Replit environment ID — used for OIDC configuration |
-| `ISSUER_URL` | Yes (auto) | Replit OIDC issuer URL |
-| `REPLIT_DOMAINS` | Yes (auto) | Allowed domains for redirect URI |
-| `RESEND_API_KEY` | No | Resend API key for welcome emails |
-| `RESEND_FROM_ADDRESS` | No | Sender address, e.g. `ShiftGlitch <admin@shiftglitch.com>` |
-| `GEMINI_API_KEY` | No | Server-side Gemini API key (users can also BYOK) |
-| `PAYFAST_MERCHANT_ID` | Payments | From PayFast merchant dashboard |
-| `PAYFAST_MERCHANT_KEY` | Payments | From PayFast merchant dashboard |
-| `PAYFAST_PASSPHRASE` | Payments | PayFast Salt Passphrase from Account Info tab |
-| `PAYFAST_SANDBOX` | No | Set `true` to point ITN validation at sandbox.payfast.co.za |
-| `PORT` | No | Server port (default: 5000) |
+| `DATABASE_URL` | Yes | PostgreSQL connection (auto-set by Replit) |
+| `SESSION_SECRET` | Yes | Session cookie signing |
+| `REPL_ID` | Yes (auto) | Replit env ID for OIDC |
+| `ISSUER_URL` | Yes (auto) | Replit OIDC issuer |
+| `REPLIT_DOMAINS` | Yes (auto) | Allowed redirect domains |
+| `RESEND_API_KEY` | No | Resend transactional email |
+| `RESEND_SG_KEY` | No | Secondary Resend key |
+| `PAYFAST_MERCHANT_ID` | Payments | PayFast dashboard |
+| `PAYFAST_MERCHANT_KEY` | Payments | PayFast dashboard |
+| `PAYFAST_PASSPHRASE` | Payments | PayFast salt passphrase |
+| `PORT` | No | Server port (default 5000) |
 
 ---
 
-## Payment Webhook Setup
+## localStorage Keys Reference
 
-**PayFast ITN:** `https://shiftglitch.replit.app/api/payfast-itn`
-- Validates with PayFast's `/eng/query/validate` endpoint
-- Reads `custom_str1` for user ID, matches amount to pack, sets `pro_expires_at`
+### Rank & Progression
+| Key | Purpose |
+|-----|---------|
+| `sg_rank` | Rank + all evidence counters + `activeDateLog` |
+| `sg_clearance_events` | All Warden clearance events (snakes/ladders) |
+| `sg_warden_log` | Warden transmission log (30 entries max) |
+| `sg_warden_trap_lock` | `{moduleId, lockUntil}` JSON — active trap state |
+| `sg_warden_trap_shown` | Timestamp of last trap display |
+| `sg_warden_trap_session` | App session count when trap was last scheduled |
+| `sg_warden_session` | sessionStorage: Warden shown this session? |
+| `sg_app_sessions` | Total login/open count (for trap cadence) |
+| `sg_hidden_node_session` | sessionStorage: hidden node state |
+| `sg_clearance_strip_last` | Timestamp of last Clearance Strip |
+| `sg_memory_wipe_alerted` | Set of run IDs already wiped |
+| `sg_consistency_ladder_at` | Streak value when bonus was granted |
+| `sg_consistency_bonus_active` | Active flag for 10% threshold reduction |
+| `sg_perf_shortcut_at` | Timestamp of last Performance Shortcut |
+
+### Study Tools
+| Key | Purpose | Exported |
+|-----|---------|---------|
+| `sg_decks` | Flashcard deck metadata | Yes |
+| `sg_cards` | Card content + Leitner positions | Yes |
+| `sg_pomodoro_log` | Focus session log | Yes |
+| `sg_blurt` | BrainDump session records | Yes |
+| `sg_eisenhower` | Eisenhower tasks + reflections | Yes |
+| `sg_recal` | Dopamine Recalibrator counts | Yes |
+| `sg_babel` | Babel Fish Feynman exercises | Yes |
+| `sg_yet` | YET Growth Shield log | Yes |
+| `sg_mcq` | MCQ attempts, scores, gaps | Yes |
+| `sg_exams` | Exam countdown entries | Yes |
+| `sg_wil` | "What I Learned?" entries | Yes |
+| `sg_theme` | Dark/light preference | Yes |
+| `sg_burned` | Burned card count | Yes |
+
+### CEM Modules
+| Key | Module |
+|-----|--------|
+| `sg_memory_palace` | Memory Palace |
+| `sg_mindmap` | Mind Map Protocol |
+| `sg_chunking` | Chunking Engine |
+| `sg_speed_run` | Speed Run |
+| `sg_mistake_vault` | Mistake Vault |
+| `sg_teach_it` | Teach It |
+| `sg_dual_coding` | Dual Coding Station |
+| `sg_interleave` | The Interleave |
+| `sg_concept_mapper` | Concept Mapper |
+| `sg_shadow_protocol` | Shadow Protocol |
 
 ---
 
-## How to Start the Project
+## External Dependencies
 
-```bash
-npm install
-node server.js
-```
+### NPM Packages
 
-The server starts on port 5000. In Replit, use the "Start application" workflow which runs `node server.js`.
+| Package | Purpose |
+|---------|---------|
+| `express` v5.2.1 | HTTP server |
+| `openid-client` v6 | Replit OIDC auth |
+| `express-session` | Session management |
+| `connect-pg-simple` | PostgreSQL session store |
+| `memoizee` | OIDC config caching |
+| `pg` | PostgreSQL queries |
+| `helmet` | Security headers |
+| `express-rate-limit` | API rate limiting |
+| `resend` | Transactional email |
+
+### CDN Dependencies (Frontend)
+- Tailwind CSS
+- Chart.js
+- Google Fonts (VT323, Share Tech Mono, Space Grotesk)
+
+### External Services
+
+| Service | Purpose |
+|---------|---------|
+| Replit Auth (OIDC) | User authentication |
+| PostgreSQL | Server-side data storage |
+| PayFast | ZAR payment processing |
+| Resend | Transactional email |
+| Open Trivia Database | (Legacy — Quiz Arena removed) |
 
 ---
 
@@ -215,42 +325,31 @@ The server starts on port 5000. In Replit, use the "Start application" workflow 
 
 | Integration | Purpose | Status |
 |-------------|---------|--------|
-| Replit Auth (javascript_log_in_with_replit) | User authentication via OpenID Connect | Installed and active |
-| PostgreSQL (javascript_database) | Database for users, sessions, leaderboard, squads, payments | Installed and active |
-| Firebase Firestore | Optional cross-device sync for Cornell Notes | Configured via `config.js` (optional) |
-| Resend | Transactional email | Active when `RESEND_API_KEY` is set |
-| PayFast | ZAR payment processing | Active when merchant credentials are set |
+| Replit Auth (`javascript_log_in_with_replit`) | OIDC authentication | Installed and active |
+| PostgreSQL (`javascript_database`) | Users, sessions, leaderboard, squads, escape runs, badges | Installed and active |
+| Resend | Welcome + onboarding email | Active when `RESEND_API_KEY` set |
+| PayFast | ZAR payment processing | Active when merchant credentials set |
 
 ---
 
-## localStorage Keys Reference
+## How to Start
 
-| Key | Owner | Purpose | Exported? |
-|-----|-------|---------|-----------|
-| `sg_decks` | Flashcard Decks | Deck metadata | Yes |
-| `sg_cards` | Flashcard Decks | Card content + Leitner positions | Yes |
-| `sg_pomodoro_log` | Learning Governor | Session log | Yes |
-| `sg_blurt` | Blurting Method | Session records | Yes |
-| `synapse_todos` | Dashboard | Mission task checklist | Yes |
-| `sg_eisenhower` | Eisenhower Matrix | Tasks + reflections | Yes |
-| `sg_recal` | Dopamine Recalibrator | Session counts | Yes |
-| `sg_babel` | Babel Fish | Feynman exercises | Yes |
-| `sg_yet` | YET Growth Shield | Growth moments log | Yes |
-| `sg_rank` | Rank System | Rank + all evidence counters | Yes |
-| `sg_mcq` | MCQ Diagnostics | Attempts, scores, gaps | Yes |
-| `sg_exams` | Exam Countdown | Upcoming exam entries | Yes |
-| `sg_wil` | Learning Governor | "What I Learned?" entries | Yes |
-| `sg_theme` | App-wide | Dark/light preference | Yes |
-| `sg_gemini_key` | Settings | User's Gemini API key | **No** |
-| `cornellNotes` | Dashboard | Cornell Notes HTML (legacy key) | Yes |
+```bash
+npm install
+node server.js
+```
+
+Server starts on port 5000. Workflow: `Start application` → `node server.js`.
 
 ---
 
-## Planned Future Development
+## Key Architectural Notes
 
-Four major development phases are planned. Full specifications are in `.local/tasks/`:
-
-1. **SYSTEM INTERRUPT Engine** (`gamification-engine.md`) — Dramatic overlay event system, achievement badges, Warden interrupt channel, Recall Sprint and Pattern Lock challenge interrupts.
-2. **Repeatable Escape Run System** (`repeatable-escape-plan.md`) — Named knowledge domain runs with 6 ordered exploits, Domain Clearance badges, reset-and-repeat mechanic, Snakes and Ladders shortcut/rollback system.
-3. **10 New Cognitive Exploit Modules** (`new-study-modules.md`) — Memory Palace, Mind Map Protocol, Chunking Engine, Speed Run, Mistake Vault, Teach It, Dual Coding Station, The Interleave, Concept Mapper, Shadow Protocol.
-4. **The Warden + Non-Linear Progression** (`warden-and-progression.md`) — Warden character with 40+ message library, Snakes (Memory Wipe, Clearance Strip, Warden's Trap), Ladders (Performance Shortcut, Consistency Ladder, Hidden Access Nodes), Operative Status Board.
+- **Monolithic HTML:** All frontend in `index.html`. Intentional — no build step.
+- **Offline-first:** All study data in `localStorage`. Server only for auth, leaderboard, squads, escape runs, payments.
+- **Pre-login snapshot:** `_preLoginLastActive` captured before `rankEngine.trackActiveDay()` — used by Warden inactivity checks so today's login doesn't mask absence.
+- **App session counter:** `sg_app_sessions` increments on every login — used for Warden Trap cadence (every 5-7 sessions).
+- **Trap lock format:** `sg_warden_trap_lock` stores `{moduleId, lockUntil}` JSON, not a bare timestamp. `isTrapLocked(moduleId)` checks module-specific lock.
+- **Memory Wipe timing:** Runs after `escapeRunEngine.load()` resolves, not at boot (runs would be empty at boot).
+- **Consistency bonus:** Cleared in `checkPromotion()` when rank-up occurs; must re-earn with another 7-day streak.
+- **`esc()` utility:** Used everywhere for XSS protection on user-rendered content.
