@@ -3106,7 +3106,10 @@
                                         <h3 class="text-2xl font-serif font-bold text-stone-900 dark:text-stone-50">Mission Notes</h3>
                                         <span id="save-status" class="text-[10px] uppercase font-bold tracking-widest text-stone-400">Synced</span>
                                     </div>
-                                    <button onclick="app.saveUserData()" class="bg-orange-600 hover:bg-orange-500 text-white px-6 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-all">Save Notes</button>
+                                    <div style="display:flex;gap:0.5rem;align-items:center;">
+                                        <button onclick="app.saveUserData()" class="bg-orange-600 hover:bg-orange-500 text-white px-6 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-all">Save Notes</button>
+                                        ${RANKS.indexOf(state.rank) >= 2 ? `<button onclick="app.navTo('shadow-protocol')" style="background:#000;border:1px solid #FF00FF;color:#FF00FF;padding:0.4rem 1rem;border-radius:0.75rem;font-size:0.65rem;font-family:'Share Tech Mono',monospace;letter-spacing:0.12em;cursor:pointer;text-transform:uppercase;">⬡ SHADOW RUN</button>` : ''}
+                                    </div>
                                 </div>
                                 <div class="cornell-notes dark:text-stone-100 flex-grow" contenteditable="true" id="notes-editable" onblur="app.saveUserData()">${savedNotes || 'Start taking notes here...'}</div>
                             </div>
@@ -4849,10 +4852,10 @@
             /* ====================================================
                COGNITIVE EXPLOIT MODULES — 10 New Protocols
                ====================================================
-               Unlock gating:
-               NPC+: speed-run, mistake-vault, teach-it, concept-mapper (1-4)
-               Script Kiddie+: chunking, interleave, memory-palace (5-7)
-               Glitch Tech+: mindmap, dual-coding, shadow-protocol (8-10)
+               Unlock gating (matches spec):
+               NPC+    (rank 0+): memory-palace, mindmap, chunking, speed-run (1-4)
+               SK+     (rank 1+): mistake-vault, teach-it, dual-coding (5-7)
+               GT+     (rank 2+): interleave, concept-mapper, shadow-protocol (8-10)
             ==================================================== */
 
             _cemRankIdx() {
@@ -5126,8 +5129,23 @@
                 sessions.push({ id: Date.now().toString(36), concept: concept.trim(), explain: explain.trim(), gap: gap.trim(), date: new Date().toISOString() });
                 localStorage.setItem('sg_teach_it', JSON.stringify(sessions));
                 app.cemTrackModuleUse('teach-it');
+                // Wire to Escape Run exploit_6 (DEBRIEF TRANSMISSION) if explanation is 50+ words
+                const wordCount = explain.trim().split(/\s+/).filter(Boolean).length;
+                if (wordCount >= 50 && typeof escapeRunEngine !== 'undefined') {
+                    const eligible6 = escapeRunEngine._pickRunForExploit('exploit_6', 'exploit_5');
+                    if (eligible6) {
+                        const debriefText = concept.trim() + '\n\n' + explain.trim() + (gap.trim() ? '\n\nGap identified: ' + gap.trim() : '');
+                        const patch6 = { debrief_text: debriefText, exploit_6: true };
+                        if (escapeRunEngine._isCorrupted(eligible6, 'exploit_6')) patch6.rollback_flags = escapeRunEngine._clearRollbackFlag(eligible6, 'exploit_6');
+                        escapeRunEngine.updateRun(eligible6.id, patch6);
+                        app.showNotification('Feynman session encoded. Debrief Transmission exploit completed for active Escape Run.');
+                    } else {
+                        app.showNotification('Feynman session encoded.');
+                    }
+                } else {
+                    app.showNotification('Feynman session encoded.');
+                }
                 state.teachItPhase='list'; state.teachItStep=0;
-                app.showNotification('Feynman session encoded.');
                 app.render();
             },
             teachItDelete(id) {
@@ -5693,16 +5711,33 @@
                 if (!root.trim()) { app.showNotification('Enter the root concept.'); return; }
                 const maps = JSON.parse(localStorage.getItem('sg_mindmap')||'[]');
                 const editId = state.mmEditId;
+                const branches = state.mmTree.branches || [];
+                // Count total nodes: root + top-level branches + sub-branches
+                const nodeCount = 1 + branches.length + branches.reduce((s,b)=>s+(b.subs||[]).length,0);
                 if (editId) {
                     const idx = maps.findIndex(m=>m.id===editId);
-                    if (idx>=0) maps[idx] = { ...maps[idx], root, branches: state.mmTree.branches, date: new Date().toISOString() };
+                    if (idx>=0) maps[idx] = { ...maps[idx], root, branches, date: new Date().toISOString() };
                 } else {
-                    maps.push({ id: Date.now().toString(36), root, branches: state.mmTree.branches, date: new Date().toISOString() });
+                    maps.push({ id: Date.now().toString(36), root, branches, date: new Date().toISOString() });
                 }
                 localStorage.setItem('sg_mindmap', JSON.stringify(maps));
                 app.cemTrackModuleUse('mindmap');
+                // Wire to Escape Run exploit_5 (NEURAL MAPPING) if map has 5+ nodes
+                if (nodeCount >= 5 && typeof escapeRunEngine !== 'undefined') {
+                    const eligible = escapeRunEngine._pickRunForExploit('exploit_5', 'exploit_4');
+                    if (eligible) {
+                        const nodes = [root, ...branches.map(b=>b.label||b.name||''), ...branches.flatMap(b=>(b.subs||[]))].filter(Boolean);
+                        const patch = { nodes: nodes.slice(0,20), exploit_5: true };
+                        if (escapeRunEngine._isCorrupted(eligible, 'exploit_5')) patch.rollback_flags = escapeRunEngine._clearRollbackFlag(eligible, 'exploit_5');
+                        escapeRunEngine.updateRun(eligible.id, patch);
+                        app.showNotification('Mind map saved. Neural Map exploit completed for active Escape Run.');
+                    } else {
+                        app.showNotification('Mind map saved.');
+                    }
+                } else {
+                    app.showNotification('Mind map saved.');
+                }
                 state.mmPhase='list'; state.mmEditId=null;
-                app.showNotification('Mind map saved.');
                 app.render();
             },
             mmDelete(id) {
