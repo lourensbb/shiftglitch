@@ -1512,7 +1512,6 @@
             _runSnakesAndLadders() {
                 setTimeout(() => {
                     try {
-                        this._checkMemoryWipeSnake();
                         this._checkClearanceStripSnake();
                     } catch(e) { console.warn('[Warden] Snakes check error', e); }
                 }, 3000);
@@ -1729,13 +1728,13 @@
                 }
             },
             _scheduleWardenTrap() {
-                const totalSessions = (state.rankEvidence && state.rankEvidence.pomodorosCompleted) || 0;
-                const lastTrapSession = parseInt(localStorage.getItem('sg_warden_trap_session') || '0', 10);
-                const nextTrapAt = lastTrapSession + 5 + Math.floor(Math.random() * 3);
-                if (totalSessions < nextTrapAt) return;
+                const appSessions = parseInt(localStorage.getItem('sg_app_sessions') || '0', 10);
+                const lastTrapAt = parseInt(localStorage.getItem('sg_warden_trap_session') || '0', 10);
+                const nextTrapAt = lastTrapAt + 5 + Math.floor(Math.random() * 3);
+                if (appSessions < nextTrapAt) return;
                 const lastTrapTs = parseInt(localStorage.getItem('sg_warden_trap_shown') || '0', 10);
                 if (Date.now() - lastTrapTs < 24 * 60 * 60 * 1000) return;
-                localStorage.setItem('sg_warden_trap_session', String(totalSessions));
+                localStorage.setItem('sg_warden_trap_session', String(appSessions));
                 localStorage.setItem('sg_warden_trap_shown', String(Date.now()));
                 const delay = (15 + Math.random() * 30) * 60 * 1000;
                 setTimeout(() => { if (!this._active) this.show('warden-trap', {}); }, delay);
@@ -2025,7 +2024,7 @@
                         '<div class="si-footer"><button onclick="SysInterrupt.dismiss(\''+id+'\')" style="background:'+color+';color:#fff;border:none;padding:10px 28px;font-family:inherit;font-size:11px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;font-weight:bold;border-radius:4px;">ACKNOWLEDGED</button></div>';
                 } else if (type === 'warden-trap') {
                     color='#FF00FF'; glow='rgba(255,0,255,0.35)';
-                    this._logWarden('Warden offered a clearance boost. (ADVERSARY TRAP)', 'Operative accepted — 2-hour module time lock applied.', 'adversary');
+                    this._logWarden('WARDEN DIRECT TRANSMISSION', 'Clearance boost offer transmitted to operative. Outcome pending.', 'adversary');
                     innerHTML = '<div class="si-header" style="border-color:'+color+'"><span style="color:'+color+';font-size:18px;">◈</span><span style="color:'+color+';font-size:13px;letter-spacing:2px;margin-left:8px;">WARDEN DIRECT TRANSMISSION</span></div>' +
                         '<div class="si-body"><p style="color:#fff;font-size:15px;line-height:1.8;margin-bottom:12px;">I have been watching your sessions. I can offer you a direct clearance boost — unlocking a restricted exploit pipeline for the next 2 hours.</p>' +
                         '<p style="color:#FF00FF;font-size:12px;letter-spacing:1px;margin-bottom:10px;">Accept this transmission and the boost will be injected immediately.</p>' +
@@ -2109,6 +2108,10 @@
                         this.runs = data.runs || [];
                         // Server-side rollback check for all active runs
                         await this._serverRollbackCheck();
+                        // Memory Wipe snake check runs here, after runs are populated
+                        if (typeof SysInterrupt !== 'undefined' && SysInterrupt._checkMemoryWipeSnake) {
+                            setTimeout(() => { try { SysInterrupt._checkMemoryWipeSnake(); } catch(e) {} }, 1500);
+                        }
                     }
                 } catch(e) { console.warn('[escapeRunEngine] load failed', e); }
                 this._loading = false;
@@ -2582,6 +2585,8 @@
                     return [...log].sort().reverse()[0];
                 })();
                 rankEngine.trackActiveDay(); rankEngine.updateNavRank();
+                const _appSessionCount = parseInt(localStorage.getItem('sg_app_sessions') || '0', 10) + 1;
+                localStorage.setItem('sg_app_sessions', String(_appSessionCount));
                 badgeEngine.load(); await badgeEngine.loadFromServer(); badgeEngine.checkOnLoad(); SysInterrupt.init(_preLoginLastActive);
 
                 const djTodoText = 'Complete the Diagnostics Journey';
