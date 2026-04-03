@@ -5127,6 +5127,10 @@
                 const explain = (document.getElementById('ti-explain')||{}).value || state['_ti_1'] || '';
                 const gap = (document.getElementById('ti-gap')||{}).value || state['_ti_2'] || '';
                 if (!concept.trim()||!explain.trim()) { app.showNotification('Concept and explanation are required.'); return; }
+                const bulletPattern = /^[\s]*[-*•]|\d+\.\s/m;
+                if (bulletPattern.test(explain)) {
+                    if (!confirm('Bullet points detected. The Feynman Protocol requires flowing prose — no lists. Remove bullets and resubmit?')) return;
+                }
                 const sessions = JSON.parse(localStorage.getItem('sg_teach_it')||'[]');
                 sessions.push({ id: Date.now().toString(36), concept: concept.trim(), explain: explain.trim(), gap: gap.trim(), date: new Date().toISOString() });
                 localStorage.setItem('sg_teach_it', JSON.stringify(sessions));
