@@ -1725,19 +1725,45 @@
                     if (res.ok) {
                         const data = await res.json();
                         this.runs = data.runs || [];
-                        this._checkDomainStaleness();
+                        // Server-side rollback check for all active runs
+                        await this._serverRollbackCheck();
                     }
                 } catch(e) { console.warn('[escapeRunEngine] load failed', e); }
                 this._loading = false;
                 escapeRunEngine._renderList();
             },
 
+            async _serverRollbackCheck() {
+                const activeRuns = this.runs.filter(r => !r.completed_at);
+                const rollbackEvents = [];
+                for (const run of activeRuns) {
+                    try {
+                        const res = await fetch('/api/escape-runs/' + run.id + '/check-rollback', {
+                            method: 'POST', credentials: 'same-origin'
+                        });
+                        if (res.ok) {
+                            const data = await res.json();
+                            if (data.rollbackApplied) {
+                                const idx = this.runs.findIndex(r => r.id === run.id);
+                                if (idx >= 0) this.runs[idx] = data.run;
+                                rollbackEvents.push({ domain: run.domain_name, exploit: ESCAPE_EXPLOITS[data.corruptedIdx]?.label || 'Unknown Exploit' });
+                            }
+                        }
+                    } catch(e) { /* ignore per-run check errors */ }
+                }
+                if (rollbackEvents.length > 0) {
+                    const ev = rollbackEvents[0];
+                    setTimeout(() => SysInterrupt.show('domain-rollback', { domain: ev.domain, exploit: ev.exploit }), 1500);
+                }
+            },
+
             async createRun(domainName) {
+                if (!domainName || !domainName.trim()) { app.showNotification('Enter a domain name to start a run.'); return null; }
                 try {
                     const res = await fetch('/api/escape-runs', {
                         method: 'POST', credentials: 'same-origin',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ domainName })
+                        body: JSON.stringify({ domainName: domainName.trim() })
                     });
                     if (!res.ok) throw new Error(await res.text());
                     const data = await res.json();
@@ -1767,6 +1793,7 @@
                 const run = this.runs.find(r => r.id === id);
                 if (!run) return;
                 const domain = run.domain_name;
+                const runNumber = run.run_number;
                 try {
                     const res = await fetch('/api/escape-runs/' + id + '/complete', {
                         method: 'POST', credentials: 'same-origin'
@@ -1777,10 +1804,11 @@
                         return;
                     }
                     const data = await res.json();
+                    // Update the run in our list — it now has completed_at set, stays as historical record
                     const idx = this.runs.findIndex(r => r.id === id);
                     if (idx >= 0) this.runs[idx] = data.run;
                     badgeEngine._tryUnlock('domain-clearance');
-                    setTimeout(() => SysInterrupt.show('domain-clearance', { domain, runNumber: data.run.run_number - 1 }), 600);
+                    setTimeout(() => SysInterrupt.show('domain-clearance', { domain, runNumber }), 600);
                     rankEngine.recordDiagnostic();
                     escapeRunEngine._renderList();
                 } catch(e) { app.showNotification('Complete failed: ' + e.message); }
@@ -1795,8 +1823,8 @@
                 } catch(e) {}
             },
 
-            getActiveRuns() { return this.runs.filter(r => !r.completed_at || r.run_number > 1 || this._allExploitsDone(r) === false).filter(r => !this._allExploitsDone(r)); },
-            getCompletedRuns() { return this.runs.filter(r => r.completed_at && !this._allExploitsDone(r) === false); },
+            getActiveRuns() { return this.runs.filter(r => !r.completed_at); },
+            getCompletedRuns() { return this.runs.filter(r => !!r.completed_at); },
             _allExploitsDone(r) { return r.exploit_1 && r.exploit_2 && r.exploit_3 && r.exploit_4 && r.exploit_5 && r.exploit_6; },
 
             _prevDone(run, exploitKey) {
@@ -1832,20 +1860,22 @@
             },
 
             onBlurtComplete(wordCount) {
-                const activeRuns = this.runs.filter(r => !this._allExploitsDone(r));
+                // Apply to all active runs that have exploit_1 done and exploit_2 not done
+                const activeRuns = this.runs.filter(r => !r.completed_at);
                 activeRuns.forEach(run => {
                     if (!run.exploit_1) return;
                     const status2 = this._getStatus(run, 'exploit_2');
                     if (status2 === 'done') return;
+                    const isShortcut = wordCount >= 200;
                     const patch = { exploit_2: true };
-                    if (this._isCorrupted(run, 'exploit_2')) {
-                        patch.rollback_flags = this._clearRollbackFlag(run, 'exploit_2');
-                    }
-                    if (wordCount >= 200) {
+                    if (this._isCorrupted(run, 'exploit_2')) patch.rollback_flags = this._clearRollbackFlag(run, 'exploit_2');
+                    if (isShortcut) {
                         patch.shortcut_flags = run.shortcut_flags | (1 << 1);
+                        patch.shortcut_bonus = (run.shortcut_bonus || 0) + 1;
                     }
                     this.updateRun(run.id, patch).then(updated => {
-                        if (updated && wordCount >= 200) {
+                        if (updated && isShortcut) {
+                            badgeEngine._tryUnlock('shortcut-signal');
                             setTimeout(() => SysInterrupt.show('shortcut-signal', { domain: run.domain_name, exploit: 'INTEGRITY CHECK' }), 800);
                         }
                     });
@@ -1855,23 +1885,23 @@
 
             onBossFightComplete(score, total) {
                 const pct = total > 0 ? Math.round(score / total * 100) : 0;
-                const activeRuns = this.runs.filter(r => !this._allExploitsDone(r));
+                const activeRuns = this.runs.filter(r => !r.completed_at);
                 activeRuns.forEach(run => {
                     if (!run.exploit_3) return;
                     const status4 = this._getStatus(run, 'exploit_4');
                     if (status4 === 'done') return;
+                    const isShortcut = pct >= 90;
                     const patch = { exploit_4: true };
-                    if (this._isCorrupted(run, 'exploit_4')) {
-                        patch.rollback_flags = this._clearRollbackFlag(run, 'exploit_4');
+                    if (this._isCorrupted(run, 'exploit_4')) patch.rollback_flags = this._clearRollbackFlag(run, 'exploit_4');
+                    if (isShortcut) {
+                        patch.shortcut_flags = run.shortcut_flags | (1 << 3);
+                        patch.shortcut_bonus = (run.shortcut_bonus || 0) + 1;
                     }
-                    if (pct >= 90) patch.shortcut_flags = run.shortcut_flags | (1 << 3);
                     this.updateRun(run.id, patch).then(updated => {
-                        if (updated && pct >= 90) {
+                        if (updated && isShortcut) {
+                            badgeEngine._tryUnlock('shortcut-signal');
                             setTimeout(() => SysInterrupt.show('shortcut-signal', { domain: run.domain_name, exploit: 'PATTERN RECOGNITION' }), 800);
-                            if ((state.rankEvidence.rollbackPenalty || 0) > 0) {
-                                state.rankEvidence.rollbackPenalty--;
-                                rankEngine.save();
-                            }
+                            if ((state.rankEvidence.rollbackPenalty || 0) > 0) { state.rankEvidence.rollbackPenalty--; rankEngine.save(); }
                         }
                     });
                     app.showNotification('PATTERN RECOGNITION marked complete on run: ' + run.domain_name);
@@ -1879,20 +1909,19 @@
             },
 
             onDeckStudyComplete(deckId) {
+                // Only apply to runs whose linked_deck_id matches this deck
                 const cards = (state.fcCards || []).filter(c => c.deckId === deckId);
                 if (cards.length < 10) return;
                 const box3Plus = cards.filter(c => (c.box || 1) >= 3).length;
                 const pct = Math.round(box3Plus / cards.length * 100);
                 if (pct < 80) return;
-                const activeRuns = this.runs.filter(r => !this._allExploitsDone(r));
+                const activeRuns = this.runs.filter(r => !r.completed_at && r.linked_deck_id === String(deckId));
                 activeRuns.forEach(run => {
                     if (!run.exploit_2) return;
                     const status3 = this._getStatus(run, 'exploit_3');
                     if (status3 === 'done') return;
                     const patch = { exploit_3: true };
-                    if (this._isCorrupted(run, 'exploit_3')) {
-                        patch.rollback_flags = this._clearRollbackFlag(run, 'exploit_3');
-                    }
+                    if (this._isCorrupted(run, 'exploit_3')) patch.rollback_flags = this._clearRollbackFlag(run, 'exploit_3');
                     this.updateRun(run.id, patch);
                     app.showNotification('SHARD REINFORCEMENT complete on run: ' + run.domain_name);
                 });
@@ -1910,11 +1939,24 @@
                     app.showNotification('You need a deck with 10+ Data Shards first. Go to Data Shards.');
                     return;
                 }
-                const patch = { exploit_1: true };
+                const selectedDeck = eligible[0];
+                const patch = { exploit_1: true, linked_deck_id: String(selectedDeck.id) };
                 const curRun = this.runs.find(r => r.id === runId);
                 if (curRun && this._isCorrupted(curRun, 'exploit_1')) {
                     patch.rollback_flags = this._clearRollbackFlag(curRun, 'exploit_1');
                 }
+                this.updateRun(runId, patch);
+            },
+
+            markExploit1WithDeck(runId, deckId) {
+                const run = this.runs.find(r => r.id === runId);
+                if (!run) return;
+                const deck = (state.fcDecks || []).find(d => d.id === deckId);
+                if (!deck) return;
+                const cards = (state.fcCards || []).filter(c => c.deckId === deckId);
+                if (cards.length < 10) { app.showNotification('This deck needs 10+ Data Shards.'); return; }
+                const patch = { exploit_1: true, linked_deck_id: String(deckId) };
+                if (run && this._isCorrupted(run, 'exploit_1')) patch.rollback_flags = this._clearRollbackFlag(run, 'exploit_1');
                 this.updateRun(runId, patch);
             },
 
@@ -1946,45 +1988,36 @@
                 this.updateRun(runId, patch6);
             },
 
-            _checkDomainStaleness() {
-                const now = Date.now();
-                const fiveDays = 5 * 24 * 3600 * 1000;
-                this.runs.forEach(run => {
-                    if (this._allExploitsDone(run)) return;
-                    const lastActivity = run.last_activity_at ? new Date(run.last_activity_at).getTime() : new Date(run.created_at).getTime();
-                    if ((now - lastActivity) > fiveDays) {
-                        const firstActive = ESCAPE_EXPLOITS.findIndex(e => run[e.key] && this._getStatus(run, e.key) !== 'corrupted');
-                        if (firstActive >= 0) {
-                            const exploitIdx = firstActive;
-                            const mask = 1 << exploitIdx;
-                            if (!(run.rollback_flags & mask)) {
-                                const newFlags = run.rollback_flags | mask;
-                                this.updateRun(run.id, { rollback_flags: newFlags, [ESCAPE_EXPLOITS[exploitIdx].key]: false });
-                                setTimeout(() => SysInterrupt.show('domain-rollback', { domain: run.domain_name, exploit: ESCAPE_EXPLOITS[exploitIdx].label }), 2000);
-                            }
-                        }
-                    }
-                });
-            },
 
             _renderList() {
                 const el = document.getElementById('er-run-list');
                 if (!el) return;
-                if (this._loading) { el.innerHTML = '<div class="text-[#FF8800]/50 text-sm font-mono text-center py-12 animate-pulse">[ LOADING DOSSIERS... ]</div>'; return; }
+                if (this._loading) { el.innerHTML = '<div style="color:#FF8800;opacity:0.4;font-size:13px;font-family:\'Share Tech Mono\',monospace;text-align:center;padding:48px 0;">[ LOADING DOSSIERS... ]</div>'; return; }
+                const active = this.getActiveRuns();
+                const completed = this.getCompletedRuns();
                 if (this.runs.length === 0) {
-                    el.innerHTML = '<div class="text-center py-16"><div style="color:#333;font-size:48px;margin-bottom:16px;">◈</div><div style="color:#444;font-size:12px;letter-spacing:3px;font-family:\'Share Tech Mono\',monospace;">NO ACTIVE ESCAPE RUNS</div><div style="color:#333;font-size:11px;margin-top:8px;">Start your first run to begin domain mastery.</div></div>';
+                    el.innerHTML = '<div style="text-align:center;padding:64px 0;"><div style="color:#333;font-size:48px;margin-bottom:16px;">◈</div><div style="color:#444;font-size:12px;letter-spacing:3px;font-family:\'Share Tech Mono\',monospace;">NO ACTIVE ESCAPE RUNS</div><div style="color:#333;font-size:11px;margin-top:8px;">Enter a domain name above and initiate your first run.</div></div>';
                     return;
                 }
-                el.innerHTML = this.runs.map(run => this._renderRunCard(run)).join('');
+                let html = '';
+                if (active.length > 0) {
+                    html += `<div style="font-family:'Share Tech Mono',monospace;color:#FF8800;font-size:10px;letter-spacing:3px;margin-bottom:12px;padding:6px 0;border-bottom:1px solid rgba(255,136,0,0.2);">// ACTIVE RUNS — ${active.length} IN PROGRESS</div>`;
+                    html += active.map(run => this._renderRunCard(run, false)).join('');
+                }
+                if (completed.length > 0) {
+                    html += `<div style="font-family:'Share Tech Mono',monospace;color:#39FF14;font-size:10px;letter-spacing:3px;margin:24px 0 12px;padding:6px 0;border-bottom:1px solid rgba(57,255,20,0.15);">// COMPLETED RUNS — ${completed.length} DOMAIN CLEARANCES</div>`;
+                    html += completed.map(run => this._renderRunCard(run, true)).join('');
+                }
+                el.innerHTML = html;
             },
 
-            _renderRunCard(run) {
+            _renderRunCard(run, isCompletedView) {
                 const allDone = this._allExploitsDone(run);
                 const completedCount = ESCAPE_EXPLOITS.filter(e => run[e.key]).length;
-                const isFullyComplete = allDone && run.completed_at;
+                const isFullyComplete = !!run.completed_at;
                 const runClass = isFullyComplete ? 'er-complete' : (run.rollback_flags ? 'er-corrupted' : '');
                 const color = isFullyComplete ? '#39FF14' : '#FF8800';
-                const archived = run.debrief_archived || [];
+                const shortcutBonus = run.shortcut_bonus || 0;
 
                 const progressDots = ESCAPE_EXPLOITS.map(e => {
                     const st = this._getStatus(run, e.key);
@@ -2009,8 +2042,17 @@
                     let inlineWidget = '';
                     if (e.key === 'exploit_1' && (status === 'active' || status === 'corrupted')) {
                         const eligible = (state.fcDecks || []).filter(d => ((state.fcCards || []).filter(c => c.deckId === d.id).length >= 10));
-                        if (eligible.length > 0) {
-                            inlineWidget = `<div style="margin-top:8px;"><button onclick="escapeRunEngine.markExploit1(${run.id})" style="background:#FF8800;color:#000;border:none;padding:6px 18px;font-family:inherit;font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-weight:bold;">LINK DECK (${eligible[0].title}) →</button></div>`;
+                        if (run.linked_deck_id) {
+                            const linkedDeck = (state.fcDecks || []).find(d => String(d.id) === String(run.linked_deck_id));
+                            inlineWidget = `<div style="margin-top:6px;color:#39FF14;font-size:11px;">✓ Linked: ${linkedDeck ? esc(linkedDeck.title) : 'Deck #' + run.linked_deck_id}</div>`;
+                        } else if (eligible.length > 1) {
+                            const opts = eligible.map(d => `<option value="${d.id}">${esc(d.title)} (${(state.fcCards||[]).filter(c=>c.deckId===d.id).length} cards)</option>`).join('');
+                            inlineWidget = `<div style="margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                                <select id="er-deck-select-${run.id}" style="background:#0a0a0a;border:1px solid #333;color:#FF8800;padding:4px 8px;font-family:inherit;font-size:11px;">${opts}</select>
+                                <button onclick="escapeRunEngine.markExploit1WithDeck(${run.id},document.getElementById('er-deck-select-${run.id}').value)" style="background:#FF8800;color:#000;border:none;padding:6px 14px;font-family:inherit;font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-weight:bold;">LINK DECK →</button>
+                            </div>`;
+                        } else if (eligible.length === 1) {
+                            inlineWidget = `<div style="margin-top:8px;"><button onclick="escapeRunEngine.markExploit1(${run.id})" style="background:#FF8800;color:#000;border:none;padding:6px 18px;font-family:inherit;font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-weight:bold;">LINK DECK — ${esc(eligible[0].title)} →</button></div>`;
                         } else {
                             inlineWidget = `<div style="margin-top:6px;color:#555;font-size:11px;">No eligible deck found. Go to Data Shards → create a deck → add 10+ cards.</div>`;
                             actionBtn = `<button onclick="app.navTo('decks')" style="background:transparent;border:1px solid #FF8800;color:#FF8800;padding:4px 14px;font-family:inherit;font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;margin-left:8px;">CREATE DECK</button>`;
@@ -2045,24 +2087,38 @@
                     </div>`;
                 }).join('');
 
-                const archivedDebriefs = archived.length > 0
-                    ? `<div style="margin-top:12px;border-top:1px solid #1a1a1a;padding-top:12px;">${archived.map(a => `<div style="margin-bottom:8px;"><div style="color:#444;font-size:10px;letter-spacing:2px;">RUN ${a.runNumber} DEBRIEF — ${a.completedAt ? a.completedAt.slice(0,10) : ''}</div><div style="color:#555;font-size:12px;line-height:1.6;">${esc(a.text || '').slice(0, 200)}${(a.text||'').length>200?'…':''}</div></div>`).join('')}</div>`
+                const debriefArchive = run.debrief_text && isFullyComplete
+                    ? `<div style="margin-top:12px;border-top:1px solid #1a1a1a;padding-top:12px;"><div style="color:#444;font-size:10px;letter-spacing:2px;margin-bottom:4px;">RUN ${run.run_number} DEBRIEF</div><div style="color:#555;font-size:12px;line-height:1.6;">${esc((run.debrief_text||'').slice(0,300))}${(run.debrief_text||'').length>300?'…':''}</div></div>`
                     : '';
 
-                const footer = allDone
-                    ? `<div style="margin-top:16px;border-top:1px solid #1a1a1a;padding-top:16px;display:flex;gap:10px;align-items:center;">
+                let footer = '';
+                if (isFullyComplete) {
+                    footer = `<div style="margin-top:12px;border-top:1px solid #1a1a1a;padding-top:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                        <span style="color:#39FF14;font-size:11px;letter-spacing:2px;">⬡ DOMAIN CLEARANCE GRANTED</span>
+                        <span style="color:#555;font-size:10px;">Completed: ${run.completed_at ? run.completed_at.slice(0,10) : '?'}</span>
+                        ${shortcutBonus > 0 ? `<span style="color:#FF8800;font-size:10px;">⚡ ${shortcutBonus} SHORTCUT BONUS${shortcutBonus > 1 ? 'ES' : ''}</span>` : ''}
+                        <button onclick="escapeRunEngine.deleteRun(${run.id})" style="margin-left:auto;background:transparent;border:1px solid #2a0000;color:#FF2222;padding:2px 10px;font-family:inherit;font-size:9px;letter-spacing:2px;cursor:pointer;">REMOVE</button>
+                    </div>`;
+                } else if (allDone) {
+                    footer = `<div style="margin-top:16px;border-top:1px solid #1a1a1a;padding-top:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
                         <button onclick="escapeRunEngine.completeRun(${run.id})" style="background:#39FF14;color:#000;border:none;padding:10px 28px;font-family:inherit;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-weight:bold;">⬡ CLAIM DOMAIN CLEARANCE</button>
-                        <span style="color:#555;font-size:10px;">Run ${run.run_number} complete. All 6 exploits executed.</span>
-                      </div>`
-                    : `<div style="margin-top:12px;color:#333;font-size:10px;letter-spacing:1px;">${completedCount}/6 EXPLOITS COMPLETE · LAST ACTIVITY: ${run.last_activity_at ? run.last_activity_at.slice(0,10) : 'NEVER'}
-                        <button onclick="escapeRunEngine.deleteRun(${run.id})" style="float:right;background:transparent;border:1px solid #2a0000;color:#FF2222;padding:2px 10px;font-family:inherit;font-size:9px;letter-spacing:2px;cursor:pointer;">ABANDON RUN</button>
-                      </div>`;
+                        <span style="color:#555;font-size:10px;">Run ${run.run_number} — all 6 exploits executed.</span>
+                    </div>`;
+                } else {
+                    footer = `<div style="margin-top:12px;color:#333;font-size:10px;letter-spacing:1px;display:flex;justify-content:space-between;align-items:center;">
+                        <span>${completedCount}/6 EXPLOITS · LAST ACTIVE: ${run.last_activity_at ? run.last_activity_at.slice(0,10) : 'NEVER'}${shortcutBonus > 0 ? ` · ⚡ ${shortcutBonus} SHORTCUT BONUS` : ''}</span>
+                        <button onclick="escapeRunEngine.deleteRun(${run.id})" style="background:transparent;border:1px solid #2a0000;color:#FF2222;padding:2px 10px;font-family:inherit;font-size:9px;letter-spacing:2px;cursor:pointer;">ABANDON RUN</button>
+                    </div>`;
+                }
 
-                return `<div class="er-dossier ${runClass} ${allDone ? 'er-active-pulse' : ''}" style="border-radius:4px;margin-bottom:20px;overflow:hidden;">
-                    <div style="background:rgba(255,136,0,0.05);padding:14px 18px;border-bottom:1px solid rgba(255,136,0,0.2);">
+                const headerBg = isFullyComplete ? 'rgba(57,255,20,0.04)' : 'rgba(255,136,0,0.05)';
+                const headerBorder = isFullyComplete ? 'rgba(57,255,20,0.2)' : 'rgba(255,136,0,0.2)';
+
+                return `<div class="er-dossier ${runClass} ${allDone && !isFullyComplete ? 'er-active-pulse' : ''}" style="border-radius:4px;margin-bottom:20px;overflow:hidden;">
+                    <div style="background:${headerBg};padding:14px 18px;border-bottom:1px solid ${headerBorder};">
                         <div style="display:flex;justify-content:space-between;align-items:center;">
                             <div>
-                                <div style="color:#555;font-size:10px;letter-spacing:3px;">// DOMAIN DOSSIER · RUN ${run.run_number}</div>
+                                <div style="color:#555;font-size:10px;letter-spacing:3px;">// DOMAIN DOSSIER · RUN ${run.run_number}${isFullyComplete ? ' · CLEARED' : ''}</div>
                                 <div style="color:${color};font-size:20px;letter-spacing:2px;font-weight:bold;margin-top:2px;">${esc(run.domain_name.toUpperCase())}</div>
                             </div>
                             <div style="text-align:right;">
@@ -2071,7 +2127,7 @@
                             </div>
                         </div>
                     </div>
-                    <div style="padding:14px 18px;">${exploitsHTML}${archivedDebriefs}${footer}</div>
+                    <div style="padding:14px 18px;">${isFullyComplete ? '' : exploitsHTML}${debriefArchive}${footer}</div>
                 </div>`;
             },
         };

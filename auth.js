@@ -110,6 +110,7 @@ async function ensureSchema() {
         user_id VARCHAR NOT NULL REFERENCES users(id) ON DELETE CASCADE,
         domain_name VARCHAR(200) NOT NULL,
         run_number INTEGER NOT NULL DEFAULT 1,
+        linked_deck_id VARCHAR(100),
         exploit_1 BOOLEAN NOT NULL DEFAULT FALSE,
         exploit_2 BOOLEAN NOT NULL DEFAULT FALSE,
         exploit_3 BOOLEAN NOT NULL DEFAULT FALSE,
@@ -118,13 +119,18 @@ async function ensureSchema() {
         exploit_6 BOOLEAN NOT NULL DEFAULT FALSE,
         shortcut_flags INTEGER NOT NULL DEFAULT 0,
         rollback_flags INTEGER NOT NULL DEFAULT 0,
+        shortcut_bonus INTEGER NOT NULL DEFAULT 0,
         nodes JSONB DEFAULT '[]'::jsonb,
         debrief_text TEXT,
-        debrief_archived JSONB DEFAULT '[]'::jsonb,
+        rollback_applied_at TIMESTAMP,
         last_activity_at TIMESTAMP DEFAULT NOW(),
         completed_at TIMESTAMP,
         created_at TIMESTAMP DEFAULT NOW()
       );
+      ALTER TABLE escape_runs ADD COLUMN IF NOT EXISTS linked_deck_id VARCHAR(100);
+      ALTER TABLE escape_runs ADD COLUMN IF NOT EXISTS shortcut_bonus INTEGER NOT NULL DEFAULT 0;
+      ALTER TABLE escape_runs ADD COLUMN IF NOT EXISTS rollback_applied_at TIMESTAMP;
+      ALTER TABLE escape_runs DROP COLUMN IF EXISTS debrief_archived;
     `);
     console.log('[auth] DB schema ready');
   } catch (err) {
@@ -587,17 +593,24 @@ async function getEscapeRuns(userId) {
 }
 
 async function createEscapeRun(userId, domainName) {
+  const name = domainName.trim().slice(0, 200);
+  // Determine the next run number for this domain
+  const { rows: prev } = await pool.query(
+    'SELECT MAX(run_number) AS maxrun FROM escape_runs WHERE user_id = $1 AND domain_name = $2',
+    [userId, name]
+  );
+  const nextRunNumber = (prev[0].maxrun || 0) + 1;
   const { rows } = await pool.query(
-    `INSERT INTO escape_runs (user_id, domain_name, last_activity_at)
-     VALUES ($1, $2, NOW()) RETURNING *`,
-    [userId, domainName.trim().slice(0, 200)]
+    `INSERT INTO escape_runs (user_id, domain_name, run_number, last_activity_at)
+     VALUES ($1, $2, $3, NOW()) RETURNING *`,
+    [userId, name, nextRunNumber]
   );
   return rows[0];
 }
 
 async function updateEscapeRun(userId, runId, patch) {
   const allowed = ['exploit_1','exploit_2','exploit_3','exploit_4','exploit_5','exploit_6',
-                   'shortcut_flags','rollback_flags','nodes','debrief_text'];
+                   'shortcut_flags','rollback_flags','shortcut_bonus','nodes','debrief_text','linked_deck_id'];
   const sets = [];
   const vals = [userId, runId];
   for (const key of allowed) {
@@ -609,7 +622,7 @@ async function updateEscapeRun(userId, runId, patch) {
   if (sets.length === 0) return null;
   sets.push('last_activity_at = NOW()');
   const { rows } = await pool.query(
-    `UPDATE escape_runs SET ${sets.join(', ')} WHERE user_id = $1 AND id = $2 RETURNING *`,
+    `UPDATE escape_runs SET ${sets.join(', ')} WHERE user_id = $1 AND id = $2 AND completed_at IS NULL RETURNING *`,
     vals
   );
   return rows[0] || null;
@@ -617,37 +630,59 @@ async function updateEscapeRun(userId, runId, patch) {
 
 async function completeEscapeRun(userId, runId) {
   const { rows: cur } = await pool.query(
-    'SELECT * FROM escape_runs WHERE user_id = $1 AND id = $2', [userId, runId]
+    'SELECT * FROM escape_runs WHERE user_id = $1 AND id = $2 AND completed_at IS NULL', [userId, runId]
   );
   if (!cur.length) return null;
   const run = cur[0];
-  // All 6 exploits must be completed (no corrupted/incomplete)
   if (!run.exploit_1 || !run.exploit_2 || !run.exploit_3 || !run.exploit_4 || !run.exploit_5 || !run.exploit_6) {
     const err = new Error('NOT_ALL_EXPLOITS_COMPLETE');
     err.code = 'NOT_ALL_EXPLOITS_COMPLETE';
     throw err;
   }
-  const archived = run.debrief_archived || [];
-  if (run.debrief_text) {
-    archived.push({ runNumber: run.run_number, text: run.debrief_text, completedAt: new Date().toISOString() });
-  }
+  // Mark this run as completed
   const { rows } = await pool.query(
-    `UPDATE escape_runs SET
-       completed_at = NOW(), last_activity_at = NOW(),
-       exploit_1 = FALSE, exploit_2 = FALSE, exploit_3 = FALSE,
-       exploit_4 = FALSE, exploit_5 = FALSE, exploit_6 = FALSE,
-       shortcut_flags = 0, rollback_flags = 0,
-       nodes = '[]'::jsonb, debrief_text = NULL,
-       debrief_archived = $3::jsonb,
-       run_number = run_number + 1
+    `UPDATE escape_runs SET completed_at = NOW(), last_activity_at = NOW()
      WHERE user_id = $1 AND id = $2 RETURNING *`,
-    [userId, runId, JSON.stringify(archived)]
+    [userId, runId]
   );
   return rows[0] || null;
+}
+
+async function applyRollbackIfStale(userId, runId) {
+  const { rows: cur } = await pool.query(
+    'SELECT * FROM escape_runs WHERE user_id = $1 AND id = $2 AND completed_at IS NULL', [userId, runId]
+  );
+  if (!cur.length) return null;
+  const run = cur[0];
+  const fiveDaysMs = 5 * 24 * 3600 * 1000;
+  const lastAct = run.last_activity_at ? new Date(run.last_activity_at).getTime() : new Date(run.created_at).getTime();
+  if ((Date.now() - lastAct) < fiveDaysMs) return null;
+  // Already applied a rollback recently
+  if (run.rollback_applied_at) {
+    const lastRollback = new Date(run.rollback_applied_at).getTime();
+    if ((Date.now() - lastRollback) < fiveDaysMs) return null;
+  }
+  // Find the highest completed exploit that hasn't been corrupted yet
+  const exploits = ['exploit_1','exploit_2','exploit_3','exploit_4','exploit_5','exploit_6'];
+  let targetIdx = -1;
+  for (let i = exploits.length - 1; i >= 0; i--) {
+    if (run[exploits[i]] && !(run.rollback_flags & (1 << i))) {
+      targetIdx = i;
+      break;
+    }
+  }
+  if (targetIdx < 0) return null;
+  const newRollbackFlags = run.rollback_flags | (1 << targetIdx);
+  const { rows: updated } = await pool.query(
+    `UPDATE escape_runs SET ${exploits[targetIdx]} = FALSE, rollback_flags = $3, rollback_applied_at = NOW(), last_activity_at = NOW()
+     WHERE user_id = $1 AND id = $2 RETURNING *`,
+    [userId, runId, newRollbackFlags]
+  );
+  return { run: updated[0], corruptedExploit: exploits[targetIdx], corruptedIdx: targetIdx };
 }
 
 async function deleteEscapeRun(userId, runId) {
   await pool.query('DELETE FROM escape_runs WHERE user_id = $1 AND id = $2', [userId, runId]);
 }
 
-module.exports = { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, updateGamertag, getUserGamertag, updateMembershipTier, checkAndExpireUser, getUserByPaymentRef, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount, getUserBadges, setUserBadges, getEscapeRuns, createEscapeRun, updateEscapeRun, completeEscapeRun, deleteEscapeRun };
+module.exports = { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, updateGamertag, getUserGamertag, updateMembershipTier, checkAndExpireUser, getUserByPaymentRef, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount, getUserBadges, setUserBadges, getEscapeRuns, createEscapeRun, updateEscapeRun, completeEscapeRun, deleteEscapeRun, applyRollbackIfStale };

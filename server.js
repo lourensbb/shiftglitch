@@ -3,7 +3,7 @@ const path = require('path');
 const crypto = require('crypto');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-const { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, getUserGamertag, updateGamertag, updateMembershipTier, checkAndExpireUser, getUserByPaymentRef, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount, getUserBadges, setUserBadges, getEscapeRuns, createEscapeRun, updateEscapeRun, completeEscapeRun, deleteEscapeRun } = require('./auth');
+const { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, getUserGamertag, updateGamertag, updateMembershipTier, checkAndExpireUser, getUserByPaymentRef, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount, getUserBadges, setUserBadges, getEscapeRuns, createEscapeRun, updateEscapeRun, completeEscapeRun, deleteEscapeRun, applyRollbackIfStale } = require('./auth');
 
 async function requirePro(req, res, next) {
   try {
@@ -630,6 +630,19 @@ app.post('/api/escape-runs/:id/complete', requireAuth, async (req, res) => {
     }
     console.error('/api/escape-runs/complete error:', err);
     res.status(500).json({ error: 'Failed to complete escape run' });
+  }
+});
+
+app.post('/api/escape-runs/:id/check-rollback', requireAuth, async (req, res) => {
+  try {
+    const runId = parseInt(req.params.id, 10);
+    if (!runId) return res.status(400).json({ error: 'Invalid run ID' });
+    const result = await applyRollbackIfStale(req.session.userId, runId);
+    if (!result) return res.json({ rollbackApplied: false });
+    res.json({ rollbackApplied: true, run: result.run, corruptedExploit: result.corruptedExploit, corruptedIdx: result.corruptedIdx });
+  } catch (err) {
+    console.error('/api/escape-runs/check-rollback error:', err);
+    res.status(500).json({ error: 'Failed to check rollback' });
   }
 });
 
