@@ -5416,6 +5416,13 @@
                                 ${[10,12,15].map(m=>`<button onclick="app.ilSetBlock(${m})" class="cem-btn" style="flex:1;${(state.ilBlockMin||10)===m?'background:#39FF14;color:#000;':''}">${m} min</button>`).join('')}
                             </div>
                         </div>
+                        <div style="margin-top:1rem;">
+                            <div class="cem-header">SESSION TARGET <span style="font-weight:400;color:#555;">(cycles)</span></div>
+                            <div style="display:flex;gap:0.5rem;">
+                                ${[0,1,2,3].map(c=>`<button onclick="app.ilSetCycleTarget(${c})" class="cem-btn" style="flex:1;${(state.ilCycleTarget||0)===c?'background:#8A2BE2;color:#fff;border-color:#8A2BE2;':''}">${c===0?'∞':c+'×'}</button>`).join('')}
+                            </div>
+                            <div style="color:#444;font-size:0.72rem;font-family:'Share Tech Mono',monospace;margin-top:0.4rem;">∞ = run until manually aborted. 1× / 2× / 3× = auto-stop after that many full cycles.</div>
+                        </div>
                         <button onclick="app.ilStart()" class="cem-btn" style="margin-top:1rem;width:100%;background:#FF8800;border-color:#FF8800;color:#000;font-size:0.9rem;padding:0.75rem;">⬡ START INTERLEAVE SESSION</button>
                     </div>
                     ${running ? `
@@ -5438,6 +5445,7 @@
                 return this._cemPageShell('THE INTERLEAVE','Interleaving Practice','Interleaving feels harder than single-domain practice but produces superior long-term retention by forcing the brain to retrieve and re-contextualise continuously.',content);
             },
             ilSetBlock(m) { state.ilBlockMin = m; app.render(); },
+            ilSetCycleTarget(c) { state.ilCycleTarget = c; app.render(); },
             ilStart() {
                 const domains = [0,1,2,3].map(i=>(document.getElementById('il-domain-'+i)||{}).value||'').filter(Boolean);
                 if (domains.length<2) { app.showNotification('Enter at least 2 domains to interleave.'); return; }
@@ -5467,7 +5475,16 @@
                     if (remaining<=0) {
                         clearInterval(state._ilInterval);
                         const nextIdx = (idx+1)%domains.length;
-                        if (nextIdx===0) state.ilCycles = (state.ilCycles||0)+1;
+                        if (nextIdx===0) {
+                            state.ilCycles = (state.ilCycles||0)+1;
+                            const target = state.ilCycleTarget||0;
+                            if (target > 0 && state.ilCycles >= target) {
+                                // Auto-stop: target cycles reached
+                                setTimeout(()=>app.ilStop(), 500);
+                                SysInterrupt.show('interleave-shift', { domain: '—', prev: domains[idx] });
+                                return;
+                            }
+                        }
                         state.ilCurrentIdx = nextIdx;
                         const nextDomain = domains[nextIdx];
                         SysInterrupt.show('interleave-shift', { domain: nextDomain, prev: domains[idx] });
