@@ -1871,53 +1871,70 @@
                 return run.rollback_flags & ~(1 << idx);
             },
 
-            onBlurtComplete(wordCount) {
-                // Apply to all active runs that have exploit_1 done and exploit_2 not done
-                const activeRuns = this.runs.filter(r => !r.completed_at);
-                activeRuns.forEach(run => {
-                    if (!run.exploit_1) return;
-                    const status2 = this._getStatus(run, 'exploit_2');
-                    if (status2 === 'done') return;
-                    const isShortcut = wordCount >= 200;
-                    const patch = { exploit_2: true };
-                    if (this._isCorrupted(run, 'exploit_2')) patch.rollback_flags = this._clearRollbackFlag(run, 'exploit_2');
-                    if (isShortcut) {
-                        patch.shortcut_flags = run.shortcut_flags | (1 << 1);
-                        patch.shortcut_bonus = (run.shortcut_bonus || 0) + 1;
-                    }
-                    this.updateRun(run.id, patch).then(updated => {
-                        if (updated && isShortcut) {
-                            badgeEngine._tryUnlock('shortcut-signal');
-                            setTimeout(() => SysInterrupt.show('shortcut-signal', { domain: run.domain_name, exploit: 'INTEGRITY CHECK' }), 800);
-                        }
-                    });
-                    app.showNotification('INTEGRITY CHECK marked complete on run: ' + run.domain_name);
+            _pickRunForExploit(exploitKey, prerequisiteKey) {
+                // Select ONE active run to credit for a global activity.
+                // Priority: (1) corrupted runs (need re-completion), (2) runs eligible by prerequisite,
+                // both sorted by most recent last_activity_at.
+                // This prevents a single BrainDump/BossFight from advancing multiple dossiers.
+                const active = this.runs.filter(r => !r.completed_at);
+                const eligible = active.filter(run => {
+                    const prevOk = prerequisiteKey ? run[prerequisiteKey] : true;
+                    if (!prevOk) return false;
+                    const status = this._getStatus(run, exploitKey);
+                    return status === 'active' || status === 'corrupted';
                 });
+                if (eligible.length === 0) return null;
+                // Prefer corrupted runs first (they need repair), then most recently active
+                const corrupted = eligible.filter(r => this._isCorrupted(r, exploitKey));
+                const pool = corrupted.length > 0 ? corrupted : eligible;
+                pool.sort((a, b) => {
+                    const ta = a.last_activity_at ? new Date(a.last_activity_at).getTime() : 0;
+                    const tb = b.last_activity_at ? new Date(b.last_activity_at).getTime() : 0;
+                    return tb - ta;
+                });
+                return pool[0];
+            },
+
+            onBlurtComplete(wordCount) {
+                // Apply to the single most-eligible active run for exploit_2
+                const run = this._pickRunForExploit('exploit_2', 'exploit_1');
+                if (!run) return;
+                const isShortcut = wordCount >= 200;
+                const patch = { exploit_2: true };
+                if (this._isCorrupted(run, 'exploit_2')) patch.rollback_flags = this._clearRollbackFlag(run, 'exploit_2');
+                if (isShortcut) {
+                    patch.shortcut_flags = (run.shortcut_flags || 0) | (1 << 1);
+                    patch.shortcut_bonus = (run.shortcut_bonus || 0) + 1;
+                }
+                this.updateRun(run.id, patch).then(updated => {
+                    if (updated && isShortcut) {
+                        badgeEngine._tryUnlock('shortcut-signal');
+                        setTimeout(() => SysInterrupt.show('shortcut-signal', { domain: run.domain_name, exploit: 'INTEGRITY CHECK' }), 800);
+                    }
+                });
+                app.showNotification('INTEGRITY CHECK marked complete → ' + run.domain_name);
             },
 
             onBossFightComplete(score, total) {
+                // Apply to the single most-eligible active run for exploit_4
+                const run = this._pickRunForExploit('exploit_4', 'exploit_3');
+                if (!run) return;
                 const pct = total > 0 ? Math.round(score / total * 100) : 0;
-                const activeRuns = this.runs.filter(r => !r.completed_at);
-                activeRuns.forEach(run => {
-                    if (!run.exploit_3) return;
-                    const status4 = this._getStatus(run, 'exploit_4');
-                    if (status4 === 'done') return;
-                    const isShortcut = pct >= 90;
-                    const patch = { exploit_4: true };
-                    if (this._isCorrupted(run, 'exploit_4')) patch.rollback_flags = this._clearRollbackFlag(run, 'exploit_4');
-                    if (isShortcut) {
-                        patch.shortcut_flags = run.shortcut_flags | (1 << 3);
-                        patch.shortcut_bonus = (run.shortcut_bonus || 0) + 1;
+                const isShortcut = pct >= 90;
+                const patch = { exploit_4: true };
+                if (this._isCorrupted(run, 'exploit_4')) patch.rollback_flags = this._clearRollbackFlag(run, 'exploit_4');
+                if (isShortcut) {
+                    patch.shortcut_flags = (run.shortcut_flags || 0) | (1 << 3);
+                    patch.shortcut_bonus = (run.shortcut_bonus || 0) + 1;
+                }
+                this.updateRun(run.id, patch).then(updated => {
+                    if (updated && isShortcut) {
+                        badgeEngine._tryUnlock('shortcut-signal');
+                        setTimeout(() => SysInterrupt.show('shortcut-signal', { domain: run.domain_name, exploit: 'PATTERN RECOGNITION' }), 800);
+                        if ((state.rankEvidence.rollbackPenalty || 0) > 0) { state.rankEvidence.rollbackPenalty--; rankEngine.save(); }
                     }
-                    this.updateRun(run.id, patch).then(updated => {
-                        if (updated && isShortcut) {
-                            badgeEngine._tryUnlock('shortcut-signal');
-                            setTimeout(() => SysInterrupt.show('shortcut-signal', { domain: run.domain_name, exploit: 'PATTERN RECOGNITION' }), 800);
-                            if ((state.rankEvidence.rollbackPenalty || 0) > 0) { state.rankEvidence.rollbackPenalty--; rankEngine.save(); }
-                        }
-                    });
-                    app.showNotification('PATTERN RECOGNITION marked complete on run: ' + run.domain_name);
                 });
+                app.showNotification('PATTERN RECOGNITION marked complete → ' + run.domain_name);
             },
 
             onDeckStudyComplete(deckId) {
@@ -2495,7 +2512,7 @@
             },
             blurtFinish: () => {
                 app.blurtSaveGaps();
-                const blurtEl = document.getElementById('blurt-text');
+                const blurtEl = document.getElementById('blurt-recall');
                 const wordCount = blurtEl ? blurtEl.value.trim().split(/\s+/).filter(Boolean).length : 0;
                 escapeRunEngine.onBlurtComplete(wordCount);
                 rankEngine.recordBlurt();
