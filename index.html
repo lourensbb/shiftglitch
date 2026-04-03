@@ -329,7 +329,7 @@
                             <button onclick="app.navTo('matrix')" class="nav-btn block w-full text-left px-4 py-2.5 text-xs font-bold tracking-widest uppercase text-[#39FF14]/50 hover:text-[#39FF14] hover:bg-[#39FF14]/5 transition-colors">Priority Grid</button>
                             <button onclick="app.navTo('recal')" class="nav-btn block w-full text-left px-4 py-2.5 text-xs font-bold tracking-widest uppercase text-[#39FF14]/50 hover:text-[#39FF14] hover:bg-[#39FF14]/5 transition-colors">Anti-Lag</button>
                             <button onclick="app.navTo('diagnostic')" class="nav-btn block w-full text-left px-4 py-2.5 text-xs font-bold tracking-widest uppercase text-[#39FF14]/50 hover:text-[#39FF14] hover:bg-[#39FF14]/5 transition-colors">Exploit Missions</button>
-                            <div style="border-top:1px solid rgba(57,255,20,0.1);margin:4px 0;padding:4px 16px 2px;font-family:'Share Tech Mono',monospace;font-size:9px;color:#39FF14;letter-spacing:0.15em;opacity:0.6;">— COGNITIVE PROTOCOLS —</div>
+                            <div style="border-top:1px solid rgba(57,255,20,0.1);margin:4px 0;padding:4px 16px 2px;font-family:'Share Tech Mono',monospace;font-size:11px;color:#39FF14;letter-spacing:0.15em;opacity:0.6;">— COGNITIVE PROTOCOLS —</div>
                             <button onclick="app.navTo('speed-run')" class="nav-btn block w-full text-left px-4 py-2 text-xs font-bold tracking-widest uppercase text-[#39FF14]/50 hover:text-[#39FF14] hover:bg-[#39FF14]/5 transition-colors">Speed Run</button>
                             <button id="nav-mistake-vault-desktop" onclick="app.navTo('mistake-vault')" class="nav-btn block w-full text-left px-4 py-2 text-xs font-bold tracking-widest uppercase text-[#39FF14]/50 hover:text-[#39FF14] hover:bg-[#39FF14]/5 transition-colors">Mistake Vault</button>
                             <button id="nav-teach-it-desktop" onclick="app.navTo('teach-it')" class="nav-btn block w-full text-left px-4 py-2 text-xs font-bold tracking-widest uppercase text-[#39FF14]/50 hover:text-[#39FF14] hover:bg-[#39FF14]/5 transition-colors">Teach It</button>
@@ -353,7 +353,7 @@
                     <div id="nav-user" class="hidden items-center gap-2 ml-2 pl-3 border-l border-[#39FF14]/20">
                         <img id="nav-avatar" src="" alt="" class="w-7 h-7 rounded-full border border-[#39FF14]/40 object-cover hidden">
                         <span id="nav-username" class="text-xs font-bold text-[#39FF14]/70 tracking-widest uppercase max-w-[90px] truncate hidden"></span>
-                        <a href="/api/logout" class="text-[10px] font-bold text-[#FF00FF]/60 hover:text-[#FF00FF] tracking-widest uppercase transition-colors" title="Log out">EXIT</a>
+                        <a href="/api/logout" class="text-[13px] font-bold text-[#FF00FF]/60 hover:text-[#FF00FF] tracking-widest uppercase transition-colors" title="Log out">EXIT</a>
                     </div>
                 </div>
                 <div class="md:hidden flex items-center">
@@ -373,7 +373,7 @@
             <button onclick="app.navTo('matrix')" class="block w-full text-left px-4 py-3 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Priority Grid</button>
             <button onclick="app.navTo('recal')" class="block w-full text-left px-4 py-3 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Anti-Lag</button>
             <button onclick="app.navTo('diagnostic')" class="block w-full text-left px-4 py-3 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Exploit Missions</button>
-            <div class="px-4 pt-2 pb-1 text-[9px] font-bold text-[#39FF14]/40 uppercase tracking-widest font-mono">— Cognitive Protocols —</div>
+            <div class="px-4 pt-2 pb-1 text-[11px] font-bold text-[#39FF14]/40 uppercase tracking-widest font-mono">— Cognitive Protocols —</div>
             <button onclick="app.navTo('speed-run')" class="block w-full text-left px-4 py-2.5 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Speed Run</button>
             <button id="nav-mistake-vault-mobile" onclick="app.navTo('mistake-vault')" class="block w-full text-left px-4 py-2.5 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Mistake Vault</button>
             <button id="nav-teach-it-mobile" onclick="app.navTo('teach-it')" class="block w-full text-left px-4 py-2.5 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Teach It</button>
@@ -397,9 +397,9 @@
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2">
                             <p id="mobile-username" class="text-xs font-bold text-[#39FF14]/70 tracking-widest uppercase truncate hidden"></p>
-                            <span id="mobile-pro-badge" class="hidden text-[10px] font-bold text-black bg-[#FF00FF] px-1.5 py-0.5 rounded uppercase tracking-wider">PRO</span>
+                            <span id="mobile-pro-badge" class="hidden text-[13px] font-bold text-black bg-[#FF00FF] px-1.5 py-0.5 rounded uppercase tracking-wider">PRO</span>
                         </div>
-                        <a href="/api/logout" class="text-[10px] font-bold text-[#FF00FF]/60 hover:text-[#FF00FF] tracking-widest uppercase transition-colors">EXIT SESSION</a>
+                        <a href="/api/logout" class="text-[13px] font-bold text-[#FF00FF]/60 hover:text-[#FF00FF] tracking-widest uppercase transition-colors">EXIT SESSION</a>
                     </div>
                 </div>
             </div>
@@ -554,9 +554,9 @@
         </div>
         <!-- Grading buttons — shown/hidden based on flip state -->
         <div id="swipe-grade-btns" class="hidden flex gap-2 px-4 pb-2 pt-2">
-            <button onclick="app.swipeGrade('again')" class="flex-1 border border-[#FF00FF]/40 text-[#FF00FF]/70 hover:text-[#FF00FF] hover:border-[#FF00FF] py-3 font-bold text-[10px] uppercase tracking-widest font-mono transition-colors">[ AGAIN ]</button>
-            <button onclick="app.swipeGrade('yet')" class="flex-1 border border-[#8A2BE2]/40 text-[#8A2BE2]/70 hover:text-[#8A2BE2] hover:border-[#8A2BE2] py-3 font-bold text-[10px] uppercase tracking-widest font-mono transition-colors">[ NOT YET 🛡️ ]</button>
-            <button onclick="app.swipeGrade('got')" class="flex-1 border border-[#39FF14]/40 text-[#39FF14]/70 hover:text-[#39FF14] hover:border-[#39FF14] py-3 font-bold text-[10px] uppercase tracking-widest font-mono transition-colors">[ GOT IT ]</button>
+            <button onclick="app.swipeGrade('again')" class="flex-1 border border-[#FF00FF]/40 text-[#FF00FF]/70 hover:text-[#FF00FF] hover:border-[#FF00FF] py-3 font-bold text-[13px] uppercase tracking-widest font-mono transition-colors">[ AGAIN ]</button>
+            <button onclick="app.swipeGrade('yet')" class="flex-1 border border-[#8A2BE2]/40 text-[#8A2BE2]/70 hover:text-[#8A2BE2] hover:border-[#8A2BE2] py-3 font-bold text-[13px] uppercase tracking-widest font-mono transition-colors">[ NOT YET 🛡️ ]</button>
+            <button onclick="app.swipeGrade('got')" class="flex-1 border border-[#39FF14]/40 text-[#39FF14]/70 hover:text-[#39FF14] hover:border-[#39FF14] py-3 font-bold text-[13px] uppercase tracking-widest font-mono transition-colors">[ GOT IT ]</button>
         </div>
         <div class="flex gap-3 px-4 pb-6 pt-2 border-t border-[#39FF14]/10">
             <button id="swipe-back-btn" onclick="app.swipeBack()" class="border border-[#39FF14]/50 text-[#39FF14]/80 hover:text-[#39FF14] hover:border-[#39FF14] px-5 py-3 font-bold text-xs uppercase tracking-widest font-mono transition-colors">← PREV</button>
@@ -592,7 +592,7 @@
                     <div class="text-[#8A2BE2]/50 text-xs uppercase tracking-widest mb-1">// eli5.explain() → PLAIN_SPEAK</div>
                     <h3 class="text-[#8A2BE2] font-mono font-bold text-lg uppercase tracking-widest">ELI5 — Explain Like I'm 5</h3>
                 </div>
-                <button onclick="app.closeELI5Modal()" class="text-[#8A2BE2]/40 hover:text-[#8A2BE2] text-xl font-mono">×</button>
+                <button onclick="app.closeELI5Modal()" class="text-[#8A2BE2]/40 hover:text-[#8A2BE2] text-xl font-mono" aria-label="Close">×</button>
             </div>
             <div id="eli5-loading" class="hidden text-center py-4">
                 <div class="text-[#8A2BE2]/60 text-sm font-mono animate-pulse">[ TRANSLATING TO CHILD-SPEAK... ]</div>
@@ -1201,7 +1201,7 @@
                         const btn = document.getElementById('nav-'+id+'-'+device);
                         if (!btn) return;
                         if (skLocked) {
-                            btn.innerHTML = label + '<span style="display:block;font-size:8px;color:#FF4444;letter-spacing:0.08em;font-style:normal;opacity:0.8;margin-top:1px;">CLEARANCE REQUIRED — LEVEL 2</span>';
+                            btn.innerHTML = label + '<span style="display:block;font-size:11px;color:#FF4444;letter-spacing:0.08em;font-style:normal;opacity:0.8;margin-top:1px;">CLEARANCE REQUIRED — LEVEL 2</span>';
                             btn.style.opacity = '0.45';
                             btn.style.cursor = 'not-allowed';
                             btn.style.color = '#666';
@@ -1220,7 +1220,7 @@
                         const btn = document.getElementById('nav-'+id+'-'+device);
                         if (!btn) return;
                         if (gtLocked) {
-                            btn.innerHTML = label + '<span style="display:block;font-size:8px;color:#FF4444;letter-spacing:0.08em;font-style:normal;opacity:0.8;margin-top:1px;">CLEARANCE REQUIRED — LEVEL 3</span>';
+                            btn.innerHTML = label + '<span style="display:block;font-size:11px;color:#FF4444;letter-spacing:0.08em;font-style:normal;opacity:0.8;margin-top:1px;">CLEARANCE REQUIRED — LEVEL 3</span>';
                             btn.style.opacity = '0.45';
                             btn.style.cursor = 'not-allowed';
                             btn.style.color = '#666';
@@ -1402,9 +1402,9 @@
                     const unlocked = this.isUnlocked(id);
                     return '<div class="flex items-center gap-3 p-3 rounded-xl border ' + (unlocked ? 'border-[#39FF14]/30 bg-[#39FF14]/5' : 'border-stone-200 dark:border-stone-700 opacity-40') + '">' +
                         '<div class="text-xl flex-shrink-0">' + b.icon + '</div>' +
-                        '<div class="min-w-0"><div class="text-[10px] font-bold uppercase tracking-widest ' + (unlocked ? 'text-[#39FF14]' : 'text-stone-400') + '">' + b.name + '</div>' +
-                        '<div class="text-[10px] text-stone-500 truncate">' + b.desc + '</div></div>' +
-                        (unlocked ? '<div class="ml-auto text-[#39FF14] text-[9px] font-bold flex-shrink-0">✓ EARNED</div>' : '') +
+                        '<div class="min-w-0"><div class="text-[13px] font-bold uppercase tracking-widest ' + (unlocked ? 'text-[#39FF14]' : 'text-stone-400') + '">' + b.name + '</div>' +
+                        '<div class="text-[13px] text-stone-500 truncate">' + b.desc + '</div></div>' +
+                        (unlocked ? '<div class="ml-auto text-[#39FF14] text-[11px] font-bold flex-shrink-0">✓ EARNED</div>' : '') +
                         '</div>';
                 }).join('');
             }
@@ -1854,7 +1854,7 @@
                     '<div class="si-body"><p id="'+id+'-pl-instr" style="color:#FF8800;font-size:11px;letter-spacing:2px;text-align:center;margin-bottom:24px;">WATCH THE SEQUENCE...</p>' +
                     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:260px;margin:0 auto 20px;">' +
                     colors.map((c,i) => '<button data-pl="'+i+'" onclick="SysInterrupt.clickPatternNode(\''+id+'\','+i+')" style="background:'+c+'22;border:2px solid '+c+';color:'+c+';padding:22px;font-family:inherit;font-size:12px;letter-spacing:2px;font-weight:bold;cursor:pointer;transition:all 0.15s;pointer-events:none;opacity:0.2;border-radius:4px;">'+labels[i]+'</button>').join('') +
-                    '</div><button onclick="SysInterrupt.dismiss(\''+id+'\')" style="background:transparent;border:1px solid #333;color:#555;padding:8px 20px;font-family:inherit;font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;width:100%;border-radius:4px;">SKIP CHALLENGE</button></div>';
+                    '</div><button onclick="SysInterrupt.dismiss(\''+id+'\')" style="background:transparent;border:1px solid #333;color:#555;padding:8px 20px;font-family:inherit;font-size:12px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;width:100%;border-radius:4px;">SKIP CHALLENGE</button></div>';
                 let step = 0;
                 const showNext = () => {
                     document.querySelectorAll('[data-pl]').forEach(b => { b.style.opacity='0.2'; b.style.transform=''; });
@@ -1917,7 +1917,7 @@
                         '<div class="si-body"><div style="color:'+color+';font-size:11px;letter-spacing:2px;margin-bottom:14px;">// CRITICAL — WARDEN-INITIATED ROLLBACK LOGGED</div>' +
                         '<p style="color:#ccc;font-size:14px;line-height:1.8;margin-bottom:14px;">The Warden has initiated a <strong style="color:'+color+';">forced rollback</strong>. One clearance point has been stripped from your record.</p>' +
                         '<p style="color:#666;font-size:12px;line-height:1.8;margin-bottom:14px;">The Mainframe does not tolerate stagnation. You must re-complete one exploit before your progress is restored.</p>' +
-                        '<div style="background:#1a0000;border:1px solid '+color+';padding:14px;border-radius:4px;margin-bottom:4px;"><div style="color:'+color+';font-size:10px;letter-spacing:2px;margin-bottom:6px;">RECOVERY PROTOCOL</div><p style="color:#aaa;font-size:12px;line-height:1.7;margin:0;">Complete one Focus Session or Recall Sprint to re-earn your clearance point. No shortcuts. No exceptions.</p></div></div>' +
+                        '<div style="background:#1a0000;border:1px solid '+color+';padding:14px;border-radius:4px;margin-bottom:4px;"><div style="color:'+color+';font-size:12px;letter-spacing:2px;margin-bottom:6px;">RECOVERY PROTOCOL</div><p style="color:#aaa;font-size:12px;line-height:1.7;margin:0;">Complete one Focus Session or Recall Sprint to re-earn your clearance point. No shortcuts. No exceptions.</p></div></div>' +
                         '<div class="si-footer" style="justify-content:center;"><button onclick="SysInterrupt.acknowledgeRollback(\''+id+'\')" style="background:'+color+';color:#fff;border:none;padding:12px 36px;font-family:inherit;font-size:11px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;font-weight:bold;border-radius:4px;width:100%;">ACKNOWLEDGE ROLLBACK</button></div>';
                 } else if (type === 'memory-degradation') {
                     color='#FF2222'; glow='rgba(255,34,34,0.2)';
@@ -1934,7 +1934,7 @@
                         '<div class="si-body"><div style="color:'+color+';font-size:11px;letter-spacing:2px;margin-bottom:14px;">// MAINFRAME ALERT — '+payload.days+'-DAY INACTIVITY LOGGED</div>' +
                         '<p style="color:#ccc;font-size:14px;line-height:1.8;margin-bottom:14px;">MAINFRAME ALERT: <strong style="color:'+color+';">Extended inactivity detected.</strong> Security protocols have been reinforced.</p>' +
                         '<p style="color:#666;font-size:12px;line-height:1.8;margin-bottom:12px;">You must re-earn your last clearance point before advancing. The Mainframe does not carry operatives who go dark.</p>' +
-                        '<div style="background:#1a0000;border:1px solid #FF222244;padding:12px;border-radius:4px;"><div style="color:'+color+';font-size:10px;letter-spacing:2px;margin-bottom:4px;">RECOVERY DIRECTIVE</div><p style="color:#aaa;font-size:12px;margin:0;">Run one complete session now to restore access.</p></div></div>' +
+                        '<div style="background:#1a0000;border:1px solid #FF222244;padding:12px;border-radius:4px;"><div style="color:'+color+';font-size:12px;letter-spacing:2px;margin-bottom:4px;">RECOVERY DIRECTIVE</div><p style="color:#aaa;font-size:12px;margin:0;">Run one complete session now to restore access.</p></div></div>' +
                         '<div class="si-footer"><button onclick="SysInterrupt.dismiss(\''+id+'\')" style="background:'+color+';color:#fff;border:none;padding:10px 28px;font-family:inherit;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-weight:bold;border-radius:4px;">RESTORE FROM BACKUP</button></div>';
                 } else if (type === 'rank-promotion') {
                     color='#39FF14'; glow='rgba(57,255,20,0.3)';
@@ -1960,7 +1960,7 @@
                         '<div style="color:'+color+';font-size:26px;letter-spacing:4px;font-weight:bold;margin-bottom:4px;">'+(payload.newRank||'').toUpperCase()+'</div>' +
                         '<div style="color:#444;font-size:11px;letter-spacing:2px;margin-bottom:16px;">CLEARANCE LEVEL '+(rankIdx2+1)+' OF '+RANKS.length+'</div>' +
                         '<p style="color:#aaa;font-size:13px;line-height:1.8;margin-bottom:16px;">'+flavour+'</p>' +
-                        '<div style="background:#001a00;border:1px solid '+color+'44;padding:12px;border-radius:4px;text-align:left;"><div style="color:'+color+';font-size:10px;letter-spacing:2px;margin-bottom:6px;">WARDEN TRANSMISSION</div>' +
+                        '<div style="background:#001a00;border:1px solid '+color+'44;padding:12px;border-radius:4px;text-align:left;"><div style="color:'+color+';font-size:12px;letter-spacing:2px;margin-bottom:6px;">WARDEN TRANSMISSION</div>' +
                         '<p style="color:#888;font-size:12px;font-style:italic;margin:0;">'+warden+'</p></div></div>' +
                         '<div class="si-footer" style="justify-content:center;"><button onclick="SysInterrupt.dismiss(\''+id+'\')" style="background:'+color+';color:#000;border:none;padding:12px 36px;font-family:inherit;font-size:12px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;font-weight:bold;border-radius:4px;width:100%;">ACCEPT PROMOTION</button></div>';
                 } else if (type === 'streak-signal') {
@@ -1985,7 +1985,7 @@
                     this._logWarden(wm.msg, wm.sub, wardenMode);
                     color='#FF00FF'; glow='rgba(255,0,255,0.2)';
                     const modeLabel = wardenMode === 'guide' ? 'GUIDE PROTOCOL' : wardenMode === 'adversary' ? 'ADVERSARY MODE' : 'OBSERVER CHANNEL';
-                    const modeBadge = '<span style="font-size:9px;letter-spacing:2px;background:#FF00FF22;border:1px solid #FF00FF44;color:#FF00FF;padding:2px 8px;border-radius:2px;margin-left:8px;">'+modeLabel+'</span>';
+                    const modeBadge = '<span style="font-size:12px;letter-spacing:2px;background:#FF00FF22;border:1px solid #FF00FF44;color:#FF00FF;padding:2px 8px;border-radius:2px;margin-left:8px;">'+modeLabel+'</span>';
                     innerHTML = '<div class="si-header" style="border-color:'+color+'"><span style="color:'+color+';font-size:18px;">◈</span><span style="color:'+color+';font-size:13px;letter-spacing:2px;margin-left:8px;">WARDEN TRANSMISSION</span>'+modeBadge+'</div>' +
                         '<div class="si-body"><p style="color:#fff;font-size:16px;line-height:1.7;margin-bottom:14px;">"'+wm.msg+'"</p>' +
                         '<p style="color:#777;font-size:13px;line-height:1.7;font-style:italic;">— '+wm.sub+'</p></div>' +
@@ -2007,7 +2007,7 @@
                         '<div class="si-body" style="text-align:center;"><div style="font-size:48px;margin-bottom:10px;">▲</div>' +
                         '<div style="color:'+color+';font-size:18px;font-weight:bold;letter-spacing:3px;margin-bottom:8px;">'+streak+'-DAY STREAK CONFIRMED</div>' +
                         '<p style="color:#ccc;font-size:13px;line-height:1.8;margin-bottom:10px;">The Mainframe rewards operatives who show up every day. Your consistency has been logged as a clearance advantage.</p>' +
-                        '<div style="background:#1a001a;border:1px solid #FF00FF44;padding:12px;border-radius:4px;"><div style="color:'+color+';font-size:10px;letter-spacing:2px;">EFFECT APPLIED</div><div style="color:#fff;font-size:13px;margin-top:4px;">Rank threshold temporarily reduced. You need less evidence for your next promotion.</div></div></div>' +
+                        '<div style="background:#1a001a;border:1px solid #FF00FF44;padding:12px;border-radius:4px;"><div style="color:'+color+';font-size:12px;letter-spacing:2px;">EFFECT APPLIED</div><div style="color:#fff;font-size:13px;margin-top:4px;">Rank threshold temporarily reduced. You need less evidence for your next promotion.</div></div></div>' +
                         '<div class="si-footer" style="justify-content:center;"><button onclick="SysInterrupt.dismiss(\''+id+'\')" style="background:'+color+';color:#000;border:none;padding:10px 28px;font-family:inherit;font-size:11px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;font-weight:bold;border-radius:4px;width:100%;">CLEARANCE ACCEPTED</button></div>';
                 } else if (type === 'warden-performance-shortcut') {
                     color='#FF00FF'; glow='rgba(255,0,255,0.3)';
@@ -2015,7 +2015,7 @@
                     innerHTML = '<div class="si-header" style="border-color:'+color+'"><span style="color:'+color+';font-size:18px;">⚡</span><span style="color:'+color+';font-size:13px;letter-spacing:2px;margin-left:8px;">PERFORMANCE SHORTCUT DETECTED</span></div>' +
                         '<div class="si-body" style="text-align:center;"><div style="font-size:48px;margin-bottom:10px;">⚡</div>' +
                         '<div style="color:'+color+';font-size:16px;font-weight:bold;letter-spacing:2px;margin-bottom:6px;">EXCEPTIONAL EXECUTION</div>' +
-                        '<div style="color:#444;font-size:10px;letter-spacing:3px;margin-bottom:14px;">'+(payload.domain||'').toUpperCase()+' — '+(payload.exploit||'')+'</div>' +
+                        '<div style="color:#444;font-size:12px;letter-spacing:3px;margin-bottom:14px;">'+(payload.domain||'').toUpperCase()+' — '+(payload.exploit||'')+'</div>' +
                         '<p style="color:#aaa;font-size:13px;line-height:1.8;">The Warden registered an exceptional performance. A clearance bonus has been logged to your operative record.</p></div>' +
                         '<div class="si-footer"><button onclick="SysInterrupt.dismiss(\''+id+'\')" style="background:'+color+';color:#000;border:none;padding:10px 28px;font-family:inherit;font-size:11px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;font-weight:bold;border-radius:4px;">COPY RECEIVED</button></div>';
                 } else if (type === 'warden-clearance-strip') {
@@ -2051,9 +2051,9 @@
                         '<div class="si-body" style="text-align:center;">' +
                         '<div style="font-size:56px;margin-bottom:10px;animation:si-pulse 1.2s ease infinite;">⬡</div>' +
                         '<div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:6px;"><div style="color:'+color+';font-size:22px;letter-spacing:3px;font-weight:bold;">'+(payload.domain||'').toUpperCase()+'</div>'+multiBadge+'</div>' +
-                        '<div style="color:#444;font-size:10px;letter-spacing:3px;margin-bottom:18px;">RUN '+(payload.runNumber||'?')+' COMPLETE' + (clearCount > 1 ? ' · CLEARANCE '+clearCount+'×' : '') + '</div>' +
+                        '<div style="color:#444;font-size:12px;letter-spacing:3px;margin-bottom:18px;">RUN '+(payload.runNumber||'?')+' COMPLETE' + (clearCount > 1 ? ' · CLEARANCE '+clearCount+'×' : '') + '</div>' +
                         '<p style="color:#aaa;font-size:13px;line-height:1.8;margin-bottom:16px;">All six exploits executed. The Mainframe has recorded your domain mastery. The cycle resets — each run encodes deeper.</p>' +
-                        '<div style="background:#001a00;border:1px solid '+color+'44;padding:12px;border-radius:4px;text-align:left;"><div style="color:'+color+';font-size:10px;letter-spacing:2px;margin-bottom:6px;">WARDEN TRANSMISSION</div>' +
+                        '<div style="background:#001a00;border:1px solid '+color+'44;padding:12px;border-radius:4px;text-align:left;"><div style="color:'+color+';font-size:12px;letter-spacing:2px;margin-bottom:6px;">WARDEN TRANSMISSION</div>' +
                         '<p style="color:#888;font-size:12px;font-style:italic;margin:0;">"The Mainframe does not grade. It encodes. You have encoded this domain. Run it again — the gap between what you knew and what you know now is the exploit."</p></div></div>' +
                         '<div class="si-footer" style="justify-content:center;"><button onclick="SysInterrupt.dismiss(\''+id+'\')" style="background:'+color+';color:#000;border:none;padding:12px 36px;font-family:inherit;font-size:12px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;font-weight:bold;border-radius:4px;width:100%;">CLEARANCE CONFIRMED</button></div>';
                 } else if (type === 'shortcut-signal') {
@@ -2062,7 +2062,7 @@
                         '<div class="si-body" style="text-align:center;">' +
                         '<div style="font-size:52px;margin-bottom:10px;">⚡</div>' +
                         '<div style="color:'+color+';font-size:18px;letter-spacing:3px;font-weight:bold;margin-bottom:8px;">EXCEPTIONAL PERFORMANCE</div>' +
-                        '<div style="color:#444;font-size:10px;letter-spacing:2px;margin-bottom:14px;">'+(payload.domain||'').toUpperCase()+' — '+(payload.exploit||'')+' EXPLOIT</div>' +
+                        '<div style="color:#444;font-size:12px;letter-spacing:2px;margin-bottom:14px;">'+(payload.domain||'').toUpperCase()+' — '+(payload.exploit||'')+' EXPLOIT</div>' +
                         '<p style="color:#aaa;font-size:13px;line-height:1.8;">You exceeded the standard execution threshold. The Mainframe registered this exploit as a Shortcut. Bonus badge awarded.</p></div>' +
                         '<div class="si-footer"><button onclick="SysInterrupt.dismiss(\''+id+'\')" style="background:'+color+';color:#000;border:none;padding:10px 36px;font-family:inherit;font-size:11px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;font-weight:bold;border-radius:4px;">COPY RECEIVED</button></div>';
                 } else if (type === 'domain-rollback') {
@@ -2078,10 +2078,10 @@
                     color='#FF8800'; glow='rgba(255,136,0,0.35)';
                     innerHTML = '<div class="si-header" style="border-color:'+color+'"><span style="color:'+color+';font-size:18px;">⬡</span><span style="color:'+color+';font-size:13px;letter-spacing:2px;margin-left:8px;">DOMAIN SHIFT</span></div>' +
                         '<div class="si-body" style="text-align:center;">' +
-                        '<div style="color:#555;font-size:10px;letter-spacing:2px;margin-bottom:8px;text-transform:uppercase;">DEPARTING</div>' +
+                        '<div style="color:#555;font-size:12px;letter-spacing:2px;margin-bottom:8px;text-transform:uppercase;">DEPARTING</div>' +
                         '<div style="color:#444;font-size:16px;font-weight:bold;margin-bottom:16px;">'+(payload.prev||'').toUpperCase()+'</div>' +
                         '<div style="color:'+color+';font-size:36px;margin-bottom:12px;">↓</div>' +
-                        '<div style="color:#aaa;font-size:10px;letter-spacing:2px;margin-bottom:8px;text-transform:uppercase;">LOADING NEXT DOMAIN</div>' +
+                        '<div style="color:#aaa;font-size:12px;letter-spacing:2px;margin-bottom:8px;text-transform:uppercase;">LOADING NEXT DOMAIN</div>' +
                         '<div style="color:'+color+';font-size:22px;font-weight:bold;letter-spacing:3px;margin-bottom:16px;">'+(payload.domain||'').toUpperCase()+'</div>' +
                         '<p style="color:#666;font-size:12px;line-height:1.8;max-width:340px;margin:0 auto;">Retrieve your last key point from the previous domain before loading new data. The Mainframe demands active context-switching.</p></div>' +
                         '<div class="si-footer" style="justify-content:center;"><button onclick="SysInterrupt.dismiss(\''+id+'\')" style="background:'+color+';color:#000;border:none;padding:12px 36px;font-family:inherit;font-size:12px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;font-weight:bold;border-radius:4px;width:100%;">SWITCHING DOMAINS</button></div>';
@@ -2434,11 +2434,11 @@
                 }
                 let html = '';
                 if (active.length > 0) {
-                    html += `<div style="font-family:'Share Tech Mono',monospace;color:#FF8800;font-size:10px;letter-spacing:3px;margin-bottom:12px;padding:6px 0;border-bottom:1px solid rgba(255,136,0,0.2);">// ACTIVE RUNS — ${active.length} IN PROGRESS</div>`;
+                    html += `<div style="font-family:'Share Tech Mono',monospace;color:#FF8800;font-size:12px;letter-spacing:3px;margin-bottom:12px;padding:6px 0;border-bottom:1px solid rgba(255,136,0,0.2);">// ACTIVE RUNS — ${active.length} IN PROGRESS</div>`;
                     html += active.map(run => this._renderRunCard(run, false)).join('');
                 }
                 if (completed.length > 0) {
-                    html += `<div style="font-family:'Share Tech Mono',monospace;color:#39FF14;font-size:10px;letter-spacing:3px;margin:24px 0 12px;padding:6px 0;border-bottom:1px solid rgba(57,255,20,0.15);">// COMPLETED RUNS — ${completed.length} DOMAIN CLEARANCES</div>`;
+                    html += `<div style="font-family:'Share Tech Mono',monospace;color:#39FF14;font-size:12px;letter-spacing:3px;margin:24px 0 12px;padding:6px 0;border-bottom:1px solid rgba(57,255,20,0.15);">// COMPLETED RUNS — ${completed.length} DOMAIN CLEARANCES</div>`;
                     html += completed.map(run => this._renderRunCard(run, true)).join('');
                 }
                 el.innerHTML = html;
@@ -2469,7 +2469,7 @@
 
                     let actionBtn = '';
                     if ((status === 'active' || status === 'corrupted') && e.action) {
-                        actionBtn = `<button onclick="app.navTo('${e.action}')" style="background:transparent;border:1px solid #FF8800;color:#FF8800;padding:4px 14px;font-family:inherit;font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;margin-left:8px;">${e.actionLabel}</button>`;
+                        actionBtn = `<button onclick="app.navTo('${e.action}')" style="background:transparent;border:1px solid #FF8800;color:#FF8800;padding:4px 14px;font-family:inherit;font-size:12px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;margin-left:8px;">${e.actionLabel}</button>`;
                     }
 
                     let inlineWidget = '';
@@ -2482,13 +2482,13 @@
                             const opts = eligible.map(d => `<option value="${d.id}">${esc(d.title)} (${(state.fcCards||[]).filter(c=>c.deckId===d.id).length} cards)</option>`).join('');
                             inlineWidget = `<div style="margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
                                 <select id="er-deck-select-${run.id}" style="background:#0a0a0a;border:1px solid #333;color:#FF8800;padding:4px 8px;font-family:inherit;font-size:11px;">${opts}</select>
-                                <button onclick="escapeRunEngine.markExploit1WithDeck(${run.id},document.getElementById('er-deck-select-${run.id}').value)" style="background:#FF8800;color:#000;border:none;padding:6px 14px;font-family:inherit;font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-weight:bold;">LINK DECK →</button>
+                                <button onclick="escapeRunEngine.markExploit1WithDeck(${run.id},document.getElementById('er-deck-select-${run.id}').value)" style="background:#FF8800;color:#000;border:none;padding:6px 14px;font-family:inherit;font-size:12px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-weight:bold;">LINK DECK →</button>
                             </div>`;
                         } else if (eligible.length === 1) {
-                            inlineWidget = `<div style="margin-top:8px;"><button onclick="escapeRunEngine.markExploit1(${run.id})" style="background:#FF8800;color:#000;border:none;padding:6px 18px;font-family:inherit;font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-weight:bold;">LINK DECK — ${esc(eligible[0].title)} →</button></div>`;
+                            inlineWidget = `<div style="margin-top:8px;"><button onclick="escapeRunEngine.markExploit1(${run.id})" style="background:#FF8800;color:#000;border:none;padding:6px 18px;font-family:inherit;font-size:12px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-weight:bold;">LINK DECK — ${esc(eligible[0].title)} →</button></div>`;
                         } else {
                             inlineWidget = `<div style="margin-top:6px;color:#555;font-size:11px;">No eligible deck found. Go to Data Shards → create a deck → add 10+ cards.</div>`;
-                            actionBtn = `<button onclick="app.navTo('decks')" style="background:transparent;border:1px solid #FF8800;color:#FF8800;padding:4px 14px;font-family:inherit;font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;margin-left:8px;">CREATE DECK</button>`;
+                            actionBtn = `<button onclick="app.navTo('decks')" style="background:transparent;border:1px solid #FF8800;color:#FF8800;padding:4px 14px;font-family:inherit;font-size:12px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;margin-left:8px;">CREATE DECK</button>`;
                         }
                     }
 
@@ -2497,20 +2497,20 @@
                         const existingInputs = Array.from({length: Math.max(5, nodes.length + 1)}, (_, i) =>
                             `<input class="er-node-input" value="${esc(nodes[i] || '')}" placeholder="Node ${i+1}..." style="background:#0a0a0a;border:1px solid #222;color:#39FF14;padding:4px 8px;font-family:inherit;font-size:11px;width:100%;margin:2px 0;outline:none;">`
                         ).join('');
-                        inlineWidget = `<div id="er-nodes-${run.id}" style="margin-top:10px;">${existingInputs}<button onclick="escapeRunEngine.saveNodes(${run.id})" style="background:#FF8800;color:#000;border:none;padding:6px 18px;font-family:inherit;font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-weight:bold;margin-top:6px;">SAVE NEURAL MAP →</button></div>`;
+                        inlineWidget = `<div id="er-nodes-${run.id}" style="margin-top:10px;">${existingInputs}<button onclick="escapeRunEngine.saveNodes(${run.id})" style="background:#FF8800;color:#000;border:none;padding:6px 18px;font-family:inherit;font-size:12px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-weight:bold;margin-top:6px;">SAVE NEURAL MAP →</button></div>`;
                         actionBtn = '';
                     }
 
                     if (e.key === 'exploit_6' && (status === 'active' || status === 'corrupted')) {
                         const txt = run.debrief_text || '';
-                        inlineWidget = `<div style="margin-top:10px;"><textarea id="er-debrief-${run.id}" placeholder="After Action Report: what was hard to encode, what the Mainframe pushed back on, what to reinforce next run..." style="width:100%;background:#0a0a0a;border:1px solid #222;color:#ccc;padding:10px;font-family:'Space Grotesk',sans-serif;font-size:13px;min-height:90px;outline:none;resize:vertical;">${esc(txt)}</textarea><div style="display:flex;align-items:center;gap:10px;margin-top:6px;"><button onclick="escapeRunEngine.saveDebrief(${run.id})" style="background:#FF8800;color:#000;border:none;padding:6px 18px;font-family:inherit;font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-weight:bold;">TRANSMIT DEBRIEF →</button><span id="er-debrief-wc-${run.id}" style="color:#555;font-size:10px;">0 words</span></div></div>`;
+                        inlineWidget = `<div style="margin-top:10px;"><textarea id="er-debrief-${run.id}" placeholder="After Action Report: what was hard to encode, what the Mainframe pushed back on, what to reinforce next run..." style="width:100%;background:#0a0a0a;border:1px solid #222;color:#ccc;padding:10px;font-family:'Space Grotesk',sans-serif;font-size:13px;min-height:90px;outline:none;resize:vertical;">${esc(txt)}</textarea><div style="display:flex;align-items:center;gap:10px;margin-top:6px;"><button onclick="escapeRunEngine.saveDebrief(${run.id})" style="background:#FF8800;color:#000;border:none;padding:6px 18px;font-family:inherit;font-size:12px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-weight:bold;">TRANSMIT DEBRIEF →</button><span id="er-debrief-wc-${run.id}" style="color:#555;font-size:12px;">0 words</span></div></div>`;
                         actionBtn = '';
                     }
 
                     return `<div class="er-exploit ${status}" style="">
                         <div style="display:flex;align-items:center;justify-content:space-between;">
                             <div>
-                                <span style="color:#555;font-size:10px;margin-right:8px;">${idx + 1}.</span>
+                                <span style="color:#555;font-size:12px;margin-right:8px;">${idx + 1}.</span>
                                 <span style="color:${status === 'done' ? '#39FF14' : status === 'locked' ? '#333' : '#ccc'};font-size:12px;letter-spacing:1px;font-weight:bold;">${e.label}</span>
                                 ${status !== 'locked' ? `<div style="color:#555;font-size:11px;margin-top:2px;margin-left:18px;">${e.desc}</div>` : ''}
                             </div>
@@ -2521,7 +2521,7 @@
                 }).join('');
 
                 const debriefArchive = run.debrief_text && isFullyComplete
-                    ? `<div style="margin-top:12px;border-top:1px solid #1a1a1a;padding-top:12px;"><div style="color:#444;font-size:10px;letter-spacing:2px;margin-bottom:4px;">RUN ${run.run_number} DEBRIEF</div><div style="color:#555;font-size:12px;line-height:1.6;">${esc((run.debrief_text||'').slice(0,300))}${(run.debrief_text||'').length>300?'…':''}</div></div>`
+                    ? `<div style="margin-top:12px;border-top:1px solid #1a1a1a;padding-top:12px;"><div style="color:#444;font-size:12px;letter-spacing:2px;margin-bottom:4px;">RUN ${run.run_number} DEBRIEF</div><div style="color:#555;font-size:12px;line-height:1.6;">${esc((run.debrief_text||'').slice(0,300))}${(run.debrief_text||'').length>300?'…':''}</div></div>`
                     : '';
 
                 // Per-domain clearance count: count all completed runs for this domain
@@ -2533,23 +2533,23 @@
                 if (isFullyComplete) {
                     const startNextBtn = !hasActiveRunForDomain
                         ? `<button onclick="escapeRunEngine.startNextRun(${run.id})" style="background:#FF8800;color:#000;border:none;padding:8px 20px;font-family:inherit;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-weight:bold;">⚡ START RUN ${run.run_number + 1}</button>`
-                        : `<span style="color:#FF8800;font-size:10px;letter-spacing:1px;">RUN ${run.run_number + 1} IN PROGRESS</span>`;
+                        : `<span style="color:#FF8800;font-size:12px;letter-spacing:1px;">RUN ${run.run_number + 1} IN PROGRESS</span>`;
                     footer = `<div style="margin-top:12px;border-top:1px solid #1a1a1a;padding-top:12px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
                         <span style="color:#39FF14;font-size:11px;letter-spacing:2px;">⬡ DOMAIN CLEARANCE GRANTED</span>
                         ${domainClearanceCount > 1 ? `<span style="color:#FF00FF;font-size:11px;font-weight:bold;letter-spacing:1px;">×${domainClearanceCount}</span>` : ''}
-                        <span style="color:#555;font-size:10px;">${run.completed_at ? run.completed_at.slice(0,10) : '?'}</span>
-                        ${shortcutBonus > 0 ? `<span style="color:#FF8800;font-size:10px;">⚡ ${shortcutBonus} SHORTCUT BONUS${shortcutBonus > 1 ? 'ES' : ''}</span>` : ''}
-                        <div style="margin-left:auto;display:flex;gap:8px;align-items:center;">${startNextBtn}<button onclick="escapeRunEngine.deleteRun(${run.id})" style="background:transparent;border:1px solid #2a0000;color:#FF2222;padding:2px 10px;font-family:inherit;font-size:9px;letter-spacing:2px;cursor:pointer;">REMOVE</button></div>
+                        <span style="color:#555;font-size:12px;">${run.completed_at ? run.completed_at.slice(0,10) : '?'}</span>
+                        ${shortcutBonus > 0 ? `<span style="color:#FF8800;font-size:12px;">⚡ ${shortcutBonus} SHORTCUT BONUS${shortcutBonus > 1 ? 'ES' : ''}</span>` : ''}
+                        <div style="margin-left:auto;display:flex;gap:8px;align-items:center;">${startNextBtn}<button onclick="escapeRunEngine.deleteRun(${run.id})" style="background:transparent;border:1px solid #2a0000;color:#FF2222;padding:2px 10px;font-family:inherit;font-size:12px;letter-spacing:2px;cursor:pointer;">REMOVE</button></div>
                     </div>`;
                 } else if (allDone) {
                     footer = `<div style="margin-top:16px;border-top:1px solid #1a1a1a;padding-top:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
                         <button onclick="escapeRunEngine.completeRun(${run.id})" style="background:#39FF14;color:#000;border:none;padding:10px 28px;font-family:inherit;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-weight:bold;">⬡ CLAIM DOMAIN CLEARANCE</button>
-                        <span style="color:#555;font-size:10px;">Run ${run.run_number} — all 6 exploits executed.</span>
+                        <span style="color:#555;font-size:12px;">Run ${run.run_number} — all 6 exploits executed.</span>
                     </div>`;
                 } else {
-                    footer = `<div style="margin-top:12px;color:#333;font-size:10px;letter-spacing:1px;display:flex;justify-content:space-between;align-items:center;">
+                    footer = `<div style="margin-top:12px;color:#333;font-size:12px;letter-spacing:1px;display:flex;justify-content:space-between;align-items:center;">
                         <span>${completedCount}/6 EXPLOITS · LAST ACTIVE: ${run.last_activity_at ? run.last_activity_at.slice(0,10) : 'NEVER'}${shortcutBonus > 0 ? ` · ⚡ ${shortcutBonus} SHORTCUT BONUS` : ''}</span>
-                        <button onclick="escapeRunEngine.deleteRun(${run.id})" style="background:transparent;border:1px solid #2a0000;color:#FF2222;padding:2px 10px;font-family:inherit;font-size:9px;letter-spacing:2px;cursor:pointer;">ABANDON RUN</button>
+                        <button onclick="escapeRunEngine.deleteRun(${run.id})" style="background:transparent;border:1px solid #2a0000;color:#FF2222;padding:2px 10px;font-family:inherit;font-size:12px;letter-spacing:2px;cursor:pointer;">ABANDON RUN</button>
                     </div>`;
                 }
 
@@ -2560,12 +2560,12 @@
                     <div style="background:${headerBg};padding:14px 18px;border-bottom:1px solid ${headerBorder};">
                         <div style="display:flex;justify-content:space-between;align-items:center;">
                             <div>
-                                <div style="color:#555;font-size:10px;letter-spacing:3px;">// DOMAIN DOSSIER · RUN ${run.run_number}${isFullyComplete ? ' · CLEARED' : ''}</div>
+                                <div style="color:#555;font-size:12px;letter-spacing:3px;">// DOMAIN DOSSIER · RUN ${run.run_number}${isFullyComplete ? ' · CLEARED' : ''}</div>
                                 <div style="color:${color};font-size:20px;letter-spacing:2px;font-weight:bold;margin-top:2px;">${esc(run.domain_name.toUpperCase())}</div>
                             </div>
                             <div style="text-align:right;">
                                 <div style="margin-bottom:6px;">${progressDots}</div>
-                                <div style="color:#555;font-size:10px;">${completedCount}/6</div>
+                                <div style="color:#555;font-size:12px;">${completedCount}/6</div>
                             </div>
                         </div>
                     </div>
@@ -2820,7 +2820,7 @@
                 if (!t) return;
                 document.getElementById('modal-content').innerHTML = `
                     <div class="p-8 relative">
-                        <button onclick="app.closeModal()" class="absolute top-6 right-6 text-stone-400 hover:text-stone-900 dark:hover:text-white transition-colors text-2xl">&#x2715;</button>
+                        <button onclick="app.closeModal()" class="absolute top-6 right-6 text-stone-400 hover:text-stone-900 dark:hover:text-white transition-colors text-2xl" aria-label="Close">&#x2715;</button>
                         <div class="mb-8"><span class="text-orange-600 font-bold uppercase tracking-widest text-xs">${esc(t.category)} Protocol</span><h2 class="text-5xl font-serif font-bold text-stone-900 dark:text-stone-50 mt-2">${esc(t.title)}</h2></div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
                             <div class="space-y-6">
@@ -3309,7 +3309,7 @@
                                 <h3 class="text-lg font-serif font-bold mb-3 text-stone-900 dark:text-stone-50">📝 My To-Do List</h3>
                                 <div class="flex gap-2 mb-3">
                                     <input id="todo-input" type="text" placeholder="Add a task..." class="flex-grow bg-stone-50 dark:bg-stone-800 px-3 py-2 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" onkeydown="if(event.key==='Enter')app.addTodo()">
-                                    <button onclick="app.addTodo()" class="bg-orange-600 hover:bg-orange-500 text-white px-3 py-2 rounded-xl text-sm font-bold transition-colors">+</button>
+                                    <button onclick="app.addTodo()" class="bg-orange-600 hover:bg-orange-500 text-white px-3 py-2 rounded-xl text-sm font-bold transition-colors" aria-label="Add task">+</button>
                                 </div>
                                 <ul class="space-y-2 max-h-48 overflow-y-auto">
                                     ${state.missionTodos.length === 0 ? '<li class="text-xs text-stone-400 italic text-center py-2">No tasks yet — add one above!</li>' :
@@ -3318,7 +3318,7 @@
                                         return '<li class="flex items-center gap-2 group">' +
                                         '<button onclick="app.toggleTodo(&quot;'+tid+'&quot;)" class="text-lg flex-shrink-0">' + (t.done ? '✅' : '⬜') + '</button>' +
                                         '<span class="flex-grow text-sm ' + (t.done ? 'line-through text-stone-400' : 'text-stone-700 dark:text-stone-200') + '">' + esc(t.text) + '</span>' +
-                                        '<button onclick="app.removeTodo(&quot;'+tid+'&quot;)" class="text-stone-300 hover:text-red-500 text-xs opacity-0 group-hover:opacity-100 transition-opacity">✕</button>' +
+                                        '<button onclick="app.removeTodo(&quot;'+tid+'&quot;)" class="text-stone-300 hover:text-red-500 text-xs opacity-0 group-hover:opacity-100 transition-opacity" aria-label="Remove task">✕</button>' +
                                         '</li>';
                                     }).join('')}
                                 </ul>
@@ -3329,7 +3329,7 @@
                                     <input id="exam-label-input" type="text" placeholder="Exam name (e.g. Biology)" class="bg-stone-50 dark:bg-stone-800 px-3 py-2 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
                                     <div class="flex gap-2">
                                         <input id="exam-date-input" type="date" class="flex-grow bg-stone-50 dark:bg-stone-800 px-3 py-2 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
-                                        <button onclick="app.addExamCountdown()" class="bg-orange-600 hover:bg-orange-500 text-white px-3 py-2 rounded-xl text-sm font-bold transition-colors">+</button>
+                                        <button onclick="app.addExamCountdown()" class="bg-orange-600 hover:bg-orange-500 text-white px-3 py-2 rounded-xl text-sm font-bold transition-colors" aria-label="Add deadline countdown">+</button>
                                     </div>
                                 </div>
                                 ${state.examCountdowns.length === 0 ? '<p class="text-xs text-stone-400 italic text-center py-1">No exams added yet.</p>' : '<div class="space-y-2">' + state.examCountdowns.map(ex => {
@@ -3340,8 +3340,8 @@
                                     const over = days < 0;
                                     return '<div class="flex items-center justify-between gap-2 ' + (urgent && !over ? 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800' : 'bg-stone-50 dark:bg-stone-800') + ' rounded-xl px-3 py-2">' +
                                         '<div><div class="text-sm font-semibold text-stone-800 dark:text-stone-100">' + esc(ex.label) + '</div>' +
-                                        '<div class="text-[10px] font-bold ' + (over ? 'text-stone-400' : urgent ? 'text-red-600' : 'text-orange-600') + '">' + (over ? 'Exam passed' : days === 0 ? 'TODAY!' : days + ' day' + (days !== 1 ? 's' : '') + ' left') + '</div></div>' +
-                                        '<button onclick="app.removeExamCountdown(\'' + ex.id + '\')" class="text-stone-300 hover:text-red-500 text-xs font-bold transition-colors">✕</button></div>';
+                                        '<div class="text-[13px] font-bold ' + (over ? 'text-stone-400' : urgent ? 'text-red-600' : 'text-orange-600') + '">' + (over ? 'Exam passed' : days === 0 ? 'TODAY!' : days + ' day' + (days !== 1 ? 's' : '') + ' left') + '</div></div>' +
+                                        '<button onclick="app.removeExamCountdown(\'' + ex.id + '\')" class="text-stone-300 hover:text-red-500 text-xs font-bold transition-colors" aria-label="Remove deadline">✕</button></div>';
                                 }).join('') + '</div>'}
                             </div>
                             <div class="bg-white dark:bg-[#292524] p-6 rounded-[2rem] border border-stone-100 dark:border-stone-800 shadow-sm">
@@ -3356,9 +3356,9 @@
                                         const dateStr = d.toISOString().slice(0, 10);
                                         const active = (state.rankEvidence.activeDateLog || []).includes(dateStr);
                                         const dayLabel = ['S','M','T','W','T','F','S'][d.getDay()];
-                                        dots.push('<div class="flex flex-col items-center gap-1"><div class="w-5 h-5 rounded-full ' + (active ? 'bg-orange-600' : 'bg-stone-200 dark:bg-stone-700') + '"></div><span class="text-[9px] font-bold text-stone-400">' + dayLabel + '</span></div>');
+                                        dots.push('<div class="flex flex-col items-center gap-1"><div class="w-5 h-5 rounded-full ' + (active ? 'bg-orange-600' : 'bg-stone-200 dark:bg-stone-700') + '"></div><span class="text-[11px] font-bold text-stone-400">' + dayLabel + '</span></div>');
                                     }
-                                    return '<div class="flex items-center gap-3 mb-4"><span class="text-4xl">' + flame + '</span><div><div class="text-2xl font-serif font-bold text-orange-600">' + streak + '</div><div class="text-[10px] font-bold uppercase tracking-widest text-stone-400">' + msg + '</div></div></div>' +
+                                    return '<div class="flex items-center gap-3 mb-4"><span class="text-4xl">' + flame + '</span><div><div class="text-2xl font-serif font-bold text-orange-600">' + streak + '</div><div class="text-[13px] font-bold uppercase tracking-widest text-stone-400">' + msg + '</div></div></div>' +
                                         '<div class="flex justify-between gap-1">' + dots.join('') + '</div>';
                                 })()}
                             </div>
@@ -3374,11 +3374,11 @@
                                         const pct = Math.min(100, (r.current / r.required) * 100);
                                         const done = r.current >= r.required;
                                         return '<div>' +
-                                            '<div class="flex justify-between text-[10px] font-bold uppercase tracking-widest mb-0.5"><span class="' + (done ? 'text-green-600' : 'text-stone-400') + '">' + r.label + '</span><span class="text-stone-400">' + Math.min(r.current, r.required) + '/' + r.required + '</span></div>' +
+                                            '<div class="flex justify-between text-[13px] font-bold uppercase tracking-widest mb-0.5"><span class="' + (done ? 'text-green-600' : 'text-stone-400') + '">' + r.label + '</span><span class="text-stone-400">' + Math.min(r.current, r.required) + '/' + r.required + '</span></div>' +
                                             '<div class="w-full bg-stone-100 dark:bg-stone-800 rounded-full h-1.5 overflow-hidden"><div class="h-full rounded-full ' + (done ? 'bg-green-500' : 'bg-orange-600') + '" style="width:' + pct + '%"></div></div>' +
                                         '</div>';
                                     }).join('') + '</div>' +
-                                    '<p class="text-[10px] text-stone-400 font-bold uppercase tracking-widest">Next: ' + esc(progress.nextRank) + '</p>';
+                                    '<p class="text-[13px] text-stone-400 font-bold uppercase tracking-widest">Next: ' + esc(progress.nextRank) + '</p>';
                                 })()}
                                 <button onclick="app.navTo('rank')" class="w-full bg-stone-100 dark:bg-stone-800 py-2 rounded-xl text-xs font-bold uppercase tracking-widest text-stone-500 hover:text-orange-600 transition-colors mt-3">View Rank</button>
                             </div>
@@ -3388,7 +3388,7 @@
                                 <div class="flex justify-between items-center mb-6">
                                     <div class="flex flex-col">
                                         <h3 class="text-2xl font-serif font-bold text-stone-900 dark:text-stone-50">Mission Notes</h3>
-                                        <span id="save-status" class="text-[10px] uppercase font-bold tracking-widest text-stone-400">Synced</span>
+                                        <span id="save-status" class="text-[13px] uppercase font-bold tracking-widest text-stone-400">Synced</span>
                                     </div>
                                     <div style="display:flex;gap:0.5rem;align-items:center;">
                                         <button onclick="app.saveUserData()" class="bg-orange-600 hover:bg-orange-500 text-white px-6 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-all">Save Notes</button>
@@ -3427,7 +3427,7 @@
                     <div class="text-left max-w-4xl mx-auto mb-12">
                         <div class="bg-white dark:bg-[#292524] rounded-[2rem] border border-stone-100 dark:border-stone-800 shadow-sm overflow-hidden">
                             <div class="p-8 pb-4">
-                                <span class="text-[10px] font-bold text-orange-600 uppercase tracking-widest">Real Talk</span>
+                                <span class="text-[13px] font-bold text-orange-600 uppercase tracking-widest">Real Talk</span>
                                 <h2 class="text-3xl font-serif font-bold text-stone-900 dark:text-stone-50 mt-1 mb-2">Q & A with Real Teens</h2>
                                 <p class="text-sm text-stone-500 dark:text-stone-400">20 honest answers to the questions students actually ask. Tap any question to read the answer.</p>
                             </div>
@@ -3465,7 +3465,7 @@
                                 <div class="flex gap-1">
                                     ${[1,2,3,4].map(i => '<div class="w-2.5 h-2.5 rounded-full ' + (pomodoroStore.consecutiveCount(state.timerTaskLabel) >= i ? 'bg-orange-600' : 'bg-stone-200 dark:bg-stone-700') + '"></div>').join('')}
                                 </div>
-                                <span class="text-[10px] font-bold uppercase tracking-widest text-stone-400">${pomodoroStore.consecutiveCount(state.timerTaskLabel)}/4</span>
+                                <span class="text-[13px] font-bold uppercase tracking-widest text-stone-400">${pomodoroStore.consecutiveCount(state.timerTaskLabel)}/4</span>
                             </div>
                             <div class="flex gap-2 w-full mb-2">
                                 <button id="timer-toggle-btn" onclick="state.timerIsRunning ? app.pauseTimer() : app.startTimer()" class="flex-grow bg-stone-900 dark:bg-stone-50 text-white dark:text-stone-900 py-3 rounded-2xl font-bold uppercase tracking-widest text-xs">Start</button>
@@ -3475,7 +3475,7 @@
                                 <button onclick="app.switchTimerMode('work')" class="flex-1 py-2 rounded-xl text-xs font-bold uppercase tracking-widest ${state.timerMode === 'work' ? 'bg-orange-600 text-white' : 'bg-stone-100 dark:bg-stone-800 text-stone-500'}">Focus</button>
                                 <button onclick="app.switchTimerMode('break')" class="flex-1 py-2 rounded-xl text-xs font-bold uppercase tracking-widest ${state.timerMode === 'break' ? 'bg-stone-600 text-white' : 'bg-stone-100 dark:bg-stone-800 text-stone-500'}">Break</button>
                             </div>
-                            <a href="https://www.youtube.com/results?search_query=lofi+hip+hop+study" target="_blank" rel="noopener" class="text-[10px] font-bold uppercase tracking-widest text-stone-400 hover:text-orange-600 transition-colors">🎵 Study Music</a>
+                            <a href="https://www.youtube.com/results?search_query=lofi+hip+hop+study" target="_blank" rel="noopener" class="text-[13px] font-bold uppercase tracking-widest text-stone-400 hover:text-orange-600 transition-colors">🎵 Study Music</a>
                         </div>
                     </div>
                 </div>`,
@@ -3485,10 +3485,10 @@
                 if (!grid) return;
                 grid.innerHTML = learningData.map(t => `
                     <div onclick="app.openModal(${t.id})" class="card-hover bg-white dark:bg-[#292524] p-8 rounded-3xl border border-stone-100 dark:border-stone-800 cursor-pointer text-left flex flex-col group transition-all">
-                        <span class="text-[10px] font-bold text-orange-600 uppercase tracking-widest mb-2">${esc(t.category)}</span>
+                        <span class="text-[13px] font-bold text-orange-600 uppercase tracking-widest mb-2">${esc(t.category)}</span>
                         <h3 class="text-2xl font-serif font-bold mb-3 text-stone-900 dark:text-stone-50">${esc(t.title)}</h3>
                         <p class="text-sm text-stone-500 dark:text-stone-400 flex-grow leading-relaxed">${esc(t.summary)}</p>
-                        <div class="mt-6 text-[10px] font-bold text-stone-400 uppercase tracking-widest group-hover:text-orange-600 transition-colors">Open Protocol</div>
+                        <div class="mt-6 text-[13px] font-bold text-stone-400 uppercase tracking-widest group-hover:text-orange-600 transition-colors">Open Protocol</div>
                     </div>`).join('');
             },
 
@@ -3541,7 +3541,7 @@
                         <div class="flex gap-4 flex-wrap">${boxNames.map((name, i) => {
                             const count = cards.filter(c => c.box === i + 1).length;
                             return `<div class="bg-white dark:bg-[#292524] px-4 py-3 rounded-xl border border-stone-200 dark:border-stone-700 text-center min-w-[80px]">
-                                <div class="text-[10px] font-bold uppercase text-stone-400 tracking-widest">${name}</div>
+                                <div class="text-[13px] font-bold uppercase text-stone-400 tracking-widest">${name}</div>
                                 <div class="font-serif font-bold text-xl ${count > 0 ? 'text-orange-600' : 'text-stone-300'}">${count}</div>
                             </div>`;
                         }).join('')}</div>
@@ -3566,7 +3566,7 @@
                                 return `<div class="${orbitStatus.bg} p-4 rounded-xl border flex items-center gap-4 transition-all">
                                     <span class="text-lg flex-shrink-0" title="${orbitStatus.label}">${orbitStatus.icon}</span>
                                     <div class="flex-grow"><span class="font-semibold text-sm">${esc(c.front)}</span> <span class="text-stone-400 mx-2">&rarr;</span> <span class="text-stone-500 text-sm">${esc(c.back)}</span></div>
-                                    <span class="text-[10px] font-bold uppercase ${orbitStatus.color} tracking-widest whitespace-nowrap">Box ${c.box}</span>
+                                    <span class="text-[13px] font-bold uppercase ${orbitStatus.color} tracking-widest whitespace-nowrap">Box ${c.box}</span>
                                     <button onclick="app.cardDelete('${c.id}')" class="text-stone-400 hover:text-red-500 text-sm">&times;</button>
                                 </div>`;
                             }).join('')}
@@ -3624,9 +3624,9 @@
                                 <p class="text-sm text-stone-500">${cards.length} cards &middot; ${due} due</p>
                                 ${cards.length > 0 ? `<div class="flex items-center gap-2 mt-2 mb-1">
                                     <div class="flex-grow bg-stone-100 dark:bg-stone-800 rounded-full h-1.5 overflow-hidden"><div class="h-full rounded-full bg-green-500 transition-all" style="width:${orbitPct}%"></div></div>
-                                    <span class="text-[9px] font-bold ${orbitPct >= 80 ? 'text-green-500' : orbitPct > 0 ? 'text-orange-500' : 'text-stone-400'}">${orbitPct}% stable</span>
+                                    <span class="text-[11px] font-bold ${orbitPct >= 80 ? 'text-green-500' : orbitPct > 0 ? 'text-orange-500' : 'text-stone-400'}">${orbitPct}% stable</span>
                                 </div>
-                                <div class="flex gap-2 text-[9px] font-bold">
+                                <div class="flex gap-2 text-[11px] font-bold">
                                     ${stableCount > 0 ? '<span class="text-green-500">✨ ' + stableCount + ' orbiting</span>' : ''}
                                     ${driftCount > 0 ? '<span class="text-red-500">🔴 ' + driftCount + ' drifting</span>' : ''}
                                 </div>` : ''}
@@ -3650,7 +3650,7 @@
                         <span class="text-xs font-bold text-stone-400 uppercase tracking-widest">${remaining} cards remaining</span>
                         <div class="flex items-center gap-3">
                             <span class="text-xs font-bold text-orange-600 uppercase tracking-widest">Box ${card.box}${isBox5 ? ' ✨' : ''}</span>
-                            <button onclick="app.openSwipeHUD()" class="text-[10px] font-bold uppercase tracking-widest border border-[#39FF14]/30 text-[#39FF14]/60 hover:text-[#39FF14] hover:border-[#39FF14] px-2 py-1 font-mono transition-colors">⟳ Swipe</button>
+                            <button onclick="app.openSwipeHUD()" class="text-[13px] font-bold uppercase tracking-widest border border-[#39FF14]/30 text-[#39FF14]/60 hover:text-[#39FF14] hover:border-[#39FF14] px-2 py-1 font-mono transition-colors">⟳ Swipe</button>
                         </div>
                     </div>
                     <div class="perspective-1000 cursor-pointer" onclick="app.studyFlip()">
@@ -3673,7 +3673,7 @@
                         <button onclick="app.studyRate(true)" class="flex-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 py-4 rounded-2xl font-bold uppercase tracking-widest text-sm">Got It</button>
                     </div>
                     <div class="flex justify-center">
-                        <button onclick="app.generateCurrentCardMnemonic()" class="text-[10px] font-mono font-bold uppercase tracking-widest border border-[#FF00FF]/30 text-[#FF00FF]/50 hover:text-[#FF00FF] hover:border-[#FF00FF] px-4 py-2 transition-colors">⚡ Generate Mnemonic</button>
+                        <button onclick="app.generateCurrentCardMnemonic()" class="text-[13px] font-mono font-bold uppercase tracking-widest border border-[#FF00FF]/30 text-[#FF00FF]/50 hover:text-[#FF00FF] hover:border-[#FF00FF] px-4 py-2 transition-colors">⚡ Generate Mnemonic</button>
                     </div>` : '<p class="text-center text-stone-400 text-sm">Tap card to reveal answer</p>'}
                 </div>`;
             },
@@ -3832,8 +3832,8 @@
                         const memberRows = s.members.map(m => {
                             const border = m.isMe ? 'border-[#8A2BE2]/50 bg-[#8A2BE2]/5' : m.isAfk ? 'border-[#FF00FF]/20 bg-[#FF00FF]/5' : 'border-[#39FF14]/10 bg-black/40';
                             const nameColor = m.isMe ? 'text-[#8A2BE2]' : m.isAfk ? 'text-[#FF00FF]/70' : 'text-[#39FF14]';
-                            const afkBadge = m.isAfk ? ` <span class="text-[10px] text-[#FF00FF]/60 font-mono">[AFK ${m.hoursInactive}h]</span>` : '';
-                            const meBadge = m.isMe ? ` <span class="text-[10px] text-[#8A2BE2]/60 font-mono">[you]</span>` : '';
+                            const afkBadge = m.isAfk ? ` <span class="text-[13px] text-[#FF00FF]/60 font-mono">[AFK ${m.hoursInactive}h]</span>` : '';
+                            const meBadge = m.isMe ? ` <span class="text-[13px] text-[#8A2BE2]/60 font-mono">[you]</span>` : '';
                             const lastActiveStr = m.lastActive
                                 ? new Date(m.lastActive).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
                                 : 'never';
@@ -3856,7 +3856,7 @@
                                     </div>
                                     <div class="text-right">
                                         <div class="text-3xl font-bold font-mono tabular-nums" style="color:#8A2BE2;">${s.squadStreak}</div>
-                                        <div class="text-[10px] font-bold uppercase tracking-widest text-[#8A2BE2]/50">SQUAD STREAK</div>
+                                        <div class="text-[13px] font-bold uppercase tracking-widest text-[#8A2BE2]/50">SQUAD STREAK</div>
                                     </div>
                                 </div>
                                 <div class="text-sm text-[#39FF14]/80 font-mono font-bold">// squad streak = lowest individual streak — one weak link drops it</div>
@@ -3999,7 +3999,7 @@
 
                     if (data.myEntry && !data.myEntryInTop && myRowEl) {
                         myRowEl.innerHTML = `<div class="border-t border-[#FF00FF]/20 pt-4 mt-4">
-                            <p class="text-[10px] text-[#FF00FF]/40 font-mono mb-2 uppercase tracking-widest">// your position</p>
+                            <p class="text-[13px] text-[#FF00FF]/40 font-mono mb-2 uppercase tracking-widest">// your position</p>
                             ${rowHTML(data.myEntry, false)}
                         </div>`;
                         myRowEl.classList.remove('hidden');
@@ -4058,7 +4058,7 @@
                             style="background:#FF8800;color:#000;border:none;padding:10px 24px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-weight:bold;white-space:nowrap;">⬡ INITIATE RUN</button>
                     </div>
                     <div id="er-run-list"><div style="color:#FF8800;opacity:0.4;font-size:13px;font-family:'Share Tech Mono',monospace;text-align:center;padding:48px 0;">[ LOADING DOSSIERS... ]</div></div>
-                    <div style="margin-top:32px;border-top:1px solid #111;padding-top:16px;color:#333;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;">
+                    <div style="margin-top:32px;border-top:1px solid #111;padding-top:16px;color:#333;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:2px;">
                         ⚡ SHORTCUT: BrainDump 200+ words or Boss Fight 90%+ score grants Shortcut Badge.<br>
                         ⚠ ROLLBACK: Domain inactivity for 5+ days corrupts one exploit. Stay active.
                     </div>
@@ -4347,17 +4347,17 @@
 
                 const taskCard = (t, showMove = true) => {
                     const moveButtons = showMove ? `<div class="flex gap-1 mt-2">
-                        ${t.quadrant !== 1 ? '<button onclick="app.matrixMove(\''+t.id+'\', 1)" class="text-[9px] font-bold uppercase tracking-widest bg-red-100 dark:bg-red-900/30 text-red-600 px-2 py-0.5 rounded">Q1</button>' : ''}
-                        ${t.quadrant !== 2 ? '<button onclick="app.matrixMove(\''+t.id+'\', 2)" class="text-[9px] font-bold uppercase tracking-widest bg-amber-100 dark:bg-amber-900/30 text-amber-600 px-2 py-0.5 rounded">Q2</button>' : ''}
-                        ${t.quadrant !== 3 ? '<button onclick="app.matrixMove(\''+t.id+'\', 3)" class="text-[9px] font-bold uppercase tracking-widest bg-blue-100 dark:bg-blue-900/30 text-blue-600 px-2 py-0.5 rounded">Q3</button>' : ''}
-                        ${t.quadrant !== 4 ? '<button onclick="app.matrixMove(\''+t.id+'\', 4)" class="text-[9px] font-bold uppercase tracking-widest bg-stone-200 dark:bg-stone-700 text-stone-500 px-2 py-0.5 rounded">Q4</button>' : ''}
+                        ${t.quadrant !== 1 ? '<button onclick="app.matrixMove(\''+t.id+'\', 1)" class="text-[11px] font-bold uppercase tracking-widest bg-red-100 dark:bg-red-900/30 text-red-600 px-2 py-0.5 rounded">Q1</button>' : ''}
+                        ${t.quadrant !== 2 ? '<button onclick="app.matrixMove(\''+t.id+'\', 2)" class="text-[11px] font-bold uppercase tracking-widest bg-amber-100 dark:bg-amber-900/30 text-amber-600 px-2 py-0.5 rounded">Q2</button>' : ''}
+                        ${t.quadrant !== 3 ? '<button onclick="app.matrixMove(\''+t.id+'\', 3)" class="text-[11px] font-bold uppercase tracking-widest bg-blue-100 dark:bg-blue-900/30 text-blue-600 px-2 py-0.5 rounded">Q3</button>' : ''}
+                        ${t.quadrant !== 4 ? '<button onclick="app.matrixMove(\''+t.id+'\', 4)" class="text-[11px] font-bold uppercase tracking-widest bg-stone-200 dark:bg-stone-700 text-stone-500 px-2 py-0.5 rounded">Q4</button>' : ''}
                     </div>` : '';
                     return `<div class="bg-white dark:bg-[#292524] p-3 rounded-xl border border-stone-100 dark:border-stone-800 flex flex-col gap-1">
                         <div class="flex items-start justify-between gap-2">
                             <span class="text-sm font-medium flex-grow">${esc(t.text)}</span>
                             <div class="flex gap-1 flex-shrink-0">
-                                <button onclick="app.matrixComplete('${t.id}')" class="text-green-500 hover:text-green-600 text-xs" title="Complete">&#x2713;</button>
-                                <button onclick="app.matrixDelete('${t.id}')" class="text-stone-400 hover:text-red-500 text-xs">&times;</button>
+                                <button onclick="app.matrixComplete('${t.id}')" class="text-green-500 hover:text-green-600 text-xs" title="Complete" aria-label="Mark complete">&#x2713;</button>
+                                <button onclick="app.matrixDelete('${t.id}')" class="text-stone-400 hover:text-red-500 text-xs" aria-label="Delete task">&times;</button>
                             </div>
                         </div>
                         ${moveButtons}
@@ -4368,7 +4368,7 @@
                     <div class="rounded-[1.5rem] p-5 border ${colorBorder} ${colorBg} flex flex-col">
                         <div class="mb-3">
                             <h3 class="text-sm font-bold uppercase tracking-widest ${colorText}">${title}</h3>
-                            <p class="text-[10px] text-stone-500 dark:text-stone-400 mt-0.5">${subtitle}</p>
+                            <p class="text-[13px] text-stone-500 dark:text-stone-400 mt-0.5">${subtitle}</p>
                         </div>
                         <div class="space-y-2 flex-grow">${items.length === 0 ? '<p class="text-xs text-stone-400 italic">No tasks here</p>' : items.map(t => taskCard(t)).join('')}</div>
                     </div>`;
@@ -4413,10 +4413,10 @@
                                 ${unsorted.map(t => `<div class="bg-stone-50 dark:bg-stone-800 p-3 rounded-xl flex items-center gap-3">
                                     <span class="text-sm font-medium flex-grow">${esc(t.text)}</span>
                                     <div class="flex gap-1">
-                                        <button onclick="app.matrixMove('${t.id}', 1)" class="text-[9px] font-bold uppercase tracking-widest bg-red-100 dark:bg-red-900/30 text-red-600 px-2 py-1 rounded-lg">Q1</button>
-                                        <button onclick="app.matrixMove('${t.id}', 2)" class="text-[9px] font-bold uppercase tracking-widest bg-amber-100 dark:bg-amber-900/30 text-amber-600 px-2 py-1 rounded-lg">Q2</button>
-                                        <button onclick="app.matrixMove('${t.id}', 3)" class="text-[9px] font-bold uppercase tracking-widest bg-blue-100 dark:bg-blue-900/30 text-blue-600 px-2 py-1 rounded-lg">Q3</button>
-                                        <button onclick="app.matrixMove('${t.id}', 4)" class="text-[9px] font-bold uppercase tracking-widest bg-stone-300 dark:bg-stone-600 text-stone-600 dark:text-stone-300 px-2 py-1 rounded-lg">Q4</button>
+                                        <button onclick="app.matrixMove('${t.id}', 1)" class="text-[11px] font-bold uppercase tracking-widest bg-red-100 dark:bg-red-900/30 text-red-600 px-2 py-1 rounded-lg">Q1</button>
+                                        <button onclick="app.matrixMove('${t.id}', 2)" class="text-[11px] font-bold uppercase tracking-widest bg-amber-100 dark:bg-amber-900/30 text-amber-600 px-2 py-1 rounded-lg">Q2</button>
+                                        <button onclick="app.matrixMove('${t.id}', 3)" class="text-[11px] font-bold uppercase tracking-widest bg-blue-100 dark:bg-blue-900/30 text-blue-600 px-2 py-1 rounded-lg">Q3</button>
+                                        <button onclick="app.matrixMove('${t.id}', 4)" class="text-[11px] font-bold uppercase tracking-widest bg-stone-300 dark:bg-stone-600 text-stone-600 dark:text-stone-300 px-2 py-1 rounded-lg">Q4</button>
                                     </div>
                                     <button onclick="app.matrixDelete('${t.id}')" class="text-stone-400 hover:text-red-500 text-sm">&times;</button>
                                 </div>`).join('')}
@@ -4435,7 +4435,7 @@
                         <p class="text-sm text-stone-600 dark:text-stone-300 mb-4">Pick a Q1 task and ask: <strong>"What Q2 action could have prevented this?"</strong> Then pick a Q2 task and schedule it before it becomes urgent.</p>
                         <textarea id="matrix-reflection" class="w-full h-20 bg-white dark:bg-stone-800 border border-amber-200 dark:border-amber-700 rounded-xl p-4 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none" placeholder="Write your reflection here..."></textarea>
                         <button onclick="app.matrixSaveReflection()" class="mt-2 bg-amber-600 hover:bg-amber-500 text-white px-6 py-2 rounded-xl font-bold text-xs uppercase tracking-widest">Save Reflection</button>
-                        ${state.eisenhowerReflections.length > 0 ? `<div class="mt-4 space-y-2">${state.eisenhowerReflections.slice(-3).reverse().map(r => `<div class="bg-white dark:bg-stone-800 p-3 rounded-lg text-sm text-stone-600 dark:text-stone-300 italic">"${esc(r.text)}" <span class="text-[10px] text-stone-400 ml-2">${new Date(r.createdAt).toLocaleDateString()}</span></div>`).join('')}</div>` : ''}
+                        ${state.eisenhowerReflections.length > 0 ? `<div class="mt-4 space-y-2">${state.eisenhowerReflections.slice(-3).reverse().map(r => `<div class="bg-white dark:bg-stone-800 p-3 rounded-lg text-sm text-stone-600 dark:text-stone-300 italic">"${esc(r.text)}" <span class="text-[13px] text-stone-400 ml-2">${new Date(r.createdAt).toLocaleDateString()}</span></div>`).join('')}</div>` : ''}
                     </div>
 
                     <div class="bg-white dark:bg-[#292524] rounded-[2rem] p-8 border border-stone-100 dark:border-stone-800 shadow-sm">
@@ -4490,7 +4490,7 @@
                         </div>
                         <div class="w-full bg-stone-200 dark:bg-stone-700 rounded-full h-1.5"><div class="bg-orange-600 h-full rounded-full transition-all" style="width:${progress}%"></div></div>
                         <div class="bg-white dark:bg-[#292524] rounded-[2rem] p-8 border border-stone-100 dark:border-stone-800 shadow-sm">
-                            <span class="text-[10px] font-bold text-orange-600 uppercase tracking-widest">${esc(app.decodeHTML(q.category))}</span>
+                            <span class="text-[13px] font-bold text-orange-600 uppercase tracking-widest">${esc(app.decodeHTML(q.category))}</span>
                             <h2 class="text-2xl font-serif font-bold mt-2 mb-6">${esc(app.decodeHTML(q.question))}</h2>
                             <div class="grid grid-cols-1 gap-3">${q.answers.map((a, i) => {
                                 let cls = 'bg-stone-50 dark:bg-stone-800 border-stone-200 dark:border-stone-700 hover:border-orange-500 cursor-pointer';
@@ -4547,10 +4547,10 @@
                 });
                 const domainCards = Object.entries(domainMap).map(([name, d]) => {
                     const multiBadge = d.count > 1 ? `<span style="color:#FF00FF;font-size:13px;font-weight:bold;letter-spacing:1px;background:#FF00FF11;border:1px solid #FF00FF44;padding:2px 8px;border-radius:2px;">×${d.count}</span>` : '<span style="color:#39FF14;font-size:11px;">✓</span>';
-                    const shortcutStr = d.totalShortcuts > 0 ? `<span style="color:#FF8800;font-size:10px;margin-left:8px;">⚡${d.totalShortcuts}</span>` : '';
+                    const shortcutStr = d.totalShortcuts > 0 ? `<span style="color:#FF8800;font-size:12px;margin-left:8px;">⚡${d.totalShortcuts}</span>` : '';
                     return `<div style="display:flex;align-items:center;justify-content:space-between;background:#0a0a0a;border:1px solid #1a3a1a;border-radius:4px;padding:10px 14px;">
                         <div><span style="color:#39FF14;font-size:13px;letter-spacing:2px;font-weight:bold;">⬡ ${esc(name.toUpperCase())}</span>${shortcutStr}</div>
-                        <div style="display:flex;align-items:center;gap:8px;">${multiBadge}<span style="color:#444;font-size:10px;">${d.lastCompleted ? d.lastCompleted.slice(0,10) : ''}</span></div>
+                        <div style="display:flex;align-items:center;gap:8px;">${multiBadge}<span style="color:#444;font-size:12px;">${d.lastCompleted ? d.lastCompleted.slice(0,10) : ''}</span></div>
                     </div>`;
                 }).join('');
                 return `<div style="background:#000;border:1px solid rgba(57,255,20,0.15);border-radius:2.5rem;padding:2.5rem;">
@@ -4575,7 +4575,7 @@
                         <p class="text-stone-500 text-sm">Rank ${rankIdx + 1} of ${RANKS.length}</p>
                         <div class="flex justify-center gap-4 mt-6">${RANKS.map((r, i) => {
                             const earned = i <= rankIdx;
-                            return '<div class="flex flex-col items-center gap-1"><div class="w-10 h-10 rounded-full flex items-center justify-center text-lg ' + (earned ? 'bg-orange-600 text-white' : 'bg-stone-200 dark:bg-stone-700 text-stone-400') + '">' + (rankIcons[r] || '') + '</div><span class="text-[9px] font-bold uppercase tracking-widest ' + (earned ? 'text-orange-600' : 'text-stone-400') + '">' + r.split(' ').map(w => w[0]).join('') + '</span></div>';
+                            return '<div class="flex flex-col items-center gap-1"><div class="w-10 h-10 rounded-full flex items-center justify-center text-lg ' + (earned ? 'bg-orange-600 text-white' : 'bg-stone-200 dark:bg-stone-700 text-stone-400') + '">' + (rankIcons[r] || '') + '</div><span class="text-[11px] font-bold uppercase tracking-widest ' + (earned ? 'text-orange-600' : 'text-stone-400') + '">' + r.split(' ').map(w => w[0]).join('') + '</span></div>';
                         }).join('<div class="flex items-center"><div class="w-8 h-0.5 ' + 'bg-stone-300 dark:bg-stone-600' + '"></div></div>')}</div>
                     </div>
                     ${progress ? '<div class="bg-white dark:bg-[#292524] rounded-[2.5rem] p-10 border border-stone-100 dark:border-stone-800 shadow-sm">' +
@@ -4608,7 +4608,7 @@
                                 const orbit = best === null ? '⚪' : best >= total * 0.8 ? '🟢' : best >= total * 0.5 ? '🟠' : '🔴';
                                 return '<div class="text-center p-3 rounded-xl border ' + (attempted ? 'bg-orange-50 dark:bg-orange-900/10 border-orange-200 dark:border-orange-800' : 'bg-stone-50 dark:bg-stone-800 border-stone-200 dark:border-stone-700') + '">' +
                                     '<div class="text-lg">' + orbit + '</div>' +
-                                    '<div class="text-[9px] font-bold uppercase tracking-widest mt-1 ' + (attempted ? 'text-orange-600' : 'text-stone-400') + '">M' + (i+1) + '</div>' +
+                                    '<div class="text-[11px] font-bold uppercase tracking-widest mt-1 ' + (attempted ? 'text-orange-600' : 'text-stone-400') + '">M' + (i+1) + '</div>' +
                                     '</div>';
                             }).join('') + '</div>' +
                             (journeyComplete ? '<div class="mt-4 bg-green-50 dark:bg-green-900/20 rounded-2xl p-4 border border-green-200 dark:border-green-800 text-center">' +
@@ -4621,13 +4621,13 @@
                     <div class="bg-white dark:bg-[#292524] rounded-[2.5rem] p-10 border border-stone-100 dark:border-stone-800 shadow-sm">
                         <h3 class="text-lg font-serif font-bold mb-4">Evidence Log</h3>
                         <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                            <div class="text-center p-4 bg-stone-50 dark:bg-stone-800 rounded-2xl"><div class="text-2xl font-serif font-bold text-orange-600">${state.rankEvidence.pomodorosCompleted}</div><div class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mt-1">Focus Sessions</div></div>
-                            <div class="text-center p-4 bg-stone-50 dark:bg-stone-800 rounded-2xl"><div class="text-2xl font-serif font-bold text-orange-600">${state.rankEvidence.blurtsCompleted}</div><div class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mt-1">Blurt Sessions</div></div>
-                            <div class="text-center p-4 bg-stone-50 dark:bg-stone-800 rounded-2xl"><div class="text-2xl font-serif font-bold text-orange-600">${state.rankEvidence.governorBreakdowns}</div><div class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mt-1">Breakdowns</div></div>
-                            <div class="text-center p-4 bg-stone-50 dark:bg-stone-800 rounded-2xl"><div class="text-2xl font-serif font-bold text-orange-600">${state.rankEvidence.cardsAdvanced}</div><div class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mt-1">Cards Studied</div></div>
-                            <div class="text-center p-4 bg-stone-50 dark:bg-stone-800 rounded-2xl"><div class="text-2xl font-serif font-bold text-orange-600">${state.rankEvidence.activeDays}</div><div class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mt-1">Active Days</div></div>
-                            <div class="text-center p-4 bg-stone-50 dark:bg-stone-800 rounded-2xl"><div class="text-2xl font-serif font-bold text-orange-600">${state.rankEvidence.diagnosticsCompleted || 0}</div><div class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mt-1">Diagnostics</div></div>
-                            <div class="text-center p-4 bg-purple-50 dark:bg-purple-900/20 rounded-2xl"><div class="text-2xl font-serif font-bold text-purple-600">${state.yetMoments.length}</div><div class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mt-1">YET Moments</div></div>
+                            <div class="text-center p-4 bg-stone-50 dark:bg-stone-800 rounded-2xl"><div class="text-2xl font-serif font-bold text-orange-600">${state.rankEvidence.pomodorosCompleted}</div><div class="text-[13px] font-bold uppercase tracking-widest text-stone-400 mt-1">Focus Sessions</div></div>
+                            <div class="text-center p-4 bg-stone-50 dark:bg-stone-800 rounded-2xl"><div class="text-2xl font-serif font-bold text-orange-600">${state.rankEvidence.blurtsCompleted}</div><div class="text-[13px] font-bold uppercase tracking-widest text-stone-400 mt-1">Blurt Sessions</div></div>
+                            <div class="text-center p-4 bg-stone-50 dark:bg-stone-800 rounded-2xl"><div class="text-2xl font-serif font-bold text-orange-600">${state.rankEvidence.governorBreakdowns}</div><div class="text-[13px] font-bold uppercase tracking-widest text-stone-400 mt-1">Breakdowns</div></div>
+                            <div class="text-center p-4 bg-stone-50 dark:bg-stone-800 rounded-2xl"><div class="text-2xl font-serif font-bold text-orange-600">${state.rankEvidence.cardsAdvanced}</div><div class="text-[13px] font-bold uppercase tracking-widest text-stone-400 mt-1">Cards Studied</div></div>
+                            <div class="text-center p-4 bg-stone-50 dark:bg-stone-800 rounded-2xl"><div class="text-2xl font-serif font-bold text-orange-600">${state.rankEvidence.activeDays}</div><div class="text-[13px] font-bold uppercase tracking-widest text-stone-400 mt-1">Active Days</div></div>
+                            <div class="text-center p-4 bg-stone-50 dark:bg-stone-800 rounded-2xl"><div class="text-2xl font-serif font-bold text-orange-600">${state.rankEvidence.diagnosticsCompleted || 0}</div><div class="text-[13px] font-bold uppercase tracking-widest text-stone-400 mt-1">Diagnostics</div></div>
+                            <div class="text-center p-4 bg-purple-50 dark:bg-purple-900/20 rounded-2xl"><div class="text-2xl font-serif font-bold text-purple-600">${state.yetMoments.length}</div><div class="text-[13px] font-bold uppercase tracking-widest text-stone-400 mt-1">YET Moments</div></div>
                         </div>
                     </div>
                     <div id="er-rank-clearances">${app.getRankClearancesHTML()}</div>
@@ -4641,14 +4641,14 @@
                         <p class="text-sm text-stone-500 dark:text-stone-400 mb-5">Share your buddy code with a friend to compare progress side-by-side.</p>
                         <div class="space-y-4">
                             <div>
-                                <p class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mb-2">Your Buddy Code</p>
+                                <p class="text-[13px] font-bold uppercase tracking-widest text-stone-400 mb-2">Your Buddy Code</p>
                                 <div class="flex gap-2">
                                     <div id="buddy-code-display" class="flex-grow bg-stone-50 dark:bg-stone-800 px-4 py-2.5 rounded-xl border border-stone-200 dark:border-stone-700 text-xs text-stone-500 font-mono break-all">(click to generate)</div>
                                     <button onclick="app.copyBuddyCode()" class="bg-orange-600 hover:bg-orange-500 text-white px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest transition-colors flex-shrink-0">Copy</button>
                                 </div>
                             </div>
                             <div>
-                                <p class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mb-2">Enter a Buddy's Code</p>
+                                <p class="text-[13px] font-bold uppercase tracking-widest text-stone-400 mb-2">Enter a Buddy's Code</p>
                                 <div class="flex gap-2">
                                     <input id="buddy-code-input" type="text" placeholder="Paste buddy code here..." class="flex-grow bg-stone-50 dark:bg-stone-800 px-4 py-2.5 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
                                     <button onclick="app.loadBuddyCode()" class="bg-stone-700 dark:bg-stone-200 text-white dark:text-stone-900 px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest transition-colors flex-shrink-0">Load</button>
@@ -4660,12 +4660,12 @@
                                 const me = { rank: state.rank, pomodoros: state.rankEvidence.pomodorosCompleted, blurts: state.rankEvidence.blurtsCompleted, cards: state.rankEvidence.cardsAdvanced, streak: rankEngine.getStreak(), yets: state.yetMoments.length };
                                 const row = (label, myVal, theirVal) => {
                                     const meBetter = myVal >= theirVal;
-                                    return '<div class="flex items-center gap-2 text-sm"><span class="flex-1 text-right font-bold ' + (meBetter ? 'text-orange-600' : 'text-stone-500') + '">' + myVal + '</span><span class="text-[10px] uppercase tracking-widest text-stone-400 w-24 text-center">' + label + '</span><span class="flex-1 text-left font-bold ' + (!meBetter ? 'text-orange-600' : 'text-stone-500') + '">' + theirVal + '</span></div>';
+                                    return '<div class="flex items-center gap-2 text-sm"><span class="flex-1 text-right font-bold ' + (meBetter ? 'text-orange-600' : 'text-stone-500') + '">' + myVal + '</span><span class="text-[13px] uppercase tracking-widest text-stone-400 w-24 text-center">' + label + '</span><span class="flex-1 text-left font-bold ' + (!meBetter ? 'text-orange-600' : 'text-stone-500') + '">' + theirVal + '</span></div>';
                                 };
                                 return '<div class="bg-stone-50 dark:bg-stone-800 rounded-2xl p-5 border border-stone-200 dark:border-stone-700">' +
-                                    '<div class="flex justify-between text-center mb-4"><div><div class="text-2xl">' + (rankIcons2[me.rank] || '🚀') + '</div><div class="text-xs font-bold text-orange-600">' + esc(me.rank) + '</div><div class="text-[10px] text-stone-400">You</div></div>' +
+                                    '<div class="flex justify-between text-center mb-4"><div><div class="text-2xl">' + (rankIcons2[me.rank] || '🚀') + '</div><div class="text-xs font-bold text-orange-600">' + esc(me.rank) + '</div><div class="text-[13px] text-stone-400">You</div></div>' +
                                     '<div class="text-sm font-bold text-stone-400 self-center">VS</div>' +
-                                    '<div><div class="text-2xl">' + (rankIcons2[b.rank] || '🚀') + '</div><div class="text-xs font-bold text-orange-600">' + esc(b.rank) + '</div><div class="text-[10px] text-stone-400">Buddy</div></div></div>' +
+                                    '<div><div class="text-2xl">' + (rankIcons2[b.rank] || '🚀') + '</div><div class="text-xs font-bold text-orange-600">' + esc(b.rank) + '</div><div class="text-[13px] text-stone-400">Buddy</div></div></div>' +
                                     '<div class="space-y-1.5">' + row('Focus', me.pomodoros, b.pomodoros) + row('Blurts', me.blurts, b.blurts) + row('Cards', me.cards, b.cards) + row('Streak', me.streak, b.streak) + row('YETs', me.yets, b.yets) + '</div></div>';
                             })() : ''}
                         </div>
@@ -4703,35 +4703,35 @@
                             '<h3 style="color:#FF00FF;font-family:\'Share Tech Mono\',monospace;font-size:1rem;font-weight:bold;letter-spacing:3px;text-transform:uppercase;margin-bottom:4px;">◈ OPERATIVE STATUS BOARD</h3>' +
                             '<p style="color:#444;font-size:0.8rem;margin-bottom:1.5rem;letter-spacing:1px;">Warden surveillance log — clearance score, active traps, streak bonuses.</p>' +
                             '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px;">' +
-                            '<div style="background:#0d0d0d;border:1px solid #FF00FF22;padding:14px;border-radius:8px;text-align:center;"><div style="color:#FF00FF;font-size:22px;font-weight:bold;font-family:\'Share Tech Mono\',monospace;">'+clearanceScore+'</div><div style="color:#555;font-size:9px;letter-spacing:2px;margin-top:4px;">CLEARANCE SCORE</div></div>' +
-                            '<div style="background:#0d0d0d;border:1px solid #FF00FF22;padding:14px;border-radius:8px;text-align:center;"><div style="color:#FF00FF;font-size:22px;font-weight:bold;font-family:\'Share Tech Mono\',monospace;">'+(totalDelta >= 0 ? '+' : '')+totalDelta+'</div><div style="color:#555;font-size:9px;letter-spacing:2px;margin-top:4px;">NET WARDEN DELTA</div></div>' +
-                            '<div style="background:#0d0d0d;border:1px solid #FF00FF22;padding:14px;border-radius:8px;text-align:center;"><div style="color:#FF00FF;font-size:22px;font-weight:bold;font-family:\'Share Tech Mono\',monospace;">'+(rankIdx+1)+' / '+RANKS.length+'</div><div style="color:#555;font-size:9px;letter-spacing:2px;margin-top:4px;">RANK TIER</div></div>' +
+                            '<div style="background:#0d0d0d;border:1px solid #FF00FF22;padding:14px;border-radius:8px;text-align:center;"><div style="color:#FF00FF;font-size:22px;font-weight:bold;font-family:\'Share Tech Mono\',monospace;">'+clearanceScore+'</div><div style="color:#555;font-size:12px;letter-spacing:2px;margin-top:4px;">CLEARANCE SCORE</div></div>' +
+                            '<div style="background:#0d0d0d;border:1px solid #FF00FF22;padding:14px;border-radius:8px;text-align:center;"><div style="color:#FF00FF;font-size:22px;font-weight:bold;font-family:\'Share Tech Mono\',monospace;">'+(totalDelta >= 0 ? '+' : '')+totalDelta+'</div><div style="color:#555;font-size:12px;letter-spacing:2px;margin-top:4px;">NET WARDEN DELTA</div></div>' +
+                            '<div style="background:#0d0d0d;border:1px solid #FF00FF22;padding:14px;border-radius:8px;text-align:center;"><div style="color:#FF00FF;font-size:22px;font-weight:bold;font-family:\'Share Tech Mono\',monospace;">'+(rankIdx+1)+' / '+RANKS.length+'</div><div style="color:#555;font-size:12px;letter-spacing:2px;margin-top:4px;">RANK TIER</div></div>' +
                             '</div>' +
                             (trapLocked ? '<div style="background:#1a0000;border:1px solid #FF222266;padding:12px 16px;border-radius:8px;margin-bottom:14px;"><span style="color:#FF2222;font-size:11px;letter-spacing:2px;font-weight:bold;">🔒 WARDEN\'S TRAP ACTIVE — '+trapMinLeft+' MIN REMAINING</span><div style="color:#888;font-size:11px;margin-top:4px;">'+(trapLockedModule ? trapLockedModule.toUpperCase()+' module is restricted until the trap expires.' : 'One module restricted until trap expires.')+'</div></div>' : '') +
                             (consistencyActive ? '<div style="background:#1a001a;border:1px solid #FF00FF44;padding:12px 16px;border-radius:8px;margin-bottom:14px;"><span style="color:#FF00FF;font-size:11px;letter-spacing:2px;font-weight:bold;">▲ CONSISTENCY LADDER ACTIVE — '+streak+'-DAY STREAK</span><div style="color:#888;font-size:11px;margin-top:4px;">Rank thresholds reduced by 10%.</div></div>' : '') +
-                            (lastFive.length > 0 ? '<div style="margin-bottom:16px;"><div style="color:#555;font-size:10px;letter-spacing:2px;margin-bottom:6px;">RECENT CLEARANCE MOVEMENT</div><div style="display:flex;align-items:center;gap:4px;">'+movementArrows+'<span style="color:#333;font-size:10px;letter-spacing:1px;margin-left:8px;">(last '+lastFive.length+' events)</span></div></div>' : '') +
-                            (snakeEvents.length > 0 ? '<div style="margin-bottom:14px;"><div style="color:#FF4444;font-size:10px;letter-spacing:2px;margin-bottom:6px;">ACTIVE SETBACKS (SNAKES)</div><div style="display:flex;flex-direction:column;gap:6px;">' + snakeEvents.map(e => '<div style="background:#1a0000;border-left:3px solid #FF4444;padding:8px 12px;border-radius:0 4px 4px 0;"><div style="color:#FF4444;font-size:11px;font-weight:bold;letter-spacing:1px;">'+e.label+' ('+e.delta+')</div>'+(e.domain ? '<div style="color:#666;font-size:10px;">'+e.domain.toUpperCase()+'</div>' : '')+'<div style="color:#444;font-size:10px;">'+formatTs(e.ts)+'</div></div>').join('') + '</div></div>' : '') +
-                            (ladderEvents.length > 0 ? '<div><div style="color:#FF00FF;font-size:10px;letter-spacing:2px;margin-bottom:6px;">ACTIVE BONUSES (LADDERS)</div><div style="display:flex;flex-direction:column;gap:6px;">' + ladderEvents.map(e => '<div style="background:#1a001a;border-left:3px solid #FF00FF;padding:8px 12px;border-radius:0 4px 4px 0;"><div style="color:#FF00FF;font-size:11px;font-weight:bold;letter-spacing:1px;">'+e.label+' (+'+e.delta+')</div>'+(e.domain ? '<div style="color:#666;font-size:10px;">'+e.domain.toUpperCase()+'</div>' : '')+'<div style="color:#444;font-size:10px;">'+formatTs(e.ts)+'</div></div>').join('') + '</div></div>' : '') +
+                            (lastFive.length > 0 ? '<div style="margin-bottom:16px;"><div style="color:#555;font-size:12px;letter-spacing:2px;margin-bottom:6px;">RECENT CLEARANCE MOVEMENT</div><div style="display:flex;align-items:center;gap:4px;">'+movementArrows+'<span style="color:#333;font-size:12px;letter-spacing:1px;margin-left:8px;">(last '+lastFive.length+' events)</span></div></div>' : '') +
+                            (snakeEvents.length > 0 ? '<div style="margin-bottom:14px;"><div style="color:#FF4444;font-size:12px;letter-spacing:2px;margin-bottom:6px;">ACTIVE SETBACKS (SNAKES)</div><div style="display:flex;flex-direction:column;gap:6px;">' + snakeEvents.map(e => '<div style="background:#1a0000;border-left:3px solid #FF4444;padding:8px 12px;border-radius:0 4px 4px 0;"><div style="color:#FF4444;font-size:11px;font-weight:bold;letter-spacing:1px;">'+e.label+' ('+e.delta+')</div>'+(e.domain ? '<div style="color:#666;font-size:12px;">'+e.domain.toUpperCase()+'</div>' : '')+'<div style="color:#444;font-size:12px;">'+formatTs(e.ts)+'</div></div>').join('') + '</div></div>' : '') +
+                            (ladderEvents.length > 0 ? '<div><div style="color:#FF00FF;font-size:12px;letter-spacing:2px;margin-bottom:6px;">ACTIVE BONUSES (LADDERS)</div><div style="display:flex;flex-direction:column;gap:6px;">' + ladderEvents.map(e => '<div style="background:#1a001a;border-left:3px solid #FF00FF;padding:8px 12px;border-radius:0 4px 4px 0;"><div style="color:#FF00FF;font-size:11px;font-weight:bold;letter-spacing:1px;">'+e.label+' (+'+e.delta+')</div>'+(e.domain ? '<div style="color:#666;font-size:12px;">'+e.domain.toUpperCase()+'</div>' : '')+'<div style="color:#444;font-size:12px;">'+formatTs(e.ts)+'</div></div>').join('') + '</div></div>' : '') +
                             (clearanceEvents.length === 0 ? '<div style="color:#333;font-size:12px;text-align:center;padding:20px;">No clearance events logged yet. Keep running sessions.</div>' : '') +
                             '</div>' +
                             (wlog.length > 0 ? '<div style="background:#080808;border:1px solid #FF00FF22;border-radius:2rem;padding:2.5rem;margin-top:2rem;">' +
                                 '<h3 style="color:#FF00FF;font-family:\'Share Tech Mono\',monospace;font-size:1rem;font-weight:bold;letter-spacing:3px;text-transform:uppercase;margin-bottom:4px;">◈ WARDEN TRANSMISSION LOG</h3>' +
                                 '<p style="color:#444;font-size:0.8rem;margin-bottom:0.25rem;letter-spacing:1px;">Record of all Warden transmissions received this operative profile. Classified.</p>' +
-                                '<div style="color:#333;font-size:9px;letter-spacing:2px;text-transform:uppercase;margin-bottom:1.25rem;">Latest first</div>' +
+                                '<div style="color:#333;font-size:12px;letter-spacing:2px;text-transform:uppercase;margin-bottom:1.25rem;">Latest first</div>' +
                                 '<div style="display:flex;flex-direction:column;gap:10px;">' +
                                 wlog.slice(0,10).map(entry => {
                                     const modeColor = entry.mode === 'adversary' ? '#FF4444' : entry.mode === 'guide' ? '#FF00FF' : '#888';
                                     const modeLabel = entry.mode === 'adversary' ? 'ADVERSARY' : entry.mode === 'guide' ? 'GUIDE' : 'OBSERVER';
                                     return '<div style="background:#0d0d0d;border:1px solid #FF00FF22;padding:14px 16px;border-radius:8px;">' +
                                         '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">' +
-                                        '<span style="color:'+modeColor+';font-size:9px;letter-spacing:3px;font-weight:bold;font-family:\'Share Tech Mono\',monospace;">◈ '+modeLabel+' MODE</span>' +
-                                        '<span style="color:#333;font-size:9px;letter-spacing:1px;">'+formatTs(entry.ts)+'</span>' +
+                                        '<span style="color:'+modeColor+';font-size:12px;letter-spacing:3px;font-weight:bold;font-family:\'Share Tech Mono\',monospace;">◈ '+modeLabel+' MODE</span>' +
+                                        '<span style="color:#333;font-size:12px;letter-spacing:1px;">'+formatTs(entry.ts)+'</span>' +
                                         '</div>' +
                                         '<div style="color:#ccc;font-size:13px;line-height:1.7;font-style:italic;margin-bottom:4px;">"'+entry.msg+'"</div>' +
                                         '<div style="color:#555;font-size:11px;">— '+entry.sub+'</div>' +
                                         '</div>';
                                 }).join('') +
-                                (wlog.length > 10 ? '<div style="color:#333;font-size:10px;text-align:center;letter-spacing:2px;padding:8px;">... +'+(wlog.length-10)+' OLDER TRANSMISSIONS ARCHIVED ...</div>' : '') +
+                                (wlog.length > 10 ? '<div style="color:#333;font-size:12px;text-align:center;letter-spacing:2px;padding:8px;">... +'+(wlog.length-10)+' OLDER TRANSMISSIONS ARCHIVED ...</div>' : '') +
                                 '</div></div>' : '');
                     })()}
                 </div>`;
@@ -4865,7 +4865,7 @@
                     <div class="bg-black border border-[#FF00FF]/30 p-5 shadow-[0_0_30px_rgba(255,0,255,0.08)]">
                         <div class="flex items-center justify-between mb-3">
                             <div>
-                                <div class="text-[#FF00FF]/40 text-[10px] font-mono uppercase tracking-widest mb-1">// boss_fight.mode — TIMED_ASSAULT</div>
+                                <div class="text-[#FF00FF]/40 text-[13px] font-mono uppercase tracking-widest mb-1">// boss_fight.mode — TIMED_ASSAULT</div>
                                 <h3 class="text-[#FF00FF] font-mono font-bold text-base uppercase tracking-widest">⚔ Boss Fight Mode</h3>
                                 <p class="text-[#FF00FF]/50 text-xs font-mono mt-1">Race the clock. Every correct answer matters.</p>
                             </div>
@@ -4886,7 +4886,7 @@
                                 '<h3 class="text-lg font-serif font-bold text-stone-900 dark:text-stone-50">' + esc(m.mission) + '</h3>' +
                                 '<p class="text-xs text-stone-500 dark:text-stone-400 mt-1">' + esc(m.subtitle) + ' &middot; ' + total + ' questions</p>' +
                                 '<div class="flex items-center gap-3 mt-2"><span class="text-xs font-bold ' + statusColor + '">' + statusLabel + '</span>' +
-                                (attempts > 0 ? '<span class="text-[10px] text-stone-400">' + attempts + ' attempt' + (attempts > 1 ? 's' : '') + '</span>' : '') +
+                                (attempts > 0 ? '<span class="text-[13px] text-stone-400">' + attempts + ' attempt' + (attempts > 1 ? 's' : '') + '</span>' : '') +
                                 '<span class="text-xs">' + orbitLabel + '</span></div>' +
                                 '</div>' +
                                 '<button onclick="app.mcqStartMission(' + idx + ')" class="bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest ' + (!hasActivity ? 'opacity-40 pointer-events-none' : 'hover:bg-stone-700 dark:hover:bg-stone-300') + ' transition-colors">Run Diagnostic</button>' +
@@ -4898,7 +4898,7 @@
                         '<p class="text-xs text-stone-500 mb-3">These concepts need more practice. Use blurting, flashcards, or the Feynman technique to strengthen them.</p>' +
                         '<div class="flex flex-wrap gap-2">' + state.mcqGaps.map(g =>
                             '<span class="inline-flex items-center gap-1 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 px-3 py-1 rounded-lg text-xs font-bold">' + esc(g) +
-                            '<button onclick="mcqStore.removeGap(&quot;' + g.replace(/"/g, '') + '&quot;); app.render();" class="text-red-400 hover:text-red-600 ml-1">✕</button></span>'
+                            '<button onclick="mcqStore.removeGap(&quot;' + g.replace(/"/g, '') + '&quot;); app.render();" class="text-red-400 hover:text-red-600 ml-1" aria-label="Dismiss gap">✕</button></span>'
                         ).join('') + '</div></div>' : ''}
                 </div>`;
             },
@@ -4944,7 +4944,7 @@
                     <div class="bg-white dark:bg-[#292524] rounded-[2rem] p-8 border border-stone-100 dark:border-stone-800 shadow-sm">
                         <div class="flex items-start justify-between gap-3 mb-6">
                             <p class="text-lg font-serif font-semibold text-stone-900 dark:text-stone-50 leading-relaxed flex-grow">${esc(q.question)}</p>
-                            <button onclick="app.generateELI5ForMCQ()" class="flex-shrink-0 border border-[#8A2BE2]/40 text-[#8A2BE2]/60 hover:text-[#8A2BE2] hover:border-[#8A2BE2] px-2 py-1 text-[10px] font-mono font-bold uppercase tracking-widest transition-colors" title="Explain this in simple language">ELI5</button>
+                            <button onclick="app.generateELI5ForMCQ()" class="flex-shrink-0 border border-[#8A2BE2]/40 text-[#8A2BE2]/60 hover:text-[#8A2BE2] hover:border-[#8A2BE2] px-2 py-1 text-[13px] font-mono font-bold uppercase tracking-widest transition-colors" title="Explain this in simple language">ELI5</button>
                         </div>
                         <div class="space-y-3">
                             ${q.options.map(opt => {
@@ -4965,7 +4965,7 @@
                     <div class="flex flex-wrap gap-1.5 justify-center">${m.questions.map((mq, i) => {
                         const answered = state.mcqAnswers[mq.id];
                         const current = i === idx;
-                        return '<button onclick="state.mcqQuestionIdx=' + i + '; app.render();" class="w-7 h-7 rounded-lg text-[10px] font-bold ' +
+                        return '<button onclick="state.mcqQuestionIdx=' + i + '; app.render();" class="w-7 h-7 rounded-lg text-[13px] font-bold ' +
                             (current ? 'bg-orange-600 text-white' : answered ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-600' : 'bg-stone-100 dark:bg-stone-800 text-stone-400') + '">' + (i+1) + '</button>';
                     }).join('')}</div>
                 </div>`;
@@ -5015,7 +5015,7 @@
                                 '<p class="text-sm font-semibold text-stone-800 dark:text-stone-200 mb-2">' + esc(q.question) + '</p>' +
                                 '<p class="text-xs text-red-600">Your answer: ' + esc(userOpt) + '</p>' +
                                 '<p class="text-xs text-green-600">Correct: ' + esc(correctOpt) + '</p>' +
-                                '<span class="inline-block mt-2 bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400 px-2 py-0.5 rounded text-[10px] font-bold">Gap: ' + esc(q.concept) + '</span>' +
+                                '<span class="inline-block mt-2 bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400 px-2 py-0.5 rounded text-[13px] font-bold">Gap: ' + esc(q.concept) + '</span>' +
                                 '</div>';
                         }).join('') + '</div></div>' : ''}
                     ${stable.length > 0 ? '<div class="bg-white dark:bg-[#292524] rounded-[2rem] p-8 border border-stone-100 dark:border-stone-800 shadow-sm">' +
@@ -5157,8 +5157,8 @@
                     <div class="bg-white dark:bg-[#292524] rounded-[2rem] p-8 border border-stone-100 dark:border-stone-800 shadow-sm">
                         <h3 class="text-lg font-serif font-bold mb-4">Session Stats</h3>
                         <div class="grid grid-cols-2 gap-4">
-                            <div class="text-center p-4 bg-stone-50 dark:bg-stone-800 rounded-2xl"><div class="text-2xl font-serif font-bold text-stone-600 dark:text-stone-300">${state.recalStealthCount}</div><div class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mt-1">Stealth Sessions</div></div>
-                            <div class="text-center p-4 bg-stone-50 dark:bg-stone-800 rounded-2xl"><div class="text-2xl font-serif font-bold text-orange-600">${state.recalRocketCount}</div><div class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mt-1">Rocket Sessions</div></div>
+                            <div class="text-center p-4 bg-stone-50 dark:bg-stone-800 rounded-2xl"><div class="text-2xl font-serif font-bold text-stone-600 dark:text-stone-300">${state.recalStealthCount}</div><div class="text-[13px] font-bold uppercase tracking-widest text-stone-400 mt-1">Stealth Sessions</div></div>
+                            <div class="text-center p-4 bg-stone-50 dark:bg-stone-800 rounded-2xl"><div class="text-2xl font-serif font-bold text-orange-600">${state.recalRocketCount}</div><div class="text-[13px] font-bold uppercase tracking-widest text-stone-400 mt-1">Rocket Sessions</div></div>
                         </div>
                     </div>
                 </div>`;
@@ -6590,8 +6590,8 @@
                             </div>
                             <button onclick="app.babelSubmit()" class="w-full bg-orange-600 hover:bg-orange-500 text-white py-4 rounded-2xl font-bold uppercase tracking-widest text-sm">Submit Translation</button>
                         <div class="flex gap-3 pt-2">
-                            <button onclick="app.generateBabelMnemonic()" class="flex-1 border border-[#FF00FF]/30 text-[#FF00FF]/50 hover:text-[#FF00FF] hover:border-[#FF00FF] py-2.5 text-[10px] font-mono font-bold uppercase tracking-widest transition-colors">⚡ Unhinged Mnemonic</button>
-                            <button onclick="app.generateBabelELI5()" class="flex-1 border border-[#8A2BE2]/30 text-[#8A2BE2]/50 hover:text-[#8A2BE2] hover:border-[#8A2BE2] py-2.5 text-[10px] font-mono font-bold uppercase tracking-widest transition-colors">ELI5 Panic Button</button>
+                            <button onclick="app.generateBabelMnemonic()" class="flex-1 border border-[#FF00FF]/30 text-[#FF00FF]/50 hover:text-[#FF00FF] hover:border-[#FF00FF] py-2.5 text-[13px] font-mono font-bold uppercase tracking-widest transition-colors">⚡ Unhinged Mnemonic</button>
+                            <button onclick="app.generateBabelELI5()" class="flex-1 border border-[#8A2BE2]/30 text-[#8A2BE2]/50 hover:text-[#8A2BE2] hover:border-[#8A2BE2] py-2.5 text-[13px] font-mono font-bold uppercase tracking-widest transition-colors">ELI5 Panic Button</button>
                         </div>
                         </div>
                     </div>`;
@@ -6634,7 +6634,7 @@
                                 </div>
                                 <p class="text-sm text-stone-600 dark:text-stone-300 mb-2 leading-relaxed">${esc(s.explanation.length > 200 ? s.explanation.slice(0, 200) + '...' : s.explanation)}</p>
                                 ${s.doodle ? '<p class="text-xs text-stone-400 italic">🎨 ' + esc(s.doodle) + '</p>' : ''}
-                                <p class="text-[10px] text-stone-400 mt-2">${new Date(s.createdAt).toLocaleDateString()}</p>
+                                <p class="text-[13px] text-stone-400 mt-2">${new Date(s.createdAt).toLocaleDateString()}</p>
                             </div>
                             <button onclick="app.babelDelete(\'${s.id}\')" class="text-stone-400 hover:text-red-500 text-sm flex-shrink-0">&times;</button>
                         </div>
@@ -6947,19 +6947,19 @@
                 if (state.bossPhase === 'setup') {
                     inner.innerHTML = `<div class="flex-1 flex flex-col items-center justify-center p-8 space-y-8 max-w-lg mx-auto w-full" style="font-family:'Share Tech Mono',monospace;">
                         <div class="text-center">
-                            <div class="text-[#FF00FF]/40 text-[10px] uppercase tracking-widest mb-2">// BOSS_FIGHT.EXE — LOADING</div>
+                            <div class="text-[#FF00FF]/40 text-[13px] uppercase tracking-widest mb-2">// BOSS_FIGHT.EXE — LOADING</div>
                             <h2 class="text-[#FF00FF] text-3xl font-bold uppercase tracking-widest mb-2">⚔ Boss Fight Mode</h2>
                             <p class="text-[#FF00FF]/50 text-xs">Select mission and timer. Survive the clock.</p>
                         </div>
                         <div class="w-full space-y-4">
                             <div>
-                                <label class="text-[#FF00FF]/50 text-[10px] uppercase tracking-widest block mb-2">Select Mission</label>
+                                <label class="text-[#FF00FF]/50 text-[13px] uppercase tracking-widest block mb-2">Select Mission</label>
                                 <select id="boss-mission-select" class="w-full bg-black border border-[#FF00FF]/30 text-[#FF00FF]/80 px-4 py-3 text-sm font-mono uppercase tracking-widest focus:outline-none focus:border-[#FF00FF]">
                                     ${mcqBank.map((m, i) => '<option value="' + i + '">' + esc(m.mission) + '</option>').join('')}
                                 </select>
                             </div>
                             <div>
-                                <label class="text-[#FF00FF]/50 text-[10px] uppercase tracking-widest block mb-2">Timer Duration</label>
+                                <label class="text-[#FF00FF]/50 text-[13px] uppercase tracking-widest block mb-2">Timer Duration</label>
                                 <div class="flex gap-3">
                                     ${[5,10,20].map(t => '<button onclick="state.bossDuration=' + (t*60) + '; document.querySelectorAll(\'.boss-dur-btn\').forEach(b=>b.classList.remove(\'border-[#FF00FF]\',\'text-[#FF00FF]\')); this.classList.add(\'border-[#FF00FF]\',\'text-[#FF00FF]\');" class="boss-dur-btn flex-1 border py-2.5 text-xs font-bold font-mono uppercase tracking-widest transition-colors ' + (t===10 ? 'border-[#FF00FF] text-[#FF00FF]' : 'border-[#FF00FF]/30 text-[#FF00FF]/40') + '">' + t + ' MIN</button>').join('')}
                                 </div>
@@ -7001,7 +7001,7 @@
                     inner.innerHTML = `<div class="flex-1 flex flex-col items-center justify-center p-8 space-y-6 max-w-lg mx-auto w-full text-center" style="font-family:'Share Tech Mono',monospace;">
                         <div class="text-7xl">${won ? '💀' : '💥'}</div>
                         <div>
-                            <div class="text-[${won ? '#39FF14' : '#FF00FF'}]/50 text-[10px] uppercase tracking-widest mb-2">${won ? '// BOSS_DEFEATED — XP LOGGED' : '// WIPE_DETECTED — RETRY_REQUIRED'}</div>
+                            <div class="text-[${won ? '#39FF14' : '#FF00FF'}]/50 text-[13px] uppercase tracking-widest mb-2">${won ? '// BOSS_DEFEATED — XP LOGGED' : '// WIPE_DETECTED — RETRY_REQUIRED'}</div>
                             <h2 class="text-3xl font-bold uppercase tracking-widest ${won ? 'text-[#39FF14]' : 'text-[#FF00FF]'}">${won ? 'BOSS DEFEATED' : 'WIPE — RETRY?'}</h2>
                         </div>
                         <div class="w-full border border-[${won ? '#39FF14' : '#FF00FF'}]/30 p-6 space-y-3">
