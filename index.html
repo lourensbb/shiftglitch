@@ -1944,16 +1944,27 @@
                 const box3Plus = cards.filter(c => (c.box || 1) >= 3).length;
                 const pct = Math.round(box3Plus / cards.length * 100);
                 if (pct < 80) return;
-                const activeRuns = this.runs.filter(r => !r.completed_at && r.linked_deck_id === String(deckId));
-                activeRuns.forEach(run => {
-                    if (!run.exploit_2) return;
-                    const status3 = this._getStatus(run, 'exploit_3');
-                    if (status3 === 'done') return;
-                    const patch = { exploit_3: true };
-                    if (this._isCorrupted(run, 'exploit_3')) patch.rollback_flags = this._clearRollbackFlag(run, 'exploit_3');
-                    this.updateRun(run.id, patch);
-                    app.showNotification('SHARD REINFORCEMENT complete on run: ' + run.domain_name);
+                // Pick ONE eligible run for this deck — most recently active, corrupted first
+                const eligible = this.runs.filter(r => {
+                    if (r.completed_at) return false;
+                    if (r.linked_deck_id !== String(deckId)) return false;
+                    if (!r.exploit_2) return false;
+                    const status3 = this._getStatus(r, 'exploit_3');
+                    return status3 === 'active' || status3 === 'corrupted';
                 });
+                if (eligible.length === 0) return;
+                const corrupted = eligible.filter(r => this._isCorrupted(r, 'exploit_3'));
+                const pool = corrupted.length > 0 ? corrupted : eligible;
+                pool.sort((a, b) => {
+                    const ta = a.last_activity_at ? new Date(a.last_activity_at).getTime() : 0;
+                    const tb = b.last_activity_at ? new Date(b.last_activity_at).getTime() : 0;
+                    return tb - ta;
+                });
+                const run = pool[0];
+                const patch = { exploit_3: true };
+                if (this._isCorrupted(run, 'exploit_3')) patch.rollback_flags = this._clearRollbackFlag(run, 'exploit_3');
+                this.updateRun(run.id, patch);
+                app.showNotification('SHARD REINFORCEMENT complete → ' + run.domain_name);
             },
 
             markExploit1(runId) {
