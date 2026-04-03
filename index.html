@@ -260,6 +260,38 @@
         .er-exploit.locked { border-left-color:#222; opacity:0.5; }
         @keyframes er-pulse { 0%,100%{box-shadow:0 0 20px rgba(255,136,0,0.15);} 50%{box-shadow:0 0 40px rgba(255,136,0,0.4);} }
         .er-active-pulse { animation:er-pulse 2s ease infinite; }
+        /* === COGNITIVE EXPLOIT MODULES === */
+        .cem-locked { opacity:0.45; pointer-events:none; cursor:not-allowed; }
+        .cem-header { font-family:'Share Tech Mono',monospace; font-size:0.75rem; letter-spacing:0.18em; text-transform:uppercase; color:#39FF14; border-bottom:1px solid rgba(57,255,20,0.2); padding-bottom:0.5rem; margin-bottom:0.75rem; }
+        .cem-card { background:#080808; border:1px solid rgba(57,255,20,0.15); padding:1.25rem 1.5rem; margin-bottom:0.75rem; font-family:'Share Tech Mono',monospace; }
+        .cem-btn { background:transparent; border:1px solid #39FF14; color:#39FF14; font-family:'Share Tech Mono',monospace; font-size:0.75rem; letter-spacing:0.15em; text-transform:uppercase; padding:0.55rem 1.25rem; cursor:pointer; transition:all 0.15s; }
+        .cem-btn:hover { background:#39FF14; color:#000; }
+        .cem-btn-danger { border-color:#FF00FF; color:#FF00FF; }
+        .cem-btn-danger:hover { background:#FF00FF; color:#fff; }
+        .cem-btn-orange { border-color:#FF8800; color:#FF8800; }
+        .cem-btn-orange:hover { background:#FF8800; color:#000; }
+        .cem-input { background:#050505; border:1px solid rgba(57,255,20,0.25); color:#d1fae5; font-family:'Space Grotesk',sans-serif; font-size:0.95rem; padding:0.65rem 0.9rem; width:100%; outline:none; resize:none; }
+        .cem-input:focus { border-color:#39FF14; box-shadow:0 0 0 1px rgba(57,255,20,0.2); }
+        .cem-tag { display:inline-block; font-family:'Share Tech Mono',monospace; font-size:0.65rem; letter-spacing:0.12em; text-transform:uppercase; padding:0.2rem 0.55rem; border:1px solid; }
+        .cem-tag-green { border-color:#39FF14; color:#39FF14; }
+        .cem-tag-orange { border-color:#FF8800; color:#FF8800; }
+        .cem-tag-magenta { border-color:#FF00FF; color:#FF00FF; }
+        .cem-tag-purple { border-color:#8A2BE2; color:#8A2BE2; }
+        /* Speed Run timer */
+        @keyframes cem-countdown { 0%{color:#39FF14;} 60%{color:#FF8800;} 85%{color:#FF4444;} 100%{color:#FF0000;} }
+        .cem-timer-running { animation: cem-countdown 120s linear forwards; font-size:3.5rem; font-family:'VT323',monospace; }
+        /* Mind Map */
+        .cem-node { background:#0a0a0a; border:1px solid rgba(57,255,20,0.3); color:#d1fae5; font-family:'Share Tech Mono',monospace; font-size:0.8rem; padding:0.4rem 0.75rem; cursor:pointer; transition:all 0.15s; display:inline-block; }
+        .cem-node.cem-root { border-color:#FF00FF; color:#FF00FF; font-size:0.95rem; font-weight:bold; }
+        .cem-node:focus { outline:2px solid #39FF14; outline-offset:2px; }
+        /* Chunking Engine */
+        .cem-chunk { background:#0a0a0a; border:1px solid rgba(57,255,20,0.2); padding:0.75rem; margin-bottom:0.5rem; }
+        .cem-chunk-item { background:#111; border:1px solid #1a1a1a; color:#ccc; font-family:'Share Tech Mono',monospace; font-size:0.82rem; padding:0.35rem 0.75rem; margin-bottom:0.3rem; display:flex; align-items:center; justify-content:space-between; }
+        /* Dual Coding */
+        .cem-canvas-wrap { border:1px solid rgba(57,255,20,0.2); background:#080808; position:relative; }
+        /* Interleave */
+        @keyframes cem-domain-pulse { 0%,100%{box-shadow:0 0 20px rgba(255,136,0,0.2);} 50%{box-shadow:0 0 50px rgba(255,136,0,0.5);} }
+        .cem-domain-active { animation:cem-domain-pulse 1.5s ease infinite; }
         /* === SYSTEM INTERRUPT ENGINE === */
         .si-overlay{position:fixed;inset:0;z-index:9998;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0);transition:background 0.35s ease;pointer-events:none;font-family:'Share Tech Mono','Courier New',monospace;}
         .si-overlay.si-visible{background:rgba(0,0,0,0.93);pointer-events:all;}
@@ -290,13 +322,24 @@
                     <button onclick="app.navTo('decks')" class="nav-btn text-[#39FF14]/50 hover:text-[#39FF14] text-xs font-bold tracking-widest transition-colors uppercase">Data Shards</button>
                     <div class="relative" id="tools-dropdown">
                         <button onclick="app.toggleToolsMenu()" class="nav-btn text-[#39FF14]/50 hover:text-[#39FF14] text-xs font-bold tracking-widest transition-colors uppercase flex items-center gap-1">Tools <svg class="w-3 h-3 transition-transform" id="tools-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></button>
-                        <div id="tools-menu" class="hidden absolute top-full left-1/2 -translate-x-1/2 mt-2 w-52 bg-black rounded-lg shadow-lg border border-[#39FF14]/20 py-2 z-50">
+                        <div id="tools-menu" class="hidden absolute top-full left-1/2 -translate-x-1/2 mt-2 w-56 bg-black rounded-lg shadow-lg border border-[#39FF14]/20 py-2 z-50" style="max-height:80vh;overflow-y:auto;">
                             <button onclick="app.navTo('blurt')" class="nav-btn block w-full text-left px-4 py-2.5 text-xs font-bold tracking-widest uppercase text-[#39FF14]/50 hover:text-[#39FF14] hover:bg-[#39FF14]/5 transition-colors">BrainDump.exe</button>
                             <button onclick="app.navTo('babel')" class="nav-btn block w-full text-left px-4 py-2.5 text-xs font-bold tracking-widest uppercase text-[#39FF14]/50 hover:text-[#39FF14] hover:bg-[#39FF14]/5 transition-colors">Jargon Decoder</button>
                             <button onclick="app.navTo('quiz')" class="nav-btn block w-full text-left px-4 py-2.5 text-xs font-bold tracking-widest uppercase text-[#39FF14]/50 hover:text-[#39FF14] hover:bg-[#39FF14]/5 transition-colors">Boss Fight</button>
                             <button onclick="app.navTo('matrix')" class="nav-btn block w-full text-left px-4 py-2.5 text-xs font-bold tracking-widest uppercase text-[#39FF14]/50 hover:text-[#39FF14] hover:bg-[#39FF14]/5 transition-colors">Priority Grid</button>
                             <button onclick="app.navTo('recal')" class="nav-btn block w-full text-left px-4 py-2.5 text-xs font-bold tracking-widest uppercase text-[#39FF14]/50 hover:text-[#39FF14] hover:bg-[#39FF14]/5 transition-colors">Anti-Lag</button>
                             <button onclick="app.navTo('diagnostic')" class="nav-btn block w-full text-left px-4 py-2.5 text-xs font-bold tracking-widest uppercase text-[#39FF14]/50 hover:text-[#39FF14] hover:bg-[#39FF14]/5 transition-colors">Exploit Missions</button>
+                            <div style="border-top:1px solid rgba(57,255,20,0.1);margin:4px 0;padding:4px 16px 2px;font-family:'Share Tech Mono',monospace;font-size:9px;color:#39FF14;letter-spacing:0.15em;opacity:0.6;">— COGNITIVE PROTOCOLS —</div>
+                            <button onclick="app.navTo('speed-run')" class="nav-btn block w-full text-left px-4 py-2 text-xs font-bold tracking-widest uppercase text-[#39FF14]/50 hover:text-[#39FF14] hover:bg-[#39FF14]/5 transition-colors">Speed Run</button>
+                            <button onclick="app.navTo('mistake-vault')" class="nav-btn block w-full text-left px-4 py-2 text-xs font-bold tracking-widest uppercase text-[#39FF14]/50 hover:text-[#39FF14] hover:bg-[#39FF14]/5 transition-colors">Mistake Vault</button>
+                            <button onclick="app.navTo('teach-it')" class="nav-btn block w-full text-left px-4 py-2 text-xs font-bold tracking-widest uppercase text-[#39FF14]/50 hover:text-[#39FF14] hover:bg-[#39FF14]/5 transition-colors">Teach It</button>
+                            <button onclick="app.navTo('concept-mapper')" class="nav-btn block w-full text-left px-4 py-2 text-xs font-bold tracking-widest uppercase text-[#39FF14]/50 hover:text-[#39FF14] hover:bg-[#39FF14]/5 transition-colors">Concept Mapper</button>
+                            <button id="nav-chunking-desktop" onclick="app.navTo('chunking')" class="nav-btn block w-full text-left px-4 py-2 text-xs font-bold tracking-widest uppercase text-[#39FF14]/50 hover:text-[#39FF14] hover:bg-[#39FF14]/5 transition-colors">Chunking Engine</button>
+                            <button id="nav-interleave-desktop" onclick="app.navTo('interleave')" class="nav-btn block w-full text-left px-4 py-2 text-xs font-bold tracking-widest uppercase text-[#39FF14]/50 hover:text-[#39FF14] hover:bg-[#39FF14]/5 transition-colors">The Interleave</button>
+                            <button id="nav-memory-palace-desktop" onclick="app.navTo('memory-palace')" class="nav-btn block w-full text-left px-4 py-2 text-xs font-bold tracking-widest uppercase text-[#39FF14]/50 hover:text-[#39FF14] hover:bg-[#39FF14]/5 transition-colors">Memory Palace</button>
+                            <button id="nav-mindmap-desktop" onclick="app.navTo('mindmap')" class="nav-btn block w-full text-left px-4 py-2 text-xs font-bold tracking-widest uppercase text-[#39FF14]/50 hover:text-[#39FF14] hover:bg-[#39FF14]/5 transition-colors">Mind Map Protocol</button>
+                            <button id="nav-dual-coding-desktop" onclick="app.navTo('dual-coding')" class="nav-btn block w-full text-left px-4 py-2 text-xs font-bold tracking-widest uppercase text-[#39FF14]/50 hover:text-[#39FF14] hover:bg-[#39FF14]/5 transition-colors">Dual Coding Station</button>
+                            <button id="nav-shadow-protocol-desktop" onclick="app.navTo('shadow-protocol')" class="nav-btn block w-full text-left px-4 py-2 text-xs font-bold tracking-widest uppercase text-[#39FF14]/50 hover:text-[#39FF14] hover:bg-[#39FF14]/5 transition-colors">Shadow Protocol</button>
                         </div>
                     </div>
                     <button onclick="app.navTo('escape-runs')" class="nav-btn text-[#FF8800]/60 hover:text-[#FF8800] text-xs font-bold tracking-widest transition-colors uppercase border border-[#FF8800]/30 px-2 py-1 rounded">⬡ ESCAPE RUNS</button>
@@ -330,6 +373,17 @@
             <button onclick="app.navTo('matrix')" class="block w-full text-left px-4 py-3 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Priority Grid</button>
             <button onclick="app.navTo('recal')" class="block w-full text-left px-4 py-3 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Anti-Lag</button>
             <button onclick="app.navTo('diagnostic')" class="block w-full text-left px-4 py-3 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Exploit Missions</button>
+            <div class="px-4 pt-2 pb-1 text-[9px] font-bold text-[#39FF14]/40 uppercase tracking-widest font-mono">— Cognitive Protocols —</div>
+            <button onclick="app.navTo('speed-run')" class="block w-full text-left px-4 py-2.5 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Speed Run</button>
+            <button onclick="app.navTo('mistake-vault')" class="block w-full text-left px-4 py-2.5 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Mistake Vault</button>
+            <button onclick="app.navTo('teach-it')" class="block w-full text-left px-4 py-2.5 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Teach It</button>
+            <button onclick="app.navTo('concept-mapper')" class="block w-full text-left px-4 py-2.5 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Concept Mapper</button>
+            <button id="nav-chunking-mobile" onclick="app.navTo('chunking')" class="block w-full text-left px-4 py-2.5 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Chunking Engine</button>
+            <button id="nav-interleave-mobile" onclick="app.navTo('interleave')" class="block w-full text-left px-4 py-2.5 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">The Interleave</button>
+            <button id="nav-memory-palace-mobile" onclick="app.navTo('memory-palace')" class="block w-full text-left px-4 py-2.5 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Memory Palace</button>
+            <button id="nav-mindmap-mobile" onclick="app.navTo('mindmap')" class="block w-full text-left px-4 py-2.5 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Mind Map Protocol</button>
+            <button id="nav-dual-coding-mobile" onclick="app.navTo('dual-coding')" class="block w-full text-left px-4 py-2.5 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Dual Coding Station</button>
+            <button id="nav-shadow-protocol-mobile" onclick="app.navTo('shadow-protocol')" class="block w-full text-left px-4 py-2.5 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Shadow Protocol</button>
             <div class="border-t border-[#39FF14]/10 my-2"></div>
             <button onclick="app.navTo('escape-runs')" class="block w-full text-left px-4 py-3 rounded text-[#FF8800]/80 font-bold uppercase text-xs tracking-widest border border-[#FF8800]/30 mt-1">⬡ ESCAPE RUNS</button>
             <button onclick="app.navTo('rank')" class="block w-full text-left px-4 py-3 rounded text-[#39FF14]/70 font-bold uppercase text-xs tracking-widest">Rank</button>
@@ -1701,6 +1755,17 @@
                         '<div style="color:#ccc;font-size:12px;"><span style="color:'+color+';">'+( payload.exploit||'Unknown Exploit')+'</span> has been flagged as CORRUPTED. You must re-execute it.</div></div>' +
                         '<p style="color:#666;font-size:12px;line-height:1.8;">The Mainframe does not hold clearance for operatives who go dark. Your run is still alive — but you must re-complete the corrupted exploit.</p></div>' +
                         '<div class="si-footer"><button onclick="SysInterrupt.dismiss(\''+id+'\')" style="background:'+color+';color:#fff;border:none;padding:10px 36px;font-family:inherit;font-size:11px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;font-weight:bold;border-radius:4px;">ACKNOWLEDGED</button></div>';
+                } else if (type === 'interleave-shift') {
+                    color='#FF8800'; glow='rgba(255,136,0,0.35)';
+                    innerHTML = '<div class="si-header" style="border-color:'+color+'"><span style="color:'+color+';font-size:18px;">⬡</span><span style="color:'+color+';font-size:13px;letter-spacing:2px;margin-left:8px;">DOMAIN SHIFT</span></div>' +
+                        '<div class="si-body" style="text-align:center;">' +
+                        '<div style="color:#555;font-size:10px;letter-spacing:2px;margin-bottom:8px;text-transform:uppercase;">DEPARTING</div>' +
+                        '<div style="color:#444;font-size:16px;font-weight:bold;margin-bottom:16px;">'+(payload.prev||'').toUpperCase()+'</div>' +
+                        '<div style="color:'+color+';font-size:36px;margin-bottom:12px;">↓</div>' +
+                        '<div style="color:#aaa;font-size:10px;letter-spacing:2px;margin-bottom:8px;text-transform:uppercase;">LOADING NEXT DOMAIN</div>' +
+                        '<div style="color:'+color+';font-size:22px;font-weight:bold;letter-spacing:3px;margin-bottom:16px;">'+(payload.domain||'').toUpperCase()+'</div>' +
+                        '<p style="color:#666;font-size:12px;line-height:1.8;max-width:340px;margin:0 auto;">Retrieve your last key point from the previous domain before loading new data. The Mainframe demands active context-switching.</p></div>' +
+                        '<div class="si-footer" style="justify-content:center;"><button onclick="SysInterrupt.dismiss(\''+id+'\')" style="background:'+color+';color:#000;border:none;padding:12px 36px;font-family:inherit;font-size:12px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;font-weight:bold;border-radius:4px;width:100%;">SWITCHING DOMAINS</button></div>';
                 }
                 return '<div class="si-overlay" id="'+id+'"><div class="si-box si-scanlines si-pulse si-flicker" style="--si-color:'+color+';--si-glow:'+glow+';"><div id="'+id+'-box">'+innerHTML+'</div></div></div>';
             },
@@ -2697,6 +2762,28 @@
                     } else if (state.view === 'escape-runs') {
                         container.innerHTML = app.getEscapeRunsHTML();
                         escapeRunEngine.load();
+                    } else if (state.view === 'speed-run') {
+                        container.innerHTML = app.getSpeedRunHTML();
+                    } else if (state.view === 'mistake-vault') {
+                        container.innerHTML = app.getMistakeVaultHTML();
+                    } else if (state.view === 'teach-it') {
+                        container.innerHTML = app.getTeachItHTML();
+                    } else if (state.view === 'concept-mapper') {
+                        container.innerHTML = app.getConceptMapperHTML();
+                    } else if (state.view === 'chunking') {
+                        container.innerHTML = app.getChunkingHTML();
+                    } else if (state.view === 'interleave') {
+                        container.innerHTML = app.getInterleaveHTML();
+                    } else if (state.view === 'memory-palace') {
+                        container.innerHTML = app.getMemoryPalaceHTML();
+                    } else if (state.view === 'mindmap') {
+                        container.innerHTML = app.getMindMapHTML();
+                        app.mindMapInit();
+                    } else if (state.view === 'dual-coding') {
+                        container.innerHTML = app.getDualCodingHTML();
+                        app.dualCodingInit();
+                    } else if (state.view === 'shadow-protocol') {
+                        container.innerHTML = app.getShadowProtocolHTML();
                     }
                     rankEngine.updateNavRank();
                 } catch (err) {
@@ -4703,6 +4790,1113 @@
                 state.babelPhase = 'list';
                 app.render();
             },
+            /* ====================================================
+               COGNITIVE EXPLOIT MODULES — 10 New Protocols
+               ====================================================
+               Unlock gating:
+               NPC+: speed-run, mistake-vault, teach-it, concept-mapper (1-4)
+               Script Kiddie+: chunking, interleave, memory-palace (5-7)
+               Glitch Tech+: mindmap, dual-coding, shadow-protocol (8-10)
+            ==================================================== */
+
+            _cemRankIdx() {
+                const RANK_ORDER = ['NPC','Script Kiddie','Glitch Tech','Netrunner','System Admin'];
+                return RANK_ORDER.indexOf(state.rank || 'NPC');
+            },
+            _cemLocked(minRankIdx) {
+                return this._cemRankIdx() < minRankIdx;
+            },
+            _cemLockedBanner(rankName) {
+                return `<div style="text-align:center;padding:4rem 1rem;border:2px dashed #222;max-width:520px;margin:3rem auto;">
+                    <div style="font-family:'VT323',monospace;font-size:2.5rem;color:#FF2222;letter-spacing:0.1em;margin-bottom:0.5rem;">ACCESS DENIED</div>
+                    <div style="font-family:'Share Tech Mono',monospace;font-size:0.85rem;color:#666;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:1.5rem;">CLEARANCE REQUIRED — ${rankName} LEVEL</div>
+                    <div style="color:#444;font-size:0.9rem;line-height:1.6;max-width:360px;margin:0 auto;">Rank up to unlock this cognitive protocol. Keep running exploits.</div>
+                    <button onclick="app.navTo('rank')" class="cem-btn" style="margin-top:1.5rem;border-color:#FF8800;color:#FF8800;">VIEW RANK REQUIREMENTS</button>
+                </div>`;
+            },
+            _cemPageShell(title, subtitle, scienceNote, content) {
+                return `<div class="animate-fade-in" style="max-width:800px;margin:0 auto;padding:1rem;">
+                    <div style="margin-bottom:1.5rem;">
+                        <div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;letter-spacing:0.2em;color:#FF8800;text-transform:uppercase;margin-bottom:0.35rem;">// COGNITIVE PROTOCOL</div>
+                        <h1 style="font-family:'VT323',monospace;font-size:3rem;color:#fff;text-transform:uppercase;letter-spacing:0.06em;line-height:1.1;margin-bottom:0.25rem;">${title}</h1>
+                        <p style="color:#888;font-family:'Share Tech Mono',monospace;font-size:0.8rem;letter-spacing:0.1em;text-transform:uppercase;">${subtitle}</p>
+                        ${scienceNote ? `<div style="margin-top:0.75rem;padding:0.6rem 1rem;background:#050505;border-left:3px solid #FF00FF;font-size:0.82rem;color:#888;font-style:italic;line-height:1.5;">${scienceNote}</div>` : ''}
+                    </div>
+                    ${content}
+                </div>`;
+            },
+
+            /* ─── 1. SPEED RUN ─── */
+            getSpeedRunHTML() {
+                const sessions = JSON.parse(localStorage.getItem('sg_speed_run') || '[]');
+                const content = `
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem;">
+                        <div class="cem-card">
+                            <div class="cem-header">Set Duration</div>
+                            <div style="display:flex;gap:0.5rem;margin-bottom:1rem;">
+                                ${[60,90,120].map(t=>`<button onclick="app.speedRunSetDuration(${t})" id="sr-dur-${t}" class="cem-btn" style="flex:1;${(state.srDuration||60)===t?'background:#39FF14;color:#000;':''}">${t}s</button>`).join('')}
+                            </div>
+                            <div class="cem-header" style="margin-top:1rem;">Domain / Topic</div>
+                            <input id="sr-topic" class="cem-input" style="margin-bottom:1rem;" placeholder="e.g. Photosynthesis, Newton's Laws..." value="${esc(state.srTopic||'')}">
+                            <button onclick="app.speedRunStart()" class="cem-btn" style="width:100%;background:#39FF14;color:#000;font-size:0.9rem;padding:0.75rem;">⚡ START SPRINT</button>
+                        </div>
+                        <div id="sr-active-panel" style="display:none;" class="cem-card" style="text-align:center;">
+                            <div class="cem-header">SPRINT RUNNING</div>
+                            <div id="sr-timer" style="font-family:'VT323',monospace;font-size:4rem;color:#39FF14;text-align:center;line-height:1;margin-bottom:0.5rem;">60</div>
+                            <div id="sr-wc" style="font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:#555;text-align:center;margin-bottom:0.75rem;">0 words</div>
+                            <textarea id="sr-recall" class="cem-input" rows="8" placeholder="Type everything you can recall — no looking back, no editing, just dump..." style="resize:none;"></textarea>
+                        </div>
+                        <div id="sr-rate-panel" style="display:none;" class="cem-card">
+                            <div class="cem-header">SPRINT COMPLETE — RATE YOUR ACCURACY</div>
+                            <div style="display:flex;gap:0.5rem;justify-content:center;margin:0.75rem 0 1rem;">
+                                ${[1,2,3,4,5].map(n=>`<button onclick="app.speedRunRate(${n})" class="cem-btn" style="width:48px;height:48px;font-size:1.1rem;${n<=2?'border-color:#FF4444;color:#FF4444;':n===3?'border-color:#FF8800;color:#FF8800;':'border-color:#39FF14;color:#39FF14;'}">${n}</button>`).join('')}
+                            </div>
+                            <div style="color:#555;font-family:'Share Tech Mono',monospace;font-size:0.7rem;text-align:center;letter-spacing:0.1em;">1=JUNK · 3=DECENT · 5=SOLID</div>
+                            <input id="sr-missed" class="cem-input" style="margin-top:1rem;" placeholder="What did you miss? (optional)">
+                        </div>
+                    </div>
+                    <div>
+                        <div class="cem-header" style="color:#888;margin-bottom:0.75rem;">PAST SPRINTS (${sessions.length})</div>
+                        ${sessions.length===0?'<div style="color:#333;font-family:Share Tech Mono,monospace;font-size:0.8rem;padding:1rem;">No sprints logged yet.</div>':
+                        sessions.slice().reverse().slice(0,12).map(s=>`
+                            <div class="cem-card" style="display:flex;align-items:center;gap:1rem;padding:0.75rem 1rem;">
+                                <div style="font-size:1.8rem;font-family:'VT323',monospace;color:#39FF14;min-width:2.5rem;">${s.rating}/5</div>
+                                <div style="flex:1;min-width:0;">
+                                    <div style="color:#ccc;font-family:'Share Tech Mono',monospace;font-size:0.8rem;font-weight:bold;truncate;">${esc(s.topic)}</div>
+                                    <div style="color:#555;font-size:0.75rem;font-family:'Share Tech Mono',monospace;">${s.duration}s · ${s.wordCount} words · ${new Date(s.date).toLocaleDateString()}</div>
+                                    ${s.missed?`<div style="color:#555;font-size:0.75rem;margin-top:0.25rem;font-style:italic;">"${esc(s.missed)}"</div>`:''}
+                                </div>
+                                <button onclick="app.speedRunDelete('${s.id}')" style="color:#333;background:none;border:none;cursor:pointer;font-size:1.1rem;padding:0.25rem;">&times;</button>
+                            </div>`).join('')}
+                    </div>`;
+                return this._cemPageShell('SPEED RUN', 'Timed Recall Sprint', 'Recall under time pressure simulates retrieval under stress conditions — practising this makes high-pressure retrieval more reliable.', content);
+            },
+            speedRunSetDuration(t) {
+                state.srDuration = t;
+                app.render();
+            },
+            speedRunStart() {
+                const topic = (document.getElementById('sr-topic')||{}).value || state.srTopic || '';
+                const dur = state.srDuration || 60;
+                if (!topic.trim()) { app.showNotification('Enter a domain or topic before sprinting.'); return; }
+                state.srTopic = topic;
+                state.srDuration = dur;
+                const active = document.getElementById('sr-active-panel');
+                const config = document.querySelector('.cem-card');
+                if (config) config.style.display = 'none';
+                if (active) { active.style.display = 'block'; }
+                const ratePan = document.getElementById('sr-rate-panel');
+                if (ratePan) ratePan.style.display = 'none';
+                let remaining = dur;
+                const timerEl = document.getElementById('sr-timer');
+                const wcEl = document.getElementById('sr-wc');
+                const recallEl = document.getElementById('sr-recall');
+                if (timerEl) timerEl.textContent = remaining;
+                if (recallEl) recallEl.focus();
+                const wcUpdate = () => {
+                    const words = ((recallEl&&recallEl.value)||'').trim().split(/\s+/).filter(Boolean).length;
+                    if (wcEl) wcEl.textContent = words + ' words';
+                };
+                if (recallEl) recallEl.addEventListener('input', wcUpdate);
+                state._srInterval = setInterval(() => {
+                    remaining--;
+                    if (timerEl) {
+                        timerEl.textContent = remaining;
+                        if (remaining <= 10) timerEl.style.color = '#FF2222';
+                        else if (remaining <= 30) timerEl.style.color = '#FF8800';
+                    }
+                    if (remaining <= 0) {
+                        clearInterval(state._srInterval);
+                        state._srRecall = (recallEl&&recallEl.value)||'';
+                        state._srWordCount = ((recallEl&&recallEl.value)||'').trim().split(/\s+/).filter(Boolean).length;
+                        if (active) active.style.display = 'none';
+                        const rp = document.getElementById('sr-rate-panel');
+                        if (rp) rp.style.display = 'block';
+                    }
+                }, 1000);
+            },
+            speedRunRate(n) {
+                const missed = (document.getElementById('sr-missed')||{}).value || '';
+                const sessions = JSON.parse(localStorage.getItem('sg_speed_run')||'[]');
+                sessions.push({ id: Date.now().toString(36), topic: state.srTopic||'', duration: state.srDuration||60, wordCount: state._srWordCount||0, rating: n, missed: missed.trim(), date: new Date().toISOString() });
+                localStorage.setItem('sg_speed_run', JSON.stringify(sessions));
+                state.srTopic = '';
+                state._srRecall = '';
+                state._srWordCount = 0;
+                app.showNotification('Sprint logged.');
+                app.render();
+            },
+            speedRunDelete(id) {
+                const sessions = JSON.parse(localStorage.getItem('sg_speed_run')||'[]').filter(s=>s.id!==id);
+                localStorage.setItem('sg_speed_run', JSON.stringify(sessions));
+                app.render();
+            },
+
+            /* ─── 2. MISTAKE VAULT ─── */
+            getMistakeVaultHTML() {
+                const entries = JSON.parse(localStorage.getItem('sg_mistake_vault')||'[]');
+                const FAILURE_MODES = ['Blanked','Misread','Knew it wrong','Couldn\'t retrieve','Partial recall','Guessed'];
+                const content = `
+                    <div class="cem-card" style="margin-bottom:1.5rem;">
+                        <div class="cem-header">LOG NEW FAILURE</div>
+                        <input id="mv-concept" class="cem-input" style="margin-bottom:0.75rem;" placeholder="What did you get wrong? (concept, question, fact...)">
+                        <div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:0.75rem;">
+                            <div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:#555;width:100%;margin-bottom:0.25rem;letter-spacing:0.1em;text-transform:uppercase;">Failure Mode:</div>
+                            ${FAILURE_MODES.map(m=>`<button onclick="app.mvSelectMode('${m}')" id="mv-mode-${m.replace(/'/g,'').replace(/ /g,'-')}" class="cem-tag ${(state.mvMode===m)?'cem-tag-orange':''}" style="cursor:pointer;border-color:${state.mvMode===m?'#FF8800':'#333'};color:${state.mvMode===m?'#FF8800':'#444'};padding:0.3rem 0.7rem;">${m}</button>`).join('')}
+                        </div>
+                        <textarea id="mv-patch" class="cem-input" rows="3" style="margin-bottom:0.75rem;" placeholder="Patch note: why did this happen? What will you do differently?"></textarea>
+                        <button onclick="app.mvSubmit()" class="cem-btn" style="background:#FF00FF;border-color:#FF00FF;color:#000;">LOG FAILURE</button>
+                    </div>
+                    <div>
+                        <div class="cem-header" style="color:#888;margin-bottom:0.75rem;">VAULT (${entries.length} failures logged)</div>
+                        ${entries.length===0?'<div style="color:#333;font-family:Share Tech Mono,monospace;font-size:0.8rem;padding:1rem;">No failures logged yet. That\'s suspicious.</div>':
+                        entries.slice().reverse().map(e=>`
+                            <div class="cem-card" style="padding:0.85rem 1rem;margin-bottom:0.5rem;">
+                                <div style="display:flex;align-items:flex-start;gap:0.75rem;">
+                                    <div style="flex:1;min-width:0;">
+                                        <div style="color:#fff;font-family:'Share Tech Mono',monospace;font-size:0.9rem;font-weight:bold;margin-bottom:0.35rem;">${esc(e.concept)}</div>
+                                        <span class="cem-tag cem-tag-orange" style="margin-bottom:0.4rem;display:inline-block;">${esc(e.mode)}</span>
+                                        ${e.patch?`<div style="color:#777;font-size:0.82rem;margin-top:0.35rem;font-style:italic;line-height:1.5;">↳ ${esc(e.patch)}</div>`:''}
+                                        <div style="color:#333;font-family:'Share Tech Mono',monospace;font-size:0.65rem;margin-top:0.4rem;">${new Date(e.date).toLocaleDateString()}</div>
+                                    </div>
+                                    <button onclick="app.mvDelete('${e.id}')" style="color:#222;background:none;border:none;cursor:pointer;font-size:1.1rem;">&times;</button>
+                                </div>
+                            </div>`).join('')}
+                    </div>`;
+                return this._cemPageShell('MISTAKE VAULT', 'Error Analysis & Metacognition', 'Understanding <em>why</em> a retrieval failed is as cognitively valuable as getting the right answer. Metacognition about errors is a stronger predictor of improvement than simply retrying.', content);
+            },
+            mvSelectMode(m) { state.mvMode = m; app.render(); },
+            mvSubmit() {
+                const concept = (document.getElementById('mv-concept')||{}).value||'';
+                const patch = (document.getElementById('mv-patch')||{}).value||'';
+                const mode = state.mvMode||'Blanked';
+                if (!concept.trim()) { app.showNotification('Enter the concept you got wrong.'); return; }
+                const entries = JSON.parse(localStorage.getItem('sg_mistake_vault')||'[]');
+                entries.push({ id: Date.now().toString(36), concept: concept.trim(), mode, patch: patch.trim(), date: new Date().toISOString() });
+                localStorage.setItem('sg_mistake_vault', JSON.stringify(entries));
+                state.mvMode = null;
+                app.showNotification('Failure logged to the Vault.');
+                app.render();
+            },
+            mvDelete(id) {
+                const entries = JSON.parse(localStorage.getItem('sg_mistake_vault')||'[]').filter(e=>e.id!==id);
+                localStorage.setItem('sg_mistake_vault', JSON.stringify(entries));
+                app.render();
+            },
+
+            /* ─── 3. TEACH IT ─── */
+            getTeachItHTML() {
+                const sessions = JSON.parse(localStorage.getItem('sg_teach_it')||'[]');
+                const phase = state.teachItPhase||'list';
+                if (phase === 'write') {
+                    const step = state.teachItStep||0;
+                    const prompts = [
+                        { label:'CONCEPT', hint:'Name the concept you are teaching.', id:'ti-concept', rows:1, placeholder:'What concept are you encoding?' },
+                        { label:'EXPLANATION — NO JARGON', hint:'Write as if the reader has zero background. No bullet points. No jargon. Clear sentences only.', id:'ti-explain', rows:8, placeholder:'Explain this as if to someone who has never encountered it before. Plain language only.' },
+                        { label:'GAP IDENTIFICATION', hint:'What part was hardest to explain clearly? That gap is exactly what needs more work.', id:'ti-gap', rows:4, placeholder:'Where did your explanation get fuzzy or vague? What couldn\'t you explain simply?' },
+                    ];
+                    const p = prompts[step];
+                    return `<div class="animate-fade-in" style="max-width:700px;margin:0 auto;padding:1rem;">
+                        <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;">
+                            <button onclick="app.teachItBack()" style="background:none;border:none;color:#39FF14;font-size:1.4rem;cursor:pointer;">&larr;</button>
+                            <h1 style="font-family:'VT323',monospace;font-size:2.8rem;color:#fff;text-transform:uppercase;letter-spacing:0.06em;">TEACH IT</h1>
+                            <div style="margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:#555;">STEP ${step+1}/3</div>
+                        </div>
+                        <div class="cem-card">
+                            <div class="cem-header">${p.label}</div>
+                            <div style="color:#888;font-size:0.85rem;line-height:1.5;margin-bottom:1rem;">${p.hint}</div>
+                            <textarea id="${p.id}" class="cem-input" rows="${p.rows}" style="resize:none;" placeholder="${p.placeholder}">${esc(state['_ti_'+step]||'')}</textarea>
+                            <div style="margin-top:1rem;display:flex;justify-content:flex-end;">
+                                ${step < 2 ? `<button onclick="app.teachItNext()" class="cem-btn" style="background:#39FF14;color:#000;">NEXT →</button>` :
+                                `<button onclick="app.teachItSave()" class="cem-btn" style="background:#39FF14;color:#000;">ENCODE AND SAVE</button>`}
+                            </div>
+                        </div>
+                    </div>`;
+                }
+                const content = `
+                    <div style="text-align:center;margin-bottom:1.5rem;">
+                        <button onclick="app.teachItStart()" class="cem-btn" style="background:#39FF14;color:#000;font-size:0.9rem;padding:0.75rem 2rem;">⚡ RUN FEYNMAN PROTOCOL</button>
+                    </div>
+                    <div>
+                        <div class="cem-header" style="color:#888;margin-bottom:0.75rem;">ENCODED EXPLANATIONS (${sessions.length})</div>
+                        ${sessions.length===0?'<div style="color:#333;font-family:Share Tech Mono,monospace;font-size:0.8rem;padding:1rem;">No sessions yet. Run the protocol to begin.</div>':
+                        sessions.slice().reverse().map(s=>`
+                            <div class="cem-card" style="margin-bottom:0.75rem;">
+                                <div style="display:flex;align-items:flex-start;gap:0.75rem;">
+                                    <div style="flex:1;">
+                                        <div style="color:#fff;font-family:'Share Tech Mono',monospace;font-size:0.9rem;font-weight:bold;margin-bottom:0.35rem;">${esc(s.concept)}</div>
+                                        <div style="color:#777;font-size:0.85rem;line-height:1.5;margin-bottom:0.4rem;">${esc(s.explain.length>180?s.explain.slice(0,180)+'...':s.explain)}</div>
+                                        ${s.gap?`<div style="color:#FF8800;font-family:'Share Tech Mono',monospace;font-size:0.72rem;">GAP: ${esc(s.gap.slice(0,120))}</div>`:''}
+                                        <div style="color:#333;font-family:'Share Tech Mono',monospace;font-size:0.65rem;margin-top:0.4rem;">${new Date(s.date).toLocaleDateString()}</div>
+                                    </div>
+                                    <button onclick="app.teachItDelete('${s.id}')" style="color:#222;background:none;border:none;cursor:pointer;font-size:1.1rem;">&times;</button>
+                                </div>
+                            </div>`).join('')}
+                    </div>`;
+                return this._cemPageShell('TEACH IT', 'Feynman Protocol / Protégé Effect', 'Preparing to teach — and actually explaining — is one of the most effective ways to consolidate understanding. You cannot teach what you don\'t actually know.', content);
+            },
+            teachItStart() { state.teachItPhase='write'; state.teachItStep=0; state._ti_0=''; state._ti_1=''; state._ti_2=''; app.render(); },
+            teachItBack() { state.teachItPhase='list'; state.teachItStep=0; app.render(); },
+            teachItNext() {
+                const step = state.teachItStep||0;
+                const ids = ['ti-concept','ti-explain','ti-gap'];
+                const val = (document.getElementById(ids[step])||{}).value||'';
+                if (!val.trim()) { app.showNotification('Complete this step before proceeding.'); return; }
+                state['_ti_'+step] = val;
+                state.teachItStep = step+1;
+                app.render();
+            },
+            teachItSave() {
+                const concept = (document.getElementById('ti-concept')||{}).value || state['_ti_0'] || '';
+                const explain = (document.getElementById('ti-explain')||{}).value || state['_ti_1'] || '';
+                const gap = (document.getElementById('ti-gap')||{}).value || state['_ti_2'] || '';
+                if (!concept.trim()||!explain.trim()) { app.showNotification('Concept and explanation are required.'); return; }
+                const sessions = JSON.parse(localStorage.getItem('sg_teach_it')||'[]');
+                sessions.push({ id: Date.now().toString(36), concept: concept.trim(), explain: explain.trim(), gap: gap.trim(), date: new Date().toISOString() });
+                localStorage.setItem('sg_teach_it', JSON.stringify(sessions));
+                state.teachItPhase='list'; state.teachItStep=0;
+                app.showNotification('Feynman session encoded.');
+                app.render();
+            },
+            teachItDelete(id) {
+                const sessions = JSON.parse(localStorage.getItem('sg_teach_it')||'[]').filter(s=>s.id!==id);
+                localStorage.setItem('sg_teach_it', JSON.stringify(sessions));
+                app.render();
+            },
+
+            /* ─── 4. CONCEPT MAPPER ─── */
+            getConceptMapperHTML() {
+                const sessions = JSON.parse(localStorage.getItem('sg_concept_mapper')||'[]');
+                const PROBES = [
+                    'Why does this happen?',
+                    'What would break this rule?',
+                    'How does this connect to what you already know?',
+                    'What would be different if this weren\'t true?',
+                    'Can you think of a concrete example?',
+                    'What is the opposite of this? Why?',
+                ];
+                const phase = state.cmPhase||'list';
+                if (phase==='probe') {
+                    const concept = state.cmConcept||'';
+                    const answers = state.cmAnswers||{};
+                    return `<div class="animate-fade-in" style="max-width:700px;margin:0 auto;padding:1rem;">
+                        <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;">
+                            <button onclick="app.cmBack()" style="background:none;border:none;color:#39FF14;font-size:1.4rem;cursor:pointer;">&larr;</button>
+                            <h1 style="font-family:'VT323',monospace;font-size:2.5rem;color:#fff;text-transform:uppercase;letter-spacing:0.06em;">CONCEPT MAPPER</h1>
+                        </div>
+                        <div class="cem-card" style="margin-bottom:1rem;">
+                            <div class="cem-header">TARGET CONCEPT</div>
+                            <div style="color:#fff;font-family:'Share Tech Mono',monospace;font-size:1.1rem;">${esc(concept)}</div>
+                        </div>
+                        ${PROBES.map((q,i)=>`
+                            <div class="cem-card" style="margin-bottom:0.75rem;">
+                                <div class="cem-header">${q}</div>
+                                <textarea id="cm-a-${i}" class="cem-input" rows="3" style="resize:none;" placeholder="Write your response...">${esc(answers[i]||'')}</textarea>
+                            </div>`).join('')}
+                        <div style="display:flex;justify-content:flex-end;margin-top:1rem;">
+                            <button onclick="app.cmSave()" class="cem-btn" style="background:#39FF14;color:#000;">ENCODE RESPONSES</button>
+                        </div>
+                    </div>`;
+                }
+                const content = `
+                    <div class="cem-card" style="margin-bottom:1.5rem;">
+                        <div class="cem-header">ENTER A CONCEPT</div>
+                        <input id="cm-concept" class="cem-input" style="margin-bottom:0.75rem;" placeholder="Enter a fact or concept to interrogate...">
+                        <button onclick="app.cmStart()" class="cem-btn" style="background:#39FF14;color:#000;width:100%;">GENERATE PROBES</button>
+                    </div>
+                    <div>
+                        <div class="cem-header" style="color:#888;margin-bottom:0.75rem;">PAST SESSIONS (${sessions.length})</div>
+                        ${sessions.length===0?'<div style="color:#333;font-family:Share Tech Mono,monospace;font-size:0.8rem;padding:1rem;">No sessions yet.</div>':
+                        sessions.slice().reverse().map(s=>`
+                            <div class="cem-card" style="margin-bottom:0.5rem;">
+                                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:0.75rem;">
+                                    <div style="flex:1;">
+                                        <div style="color:#fff;font-family:'Share Tech Mono',monospace;font-size:0.9rem;font-weight:bold;">${esc(s.concept)}</div>
+                                        <div style="color:#555;font-size:0.75rem;font-family:'Share Tech Mono',monospace;">${Object.keys(s.answers||{}).length} probes answered · ${new Date(s.date).toLocaleDateString()}</div>
+                                    </div>
+                                    <button onclick="app.cmDelete('${s.id}')" style="color:#222;background:none;border:none;cursor:pointer;font-size:1.1rem;">&times;</button>
+                                </div>
+                            </div>`).join('')}
+                    </div>`;
+                return this._cemPageShell('CONCEPT MAPPER', 'Elaborative Interrogation', 'Answering "why" and "how" questions forces the brain to integrate new information with existing knowledge — the depth of processing dramatically improves retention.', content);
+            },
+            cmStart() {
+                const concept = (document.getElementById('cm-concept')||{}).value||'';
+                if (!concept.trim()) { app.showNotification('Enter a concept to interrogate.'); return; }
+                state.cmConcept = concept.trim();
+                state.cmAnswers = {};
+                state.cmPhase = 'probe';
+                app.render();
+            },
+            cmBack() { state.cmPhase='list'; app.render(); },
+            cmSave() {
+                const PROBE_COUNT = 6;
+                const answers = {};
+                for (let i=0; i<PROBE_COUNT; i++) {
+                    const v = (document.getElementById('cm-a-'+i)||{}).value||'';
+                    if (v.trim()) answers[i] = v.trim();
+                }
+                if (Object.keys(answers).length===0) { app.showNotification('Answer at least one probe before saving.'); return; }
+                const sessions = JSON.parse(localStorage.getItem('sg_concept_mapper')||'[]');
+                sessions.push({ id: Date.now().toString(36), concept: state.cmConcept, answers, date: new Date().toISOString() });
+                localStorage.setItem('sg_concept_mapper', JSON.stringify(sessions));
+                state.cmPhase = 'list';
+                app.showNotification('Concept session encoded.');
+                app.render();
+            },
+            cmDelete(id) {
+                const sessions = JSON.parse(localStorage.getItem('sg_concept_mapper')||'[]').filter(s=>s.id!==id);
+                localStorage.setItem('sg_concept_mapper', JSON.stringify(sessions));
+                app.render();
+            },
+
+            /* ─── 5. CHUNKING ENGINE (Script Kiddie+) ─── */
+            getChunkingHTML() {
+                if (this._cemLocked(1)) return this._cemPageShell('CHUNKING ENGINE','Chunking Technique','',this._cemLockedBanner('SCRIPT KIDDIE'));
+                const chunks = JSON.parse(localStorage.getItem('sg_chunking')||'[]');
+                const phase = state.chunkPhase||'list';
+                if (phase==='build') {
+                    const rawItems = state.chunkRawItems||[];
+                    const groups = state.chunkGroups||[];
+                    return `<div class="animate-fade-in" style="max-width:800px;margin:0 auto;padding:1rem;">
+                        <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;">
+                            <button onclick="app.chunkBack()" style="background:none;border:none;color:#39FF14;font-size:1.4rem;cursor:pointer;">&larr;</button>
+                            <h1 style="font-family:'VT323',monospace;font-size:2.8rem;color:#fff;text-transform:uppercase;">CHUNKING ENGINE</h1>
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;">
+                            <div>
+                                <div class="cem-card">
+                                    <div class="cem-header">RAW DATA (${rawItems.length} items)</div>
+                                    ${rawItems.length===0?'<div style="color:#333;font-size:0.8rem;font-family:Share Tech Mono,monospace;">Paste raw data to the right to get started.</div>':
+                                    rawItems.map((item,i)=>`<div class="cem-chunk-item" draggable="true" id="chunk-item-${i}" style="cursor:grab;margin-bottom:0.3rem;">
+                                        <span>${esc(item)}</span>
+                                        <button onclick="app.chunkAddToGroup(${i})" class="cem-btn" style="padding:0.2rem 0.5rem;font-size:0.6rem;border-color:#555;color:#555;">+ GROUP</button>
+                                    </div>`).join('')}
+                                </div>
+                                <div class="cem-card" style="margin-top:0.75rem;">
+                                    <div class="cem-header">ADD NEW GROUP</div>
+                                    <input id="chunk-gname" class="cem-input" style="margin-bottom:0.5rem;" placeholder="Group name...">
+                                    <button onclick="app.chunkCreateGroup()" class="cem-btn" style="width:100%;">+ CREATE GROUP</button>
+                                </div>
+                            </div>
+                            <div>
+                                ${groups.length===0?'<div class="cem-card" style="color:#333;font-size:0.8rem;font-family:Share Tech Mono,monospace;">Create groups to start chunking.</div>':
+                                groups.map((g,gi)=>`
+                                    <div class="cem-card" style="margin-bottom:0.75rem;border-color:${g.items.length>7?'#FF2222':g.items.length>5?'#FF8800':'rgba(57,255,20,0.2)'};">
+                                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
+                                            <div style="font-family:'Share Tech Mono',monospace;font-size:0.8rem;color:#39FF14;font-weight:bold;">${esc(g.name)}</div>
+                                            <span class="cem-tag ${g.items.length>7?'cem-tag-magenta':g.items.length>5?'cem-tag-orange':'cem-tag-green'}">${g.items.length}/7</span>
+                                        </div>
+                                        ${g.items.map((item,ii)=>`<div class="cem-chunk-item">
+                                            <span>${esc(item)}</span>
+                                            <button onclick="app.chunkRemoveFromGroup(${gi},${ii})" style="background:none;border:none;color:#333;cursor:pointer;font-size:0.9rem;">&times;</button>
+                                        </div>`).join('')}
+                                        ${g.items.length>7?'<div style="color:#FF2222;font-family:Share Tech Mono,monospace;font-size:0.65rem;margin-top:0.4rem;letter-spacing:0.1em;">⚠ OVERFLOW — Working memory limit exceeded. Split this group.</div>':''}
+                                        <button onclick="app.chunkDeleteGroup(${gi})" style="background:none;border:none;color:#333;cursor:pointer;font-size:0.65rem;font-family:Share Tech Mono,monospace;letter-spacing:0.1em;text-transform:uppercase;margin-top:0.5rem;">DELETE GROUP</button>
+                                    </div>`).join('')}
+                            </div>
+                        </div>
+                        <div style="margin-top:1rem;display:flex;justify-content:flex-end;">
+                            <button onclick="app.chunkSave()" class="cem-btn" style="background:#39FF14;color:#000;">SAVE CHUNK MAP</button>
+                        </div>
+                    </div>`;
+                }
+                const content = `
+                    <div class="cem-card" style="margin-bottom:1.5rem;">
+                        <div class="cem-header">PASTE RAW DATA</div>
+                        <div style="color:#666;font-size:0.82rem;font-family:'Share Tech Mono',monospace;margin-bottom:0.75rem;line-height:1.5;">One item per line. The engine will load them as individual data points for you to group.</div>
+                        <textarea id="chunk-raw" class="cem-input" rows="6" style="resize:none;" placeholder="Paste items here — one per line...&#10;e.g.&#10;Mitochondria&#10;Nucleus&#10;Cell membrane&#10;Ribosome"></textarea>
+                        <button onclick="app.chunkLoad()" class="cem-btn" style="margin-top:0.75rem;background:#39FF14;color:#000;width:100%;">LOAD INTO ENGINE</button>
+                    </div>
+                    <div>
+                        <div class="cem-header" style="color:#888;margin-bottom:0.75rem;">SAVED CHUNK MAPS (${chunks.length})</div>
+                        ${chunks.length===0?'<div style="color:#333;font-family:Share Tech Mono,monospace;font-size:0.8rem;padding:1rem;">No chunk maps yet.</div>':
+                        chunks.slice().reverse().map(c=>`
+                            <div class="cem-card" style="margin-bottom:0.5rem;">
+                                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:0.75rem;">
+                                    <div>
+                                        <div style="color:#fff;font-family:'Share Tech Mono',monospace;font-size:0.85rem;font-weight:bold;">${c.groups.length} groups · ${c.totalItems} items</div>
+                                        <div style="color:#555;font-size:0.72rem;font-family:'Share Tech Mono',monospace;">${c.groups.map(g=>`${esc(g.name)}(${g.items.length})`).join(' · ')}</div>
+                                        <div style="color:#333;font-size:0.65rem;font-family:'Share Tech Mono',monospace;margin-top:0.3rem;">${new Date(c.date).toLocaleDateString()}</div>
+                                    </div>
+                                    <button onclick="app.chunkDelete('${c.id}')" style="color:#222;background:none;border:none;cursor:pointer;font-size:1.1rem;">&times;</button>
+                                </div>
+                            </div>`).join('')}
+                    </div>`;
+                return this._cemPageShell('CHUNKING ENGINE','Chunking Technique','Working memory has a hard capacity of roughly 7±2 items; chunking compresses information into units that fit within that limit, making complex data manageable without overloading the system.',content);
+            },
+            chunkLoad() {
+                const raw = (document.getElementById('chunk-raw')||{}).value||'';
+                const items = raw.split('\n').map(l=>l.trim()).filter(Boolean);
+                if (items.length===0) { app.showNotification('Paste at least one item.'); return; }
+                state.chunkRawItems = items;
+                state.chunkGroups = [];
+                state.chunkPhase = 'build';
+                app.render();
+            },
+            chunkBack() { state.chunkPhase='list'; app.render(); },
+            chunkCreateGroup() {
+                const name = (document.getElementById('chunk-gname')||{}).value||'';
+                if (!name.trim()) { app.showNotification('Name the group first.'); return; }
+                if (!state.chunkGroups) state.chunkGroups = [];
+                state.chunkGroups.push({ name: name.trim(), items: [] });
+                app.render();
+            },
+            chunkAddToGroup(itemIdx) {
+                const groups = state.chunkGroups||[];
+                if (groups.length===0) { app.showNotification('Create a group first.'); return; }
+                const item = (state.chunkRawItems||[])[itemIdx];
+                if (!item) return;
+                const group = groups[groups.length-1];
+                if (group.items.includes(item)) { app.showNotification('Item already in that group.'); return; }
+                group.items.push(item);
+                app.render();
+            },
+            chunkRemoveFromGroup(gi,ii) {
+                state.chunkGroups[gi].items.splice(ii,1);
+                app.render();
+            },
+            chunkDeleteGroup(gi) {
+                state.chunkGroups.splice(gi,1);
+                app.render();
+            },
+            chunkSave() {
+                const groups = state.chunkGroups||[];
+                if (groups.length===0) { app.showNotification('Add at least one group.'); return; }
+                const totalItems = groups.reduce((a,g)=>a+g.items.length,0);
+                const chunks = JSON.parse(localStorage.getItem('sg_chunking')||'[]');
+                chunks.push({ id: Date.now().toString(36), groups: groups.map(g=>({name:g.name,items:[...g.items]})), totalItems, date: new Date().toISOString() });
+                localStorage.setItem('sg_chunking', JSON.stringify(chunks));
+                state.chunkPhase='list';
+                app.showNotification('Chunk map saved.');
+                app.render();
+            },
+            chunkDelete(id) {
+                const chunks = JSON.parse(localStorage.getItem('sg_chunking')||'[]').filter(c=>c.id!==id);
+                localStorage.setItem('sg_chunking', JSON.stringify(chunks));
+                app.render();
+            },
+
+            /* ─── 6. THE INTERLEAVE (Script Kiddie+) ─── */
+            getInterleaveHTML() {
+                if (this._cemLocked(1)) return this._cemPageShell('THE INTERLEAVE','Interleaving Practice','',this._cemLockedBanner('SCRIPT KIDDIE'));
+                const sessions = JSON.parse(localStorage.getItem('sg_interleave')||'[]');
+                const running = state.ilRunning||false;
+                const content = `
+                    <div class="cem-card" style="margin-bottom:1.5rem;" id="il-setup" style="${running?'display:none':''}">
+                        <div class="cem-header">CONFIGURE SESSION</div>
+                        <div style="color:#666;font-size:0.82rem;font-family:'Share Tech Mono',monospace;margin-bottom:1rem;line-height:1.5;">Select 2–4 knowledge domains. Set block duration. The engine cycles them with a DOMAIN SHIFT interrupt between each switch.</div>
+                        ${[0,1,2,3].map(i=>`
+                            <div style="display:flex;gap:0.5rem;align-items:center;margin-bottom:0.5rem;">
+                                <div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:#555;min-width:2rem;">D${i+1}</div>
+                                <input id="il-domain-${i}" class="cem-input" style="flex:1;" placeholder="${i<2?'Required':'Optional'}: Domain name..." value="${esc((state.ilDomains&&state.ilDomains[i])||'')}">
+                            </div>`).join('')}
+                        <div style="margin-top:1rem;">
+                            <div class="cem-header">BLOCK DURATION</div>
+                            <div style="display:flex;gap:0.5rem;">
+                                ${[10,12,15].map(m=>`<button onclick="app.ilSetBlock(${m})" class="cem-btn" style="flex:1;${(state.ilBlockMin||10)===m?'background:#39FF14;color:#000;':''}">${m} min</button>`).join('')}
+                            </div>
+                        </div>
+                        <button onclick="app.ilStart()" class="cem-btn" style="margin-top:1rem;width:100%;background:#FF8800;border-color:#FF8800;color:#000;font-size:0.9rem;padding:0.75rem;">⬡ START INTERLEAVE SESSION</button>
+                    </div>
+                    ${running ? `
+                    <div class="cem-card cem-domain-active" id="il-running-panel" style="text-align:center;padding:2rem;">
+                        <div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:#FF8800;letter-spacing:0.2em;margin-bottom:0.5rem;">DOMAIN ${(state.ilCurrentIdx||0)+1} OF ${(state.ilDomains||[]).filter(Boolean).length}</div>
+                        <div id="il-domain-name" style="font-family:'VT323',monospace;font-size:3rem;color:#FF8800;text-transform:uppercase;margin-bottom:0.75rem;">${esc((state.ilDomains||[])[state.ilCurrentIdx||0]||'')}</div>
+                        <div id="il-timer-display" style="font-family:'VT323',monospace;font-size:4rem;color:#fff;margin-bottom:1rem;">-:--</div>
+                        <div style="color:#555;font-family:'Share Tech Mono',monospace;font-size:0.75rem;margin-bottom:1.5rem;">Focus on this domain only. When the timer ends, a DOMAIN SHIFT interrupt will fire.</div>
+                        <button onclick="app.ilStop()" class="cem-btn cem-btn-danger">ABORT SESSION</button>
+                    </div>` : ''}
+                    <div>
+                        <div class="cem-header" style="color:#888;margin-bottom:0.75rem;">PAST SESSIONS (${sessions.length})</div>
+                        ${sessions.length===0?'<div style="color:#333;font-family:Share Tech Mono,monospace;font-size:0.8rem;padding:1rem;">No sessions logged yet.</div>':
+                        sessions.slice().reverse().slice(0,10).map(s=>`
+                            <div class="cem-card" style="margin-bottom:0.5rem;padding:0.75rem 1rem;">
+                                <div style="color:#ccc;font-family:'Share Tech Mono',monospace;font-size:0.82rem;">${s.domains.map(d=>esc(d)).join(' → ')}</div>
+                                <div style="color:#555;font-size:0.72rem;font-family:'Share Tech Mono',monospace;">${s.blockMin}min blocks · ${s.cycles} cycle(s) · ${new Date(s.date).toLocaleDateString()}</div>
+                            </div>`).join('')}
+                    </div>`;
+                return this._cemPageShell('THE INTERLEAVE','Interleaving Practice','Interleaving feels harder than single-domain practice but produces superior long-term retention by forcing the brain to retrieve and re-contextualise continuously.',content);
+            },
+            ilSetBlock(m) { state.ilBlockMin = m; app.render(); },
+            ilStart() {
+                const domains = [0,1,2,3].map(i=>(document.getElementById('il-domain-'+i)||{}).value||'').filter(Boolean);
+                if (domains.length<2) { app.showNotification('Enter at least 2 domains to interleave.'); return; }
+                state.ilDomains = domains;
+                state.ilCurrentIdx = 0;
+                state.ilCycles = 0;
+                state.ilRunning = true;
+                app.render();
+                setTimeout(()=>app.ilRunBlock(),100);
+            },
+            ilRunBlock() {
+                if (!state.ilRunning) return;
+                const domains = state.ilDomains||[];
+                const idx = state.ilCurrentIdx||0;
+                const blockSec = (state.ilBlockMin||10)*60;
+                let remaining = blockSec;
+                const timerEl = document.getElementById('il-timer-display');
+                const domainEl = document.getElementById('il-domain-name');
+                if (domainEl) domainEl.textContent = domains[idx]||'';
+                if (timerEl) timerEl.textContent = Math.floor(remaining/60)+':'+String(remaining%60).padStart(2,'0');
+                clearInterval(state._ilInterval);
+                state._ilInterval = setInterval(()=>{
+                    remaining--;
+                    if (!state.ilRunning) { clearInterval(state._ilInterval); return; }
+                    const el = document.getElementById('il-timer-display');
+                    if (el) el.textContent = Math.floor(remaining/60)+':'+String(remaining%60).padStart(2,'0');
+                    if (remaining<=0) {
+                        clearInterval(state._ilInterval);
+                        const nextIdx = (idx+1)%domains.length;
+                        if (nextIdx===0) state.ilCycles = (state.ilCycles||0)+1;
+                        state.ilCurrentIdx = nextIdx;
+                        const nextDomain = domains[nextIdx];
+                        SysInterrupt.show('interleave-shift', { domain: nextDomain, prev: domains[idx] });
+                        setTimeout(()=>{ if (state.ilRunning) app.ilRunBlock(); }, 500);
+                    }
+                }, 1000);
+            },
+            ilStop() {
+                clearInterval(state._ilInterval);
+                const domains = state.ilDomains||[];
+                const sessions = JSON.parse(localStorage.getItem('sg_interleave')||'[]');
+                sessions.push({ id: Date.now().toString(36), domains, blockMin: state.ilBlockMin||10, cycles: state.ilCycles||0, date: new Date().toISOString() });
+                localStorage.setItem('sg_interleave', JSON.stringify(sessions));
+                state.ilRunning = false;
+                state.ilCurrentIdx = 0;
+                app.showNotification('Interleave session logged.');
+                app.render();
+            },
+
+            /* ─── 7. MEMORY PALACE (Script Kiddie+) ─── */
+            getMemoryPalaceHTML() {
+                if (this._cemLocked(1)) return this._cemPageShell('MEMORY PALACE','Method of Loci','',this._cemLockedBanner('SCRIPT KIDDIE'));
+                const palaces = JSON.parse(localStorage.getItem('sg_memory_palace')||'[]');
+                const phase = state.mpPhase||'list';
+                if (phase==='build') {
+                    const palace = state.mpBuilding||{ name:'', stops:[] };
+                    return `<div class="animate-fade-in" style="max-width:720px;margin:0 auto;padding:1rem;">
+                        <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;">
+                            <button onclick="app.mpBack()" style="background:none;border:none;color:#39FF14;font-size:1.4rem;cursor:pointer;">&larr;</button>
+                            <h1 style="font-family:'VT323',monospace;font-size:2.8rem;color:#fff;text-transform:uppercase;">MEMORY PALACE</h1>
+                        </div>
+                        <div class="cem-card" style="margin-bottom:1rem;">
+                            <div class="cem-header">PALACE NAME</div>
+                            <input id="mp-name" class="cem-input" placeholder="Name your memory palace..." value="${esc(palace.name)}">
+                        </div>
+                        <div class="cem-card" style="margin-bottom:1rem;">
+                            <div class="cem-header">STOPS (${palace.stops.length})</div>
+                            ${palace.stops.map((s,i)=>`
+                                <div style="display:flex;gap:0.75rem;align-items:flex-start;margin-bottom:0.75rem;padding-bottom:0.75rem;border-bottom:1px solid #111;">
+                                    <div style="font-family:'VT323',monospace;font-size:1.8rem;color:#FF8800;min-width:2rem;text-align:center;">${i+1}</div>
+                                    <div style="flex:1;">
+                                        <div style="font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:#555;margin-bottom:0.2rem;">LOCATION</div>
+                                        <div style="color:#ccc;font-size:0.9rem;margin-bottom:0.4rem;">${esc(s.location)}</div>
+                                        <div style="font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:#555;margin-bottom:0.2rem;">DATA POINT</div>
+                                        <div style="color:#39FF14;font-size:0.9rem;">${esc(s.data)}</div>
+                                    </div>
+                                    <button onclick="app.mpRemoveStop(${i})" style="background:none;border:none;color:#333;cursor:pointer;font-size:1.1rem;">&times;</button>
+                                </div>`).join('')}
+                            <div style="margin-top:0.5rem;">
+                                <div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:#555;margin-bottom:0.4rem;">ADD STOP</div>
+                                <input id="mp-loc" class="cem-input" style="margin-bottom:0.5rem;" placeholder="Location name (e.g. Front door, Kitchen sink...)">
+                                <textarea id="mp-data" class="cem-input" rows="2" style="margin-bottom:0.5rem;resize:none;" placeholder="Data point to encode at this location..."></textarea>
+                                <button onclick="app.mpAddStop()" class="cem-btn" style="width:100%;">+ ADD STOP</button>
+                            </div>
+                        </div>
+                        <div style="display:flex;gap:0.75rem;justify-content:flex-end;">
+                            <button onclick="app.mpSave()" class="cem-btn" style="background:#39FF14;color:#000;">LOCK IN PALACE</button>
+                        </div>
+                    </div>`;
+                }
+                if (phase==='review') {
+                    const palace = state.mpReviewing;
+                    const stopIdx = state.mpReviewIdx||0;
+                    const stop = palace.stops[stopIdx];
+                    const revealed = state.mpRevealed||false;
+                    return `<div class="animate-fade-in" style="max-width:600px;margin:0 auto;padding:1rem;">
+                        <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;">
+                            <button onclick="app.mpBackToList()" style="background:none;border:none;color:#39FF14;font-size:1.4rem;cursor:pointer;">&larr;</button>
+                            <h1 style="font-family:'VT323',monospace;font-size:2.5rem;color:#fff;text-transform:uppercase;">${esc(palace.name)}</h1>
+                        </div>
+                        <div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:#555;text-align:center;margin-bottom:1rem;">STOP ${stopIdx+1} OF ${palace.stops.length}</div>
+                        <div class="cem-card" style="text-align:center;padding:2rem;">
+                            <div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:#FF8800;margin-bottom:0.5rem;letter-spacing:0.15em;">LOCATION</div>
+                            <div style="font-family:'VT323',monospace;font-size:2.5rem;color:#FF8800;margin-bottom:1.5rem;">${esc(stop.location)}</div>
+                            ${revealed ?
+                                `<div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:#39FF14;margin-bottom:0.5rem;letter-spacing:0.15em;">DATA POINT</div>
+                                <div style="color:#39FF14;font-size:1.1rem;font-weight:bold;margin-bottom:1.5rem;">${esc(stop.data)}</div>` :
+                                `<button onclick="app.mpReveal()" class="cem-btn" style="margin-bottom:1.5rem;">REVEAL DATA POINT</button>`}
+                            <div style="display:flex;gap:0.75rem;justify-content:center;">
+                                ${stopIdx>0?`<button onclick="app.mpReviewPrev()" class="cem-btn">← PREV</button>`:''}
+                                ${stopIdx<palace.stops.length-1?`<button onclick="app.mpReviewNext()" class="cem-btn" style="background:#39FF14;color:#000;">NEXT →</button>`:
+                                `<button onclick="app.mpBackToList()" class="cem-btn" style="background:#39FF14;color:#000;">COMPLETE ✓</button>`}
+                            </div>
+                        </div>
+                    </div>`;
+                }
+                const content = `
+                    <div style="text-align:center;margin-bottom:1.5rem;">
+                        <button onclick="app.mpNew()" class="cem-btn" style="background:#39FF14;color:#000;font-size:0.9rem;padding:0.75rem 2rem;">+ BUILD NEW PALACE</button>
+                    </div>
+                    <div>
+                        <div class="cem-header" style="color:#888;margin-bottom:0.75rem;">YOUR PALACES (${palaces.length})</div>
+                        ${palaces.length===0?'<div style="color:#333;font-family:Share Tech Mono,monospace;font-size:0.8rem;padding:1rem;">No palaces built yet. Construct your first one above.</div>':
+                        palaces.slice().reverse().map(p=>`
+                            <div class="cem-card" style="margin-bottom:0.75rem;">
+                                <div style="display:flex;align-items:flex-start;gap:0.75rem;">
+                                    <div style="flex:1;">
+                                        <div style="color:#fff;font-family:'Share Tech Mono',monospace;font-size:0.9rem;font-weight:bold;margin-bottom:0.25rem;">${esc(p.name)}</div>
+                                        <div style="color:#555;font-size:0.75rem;font-family:'Share Tech Mono',monospace;">${p.stops.length} stops · ${new Date(p.date).toLocaleDateString()}</div>
+                                        <div style="color:#444;font-size:0.72rem;font-family:'Share Tech Mono',monospace;margin-top:0.2rem;">${p.stops.slice(0,3).map(s=>esc(s.location)).join(' → ')}${p.stops.length>3?' → ...':''}</div>
+                                    </div>
+                                    <div style="display:flex;flex-direction:column;gap:0.4rem;align-items:flex-end;">
+                                        <button onclick="app.mpReview('${p.id}')" class="cem-btn" style="padding:0.35rem 0.75rem;font-size:0.65rem;">REVIEW</button>
+                                        <button onclick="app.mpDeletePalace('${p.id}')" style="background:none;border:none;color:#222;cursor:pointer;font-size:1rem;">&times;</button>
+                                    </div>
+                                </div>
+                            </div>`).join('')}
+                    </div>`;
+                return this._cemPageShell('MEMORY PALACE','Method of Loci','The brain\'s spatial memory system (used for navigation) is one of the most durable — placing information into locations hijacks this system for data retention.',content);
+            },
+            mpNew() { state.mpPhase='build'; state.mpBuilding={ name:'', stops:[] }; app.render(); },
+            mpBack() { state.mpPhase='list'; app.render(); },
+            mpBackToList() { state.mpPhase='list'; app.render(); },
+            mpAddStop() {
+                const loc = (document.getElementById('mp-loc')||{}).value||'';
+                const data = (document.getElementById('mp-data')||{}).value||'';
+                if (!loc.trim()||!data.trim()) { app.showNotification('Enter both a location and a data point.'); return; }
+                const name = (document.getElementById('mp-name')||{}).value || state.mpBuilding.name;
+                state.mpBuilding.name = name;
+                state.mpBuilding.stops.push({ location: loc.trim(), data: data.trim() });
+                app.render();
+            },
+            mpRemoveStop(i) { state.mpBuilding.stops.splice(i,1); app.render(); },
+            mpSave() {
+                const name = (document.getElementById('mp-name')||{}).value || state.mpBuilding.name;
+                if (!name.trim()) { app.showNotification('Name the palace.'); return; }
+                if (state.mpBuilding.stops.length===0) { app.showNotification('Add at least one stop.'); return; }
+                state.mpBuilding.name = name.trim();
+                const palaces = JSON.parse(localStorage.getItem('sg_memory_palace')||'[]');
+                palaces.push({ id: Date.now().toString(36), name: state.mpBuilding.name, stops: state.mpBuilding.stops, date: new Date().toISOString() });
+                localStorage.setItem('sg_memory_palace', JSON.stringify(palaces));
+                state.mpPhase='list';
+                app.showNotification('Palace locked in.');
+                app.render();
+            },
+            mpReview(id) {
+                const palaces = JSON.parse(localStorage.getItem('sg_memory_palace')||'[]');
+                const palace = palaces.find(p=>p.id===id);
+                if (!palace||palace.stops.length===0) return;
+                state.mpReviewing = palace;
+                state.mpReviewIdx = 0;
+                state.mpRevealed = false;
+                state.mpPhase = 'review';
+                app.render();
+            },
+            mpReveal() { state.mpRevealed = true; app.render(); },
+            mpReviewNext() { state.mpReviewIdx = (state.mpReviewIdx||0)+1; state.mpRevealed=false; app.render(); },
+            mpReviewPrev() { state.mpReviewIdx = Math.max(0,(state.mpReviewIdx||1)-1); state.mpRevealed=false; app.render(); },
+            mpDeletePalace(id) {
+                if (!confirm('Delete this palace?')) return;
+                const palaces = JSON.parse(localStorage.getItem('sg_memory_palace')||'[]').filter(p=>p.id!==id);
+                localStorage.setItem('sg_memory_palace', JSON.stringify(palaces));
+                app.render();
+            },
+
+            /* ─── 8. MIND MAP PROTOCOL (Glitch Tech+) ─── */
+            getMindMapHTML() {
+                if (this._cemLocked(2)) return this._cemPageShell('MIND MAP PROTOCOL','Concept Mapping','',this._cemLockedBanner('GLITCH TECH'));
+                const maps = JSON.parse(localStorage.getItem('sg_mindmap')||'[]');
+                const phase = state.mmPhase||'list';
+                if (phase==='build') {
+                    const tree = state.mmTree||{ root:'', branches:[] };
+                    return `<div class="animate-fade-in" style="max-width:800px;margin:0 auto;padding:1rem;">
+                        <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.25rem;">
+                            <button onclick="app.mmBack()" style="background:none;border:none;color:#39FF14;font-size:1.4rem;cursor:pointer;">&larr;</button>
+                            <h1 style="font-family:'VT323',monospace;font-size:2.8rem;color:#fff;text-transform:uppercase;">MIND MAP PROTOCOL</h1>
+                        </div>
+                        <div id="mm-tree-container" style="margin-bottom:1.25rem;">
+                            <div class="cem-card">
+                                <div class="cem-header">ROOT CONCEPT</div>
+                                <input id="mm-root" class="cem-input" placeholder="Central concept..." value="${esc(tree.root)}">
+                            </div>
+                            <div id="mm-branches" style="margin-top:0.75rem;">
+                                ${(tree.branches||[]).map((b,bi)=>`
+                                <div class="cem-card" style="border-color:rgba(57,255,20,0.25);margin-bottom:0.5rem;">
+                                    <div style="display:flex;gap:0.75rem;align-items:center;margin-bottom:0.5rem;">
+                                        <div style="color:#39FF14;font-family:'Share Tech Mono',monospace;font-size:0.7rem;letter-spacing:0.1em;">BRANCH ${bi+1}</div>
+                                        <input id="mm-branch-${bi}" class="cem-input" style="flex:1;" placeholder="Branch idea..." value="${esc(b.label)}">
+                                        <button onclick="app.mmRemoveBranch(${bi})" style="background:none;border:none;color:#333;cursor:pointer;font-size:1.1rem;">&times;</button>
+                                    </div>
+                                    <div style="padding-left:1.5rem;">
+                                        ${(b.subs||[]).map((s,si)=>`
+                                        <div style="display:flex;gap:0.5rem;align-items:center;margin-bottom:0.35rem;">
+                                            <div style="color:#555;font-size:0.7rem;font-family:'Share Tech Mono',monospace;">↳</div>
+                                            <input id="mm-sub-${bi}-${si}" class="cem-input" style="flex:1;" placeholder="Sub-idea..." value="${esc(s)}">
+                                            <button onclick="app.mmRemoveSub(${bi},${si})" style="background:none;border:none;color:#333;cursor:pointer;font-size:0.9rem;">&times;</button>
+                                        </div>`).join('')}
+                                        <button onclick="app.mmAddSub(${bi})" class="cem-btn" style="font-size:0.6rem;padding:0.25rem 0.65rem;margin-top:0.25rem;border-color:#333;color:#444;">+ SUB-IDEA</button>
+                                    </div>
+                                </div>`).join('')}
+                            </div>
+                            <button onclick="app.mmAddBranch()" class="cem-btn" style="width:100%;margin-top:0.5rem;">+ ADD BRANCH</button>
+                        </div>
+                        <div style="display:flex;gap:0.75rem;justify-content:flex-end;">
+                            <button onclick="app.mmExport()" class="cem-btn cem-btn-orange">EXPORT OUTLINE</button>
+                            <button onclick="app.mmSave()" class="cem-btn" style="background:#39FF14;color:#000;">SAVE MAP</button>
+                        </div>
+                    </div>`;
+                }
+                const content = `
+                    <div style="text-align:center;margin-bottom:1.5rem;">
+                        <button onclick="app.mmNew()" class="cem-btn" style="background:#39FF14;color:#000;font-size:0.9rem;padding:0.75rem 2rem;">+ NEW MIND MAP</button>
+                    </div>
+                    <div>
+                        <div class="cem-header" style="color:#888;margin-bottom:0.75rem;">SAVED MAPS (${maps.length})</div>
+                        ${maps.length===0?'<div style="color:#333;font-family:Share Tech Mono,monospace;font-size:0.8rem;padding:1rem;">No maps yet.</div>':
+                        maps.slice().reverse().map(m=>`
+                            <div class="cem-card" style="margin-bottom:0.75rem;">
+                                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:0.75rem;">
+                                    <div>
+                                        <div style="color:#FF00FF;font-family:'Share Tech Mono',monospace;font-size:0.9rem;font-weight:bold;margin-bottom:0.25rem;">${esc(m.root)}</div>
+                                        <div style="color:#555;font-size:0.75rem;font-family:'Share Tech Mono',monospace;">${m.branches.length} branches · ${new Date(m.date).toLocaleDateString()}</div>
+                                        <div style="color:#444;font-size:0.72rem;font-family:'Share Tech Mono',monospace;margin-top:0.2rem;">${m.branches.slice(0,4).map(b=>esc(b.label)).join(' · ')}</div>
+                                    </div>
+                                    <div style="display:flex;gap:0.5rem;align-items:flex-start;">
+                                        <button onclick="app.mmLoad('${m.id}')" class="cem-btn" style="padding:0.3rem 0.65rem;font-size:0.65rem;">EDIT</button>
+                                        <button onclick="app.mmDelete('${m.id}')" style="background:none;border:none;color:#222;cursor:pointer;font-size:1.1rem;">&times;</button>
+                                    </div>
+                                </div>
+                            </div>`).join('')}
+                    </div>`;
+                return this._cemPageShell('MIND MAP PROTOCOL','Concept Mapping','Explicitly mapping the connections between ideas forces the brain to organise information into schemas — connected knowledge is retrieved faster and forgotten more slowly.',content);
+            },
+            mindMapInit() {},
+            mmNew() { state.mmPhase='build'; state.mmTree={ root:'', branches:[] }; state.mmEditId=null; app.render(); },
+            mmBack() { state.mmPhase='list'; app.render(); },
+            mmLoad(id) {
+                const maps = JSON.parse(localStorage.getItem('sg_mindmap')||'[]');
+                const m = maps.find(x=>x.id===id);
+                if (!m) return;
+                state.mmTree = { root:m.root, branches: m.branches.map(b=>({...b,subs:[...(b.subs||[])]}) ) };
+                state.mmEditId = id;
+                state.mmPhase = 'build';
+                app.render();
+            },
+            _mmSyncTree() {
+                const root = (document.getElementById('mm-root')||{}).value||state.mmTree.root;
+                state.mmTree.root = root;
+                (state.mmTree.branches||[]).forEach((b,bi)=>{
+                    const bEl = document.getElementById('mm-branch-'+bi);
+                    if (bEl) b.label = bEl.value;
+                    (b.subs||[]).forEach((s,si)=>{
+                        const sEl = document.getElementById('mm-sub-'+bi+'-'+si);
+                        if (sEl) b.subs[si] = sEl.value;
+                    });
+                });
+            },
+            mmAddBranch() { this._mmSyncTree(); state.mmTree.branches.push({ label:'', subs:[] }); app.render(); },
+            mmRemoveBranch(bi) { this._mmSyncTree(); state.mmTree.branches.splice(bi,1); app.render(); },
+            mmAddSub(bi) { this._mmSyncTree(); state.mmTree.branches[bi].subs.push(''); app.render(); },
+            mmRemoveSub(bi,si) { this._mmSyncTree(); state.mmTree.branches[bi].subs.splice(si,1); app.render(); },
+            mmSave() {
+                this._mmSyncTree();
+                const root = state.mmTree.root;
+                if (!root.trim()) { app.showNotification('Enter the root concept.'); return; }
+                const maps = JSON.parse(localStorage.getItem('sg_mindmap')||'[]');
+                const editId = state.mmEditId;
+                if (editId) {
+                    const idx = maps.findIndex(m=>m.id===editId);
+                    if (idx>=0) maps[idx] = { ...maps[idx], root, branches: state.mmTree.branches, date: new Date().toISOString() };
+                } else {
+                    maps.push({ id: Date.now().toString(36), root, branches: state.mmTree.branches, date: new Date().toISOString() });
+                }
+                localStorage.setItem('sg_mindmap', JSON.stringify(maps));
+                state.mmPhase='list'; state.mmEditId=null;
+                app.showNotification('Mind map saved.');
+                app.render();
+            },
+            mmDelete(id) {
+                if (!confirm('Delete this map?')) return;
+                const maps = JSON.parse(localStorage.getItem('sg_mindmap')||'[]').filter(m=>m.id!==id);
+                localStorage.setItem('sg_mindmap', JSON.stringify(maps));
+                app.render();
+            },
+            mmExport() {
+                this._mmSyncTree();
+                const tree = state.mmTree;
+                let text = tree.root.toUpperCase()+'\n';
+                (tree.branches||[]).forEach((b,i)=>{
+                    text += `  ${i+1}. ${b.label}\n`;
+                    (b.subs||[]).forEach(s=>{ if(s.trim()) text += `       • ${s}\n`; });
+                });
+                const blob = new Blob([text], {type:'text/plain'});
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = (tree.root||'mindmap').replace(/\s+/g,'_').toLowerCase()+'.txt';
+                a.click();
+            },
+
+            /* ─── 9. DUAL CODING STATION (Glitch Tech+) ─── */
+            getDualCodingHTML() {
+                if (this._cemLocked(2)) return this._cemPageShell('DUAL CODING STATION','Dual Coding Theory','',this._cemLockedBanner('GLITCH TECH'));
+                const sessions = JSON.parse(localStorage.getItem('sg_dual_coding')||'[]');
+                const phase = state.dcPhase||'list';
+                if (phase==='create') {
+                    return `<div class="animate-fade-in" style="max-width:900px;margin:0 auto;padding:1rem;">
+                        <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.25rem;">
+                            <button onclick="app.dcBack()" style="background:none;border:none;color:#39FF14;font-size:1.4rem;cursor:pointer;">&larr;</button>
+                            <h1 style="font-family:'VT323',monospace;font-size:2.5rem;color:#fff;text-transform:uppercase;">DUAL CODING STATION</h1>
+                        </div>
+                        <input id="dc-title" class="cem-input" style="margin-bottom:1rem;" placeholder="Concept title..." value="${esc(state.dcTitle||'')}">
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+                            <div>
+                                <div class="cem-header">TEXT ENCODING</div>
+                                <textarea id="dc-text" class="cem-input" rows="14" style="resize:none;" placeholder="Write your concept description, key points, notes...">${esc(state.dcText||'')}</textarea>
+                            </div>
+                            <div>
+                                <div class="cem-header">VISUAL ENCODING <span style="font-size:0.6rem;color:#555;">(draw / label / diagram)</span></div>
+                                <div class="cem-canvas-wrap">
+                                    <canvas id="dc-canvas" width="420" height="340" style="display:block;touch-action:none;cursor:crosshair;background:#080808;"></canvas>
+                                </div>
+                                <div style="display:flex;gap:0.5rem;margin-top:0.5rem;flex-wrap:wrap;">
+                                    <button onclick="app.dcSetColor('#39FF14')" class="cem-btn" style="padding:0.3rem 0.6rem;border-color:#39FF14;color:#39FF14;font-size:0.6rem;">GREEN</button>
+                                    <button onclick="app.dcSetColor('#FF00FF')" class="cem-btn" style="padding:0.3rem 0.6rem;border-color:#FF00FF;color:#FF00FF;font-size:0.6rem;">MAGENTA</button>
+                                    <button onclick="app.dcSetColor('#FF8800')" class="cem-btn" style="padding:0.3rem 0.6rem;border-color:#FF8800;color:#FF8800;font-size:0.6rem;">ORANGE</button>
+                                    <button onclick="app.dcSetColor('#fff')" class="cem-btn" style="padding:0.3rem 0.6rem;font-size:0.6rem;">WHITE</button>
+                                    <button onclick="app.dcAddLabel()" class="cem-btn cem-btn-orange" style="padding:0.3rem 0.6rem;font-size:0.6rem;">+ LABEL</button>
+                                    <button onclick="app.dcClearCanvas()" class="cem-btn cem-btn-danger" style="padding:0.3rem 0.6rem;font-size:0.6rem;">CLEAR</button>
+                                </div>
+                                <div id="dc-labels" style="margin-top:0.5rem;">${(state.dcLabels||[]).map((l,i)=>`<div style="display:flex;gap:0.4rem;align-items:center;margin-bottom:0.3rem;"><span style="color:#FF8800;font-family:Share Tech Mono,monospace;font-size:0.65rem;min-width:1.5rem;">${i+1}</span><input class="cem-input" style="flex:1;padding:0.3rem 0.5rem;" value="${esc(l)}" oninput="app.dcUpdateLabel(${i},this.value)"></div>`).join('')}</div>
+                            </div>
+                        </div>
+                        <div style="display:flex;justify-content:flex-end;margin-top:1rem;">
+                            <button onclick="app.dcSave()" class="cem-btn" style="background:#39FF14;color:#000;">ENCODE SESSION</button>
+                        </div>
+                    </div>`;
+                }
+                const content = `
+                    <div style="text-align:center;margin-bottom:1.5rem;">
+                        <button onclick="app.dcNew()" class="cem-btn" style="background:#39FF14;color:#000;font-size:0.9rem;padding:0.75rem 2rem;">+ NEW DUAL CODING SESSION</button>
+                    </div>
+                    <div>
+                        <div class="cem-header" style="color:#888;margin-bottom:0.75rem;">SAVED SESSIONS (${sessions.length})</div>
+                        ${sessions.length===0?'<div style="color:#333;font-family:Share Tech Mono,monospace;font-size:0.8rem;padding:1rem;">No sessions yet.</div>':
+                        sessions.slice().reverse().map(s=>`
+                            <div class="cem-card" style="margin-bottom:0.75rem;">
+                                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:0.75rem;">
+                                    <div style="flex:1;">
+                                        <div style="color:#fff;font-family:'Share Tech Mono',monospace;font-size:0.9rem;font-weight:bold;margin-bottom:0.25rem;">${esc(s.title||'Untitled')}</div>
+                                        <div style="color:#666;font-size:0.8rem;line-height:1.5;">${esc((s.text||'').slice(0,100))}${(s.text||'').length>100?'...':''}</div>
+                                        <div style="color:#333;font-size:0.65rem;font-family:'Share Tech Mono',monospace;margin-top:0.3rem;">${s.labels&&s.labels.length?s.labels.length+' labels · ':''} ${new Date(s.date).toLocaleDateString()}</div>
+                                    </div>
+                                    <button onclick="app.dcDelete('${s.id}')" style="background:none;border:none;color:#222;cursor:pointer;font-size:1.1rem;">&times;</button>
+                                </div>
+                            </div>`).join('')}
+                    </div>`;
+                return this._cemPageShell('DUAL CODING STATION','Dual Coding Theory','Combining verbal and visual representations creates two independent retrieval pathways for the same data — either can trigger recall of the other.',content);
+            },
+            dualCodingInit() {
+                if (state.dcPhase!=='create') return;
+                setTimeout(()=>{
+                    const canvas = document.getElementById('dc-canvas');
+                    if (!canvas) return;
+                    const ctx = canvas.getContext('2d');
+                    state._dcCtx = ctx;
+                    state._dcDrawing = false;
+                    state._dcColor = state._dcColor||'#39FF14';
+                    if (state._dcImageData) {
+                        const img = new Image();
+                        img.onload = ()=>ctx.drawImage(img,0,0);
+                        img.src = state._dcImageData;
+                    }
+                    canvas.addEventListener('mousedown', e=>{ state._dcDrawing=true; ctx.beginPath(); const r=canvas.getBoundingClientRect(); ctx.moveTo(e.clientX-r.left,e.clientY-r.top); });
+                    canvas.addEventListener('mousemove', e=>{ if(!state._dcDrawing) return; const r=canvas.getBoundingClientRect(); ctx.lineTo(e.clientX-r.left,e.clientY-r.top); ctx.strokeStyle=state._dcColor; ctx.lineWidth=2; ctx.lineCap='round'; ctx.stroke(); });
+                    canvas.addEventListener('mouseup', ()=>{ state._dcDrawing=false; state._dcImageData=canvas.toDataURL(); });
+                    canvas.addEventListener('touchstart', e=>{ e.preventDefault(); state._dcDrawing=true; const t=e.touches[0]; const r=canvas.getBoundingClientRect(); ctx.beginPath(); ctx.moveTo(t.clientX-r.left,t.clientY-r.top); }, {passive:false});
+                    canvas.addEventListener('touchmove', e=>{ e.preventDefault(); if(!state._dcDrawing) return; const t=e.touches[0]; const r=canvas.getBoundingClientRect(); ctx.lineTo(t.clientX-r.left,t.clientY-r.top); ctx.strokeStyle=state._dcColor; ctx.lineWidth=2; ctx.lineCap='round'; ctx.stroke(); }, {passive:false});
+                    canvas.addEventListener('touchend', ()=>{ state._dcDrawing=false; state._dcImageData=canvas.toDataURL(); });
+                }, 50);
+            },
+            dcNew() { state.dcPhase='create'; state.dcTitle=''; state.dcText=''; state.dcLabels=[]; state._dcImageData=null; app.render(); },
+            dcBack() { state.dcPhase='list'; app.render(); },
+            dcSetColor(c) { state._dcColor=c; },
+            dcAddLabel() { if (!state.dcLabels) state.dcLabels=[]; state.dcLabels.push(''); app.render(); },
+            dcUpdateLabel(i,v) { if (state.dcLabels) state.dcLabels[i]=v; },
+            dcClearCanvas() {
+                const canvas = document.getElementById('dc-canvas');
+                if (!canvas) return;
+                canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height);
+                state._dcImageData = null;
+            },
+            dcSave() {
+                const title = (document.getElementById('dc-title')||{}).value||state.dcTitle||'';
+                const text = (document.getElementById('dc-text')||{}).value||state.dcText||'';
+                if (!title.trim()&&!text.trim()) { app.showNotification('Enter at least a title or text.'); return; }
+                const canvas = document.getElementById('dc-canvas');
+                const imgData = canvas ? canvas.toDataURL() : state._dcImageData;
+                const sessions = JSON.parse(localStorage.getItem('sg_dual_coding')||'[]');
+                sessions.push({ id: Date.now().toString(36), title: title.trim(), text: text.trim(), canvas: imgData, labels: state.dcLabels||[], date: new Date().toISOString() });
+                localStorage.setItem('sg_dual_coding', JSON.stringify(sessions));
+                state.dcPhase='list'; state._dcImageData=null;
+                app.showNotification('Dual coding session saved.');
+                app.render();
+            },
+            dcDelete(id) {
+                if (!confirm('Delete this session?')) return;
+                const sessions = JSON.parse(localStorage.getItem('sg_dual_coding')||'[]').filter(s=>s.id!==id);
+                localStorage.setItem('sg_dual_coding', JSON.stringify(sessions));
+                app.render();
+            },
+
+            /* ─── 10. SHADOW PROTOCOL (Glitch Tech+) ─── */
+            getShadowProtocolHTML() {
+                if (this._cemLocked(2)) return this._cemPageShell('SHADOW PROTOCOL','Cornell Note Enhancement','',this._cemLockedBanner('GLITCH TECH'));
+                const notes = JSON.parse(localStorage.getItem('sg_shadow_protocol')||'[]');
+                const phase = state.spPhase||'list';
+                if (phase==='create') {
+                    const cues = state.spCues||[{ cue:'', data:'' }];
+                    return `<div class="animate-fade-in" style="max-width:800px;margin:0 auto;padding:1rem;">
+                        <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.25rem;">
+                            <button onclick="app.spBack()" style="background:none;border:none;color:#39FF14;font-size:1.4rem;cursor:pointer;">&larr;</button>
+                            <h1 style="font-family:'VT323',monospace;font-size:2.5rem;color:#fff;text-transform:uppercase;">SHADOW PROTOCOL</h1>
+                        </div>
+                        <div class="cem-card" style="margin-bottom:1rem;">
+                            <div class="cem-header">NOTE TITLE</div>
+                            <input id="sp-title" class="cem-input" placeholder="Topic or title..." value="${esc(state.spTitle||'')}">
+                        </div>
+                        <div style="display:grid;grid-template-columns:200px 1fr;gap:0;border:1px solid rgba(57,255,20,0.15);margin-bottom:1rem;">
+                            <div style="background:#080808;border-right:1px solid rgba(57,255,20,0.15);padding:0.5rem;font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:#39FF14;letter-spacing:0.1em;text-transform:uppercase;">CUE / QUESTION</div>
+                            <div style="background:#060606;padding:0.5rem;font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:#39FF14;letter-spacing:0.1em;text-transform:uppercase;">FULL DATA</div>
+                            ${cues.map((c,i)=>`
+                            <div style="background:#080808;border-right:1px solid rgba(57,255,20,0.15);border-top:1px solid #111;padding:0.4rem;">
+                                <input id="sp-cue-${i}" class="cem-input" style="padding:0.4rem;font-size:0.82rem;" placeholder="Cue..." value="${esc(c.cue)}">
+                            </div>
+                            <div style="background:#060606;border-top:1px solid #111;padding:0.4rem;display:flex;gap:0.5rem;">
+                                <textarea id="sp-data-${i}" class="cem-input" rows="2" style="flex:1;padding:0.4rem;font-size:0.82rem;resize:none;" placeholder="Full data...">${esc(c.data)}</textarea>
+                                <button onclick="app.spRemoveCue(${i})" style="background:none;border:none;color:#222;cursor:pointer;align-self:flex-start;">&times;</button>
+                            </div>`).join('')}
+                        </div>
+                        <div style="display:flex;gap:0.75rem;margin-bottom:1rem;">
+                            <button onclick="app.spAddCue()" class="cem-btn" style="flex:1;">+ ADD ROW</button>
+                            <button onclick="app.spSave()" class="cem-btn" style="flex:1;background:#39FF14;color:#000;">SAVE NOTE</button>
+                        </div>
+                    </div>`;
+                }
+                if (phase==='shadow') {
+                    const note = state.spReviewing;
+                    const revealed = state.spShadowRevealed||{};
+                    const missed = state.spShadowMissed||{};
+                    const done = Object.keys(revealed).length + Object.keys(missed).length;
+                    const total = note.cues.length;
+                    return `<div class="animate-fade-in" style="max-width:800px;margin:0 auto;padding:1rem;">
+                        <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.25rem;">
+                            <button onclick="app.spExitShadow()" style="background:none;border:none;color:#39FF14;font-size:1.4rem;cursor:pointer;">&larr;</button>
+                            <h1 style="font-family:'VT323',monospace;font-size:2.5rem;color:#fff;text-transform:uppercase;">SHADOW MODE</h1>
+                            <div style="margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:#555;">${done}/${total} DONE</div>
+                        </div>
+                        <div style="font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:#555;margin-bottom:1rem;letter-spacing:0.1em;text-transform:uppercase;">${esc(note.title)}</div>
+                        <div style="display:grid;grid-template-columns:200px 1fr;gap:0;border:1px solid rgba(57,255,20,0.15);">
+                            <div style="background:#080808;border-right:1px solid rgba(57,255,20,0.15);padding:0.5rem;font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:#39FF14;letter-spacing:0.1em;text-transform:uppercase;">CUE</div>
+                            <div style="background:#060606;padding:0.5rem;font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:#39FF14;letter-spacing:0.1em;text-transform:uppercase;">RECALL — DATA HIDDEN</div>
+                            ${note.cues.map((c,i)=>`
+                            <div style="background:#080808;border-right:1px solid rgba(57,255,20,0.15);border-top:1px solid #111;padding:0.6rem;color:${missed[i]?'#FF4444':revealed[i]?'#39FF14':'#ccc'};font-family:'Share Tech Mono',monospace;font-size:0.82rem;">${esc(c.cue)}</div>
+                            <div style="background:#060606;border-top:1px solid #111;padding:0.6rem;">
+                                ${revealed[i] ? `<div style="color:#39FF14;font-size:0.85rem;margin-bottom:0.4rem;">${esc(c.data)}</div>` :
+                                missed[i] ? `<div style="color:#FF4444;font-size:0.85rem;margin-bottom:0.4rem;font-style:italic;">MISSED — ${esc(c.data)}</div>` :
+                                `<div style="color:#333;font-size:0.82rem;margin-bottom:0.4rem;font-style:italic;">[ DATA SHADOWED — recall from cue ]</div>`}
+                                ${(!revealed[i]&&!missed[i])?`<div style="display:flex;gap:0.5rem;">
+                                    <button onclick="app.spRevealCue(${i})" class="cem-btn" style="padding:0.25rem 0.65rem;font-size:0.6rem;background:#39FF14;color:#000;">RECALLED ✓</button>
+                                    <button onclick="app.spMissCue(${i})" class="cem-btn cem-btn-danger" style="padding:0.25rem 0.65rem;font-size:0.6rem;">MISSED ✗</button>
+                                </div>`:''}
+                            </div>`).join('')}
+                        </div>
+                        ${done===total?`<div style="text-align:center;margin-top:1.5rem;">
+                            <div style="font-family:'Share Tech Mono',monospace;font-size:0.8rem;color:#39FF14;margin-bottom:0.75rem;">SHADOW RUN COMPLETE — ${Object.keys(revealed).length}/${total} recalled</div>
+                            ${Object.keys(missed).length>0?`<div style="font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:#FF4444;margin-bottom:0.75rem;">⚠ ${Object.keys(missed).length} cue(s) flagged for priority review</div>`:''}
+                            <button onclick="app.spExitShadow()" class="cem-btn" style="background:#39FF14;color:#000;">DONE</button>
+                        </div>`:''}
+                    </div>`;
+                }
+                const content = `
+                    <div style="text-align:center;margin-bottom:1.5rem;">
+                        <button onclick="app.spNew()" class="cem-btn" style="background:#39FF14;color:#000;font-size:0.9rem;padding:0.75rem 2rem;">+ NEW SHADOW NOTE</button>
+                    </div>
+                    <div>
+                        <div class="cem-header" style="color:#888;margin-bottom:0.75rem;">NOTES (${notes.length})</div>
+                        ${notes.length===0?'<div style="color:#333;font-family:Share Tech Mono,monospace;font-size:0.8rem;padding:1rem;">No notes yet.</div>':
+                        notes.slice().reverse().map(n=>`
+                            <div class="cem-card" style="margin-bottom:0.75rem;">
+                                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:0.75rem;">
+                                    <div style="flex:1;">
+                                        <div style="color:#fff;font-family:'Share Tech Mono',monospace;font-size:0.9rem;font-weight:bold;margin-bottom:0.25rem;">${esc(n.title||'Untitled')}</div>
+                                        <div style="color:#555;font-size:0.75rem;font-family:'Share Tech Mono',monospace;">${n.cues.length} cues · ${new Date(n.date).toLocaleDateString()}</div>
+                                    </div>
+                                    <div style="display:flex;gap:0.5rem;align-items:flex-start;">
+                                        <button onclick="app.spShadow('${n.id}')" class="cem-btn" style="padding:0.3rem 0.75rem;font-size:0.65rem;border-color:#FF00FF;color:#FF00FF;">SHADOW RUN</button>
+                                        <button onclick="app.spDelete('${n.id}')" style="background:none;border:none;color:#222;cursor:pointer;font-size:1.1rem;">&times;</button>
+                                    </div>
+                                </div>
+                            </div>`).join('')}
+                    </div>`;
+                return this._cemPageShell('SHADOW PROTOCOL','Cornell Note Enhancement','Converting linear notes into an active retrieval exercise multiplies their value — passive re-reading produces far less durable encoding than prompted recall.',content);
+            },
+            spNew() { state.spPhase='create'; state.spTitle=''; state.spCues=[{cue:'',data:''}]; app.render(); },
+            spBack() { state.spPhase='list'; app.render(); },
+            spAddCue() {
+                const cues = this._spSyncCues();
+                cues.push({cue:'',data:''});
+                state.spCues = cues;
+                app.render();
+            },
+            spRemoveCue(i) {
+                const cues = this._spSyncCues();
+                cues.splice(i,1);
+                state.spCues = cues;
+                if (cues.length===0) state.spCues = [{cue:'',data:''}];
+                app.render();
+            },
+            _spSyncCues() {
+                const cues = state.spCues||[];
+                cues.forEach((c,i)=>{
+                    const cEl=document.getElementById('sp-cue-'+i); if(cEl) c.cue=cEl.value;
+                    const dEl=document.getElementById('sp-data-'+i); if(dEl) c.data=dEl.value;
+                });
+                state.spTitle = (document.getElementById('sp-title')||{}).value||state.spTitle||'';
+                return cues;
+            },
+            spSave() {
+                const cues = this._spSyncCues().filter(c=>c.cue.trim()||c.data.trim());
+                const title = state.spTitle||'';
+                if (!title.trim()&&cues.length===0) { app.showNotification('Add a title and at least one cue.'); return; }
+                const notes = JSON.parse(localStorage.getItem('sg_shadow_protocol')||'[]');
+                notes.push({ id: Date.now().toString(36), title: title.trim(), cues, date: new Date().toISOString() });
+                localStorage.setItem('sg_shadow_protocol', JSON.stringify(notes));
+                state.spPhase='list';
+                app.showNotification('Shadow note saved.');
+                app.render();
+            },
+            spShadow(id) {
+                const notes = JSON.parse(localStorage.getItem('sg_shadow_protocol')||'[]');
+                const note = notes.find(n=>n.id===id);
+                if (!note) return;
+                state.spReviewing = note;
+                state.spShadowRevealed = {};
+                state.spShadowMissed = {};
+                state.spPhase = 'shadow';
+                app.render();
+            },
+            spRevealCue(i) { if (!state.spShadowRevealed) state.spShadowRevealed={}; state.spShadowRevealed[i]=true; app.render(); },
+            spMissCue(i) { if (!state.spShadowMissed) state.spShadowMissed={}; state.spShadowMissed[i]=true; app.render(); },
+            spExitShadow() { state.spPhase='list'; app.render(); },
+            spDelete(id) {
+                if (!confirm('Delete this note?')) return;
+                const notes = JSON.parse(localStorage.getItem('sg_shadow_protocol')||'[]').filter(n=>n.id!==id);
+                localStorage.setItem('sg_shadow_protocol', JSON.stringify(notes));
+                app.render();
+            },
+
             getBabelHTML() {
                 if (state.babelPhase === 'create') {
                     return `<div class="animate-fade-in max-w-2xl mx-auto space-y-8">
