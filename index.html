@@ -3291,7 +3291,7 @@
                             <h2 class="text-2xl font-serif font-semibold text-white">🤖 Cheat Code Injector</h2>
                             <p class="text-sm text-stone-300">Drop a topic. Get a 3-step exploit strat. AI-generated. Zero fluff.</p>
                             <div class="flex flex-col sm:flex-row gap-3">
-                                <input id="subjectInput" type="text" placeholder="e.g. Photosynthesis, World War 2, Algebra..." class="flex-grow bg-white/10 px-6 py-4 rounded-2xl border border-white/20 text-white font-sans focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all" onkeydown="if(event.key==='Enter')app.generateMissionPlan()">
+                                <input id="subjectInput" type="text" aria-label="Topic or subject to generate a mission plan for" placeholder="e.g. Photosynthesis, World War 2, Algebra..." class="flex-grow bg-white/10 px-6 py-4 rounded-2xl border border-white/20 text-white font-sans focus:outline-none focus:ring-2 focus:ring-orange-500 transition-all" onkeydown="if(event.key==='Enter')app.generateMissionPlan()">
                                 <button onclick="app.generateMissionPlan()" class="bg-orange-600 px-8 py-4 rounded-2xl font-bold tracking-wide hover:bg-orange-500 transition-all">
                                     ${state.isAiLoading ? '<span class="ai-loader"></span>' : 'Inject Strat'}
                                 </button>
@@ -3308,7 +3308,7 @@
                             <div class="bg-white dark:bg-[#292524] p-6 rounded-[2rem] border border-stone-100 dark:border-stone-800 shadow-sm">
                                 <h3 class="text-lg font-serif font-bold mb-3 text-stone-900 dark:text-stone-50">📝 My To-Do List</h3>
                                 <div class="flex gap-2 mb-3">
-                                    <input id="todo-input" type="text" placeholder="Add a task..." class="flex-grow bg-stone-50 dark:bg-stone-800 px-3 py-2 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" onkeydown="if(event.key==='Enter')app.addTodo()">
+                                    <input id="todo-input" type="text" aria-label="New task" placeholder="Add a task..." class="flex-grow bg-stone-50 dark:bg-stone-800 px-3 py-2 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" onkeydown="if(event.key==='Enter')app.addTodo()">
                                     <button onclick="app.addTodo()" class="bg-orange-600 hover:bg-orange-500 text-white px-3 py-2 rounded-xl text-sm font-bold transition-colors" aria-label="Add task">+</button>
                                 </div>
                                 <ul class="space-y-2 max-h-48 overflow-y-auto">
@@ -3326,9 +3326,9 @@
                             <div class="bg-white dark:bg-[#292524] p-6 rounded-[2rem] border border-stone-100 dark:border-stone-800 shadow-sm">
                                 <h3 class="text-lg font-serif font-bold text-stone-900 dark:text-stone-50 mb-3">📅 Exam Countdowns</h3>
                                 <div class="flex flex-col gap-1 mb-3">
-                                    <input id="exam-label-input" type="text" placeholder="Exam name (e.g. Biology)" class="bg-stone-50 dark:bg-stone-800 px-3 py-2 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+                                    <input id="exam-label-input" type="text" aria-label="Assessment or exam name" placeholder="Exam name (e.g. Biology)" class="bg-stone-50 dark:bg-stone-800 px-3 py-2 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
                                     <div class="flex gap-2">
-                                        <input id="exam-date-input" type="date" class="flex-grow bg-stone-50 dark:bg-stone-800 px-3 py-2 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+                                        <input id="exam-date-input" type="date" aria-label="Assessment date" class="flex-grow bg-stone-50 dark:bg-stone-800 px-3 py-2 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
                                         <button onclick="app.addExamCountdown()" class="bg-orange-600 hover:bg-orange-500 text-white px-3 py-2 rounded-xl text-sm font-bold transition-colors" aria-label="Add deadline countdown">+</button>
                                     </div>
                                 </div>
@@ -3449,8 +3449,8 @@
                                 </svg>
                                 <div id="timer-display" class="absolute inset-0 flex items-center justify-center text-3xl font-bold font-sans">25:00</div>
                             </div>
-                            <input id="timer-task-label" type="text" value="${esc(state.timerTaskLabel)}" placeholder="What are you working on?" class="w-full bg-stone-50 dark:bg-stone-800 px-4 py-2.5 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 mb-2 ${state.timerIsRunning ? 'opacity-50 pointer-events-none' : ''}" ${state.timerIsRunning ? 'disabled' : ''}>
-                            <select id="timer-subject-select" class="w-full bg-stone-50 dark:bg-stone-800 px-4 py-2.5 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 mb-3 ${state.timerIsRunning ? 'opacity-50 pointer-events-none' : ''}" ${state.timerIsRunning ? 'disabled' : ''}>
+                            <input id="timer-task-label" type="text" aria-label="Current session focus task" value="${esc(state.timerTaskLabel)}" placeholder="What are you working on?" class="w-full bg-stone-50 dark:bg-stone-800 px-4 py-2.5 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 mb-2 ${state.timerIsRunning ? 'opacity-50 pointer-events-none' : ''}" ${state.timerIsRunning ? 'disabled' : ''}>
+                            <select id="timer-subject-select" aria-label="Session knowledge domain (optional)" class="w-full bg-stone-50 dark:bg-stone-800 px-4 py-2.5 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 mb-3 ${state.timerIsRunning ? 'opacity-50 pointer-events-none' : ''}" ${state.timerIsRunning ? 'disabled' : ''}>
                                 <option value="">Subject (optional)</option>
                                 <option value="Maths" ${state.timerSubject==='Maths'?'selected':''}>Maths</option>
                                 <option value="English" ${state.timerSubject==='English'?'selected':''}>English</option>
@@ -4404,7 +4404,7 @@
                         <h3 class="text-sm font-bold uppercase text-stone-500 tracking-widest mb-3">Brain Dump</h3>
                         <p class="text-xs text-stone-400 mb-4">Write everything on your mind. Don't organise yet — just dump.</p>
                         <div class="flex gap-3">
-                            <input id="matrix-task-input" type="text" placeholder="What's on your mind?" class="flex-grow bg-stone-50 dark:bg-stone-800 px-4 py-3 rounded-xl border border-stone-200 dark:border-stone-700 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" onkeydown="if(event.key==='Enter')app.matrixAddTask()">
+                            <input id="matrix-task-input" type="text" aria-label="New priority grid task" placeholder="What's on your mind?" class="flex-grow bg-stone-50 dark:bg-stone-800 px-4 py-3 rounded-xl border border-stone-200 dark:border-stone-700 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500" onkeydown="if(event.key==='Enter')app.matrixAddTask()">
                             <button onclick="app.matrixAddTask()" class="bg-orange-600 hover:bg-orange-500 text-white px-6 py-3 rounded-xl font-bold text-sm uppercase tracking-widest">Add</button>
                         </div>
                         ${unsorted.length > 0 ? `
@@ -4433,7 +4433,7 @@
                     <div class="bg-amber-50 dark:bg-amber-900/10 rounded-[2rem] p-8 border border-amber-200 dark:border-amber-800">
                         <h3 class="text-sm font-bold uppercase text-amber-600 tracking-widest mb-2">The Smart Shift</h3>
                         <p class="text-sm text-stone-600 dark:text-stone-300 mb-4">Pick a Q1 task and ask: <strong>"What Q2 action could have prevented this?"</strong> Then pick a Q2 task and schedule it before it becomes urgent.</p>
-                        <textarea id="matrix-reflection" class="w-full h-20 bg-white dark:bg-stone-800 border border-amber-200 dark:border-amber-700 rounded-xl p-4 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none" placeholder="Write your reflection here..."></textarea>
+                        <textarea id="matrix-reflection" aria-label="Weekly reflection" class="w-full h-20 bg-white dark:bg-stone-800 border border-amber-200 dark:border-amber-700 rounded-xl p-4 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none" placeholder="Write your reflection here..."></textarea>
                         <button onclick="app.matrixSaveReflection()" class="mt-2 bg-amber-600 hover:bg-amber-500 text-white px-6 py-2 rounded-xl font-bold text-xs uppercase tracking-widest">Save Reflection</button>
                         ${state.eisenhowerReflections.length > 0 ? `<div class="mt-4 space-y-2">${state.eisenhowerReflections.slice(-3).reverse().map(r => `<div class="bg-white dark:bg-stone-800 p-3 rounded-lg text-sm text-stone-600 dark:text-stone-300 italic">"${esc(r.text)}" <span class="text-[13px] text-stone-400 ml-2">${new Date(r.createdAt).toLocaleDateString()}</span></div>`).join('')}</div>` : ''}
                     </div>
@@ -4513,7 +4513,7 @@
                     <div class="bg-white dark:bg-[#292524] rounded-[2.5rem] p-10 border border-stone-100 dark:border-stone-800 shadow-sm space-y-6">
                         <div>
                             <label class="text-sm font-bold uppercase text-stone-500 tracking-widest block mb-2">Category</label>
-                            <select id="quiz-category" class="w-full bg-stone-50 dark:bg-stone-800 px-4 py-3 rounded-xl border border-stone-200 dark:border-stone-700 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+                            <select id="quiz-category" aria-label="Knowledge domain for boss fight" class="w-full bg-stone-50 dark:bg-stone-800 px-4 py-3 rounded-xl border border-stone-200 dark:border-stone-700 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
                                 <option value="">Any Category</option>
                                 <option value="9">General Knowledge</option><option value="17">Science & Nature</option><option value="18">Computers</option><option value="19">Mathematics</option>
                                 <option value="22">Geography</option><option value="23">History</option><option value="21">Sports</option><option value="25">Art</option>
@@ -4650,7 +4650,7 @@
                             <div>
                                 <p class="text-[13px] font-bold uppercase tracking-widest text-stone-400 mb-2">Enter a Buddy's Code</p>
                                 <div class="flex gap-2">
-                                    <input id="buddy-code-input" type="text" placeholder="Paste buddy code here..." class="flex-grow bg-stone-50 dark:bg-stone-800 px-4 py-2.5 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+                                    <input id="buddy-code-input" type="text" aria-label="Squad buddy access code" placeholder="Paste buddy code here..." class="flex-grow bg-stone-50 dark:bg-stone-800 px-4 py-2.5 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-900 dark:text-stone-100 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
                                     <button onclick="app.loadBuddyCode()" class="bg-stone-700 dark:bg-stone-200 text-white dark:text-stone-900 px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest transition-colors flex-shrink-0">Load</button>
                                 </div>
                             </div>
@@ -5026,7 +5026,7 @@
                     <div class="bg-white dark:bg-[#292524] rounded-[2rem] p-8 border border-stone-100 dark:border-stone-800 shadow-sm">
                         <h3 class="text-lg font-serif font-bold mb-3">💭 Reflection</h3>
                         <p class="text-xs text-stone-500 mb-3">What changed in how you think about this topic? What will you practise next?</p>
-                        <textarea id="mcq-reflection-input" rows="3" class="w-full bg-stone-50 dark:bg-stone-800 px-4 py-3 rounded-xl border border-stone-200 dark:border-stone-700 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none">${esc(reflection)}</textarea>
+                        <textarea id="mcq-reflection-input" rows="3" aria-label="Session reflection after boss fight" class="w-full bg-stone-50 dark:bg-stone-800 px-4 py-3 rounded-xl border border-stone-200 dark:border-stone-700 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none">${esc(reflection)}</textarea>
                         <button onclick="app.mcqSaveReflection()" class="mt-2 bg-orange-600 hover:bg-orange-500 text-white px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-colors">Save Reflection</button>
                     </div>
                     <div class="flex gap-3">
@@ -5265,14 +5265,14 @@
                                 ${[60,90,120].map(t=>`<button onclick="app.speedRunSetDuration(${t})" id="sr-dur-${t}" class="cem-btn" style="flex:1;${(state.srDuration||60)===t?'background:#39FF14;color:#000;':''}">${t}s</button>`).join('')}
                             </div>
                             <div class="cem-header" style="margin-top:1rem;">Domain / Topic</div>
-                            <input id="sr-topic" class="cem-input" style="margin-bottom:1rem;" placeholder="e.g. Russian Revolution, Organic Chemistry, Chess Openings..." value="${esc(state.srTopic||'')}">
+                            <input id="sr-topic" class="cem-input" aria-label="Topic to recall" style="margin-bottom:1rem;" placeholder="e.g. Russian Revolution, Organic Chemistry, Chess Openings..." value="${esc(state.srTopic||'')}">
                             <button onclick="app.speedRunStart()" class="cem-btn" style="width:100%;background:#39FF14;color:#000;font-size:0.9rem;padding:0.75rem;">⚡ START SPRINT</button>
                         </div>
                         <div id="sr-active-panel" style="display:none;text-align:center;" class="cem-card">
                             <div class="cem-header">SPRINT RUNNING</div>
                             <div id="sr-timer" style="font-family:'VT323',monospace;font-size:4rem;color:#39FF14;text-align:center;line-height:1;margin-bottom:0.5rem;">60</div>
                             <div id="sr-wc" style="font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:#555;text-align:center;margin-bottom:0.75rem;">0 words</div>
-                            <textarea id="sr-recall" class="cem-input" rows="8" placeholder="Type everything you can recall — no looking back, no editing, just dump..." style="resize:none;"></textarea>
+                            <textarea id="sr-recall" class="cem-input" aria-label="Recall dump — everything you remember" rows="8" placeholder="Type everything you can recall — no looking back, no editing, just dump..." style="resize:none;"></textarea>
                         </div>
                         <div id="sr-rate-panel" style="display:none;" class="cem-card">
                             <div class="cem-header">SPRINT COMPLETE — RATE YOUR ACCURACY</div>
@@ -5280,7 +5280,7 @@
                                 ${[1,2,3,4,5].map(n=>`<button onclick="app.speedRunRate(${n})" class="cem-btn" style="width:48px;height:48px;font-size:1.1rem;${n<=2?'border-color:#FF4444;color:#FF4444;':n===3?'border-color:#FF8800;color:#FF8800;':'border-color:#39FF14;color:#39FF14;'}">${n}</button>`).join('')}
                             </div>
                             <div style="color:#555;font-family:'Share Tech Mono',monospace;font-size:0.7rem;text-align:center;letter-spacing:0.1em;">1=JUNK · 3=DECENT · 5=SOLID</div>
-                            <input id="sr-missed" class="cem-input" style="margin-top:1rem;" placeholder="What did you miss? (optional)">
+                            <input id="sr-missed" class="cem-input" aria-label="What you missed or forgot (optional)" style="margin-top:1rem;" placeholder="What did you miss? (optional)">
                         </div>
                     </div>
                     <div>
@@ -5382,12 +5382,12 @@
                 const content = `
                     <div class="cem-card" style="margin-bottom:1.5rem;">
                         <div class="cem-header">LOG NEW FAILURE</div>
-                        <input id="mv-concept" class="cem-input" style="margin-bottom:0.75rem;" placeholder="What did you get wrong? (concept, question, fact...)">
+                        <input id="mv-concept" class="cem-input" aria-label="Concept, question, or fact you got wrong" style="margin-bottom:0.75rem;" placeholder="What did you get wrong? (concept, question, fact...)">
                         <div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:0.75rem;">
                             <div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:#555;width:100%;margin-bottom:0.25rem;letter-spacing:0.1em;text-transform:uppercase;">Failure Mode:</div>
                             ${FAILURE_MODES.map((m,mi)=>`<button onclick="app.mvSelectModeIdx(${mi})" id="mv-mode-${mi}" class="cem-tag ${(state.mvMode===m)?'cem-tag-orange':''}" style="cursor:pointer;border-color:${state.mvMode===m?'#FF8800':'#333'};color:${state.mvMode===m?'#FF8800':'#444'};padding:0.3rem 0.7rem;">${m}</button>`).join('')}
                         </div>
-                        <textarea id="mv-patch" class="cem-input" rows="3" style="margin-bottom:0.75rem;" placeholder="Patch note: why did this happen? What will you do differently?"></textarea>
+                        <textarea id="mv-patch" class="cem-input" rows="3" aria-label="Patch note: why it happened and what to do differently" style="margin-bottom:0.75rem;" placeholder="Patch note: why did this happen? What will you do differently?"></textarea>
                         <button onclick="app.mvSubmit()" class="cem-btn" style="background:#FF00FF;border-color:#FF00FF;color:#000;">LOG FAILURE</button>
                     </div>
                     <div>
@@ -5456,7 +5456,7 @@
                         <div class="cem-card">
                             <div class="cem-header">${p.label}</div>
                             <div style="color:#888;font-size:0.85rem;line-height:1.5;margin-bottom:1rem;">${p.hint}</div>
-                            <textarea id="${p.id}" class="cem-input" rows="${p.rows}" style="resize:none;" placeholder="${p.placeholder}">${esc(state['_ti_'+step]||'')}</textarea>
+                            <textarea id="${p.id}" class="cem-input" aria-label="${p.label||p.placeholder||'Teach It response'}" rows="${p.rows}" style="resize:none;" placeholder="${p.placeholder}">${esc(state['_ti_'+step]||'')}</textarea>
                             <div style="margin-top:1rem;display:flex;justify-content:flex-end;">
                                 ${step < 2 ? `<button onclick="app.teachItNext()" class="cem-btn" style="background:#39FF14;color:#000;">NEXT →</button>` :
                                 `<button onclick="app.teachItSave()" class="cem-btn" style="background:#39FF14;color:#000;">ENCODE AND SAVE</button>`}
@@ -5565,7 +5565,7 @@
                         ${PROBES.map((q,i)=>`
                             <div class="cem-card" style="margin-bottom:0.75rem;">
                                 <div class="cem-header">${q}</div>
-                                <textarea id="cm-a-${i}" class="cem-input" rows="3" style="resize:none;" placeholder="Write your response...">${esc(answers[i]||'')}</textarea>
+                                <textarea id="cm-a-${i}" class="cem-input" aria-label="Response to question ${i+1}" rows="3" style="resize:none;" placeholder="Write your response...">${esc(answers[i]||'')}</textarea>
                             </div>`).join('')}
                         <div style="display:flex;justify-content:flex-end;margin-top:1rem;">
                             <button onclick="app.cmSave()" class="cem-btn" style="background:#39FF14;color:#000;">ENCODE RESPONSES</button>
@@ -5575,7 +5575,7 @@
                 const content = `
                     <div class="cem-card" style="margin-bottom:1.5rem;">
                         <div class="cem-header">ENTER A CONCEPT</div>
-                        <input id="cm-concept" class="cem-input" style="margin-bottom:0.75rem;" placeholder="Enter a fact or concept to interrogate...">
+                        <input id="cm-concept" class="cem-input" aria-label="Fact or concept to interrogate with Socratic questions" style="margin-bottom:0.75rem;" placeholder="Enter a fact or concept to interrogate...">
                         <button onclick="app.cmStart()" class="cem-btn" style="background:#39FF14;color:#000;width:100%;">GENERATE PROBES</button>
                     </div>
                     <div>
@@ -5651,7 +5651,7 @@
                                 </div>
                                 <div class="cem-card" style="margin-top:0.75rem;">
                                     <div class="cem-header">ADD NEW GROUP</div>
-                                    <input id="chunk-gname" class="cem-input" style="margin-bottom:0.5rem;" placeholder="Group name...">
+                                    <input id="chunk-gname" class="cem-input" aria-label="Chunk group name" style="margin-bottom:0.5rem;" placeholder="Group name...">
                                     <button onclick="app.chunkCreateGroup()" class="cem-btn" style="width:100%;">+ CREATE GROUP</button>
                                 </div>
                             </div>
@@ -5681,7 +5681,7 @@
                     <div class="cem-card" style="margin-bottom:1.5rem;">
                         <div class="cem-header">PASTE RAW DATA</div>
                         <div style="color:#666;font-size:0.82rem;font-family:'Share Tech Mono',monospace;margin-bottom:0.75rem;line-height:1.5;">One item per line. The engine will load them as individual data points for you to group.</div>
-                        <textarea id="chunk-raw" class="cem-input" rows="6" style="resize:none;" placeholder="Paste items here — one per line...&#10;e.g.&#10;Stack&#10;Queue&#10;Linked list&#10;Binary tree&#10;Hash map&#10;Graph"></textarea>
+                        <textarea id="chunk-raw" class="cem-input" aria-label="Items to chunk — one per line" rows="6" style="resize:none;" placeholder="Paste items here — one per line...&#10;e.g.&#10;Stack&#10;Queue&#10;Linked list&#10;Binary tree&#10;Hash map&#10;Graph"></textarea>
                         <button onclick="app.chunkLoad()" class="cem-btn" style="margin-top:0.75rem;background:#39FF14;color:#000;width:100%;">LOAD INTO ENGINE</button>
                     </div>
                     <div>
@@ -5777,7 +5777,7 @@
                         ${[0,1,2,3].map(i=>`
                             <div style="display:flex;gap:0.5rem;align-items:center;margin-bottom:0.5rem;">
                                 <div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:#555;min-width:2rem;">D${i+1}</div>
-                                <input id="il-domain-${i}" class="cem-input" style="flex:1;" placeholder="${i<2?'Required':'Optional'}: Domain name..." value="${esc((state.ilDomains&&state.ilDomains[i])||'')}">
+                                <input id="il-domain-${i}" class="cem-input" aria-label="${i<2?'Required domain':'Optional domain'} ${i+1} for interleaving" style="flex:1;" placeholder="${i<2?'Required':'Optional'}: Domain name..." value="${esc((state.ilDomains&&state.ilDomains[i])||'')}">
                             </div>`).join('')}
                         <div style="margin-top:1rem;">
                             <div class="cem-header">BLOCK DURATION</div>
@@ -5889,7 +5889,7 @@
                         </div>
                         <div class="cem-card" style="margin-bottom:1rem;">
                             <div class="cem-header">PALACE NAME</div>
-                            <input id="mp-name" class="cem-input" placeholder="Name your memory palace..." value="${esc(palace.name)}">
+                            <input id="mp-name" class="cem-input" aria-label="Memory palace name" placeholder="Name your memory palace..." value="${esc(palace.name)}">
                         </div>
                         <div class="cem-card" style="margin-bottom:1rem;">
                             <div class="cem-header">STOPS (${palace.stops.length})</div>
