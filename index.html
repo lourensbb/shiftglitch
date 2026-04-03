@@ -2369,7 +2369,7 @@
             navTo: (tabId) => {
                 // Stop any active module timers when navigating away
                 if (state._srInterval) { clearInterval(state._srInterval); state._srInterval = null; }
-                if (state._ilInterval) { clearInterval(state._ilInterval); state._ilInterval = null; }
+                if (state._ilInterval) { clearInterval(state._ilInterval); state._ilInterval = null; state.ilRunning = false; }
                 if (typeof app._spStopTimer === 'function') app._spStopTimer();
                 state.view = tabId;
                 window.scrollTo(0, 0);
@@ -4899,7 +4899,7 @@
                                 ${[60,90,120].map(t=>`<button onclick="app.speedRunSetDuration(${t})" id="sr-dur-${t}" class="cem-btn" style="flex:1;${(state.srDuration||60)===t?'background:#39FF14;color:#000;':''}">${t}s</button>`).join('')}
                             </div>
                             <div class="cem-header" style="margin-top:1rem;">Domain / Topic</div>
-                            <input id="sr-topic" class="cem-input" style="margin-bottom:1rem;" placeholder="e.g. Photosynthesis, Newton's Laws..." value="${esc(state.srTopic||'')}">
+                            <input id="sr-topic" class="cem-input" style="margin-bottom:1rem;" placeholder="e.g. Russian Revolution, Organic Chemistry, Chess Openings..." value="${esc(state.srTopic||'')}">
                             <button onclick="app.speedRunStart()" class="cem-btn" style="width:100%;background:#39FF14;color:#000;font-size:0.9rem;padding:0.75rem;">⚡ START SPRINT</button>
                         </div>
                         <div id="sr-active-panel" style="display:none;text-align:center;" class="cem-card">
