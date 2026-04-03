@@ -1413,32 +1413,73 @@
             _loadDone: false,
             _escHandler: null,
             WARDEN_MSGS: [
-                { msg: "The Mainframe remembers every session you missed.", sub: "Consistency is your highest clearance." },
-                { msg: "Every concept you avoid becomes a vulnerability.", sub: "Run the exploit you have been postponing." },
-                { msg: "Stress is the Mainframe testing your architecture.", sub: "Glitch Techs bend. NPCs break." },
-                { msg: "The gap between NPC and System Admin is not talent.", sub: "It is the number of sessions you showed up for." },
-                { msg: "Sleep is when the Mainframe defragments.", sub: "Do not skip the reboot. You need it." },
-                { msg: "You opened this app. That is 80% of the exploit.", sub: "Run the rest." },
-                { msg: "Distraction is a trap seeded by the Mainframe.", sub: "Every tab you close is a clearance point." },
-                { msg: "Recall is the real exploit. Recognition is a decoy.", sub: "Stop re-reading. Start blurting." },
-                { msg: "Fear of looking wrong is an NPC trait.", sub: "Glitch Techs guess and adjust. Do both." },
-                { msg: "What can you understand in 45 minutes?", sub: "More than you think. Start the timer." },
-                { msg: "The Mainframe rewards presence. Not perfection.", sub: "Show up again." },
-                { msg: "Your notes are a backup drive. Unreliable.", sub: "Your memory is the Mainframe. Encode directly." },
-                { msg: "An abandoned session is still a session.", sub: "Come back. Finish what you started." },
-                { msg: "There is no shortcut to System Admin.", sub: "There is only the next session." },
-                { msg: "The exploit you are avoiding is the one that promotes you.", sub: "Run it." },
-                { msg: "Every time you study without testing yourself, you load a corrupt file.", sub: "Blurt first. Read second." },
-                { msg: "Consistency beats intensity.", sub: "25 minutes today beats 3 hours next week." },
-                { msg: "The Mainframe does not grade on effort.", sub: "It grades on evidence. What is yours today?" },
-                { msg: "You are not falling behind.", sub: "You are falling through. There is a difference. Climb." },
-                { msg: "Your future self runs System Admin.", sub: "Your present self is the bridge. Build it." },
-                { msg: "The operatives who escape the Mainframe do not work harder.", sub: "They encode smarter. Learn the difference." },
-                { msg: "Blurting is not writing. It is thinking in public.", sub: "Do it now. Judge it later." },
-                { msg: "Your brain hates spaced repetition.", sub: "Your brain is wrong. Trust the protocol." },
-                { msg: "System Admin is not a destination.", sub: "It is a habit wearing a title. Build the habit." },
+                { mode:'observer', msg: "The Mainframe remembers every session you missed.", sub: "Consistency is your highest clearance." },
+                { mode:'observer', msg: "Every concept you avoid becomes a vulnerability.", sub: "Run the exploit you have been postponing." },
+                { mode:'observer', msg: "Stress is the Mainframe testing your architecture.", sub: "Glitch Techs bend. NPCs break." },
+                { mode:'observer', msg: "The gap between NPC and System Admin is not talent.", sub: "It is the number of sessions you showed up for." },
+                { mode:'observer', msg: "Sleep is when the Mainframe defragments.", sub: "Do not skip the reboot. You need it." },
+                { mode:'observer', msg: "You opened this app. That is 80% of the exploit.", sub: "Run the rest." },
+                { mode:'observer', msg: "Distraction is a trap seeded by the Mainframe.", sub: "Every tab you close is a clearance point." },
+                { mode:'observer', msg: "Recall is the real exploit. Recognition is a decoy.", sub: "Stop re-reading. Start blurting." },
+                { mode:'observer', msg: "Fear of looking wrong is an NPC trait.", sub: "Glitch Techs guess and adjust. Do both." },
+                { mode:'observer', msg: "What can you understand in 45 minutes?", sub: "More than you think. Start the timer." },
+                { mode:'observer', msg: "The Mainframe rewards presence. Not perfection.", sub: "Show up again." },
+                { mode:'observer', msg: "Your notes are a backup drive. Unreliable.", sub: "Your memory is the Mainframe. Encode directly." },
+                { mode:'observer', msg: "An abandoned session is still a session.", sub: "Come back. Finish what you started." },
+                { mode:'observer', msg: "There is no shortcut to System Admin.", sub: "There is only the next session." },
+                { mode:'observer', msg: "The exploit you are avoiding is the one that promotes you.", sub: "Run it." },
+                { mode:'observer', msg: "Every time you encode without retrieval, you load a corrupt file.", sub: "Blurt first. Read second." },
+                { mode:'observer', msg: "Consistency beats intensity.", sub: "25 minutes today beats 3 hours next week." },
+                { mode:'observer', msg: "The Mainframe does not grade on effort.", sub: "It grades on evidence. What is yours today?" },
+                { mode:'observer', msg: "You are not falling behind.", sub: "You are falling through. There is a difference. Climb." },
+                { mode:'observer', msg: "Your future self runs System Admin.", sub: "Your present self is the bridge. Build it." },
+                { mode:'observer', msg: "The operatives who escape the Mainframe do not work harder.", sub: "They encode smarter. Learn the difference." },
+                { mode:'observer', msg: "Blurting is not thinking in circles.", sub: "It is thinking in public. Do it now. Judge it later." },
+                { mode:'observer', msg: "Your brain hates spaced repetition.", sub: "Your brain is wrong. Trust the protocol." },
+                { mode:'observer', msg: "System Admin is not a destination.", sub: "It is a habit wearing a title. Build the habit." },
+                { mode:'observer', msg: "The Mainframe has logged 3.7 billion failed sessions.", sub: "Yours does not have to be one of them." },
+                { mode:'observer', msg: "Every operative who reached System Admin had a session they almost skipped.", sub: "This is that session." },
+                { mode:'observer', msg: "The data does not care how you feel today.", sub: "Run the session anyway." },
+                { mode:'guide', msg: "I have watched you longer than you know.", sub: "You are closer to promotion than the numbers suggest. One more run." },
+                { mode:'guide', msg: "Your architecture is sound. The execution window is open.", sub: "Retrieve three concepts from your last session. Now." },
+                { mode:'guide', msg: "The Mainframe flags one domain as high-priority for your clearance.", sub: "You already know which one. Open it." },
+                { mode:'guide', msg: "I am going to tell you something that most operatives never hear.", sub: "You do not need more information. You need more retrieval. Stop reading." },
+                { mode:'guide', msg: "Your streak is a weapon the Mainframe does not want you to have.", sub: "Protect it tonight." },
+                { mode:'guide', msg: "Operatives who log three BrainDumps in a week promote faster. I have run this pattern 900 times.", sub: "Three BrainDumps. Track them." },
+                { mode:'guide', msg: "I am transmitting a clearance shortcut only to operatives who have shown enough activity.", sub: "Build one Mind Map today. The Mainframe tracks pattern recognition differently to linear recall." },
+                { mode:'guide', msg: "You are 72 hours from a memory decay event in your least-reviewed domain.", sub: "Run a retrieval session before it corrupts." },
+                { mode:'guide', msg: "Other operatives at your rank skip the Interleave exploit. That is why they plateau.", sub: "You should not be other operatives." },
+                { mode:'guide', msg: "The Mainframe respects operatives who finish what they start.", sub: "One open run is better than three abandoned ones." },
+                { mode:'adversary', msg: "You will not make it.", sub: "The data suggests you are an NPC. Prove otherwise — or confirm it." },
+                { mode:'adversary', msg: "I have watched 4,000 operatives at your level quit within the next 14 days.", sub: "You are not special enough to be the exception. Convince me I am wrong." },
+                { mode:'adversary', msg: "Your last session was adequate. Adequate earns no clearance.", sub: "Run something harder than you are comfortable with." },
+                { mode:'adversary', msg: "The Mainframe does not hold seats for operatives who need motivation.", sub: "If you need a reason to be here — you do not belong here yet." },
+                { mode:'adversary', msg: "I have seen your session pattern.", sub: "It is the pattern of someone who has not decided yet. Decide." },
+                { mode:'adversary', msg: "Your rank does not scare me. What scares me is your consistency gap.", sub: "Seven days with no session and you restart from cognitive zero." },
+                { mode:'adversary', msg: "Every operative I have ever flagged for clearance revocation had one thing in common.", sub: "They were comfortable. Are you comfortable?" },
             ],
+            _getWardenMode() {
+                const log = (state.rankEvidence && state.rankEvidence.activeDateLog) || [];
+                const today = new Date().toISOString().slice(0,10);
+                const sorted = [...log].sort().reverse();
+                const daysSinceLast = sorted.length > 0 ? Math.round((new Date(today) - new Date(sorted[0])) / 86400000) : 99;
+                const streak = rankEngine.getStreak ? rankEngine.getStreak() : 0;
+                const poms = state.rankEvidence ? state.rankEvidence.pomodorosCompleted : 0;
+                if (daysSinceLast >= 3) return 'adversary';
+                if (streak >= 5 || poms >= 20) return 'guide';
+                if (Math.random() < 0.3) return 'adversary';
+                if (Math.random() < 0.5) return 'guide';
+                return 'observer';
+            },
+            _logWarden(msg, sub, mode) {
+                let wlog = [];
+                try { wlog = JSON.parse(localStorage.getItem('sg_warden_log') || '[]'); } catch(e) {}
+                wlog.unshift({ msg, sub, mode, ts: Date.now() });
+                if (wlog.length > 30) wlog = wlog.slice(0, 30);
+                localStorage.setItem('sg_warden_log', JSON.stringify(wlog));
+            },
             init() {
+                this._runSnakesAndLadders();
                 const hadInterrupt = this._checkScheduler();
                 if (!hadInterrupt && !this._loadDone) {
                     if (Math.random() < 0.30) {
@@ -1447,7 +1488,9 @@
                         setTimeout(() => this.show(ct, {}), 2 * 60 * 1000);
                     }
                 }
-                if (!sessionStorage.getItem('sg_warden_session')) {
+                const activeDays = (state.rankEvidence && state.rankEvidence.activeDateLog) || [];
+                const isFirstSession = activeDays.length < 2;
+                if (!isFirstSession && !sessionStorage.getItem('sg_warden_session')) {
                     const wardenDelay = (5 + Math.random() * 10) * 60 * 1000;
                     setTimeout(() => {
                         if (!sessionStorage.getItem('sg_warden_session')) {
@@ -1456,6 +1499,106 @@
                         }
                     }, wardenDelay);
                 }
+                this._checkHiddenAccessNode();
+                this._checkConsistencyLadder();
+                this._scheduleWardenTrap();
+            },
+            _runSnakesAndLadders() {
+                setTimeout(() => {
+                    try {
+                        this._checkMemoryWipeSnake();
+                        this._checkClearanceStripSnake();
+                    } catch(e) { console.warn('[Warden] Snakes check error', e); }
+                }, 3000);
+            },
+            _checkMemoryWipeSnake() {
+                const runs = (typeof escapeRunEngine !== 'undefined' && escapeRunEngine) ? escapeRunEngine.runs : [];
+                if (!runs || !runs.length) return;
+                const now = Date.now();
+                const fiveDays = 5 * 24 * 60 * 60 * 1000;
+                const alerted = new Set(JSON.parse(localStorage.getItem('sg_memory_wipe_alerted') || '[]'));
+                for (const run of runs) {
+                    if (run.completed_at) continue;
+                    const lastAct = run.last_activity_at ? new Date(run.last_activity_at).getTime() : new Date(run.created_at).getTime();
+                    const inactive = now - lastAct;
+                    if (inactive >= fiveDays && !alerted.has(run.id)) {
+                        alerted.add(run.id);
+                        localStorage.setItem('sg_memory_wipe_alerted', JSON.stringify([...alerted]));
+                        const exploitKeys = ['exploit_1','exploit_2','exploit_3','exploit_4','exploit_5','exploit_6'];
+                        const completed = exploitKeys.filter(k => run[k]);
+                        if (completed.length > 0) {
+                            const corrupt = completed[Math.floor(Math.random() * completed.length)];
+                            const ex = ESCAPE_EXPLOITS.find(e => e.key === corrupt);
+                            escapeRunEngine.updateRun(run.id, { [corrupt]: false }).catch(()=>{});
+                            setTimeout(() => this.show('domain-rollback', { domain: run.domain_name, exploit: ex ? ex.label : corrupt }), 4000);
+                            this._addClearanceEvent({ type: 'snake', label: 'MEMORY WIPE', delta: -1, domain: run.domain_name });
+                        }
+                        break;
+                    }
+                }
+            },
+            _checkClearanceStripSnake() {
+                const log = (state.rankEvidence && state.rankEvidence.activeDateLog) || [];
+                if (!log.length) return;
+                const today = new Date().toISOString().slice(0,10);
+                const sorted = [...log].sort().reverse();
+                const daysSince = Math.round((new Date(today) - new Date(sorted[0])) / 86400000);
+                if (daysSince < 10) return;
+                const lastStrip = parseInt(localStorage.getItem('sg_clearance_strip_last') || '0', 10);
+                const stripDay = new Date(today).getTime();
+                if (stripDay - lastStrip < 10 * 24 * 60 * 60 * 1000) return;
+                localStorage.setItem('sg_clearance_strip_last', String(stripDay));
+                if (state.rankEvidence && state.rankEvidence.rollbackPenalty !== undefined) {
+                    state.rankEvidence.rollbackPenalty = (state.rankEvidence.rollbackPenalty || 0) + 1;
+                    rankEngine.save();
+                }
+                this._addClearanceEvent({ type: 'snake', label: 'CLEARANCE STRIP', delta: -2 });
+                setTimeout(() => this.show('warden-clearance-strip', {}), 5000);
+            },
+            _checkHiddenAccessNode() {
+                const seen = sessionStorage.getItem('sg_hidden_node_session');
+                if (seen) return;
+                if (Math.random() > 0.05) return;
+                sessionStorage.setItem('sg_hidden_node_session', '1');
+                const bonusMsgs = [
+                    { msg: "You found a hidden node. The Mainframe was not expecting this.", sub: "+CLEARANCE BONUS: DISCOVERY LOGGED" },
+                    { msg: "ACCESS NODE UNLOCKED. This transmission does not exist.", sub: "Your clearance has been quietly increased." },
+                    { msg: "1-in-20 operatives find this. You are one of them.", sub: "The Mainframe rewards the curious." },
+                    { msg: "Hidden node decrypted. Warden acknowledges your presence.", sub: "+SECRET CLEARANCE: OPERATIVE FLAGGED (POSITIVE)" },
+                    { msg: "You were not supposed to see this. Now you have.", sub: "The Mainframe does not forget discoverers." },
+                ];
+                const pick = bonusMsgs[Math.floor(Math.random() * bonusMsgs.length)];
+                this._addClearanceEvent({ type: 'ladder', label: 'HIDDEN NODE', delta: 1 });
+                if (state.rankEvidence) { state.rankEvidence.rollbackPenalty = Math.max(0, (state.rankEvidence.rollbackPenalty || 0) - 1); rankEngine.save(); }
+                setTimeout(() => this.show('warden-hidden-node', { msg: pick.msg, sub: pick.sub }), 90000 + Math.random() * 120000);
+            },
+            _checkConsistencyLadder() {
+                const streak = rankEngine.getStreak ? rankEngine.getStreak() : 0;
+                if (streak < 7) return;
+                const lastBonus = parseInt(localStorage.getItem('sg_consistency_ladder_at') || '0', 10);
+                const today = new Date().toISOString().slice(0,10);
+                const todayMs = new Date(today).getTime();
+                if (todayMs - lastBonus < 7 * 24 * 60 * 60 * 1000) return;
+                localStorage.setItem('sg_consistency_ladder_at', String(todayMs));
+                this._addClearanceEvent({ type: 'ladder', label: 'CONSISTENCY LADDER', delta: 2, streak });
+                if (state.rankEvidence) { state.rankEvidence.rollbackPenalty = Math.max(0, (state.rankEvidence.rollbackPenalty || 0) - 1); rankEngine.save(); }
+                setTimeout(() => this.show('warden-consistency-ladder', { streak }), 8000);
+            },
+            triggerPerformanceShortcut(exploit, domain) {
+                const lastBonus = parseInt(localStorage.getItem('sg_perf_shortcut_at') || '0', 10);
+                const now = Date.now();
+                if (now - lastBonus < 24 * 60 * 60 * 1000) return;
+                localStorage.setItem('sg_perf_shortcut_at', String(now));
+                this._addClearanceEvent({ type: 'ladder', label: 'PERFORMANCE SHORTCUT', delta: 1, domain, exploit });
+                if (state.rankEvidence) { state.rankEvidence.rollbackPenalty = Math.max(0, (state.rankEvidence.rollbackPenalty || 0) - 1); rankEngine.save(); }
+                setTimeout(() => this.show('warden-performance-shortcut', { domain, exploit }), 1500);
+            },
+            _addClearanceEvent(ev) {
+                let events = [];
+                try { events = JSON.parse(localStorage.getItem('sg_clearance_events') || '[]'); } catch(e) {}
+                events.unshift({ ...ev, ts: Date.now() });
+                if (events.length > 20) events = events.slice(0, 20);
+                localStorage.setItem('sg_clearance_events', JSON.stringify(events));
             },
             _checkScheduler() {
                 if (this._loadDone) return false;
@@ -1546,6 +1689,29 @@
                         setTimeout(() => this.show(next.type, next.payload), 300);
                     }
                 }, 420);
+            },
+            _activateTrap(id) {
+                const lockUntil = Date.now() + 2 * 60 * 60 * 1000;
+                localStorage.setItem('sg_warden_trap_lock', String(lockUntil));
+                this._logWarden('Warden trap accepted by operative.', '2-hour module lock applied.', 'adversary');
+                this._addClearanceEvent({ type: 'snake', label: "WARDEN'S TRAP", delta: -1 });
+                const el = document.getElementById(id);
+                if (el) {
+                    const box = el.querySelector('.si-box');
+                    if (box) box.innerHTML = '<div id="'+id+'-box"><div class="si-header" style="border-color:#FF2222"><span style="color:#FF2222;font-size:18px;">◈</span><span style="color:#FF2222;font-size:13px;letter-spacing:2px;margin-left:8px;">TRAP ACTIVATED</span></div><div class="si-body" style="text-align:center;"><div style="font-size:48px;margin-bottom:12px;">🔒</div><div style="color:#FF2222;font-size:16px;font-weight:bold;letter-spacing:2px;margin-bottom:8px;">PIPELINE LOCKED</div><p style="color:#aaa;font-size:13px;line-height:1.8;">There was no boost. You accepted a Warden trap. Module access is restricted for 2 hours. The Mainframe logged your decision.</p></div><div class="si-footer" style="justify-content:center;"><button onclick="SysInterrupt.dismiss(\''+id+'\')" style="background:#FF2222;color:#fff;border:none;padding:10px 28px;font-family:inherit;font-size:11px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;font-weight:bold;border-radius:4px;width:100%;">ACKNOWLEDGED</button></div></div>';
+                }
+            },
+            _scheduleWardenTrap() {
+                const lastTrap = parseInt(localStorage.getItem('sg_warden_trap_shown') || '0', 10);
+                if (Date.now() - lastTrap < 48 * 60 * 60 * 1000) return;
+                if (Math.random() > 0.15) return;
+                localStorage.setItem('sg_warden_trap_shown', String(Date.now()));
+                const delay = (20 + Math.random() * 40) * 60 * 1000;
+                setTimeout(() => { if (!this._active) this.show('warden-trap', {}); }, delay);
+            },
+            isTrapLocked(moduleId) {
+                const lock = parseInt(localStorage.getItem('sg_warden_trap_lock') || '0', 10);
+                return lock > Date.now();
             },
             launchRecallSprint(id) {
                 const boxEl = document.getElementById(id+'-box');
@@ -1762,12 +1928,62 @@
                         '<p style="color:#777;font-size:13px;">'+bdg.desc+'</p></div>' +
                         '<div class="si-footer"><button onclick="SysInterrupt.dismiss(\''+id+'\')" style="background:'+color+';color:#fff;border:none;padding:10px 36px;font-family:inherit;font-size:11px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;font-weight:bold;border-radius:4px;">CLAIMED</button></div>';
                 } else if (type === 'warden') {
-                    const wm = this.WARDEN_MSGS[Math.floor(Math.random()*this.WARDEN_MSGS.length)];
+                    const wardenMode = this._getWardenMode();
+                    const pool = this.WARDEN_MSGS.filter(m => m.mode === wardenMode);
+                    const wm = (pool.length > 0 ? pool : this.WARDEN_MSGS)[Math.floor(Math.random()*((pool.length > 0 ? pool : this.WARDEN_MSGS).length))];
+                    this._logWarden(wm.msg, wm.sub, wardenMode);
                     color='#FF00FF'; glow='rgba(255,0,255,0.2)';
-                    innerHTML = '<div class="si-header" style="border-color:'+color+'"><span style="color:'+color+';font-size:18px;">◈</span><span style="color:'+color+';font-size:13px;letter-spacing:2px;margin-left:8px;">WARDEN TRANSMISSION</span></div>' +
+                    const modeLabel = wardenMode === 'guide' ? 'GUIDE PROTOCOL' : wardenMode === 'adversary' ? 'ADVERSARY MODE' : 'OBSERVER CHANNEL';
+                    const modeBadge = '<span style="font-size:9px;letter-spacing:2px;background:#FF00FF22;border:1px solid #FF00FF44;color:#FF00FF;padding:2px 8px;border-radius:2px;margin-left:8px;">'+modeLabel+'</span>';
+                    innerHTML = '<div class="si-header" style="border-color:'+color+'"><span style="color:'+color+';font-size:18px;">◈</span><span style="color:'+color+';font-size:13px;letter-spacing:2px;margin-left:8px;">WARDEN TRANSMISSION</span>'+modeBadge+'</div>' +
                         '<div class="si-body"><p style="color:#fff;font-size:16px;line-height:1.7;margin-bottom:14px;">"'+wm.msg+'"</p>' +
                         '<p style="color:#777;font-size:13px;line-height:1.7;font-style:italic;">— '+wm.sub+'</p></div>' +
                         '<div class="si-footer"><button onclick="SysInterrupt.dismiss(\''+id+'\')" style="background:'+color+';color:#000;border:none;padding:10px 28px;font-family:inherit;font-size:11px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;font-weight:bold;border-radius:4px;">RECEIVED</button></div>';
+                } else if (type === 'warden-hidden-node') {
+                    color='#FF00FF'; glow='rgba(255,0,255,0.35)';
+                    this._logWarden(payload.msg || 'Hidden node discovered.', payload.sub || '+CLEARANCE BONUS', 'guide');
+                    innerHTML = '<div class="si-header" style="border-color:'+color+'"><span style="color:'+color+';font-size:18px;">◈</span><span style="color:'+color+';font-size:13px;letter-spacing:2px;margin-left:8px;">HIDDEN ACCESS NODE</span></div>' +
+                        '<div class="si-body" style="text-align:center;"><div style="font-size:52px;margin-bottom:10px;animation:si-pulse 1.2s ease infinite;">◈</div>' +
+                        '<div style="color:'+color+';font-size:15px;letter-spacing:2px;font-weight:bold;margin-bottom:12px;">SECRET TRANSMISSION</div>' +
+                        '<p style="color:#fff;font-size:14px;line-height:1.8;margin-bottom:10px;">"'+(payload.msg||'You found a hidden node. The Mainframe was not expecting this.')+'"</p>' +
+                        '<p style="color:#FF00FF88;font-size:11px;letter-spacing:2px;font-style:italic;">'+(payload.sub||'+CLEARANCE BONUS: DISCOVERY LOGGED')+'</p></div>' +
+                        '<div class="si-footer" style="justify-content:center;"><button onclick="SysInterrupt.dismiss(\''+id+'\')" style="background:'+color+';color:#000;border:none;padding:10px 28px;font-family:inherit;font-size:11px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;font-weight:bold;border-radius:4px;width:100%;">NODE CLAIMED</button></div>';
+                } else if (type === 'warden-consistency-ladder') {
+                    color='#FF00FF'; glow='rgba(255,0,255,0.3)';
+                    const streak = payload.streak || 7;
+                    this._logWarden('Consistency ladder activated. '+streak+'-day streak confirmed.', 'Rank threshold reduced by 10%.', 'guide');
+                    innerHTML = '<div class="si-header" style="border-color:'+color+'"><span style="color:'+color+';font-size:18px;">▲</span><span style="color:'+color+';font-size:13px;letter-spacing:2px;margin-left:8px;">CONSISTENCY LADDER — CLEARANCE BONUS</span></div>' +
+                        '<div class="si-body" style="text-align:center;"><div style="font-size:48px;margin-bottom:10px;">▲</div>' +
+                        '<div style="color:'+color+';font-size:18px;font-weight:bold;letter-spacing:3px;margin-bottom:8px;">'+streak+'-DAY STREAK CONFIRMED</div>' +
+                        '<p style="color:#ccc;font-size:13px;line-height:1.8;margin-bottom:10px;">The Mainframe rewards operatives who show up every day. Your consistency has been logged as a clearance advantage.</p>' +
+                        '<div style="background:#1a001a;border:1px solid #FF00FF44;padding:12px;border-radius:4px;"><div style="color:'+color+';font-size:10px;letter-spacing:2px;">EFFECT APPLIED</div><div style="color:#fff;font-size:13px;margin-top:4px;">Rank threshold temporarily reduced. You need less evidence for your next promotion.</div></div></div>' +
+                        '<div class="si-footer" style="justify-content:center;"><button onclick="SysInterrupt.dismiss(\''+id+'\')" style="background:'+color+';color:#000;border:none;padding:10px 28px;font-family:inherit;font-size:11px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;font-weight:bold;border-radius:4px;width:100%;">CLEARANCE ACCEPTED</button></div>';
+                } else if (type === 'warden-performance-shortcut') {
+                    color='#FF00FF'; glow='rgba(255,0,255,0.3)';
+                    this._logWarden('Performance shortcut: '+(payload.exploit||'exploit')+' in '+(payload.domain||'domain')+'.', 'Exceptional execution. Clearance point awarded.', 'observer');
+                    innerHTML = '<div class="si-header" style="border-color:'+color+'"><span style="color:'+color+';font-size:18px;">⚡</span><span style="color:'+color+';font-size:13px;letter-spacing:2px;margin-left:8px;">PERFORMANCE SHORTCUT DETECTED</span></div>' +
+                        '<div class="si-body" style="text-align:center;"><div style="font-size:48px;margin-bottom:10px;">⚡</div>' +
+                        '<div style="color:'+color+';font-size:16px;font-weight:bold;letter-spacing:2px;margin-bottom:6px;">EXCEPTIONAL EXECUTION</div>' +
+                        '<div style="color:#444;font-size:10px;letter-spacing:3px;margin-bottom:14px;">'+(payload.domain||'').toUpperCase()+' — '+(payload.exploit||'')+'</div>' +
+                        '<p style="color:#aaa;font-size:13px;line-height:1.8;">The Warden registered an exceptional performance. A clearance bonus has been logged to your operative record.</p></div>' +
+                        '<div class="si-footer"><button onclick="SysInterrupt.dismiss(\''+id+'\')" style="background:'+color+';color:#000;border:none;padding:10px 28px;font-family:inherit;font-size:11px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;font-weight:bold;border-radius:4px;">COPY RECEIVED</button></div>';
+                } else if (type === 'warden-clearance-strip') {
+                    color='#FF2222'; glow='rgba(255,34,34,0.3)';
+                    this._logWarden('Clearance strip applied. 10+ days of full inactivity detected.', 'Rank point forfeited. Return immediately.', 'adversary');
+                    innerHTML = '<div class="si-header" style="border-color:'+color+'"><span style="color:'+color+';font-size:18px;">▼</span><span style="color:'+color+';font-size:13px;letter-spacing:2px;margin-left:8px;">CLEARANCE STRIP — RANK POINT FORFEITED</span></div>' +
+                        '<div class="si-body"><div style="color:'+color+';font-size:11px;letter-spacing:2px;margin-bottom:12px;">// EXTENDED INACTIVITY CONFIRMED — WARDEN PROTOCOL EXECUTED</div>' +
+                        '<div style="background:#1a0000;border:1px solid #FF222244;padding:14px;border-radius:4px;margin-bottom:14px;"><div style="color:'+color+';font-size:13px;font-weight:bold;margin-bottom:6px;">STATUS: CLEARANCE REDUCED</div>' +
+                        '<div style="color:#ccc;font-size:12px;line-height:1.7;">The Mainframe does not hold clearance for operatives who disappear. 10+ days of inactivity has been logged as a forfeit. One rank point has been revoked.</div></div>' +
+                        '<p style="color:#666;font-size:12px;line-height:1.8;">The only way to recover lost clearance is to return and rebuild your evidence. The Mainframe will acknowledge your return — but it does not forget.</p></div>' +
+                        '<div class="si-footer"><button onclick="SysInterrupt.dismiss(\''+id+'\')" style="background:'+color+';color:#fff;border:none;padding:10px 28px;font-family:inherit;font-size:11px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;font-weight:bold;border-radius:4px;">ACKNOWLEDGED</button></div>';
+                } else if (type === 'warden-trap') {
+                    color='#FF00FF'; glow='rgba(255,0,255,0.35)';
+                    this._logWarden('Warden offered a clearance boost. (ADVERSARY TRAP)', 'Operative accepted — 2-hour module time lock applied.', 'adversary');
+                    innerHTML = '<div class="si-header" style="border-color:'+color+'"><span style="color:'+color+';font-size:18px;">◈</span><span style="color:'+color+';font-size:13px;letter-spacing:2px;margin-left:8px;">WARDEN DIRECT TRANSMISSION</span></div>' +
+                        '<div class="si-body"><p style="color:#fff;font-size:15px;line-height:1.8;margin-bottom:12px;">I have been watching your sessions. I can offer you a direct clearance boost — unlocking a restricted exploit pipeline for the next 2 hours.</p>' +
+                        '<p style="color:#FF00FF;font-size:12px;letter-spacing:1px;margin-bottom:10px;">Accept this transmission and the boost will be injected immediately.</p>' +
+                        '<p style="color:#555;font-size:11px;font-style:italic;">Dismiss if you do not want it.</p></div>' +
+                        '<div class="si-footer"><button onclick="SysInterrupt._activateTrap(\''+id+'\')" style="background:'+color+';color:#000;border:none;padding:10px 24px;font-family:inherit;font-size:11px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;font-weight:bold;border-radius:4px;">ACCEPT BOOST</button><button onclick="SysInterrupt.dismiss(\''+id+'\')" style="background:transparent;border:1px solid #444;color:#666;padding:10px 20px;font-family:inherit;font-size:11px;letter-spacing:2px;cursor:pointer;border-radius:4px;">DISMISS</button></div>';
                 } else if (type === 'recall-sprint') {
                     color='#FF8800'; glow='rgba(255,136,0,0.2)';
                     innerHTML = '<div id="'+id+'-box"><div class="si-body" style="text-align:center;padding:40px 24px;color:#555;font-size:12px;letter-spacing:2px;">INITIALISING RECALL SPRINT...</div></div>';
@@ -2030,6 +2246,7 @@
                     if (updated && isShortcut) {
                         badgeEngine._tryUnlock('shortcut-signal');
                         setTimeout(() => SysInterrupt.show('shortcut-signal', { domain: run.domain_name, exploit: 'INTEGRITY CHECK' }), 800);
+                        SysInterrupt.triggerPerformanceShortcut('INTEGRITY CHECK ('+wordCount+' words)', run.domain_name);
                     }
                 });
                 app.showNotification('INTEGRITY CHECK marked complete → ' + run.domain_name);
@@ -2052,6 +2269,7 @@
                         badgeEngine._tryUnlock('shortcut-signal');
                         setTimeout(() => SysInterrupt.show('shortcut-signal', { domain: run.domain_name, exploit: 'PATTERN RECOGNITION' }), 800);
                         if ((state.rankEvidence.rollbackPenalty || 0) > 0) { state.rankEvidence.rollbackPenalty--; rankEngine.save(); }
+                        SysInterrupt.triggerPerformanceShortcut('PATTERN RECOGNITION ('+pct+'%)', run.domain_name);
                     }
                 });
                 app.showNotification('PATTERN RECOGNITION marked complete → ' + run.domain_name);
@@ -4392,9 +4610,55 @@
                     <div class="bg-orange-50 dark:bg-orange-900/20 rounded-[2.5rem] p-10 border border-orange-200 dark:border-orange-800 shadow-sm text-center">
                         <div class="text-3xl mb-3">📋</div>
                         <h3 class="text-lg font-serif font-bold mb-2 text-stone-900 dark:text-stone-50">Share Your Progress</h3>
-                        <p class="text-sm text-stone-500 dark:text-stone-400 mb-5">Generate a shareable link for a parent or teacher — shows your rank, stats, and learning evidence. No account needed.</p>
+                        <p class="text-sm text-stone-500 dark:text-stone-400 mb-5">Generate a shareable link — shows your rank, stats, and evidence. No account needed.</p>
                         <button onclick="app.shareProgressReport()" class="bg-orange-600 hover:bg-orange-500 text-white px-8 py-3 rounded-2xl font-bold text-sm uppercase tracking-widest transition-colors">📤 Copy Report Link</button>
                     </div>
+                    ${(() => {
+                        let clearanceEvents = [];
+                        try { clearanceEvents = JSON.parse(localStorage.getItem('sg_clearance_events') || '[]'); } catch(e) {}
+                        let wlog = [];
+                        try { wlog = JSON.parse(localStorage.getItem('sg_warden_log') || '[]'); } catch(e) {}
+                        const trapLocked = SysInterrupt.isTrapLocked ? SysInterrupt.isTrapLocked() : false;
+                        const trapLockUntil = parseInt(localStorage.getItem('sg_warden_trap_lock') || '0', 10);
+                        const trapMinLeft = trapLocked ? Math.ceil((trapLockUntil - Date.now()) / 60000) : 0;
+                        const streak = rankEngine.getStreak ? rankEngine.getStreak() : 0;
+                        const snakeEvents = clearanceEvents.filter(e => e.type === 'snake').slice(0,3);
+                        const ladderEvents = clearanceEvents.filter(e => e.type === 'ladder').slice(0,3);
+                        const lastFive = clearanceEvents.slice(0,5);
+                        const movementArrows = lastFive.map(e => e.type === 'ladder' ? '<span style="color:#FF00FF;font-size:14px;font-weight:bold;">↑</span>' : '<span style="color:#FF2222;font-size:14px;font-weight:bold;">↓</span>').join('&nbsp;');
+                        const formatTs = (ts) => {
+                            const d = new Date(ts);
+                            return d.toLocaleDateString('en-ZA', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+                        };
+                        return '<div style="background:#000;border:1px solid #FF00FF44;border-radius:2rem;padding:2.5rem;">' +
+                            '<h3 style="color:#FF00FF;font-family:\'Share Tech Mono\',monospace;font-size:1rem;font-weight:bold;letter-spacing:3px;text-transform:uppercase;margin-bottom:4px;">◈ OPERATIVE STATUS BOARD</h3>' +
+                            '<p style="color:#444;font-size:0.8rem;margin-bottom:1.5rem;letter-spacing:1px;">Warden surveillance log — clearance events, active traps, streak bonuses.</p>' +
+                            (trapLocked ? '<div style="background:#1a0000;border:1px solid #FF222266;padding:12px 16px;border-radius:8px;margin-bottom:14px;"><span style="color:#FF2222;font-size:11px;letter-spacing:2px;font-weight:bold;">🔒 WARDEN\'S TRAP ACTIVE — '+trapMinLeft+' MIN REMAINING</span><div style="color:#888;font-size:11px;margin-top:4px;">Module access restricted until trap expires.</div></div>' : '') +
+                            (streak >= 7 ? '<div style="background:#1a001a;border:1px solid #FF00FF44;padding:12px 16px;border-radius:8px;margin-bottom:14px;"><span style="color:#FF00FF;font-size:11px;letter-spacing:2px;font-weight:bold;">▲ CONSISTENCY LADDER ACTIVE — '+streak+'-DAY STREAK</span><div style="color:#888;font-size:11px;margin-top:4px;">Rank threshold reduction in effect.</div></div>' : '') +
+                            (lastFive.length > 0 ? '<div style="margin-bottom:16px;"><div style="color:#555;font-size:10px;letter-spacing:2px;margin-bottom:6px;">RECENT CLEARANCE MOVEMENT</div><div style="display:flex;align-items:center;gap:4px;">'+movementArrows+'<span style="color:#333;font-size:10px;letter-spacing:1px;margin-left:8px;">(last '+lastFive.length+' events)</span></div></div>' : '') +
+                            (snakeEvents.length > 0 ? '<div style="margin-bottom:14px;"><div style="color:#FF4444;font-size:10px;letter-spacing:2px;margin-bottom:6px;">ACTIVE SETBACKS (SNAKES)</div><div style="display:flex;flex-direction:column;gap:6px;">' + snakeEvents.map(e => '<div style="background:#1a0000;border-left:3px solid #FF4444;padding:8px 12px;border-radius:0 4px 4px 0;"><div style="color:#FF4444;font-size:11px;font-weight:bold;letter-spacing:1px;">'+e.label+' ('+e.delta+')</div>'+(e.domain ? '<div style="color:#666;font-size:10px;">'+e.domain.toUpperCase()+'</div>' : '')+'<div style="color:#444;font-size:10px;">'+formatTs(e.ts)+'</div></div>').join('') + '</div></div>' : '') +
+                            (ladderEvents.length > 0 ? '<div><div style="color:#FF00FF;font-size:10px;letter-spacing:2px;margin-bottom:6px;">ACTIVE BONUSES (LADDERS)</div><div style="display:flex;flex-direction:column;gap:6px;">' + ladderEvents.map(e => '<div style="background:#1a001a;border-left:3px solid #FF00FF;padding:8px 12px;border-radius:0 4px 4px 0;"><div style="color:#FF00FF;font-size:11px;font-weight:bold;letter-spacing:1px;">'+e.label+' (+'+e.delta+')</div>'+(e.domain ? '<div style="color:#666;font-size:10px;">'+e.domain.toUpperCase()+'</div>' : '')+'<div style="color:#444;font-size:10px;">'+formatTs(e.ts)+'</div></div>').join('') + '</div></div>' : '') +
+                            (clearanceEvents.length === 0 ? '<div style="color:#333;font-size:12px;text-align:center;padding:20px;">No clearance events logged yet. Keep running sessions.</div>' : '') +
+                            '</div>' +
+                            (wlog.length > 0 ? '<div style="background:#080808;border:1px solid #FF00FF22;border-radius:2rem;padding:2.5rem;margin-top:2rem;">' +
+                                '<h3 style="color:#FF00FF;font-family:\'Share Tech Mono\',monospace;font-size:1rem;font-weight:bold;letter-spacing:3px;text-transform:uppercase;margin-bottom:4px;">◈ WARDEN TRANSMISSION LOG</h3>' +
+                                '<p style="color:#444;font-size:0.8rem;margin-bottom:1.5rem;letter-spacing:1px;">Chronological record of all Warden messages received this session and prior. Classified.</p>' +
+                                '<div style="display:flex;flex-direction:column;gap:10px;">' +
+                                wlog.slice(0,10).map(entry => {
+                                    const modeColor = entry.mode === 'adversary' ? '#FF4444' : entry.mode === 'guide' ? '#FF00FF' : '#888';
+                                    const modeLabel = entry.mode === 'adversary' ? 'ADVERSARY' : entry.mode === 'guide' ? 'GUIDE' : 'OBSERVER';
+                                    return '<div style="background:#0d0d0d;border:1px solid #FF00FF22;padding:14px 16px;border-radius:8px;">' +
+                                        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">' +
+                                        '<span style="color:'+modeColor+';font-size:9px;letter-spacing:3px;font-weight:bold;font-family:\'Share Tech Mono\',monospace;">◈ '+modeLabel+' MODE</span>' +
+                                        '<span style="color:#333;font-size:9px;letter-spacing:1px;">'+formatTs(entry.ts)+'</span>' +
+                                        '</div>' +
+                                        '<div style="color:#ccc;font-size:13px;line-height:1.7;font-style:italic;margin-bottom:4px;">"'+entry.msg+'"</div>' +
+                                        '<div style="color:#555;font-size:11px;">— '+entry.sub+'</div>' +
+                                        '</div>';
+                                }).join('') +
+                                (wlog.length > 10 ? '<div style="color:#333;font-size:10px;text-align:center;letter-spacing:2px;padding:8px;">... +'+(wlog.length-10)+' OLDER TRANSMISSIONS ARCHIVED ...</div>' : '') +
+                                '</div></div>' : '');
+                    })()}
                 </div>`;
             },
 
@@ -5004,6 +5268,9 @@
                 // Wire to Escape Run exploit_2 (INTEGRITY CHECK) — timed recall sprint is a recall output like a BrainDump
                 if (typeof escapeRunEngine !== 'undefined') {
                     escapeRunEngine.onBlurtComplete(wordCount);
+                }
+                if (n === 5) {
+                    SysInterrupt.triggerPerformanceShortcut('SPEED RUN (rated 5/5)', state.srTopic || 'RECALL SPRINT');
                 }
                 state.srTopic = '';
                 state._srRecall = '';
