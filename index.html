@@ -1672,11 +1672,13 @@
                     return '<div class="si-overlay" id="'+id+'"><div class="si-box si-scanlines si-pulse si-flicker" style="--si-color:'+color+';--si-glow:'+glow+';">'+innerHTML+'</div></div>';
                 } else if (type === 'domain-clearance') {
                     color='#39FF14'; glow='rgba(57,255,20,0.35)';
+                    const clearCount = payload.clearanceCount || 1;
+                    const multiBadge = clearCount > 1 ? '<span style="background:#FF00FF22;border:1px solid #FF00FF;color:#FF00FF;font-size:13px;letter-spacing:2px;padding:3px 12px;border-radius:2px;font-weight:bold;margin-left:10px;">×'+clearCount+'</span>' : '';
                     innerHTML = '<div class="si-header" style="border-color:'+color+'"><span style="color:'+color+';font-size:20px;">⬡</span><span style="color:'+color+';font-size:13px;letter-spacing:2px;margin-left:8px;">DOMAIN CLEARANCE ACHIEVED</span></div>' +
                         '<div class="si-body" style="text-align:center;">' +
                         '<div style="font-size:56px;margin-bottom:10px;animation:si-pulse 1.2s ease infinite;">⬡</div>' +
-                        '<div style="color:'+color+';font-size:22px;letter-spacing:3px;font-weight:bold;margin-bottom:6px;">'+(payload.domain||'').toUpperCase()+'</div>' +
-                        '<div style="color:#444;font-size:10px;letter-spacing:3px;margin-bottom:18px;">RUN '+(payload.runNumber||'?')+' COMPLETE</div>' +
+                        '<div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:6px;"><div style="color:'+color+';font-size:22px;letter-spacing:3px;font-weight:bold;">'+(payload.domain||'').toUpperCase()+'</div>'+multiBadge+'</div>' +
+                        '<div style="color:#444;font-size:10px;letter-spacing:3px;margin-bottom:18px;">RUN '+(payload.runNumber||'?')+' COMPLETE' + (clearCount > 1 ? ' · CLEARANCE '+clearCount+'×' : '') + '</div>' +
                         '<p style="color:#aaa;font-size:13px;line-height:1.8;margin-bottom:16px;">All six exploits executed. The Mainframe has recorded your domain mastery. The cycle resets — each run encodes deeper.</p>' +
                         '<div style="background:#001a00;border:1px solid '+color+'44;padding:12px;border-radius:4px;text-align:left;"><div style="color:'+color+';font-size:10px;letter-spacing:2px;margin-bottom:6px;">WARDEN TRANSMISSION</div>' +
                         '<p style="color:#888;font-size:12px;font-style:italic;margin:0;">"The Mainframe does not grade. It encodes. You have encoded this domain. Run it again — the gap between what you knew and what you know now is the exploit."</p></div></div>' +
@@ -1808,10 +1810,20 @@
                     const idx = this.runs.findIndex(r => r.id === id);
                     if (idx >= 0) this.runs[idx] = data.run;
                     badgeEngine._tryUnlock('domain-clearance');
-                    setTimeout(() => SysInterrupt.show('domain-clearance', { domain, runNumber }), 600);
+                    // Count total clearances for this domain (including just-completed)
+                    const clearanceCount = this.runs.filter(r => r.domain_name === domain && r.completed_at).length;
+                    setTimeout(() => SysInterrupt.show('domain-clearance', { domain, runNumber, clearanceCount }), 600);
                     rankEngine.recordDiagnostic();
                     escapeRunEngine._renderList();
                 } catch(e) { app.showNotification('Complete failed: ' + e.message); }
+            },
+
+            async startNextRun(domainName) {
+                // Creates a new run for the same domain (run_number auto-increments on server)
+                const run = await this.createRun(domainName);
+                if (run) {
+                    app.showNotification('Run ' + run.run_number + ' initiated for: ' + domainName);
+                }
             },
 
             async deleteRun(id) {
@@ -2091,13 +2103,22 @@
                     ? `<div style="margin-top:12px;border-top:1px solid #1a1a1a;padding-top:12px;"><div style="color:#444;font-size:10px;letter-spacing:2px;margin-bottom:4px;">RUN ${run.run_number} DEBRIEF</div><div style="color:#555;font-size:12px;line-height:1.6;">${esc((run.debrief_text||'').slice(0,300))}${(run.debrief_text||'').length>300?'…':''}</div></div>`
                     : '';
 
+                // Per-domain clearance count: count all completed runs for this domain
+                const domainClearanceCount = this.getCompletedRuns().filter(r => r.domain_name === run.domain_name).length;
+                // Check if an active run for this domain already exists (to avoid duplicate start)
+                const hasActiveRunForDomain = this.getActiveRuns().some(r => r.domain_name === run.domain_name);
+
                 let footer = '';
                 if (isFullyComplete) {
-                    footer = `<div style="margin-top:12px;border-top:1px solid #1a1a1a;padding-top:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                    const startNextBtn = !hasActiveRunForDomain
+                        ? `<button onclick="escapeRunEngine.startNextRun('${esc(run.domain_name)}')" style="background:#FF8800;color:#000;border:none;padding:8px 20px;font-family:inherit;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-weight:bold;">⚡ START RUN ${run.run_number + 1}</button>`
+                        : `<span style="color:#FF8800;font-size:10px;letter-spacing:1px;">RUN ${run.run_number + 1} IN PROGRESS</span>`;
+                    footer = `<div style="margin-top:12px;border-top:1px solid #1a1a1a;padding-top:12px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
                         <span style="color:#39FF14;font-size:11px;letter-spacing:2px;">⬡ DOMAIN CLEARANCE GRANTED</span>
-                        <span style="color:#555;font-size:10px;">Completed: ${run.completed_at ? run.completed_at.slice(0,10) : '?'}</span>
+                        ${domainClearanceCount > 1 ? `<span style="color:#FF00FF;font-size:11px;font-weight:bold;letter-spacing:1px;">×${domainClearanceCount}</span>` : ''}
+                        <span style="color:#555;font-size:10px;">${run.completed_at ? run.completed_at.slice(0,10) : '?'}</span>
                         ${shortcutBonus > 0 ? `<span style="color:#FF8800;font-size:10px;">⚡ ${shortcutBonus} SHORTCUT BONUS${shortcutBonus > 1 ? 'ES' : ''}</span>` : ''}
-                        <button onclick="escapeRunEngine.deleteRun(${run.id})" style="margin-left:auto;background:transparent;border:1px solid #2a0000;color:#FF2222;padding:2px 10px;font-family:inherit;font-size:9px;letter-spacing:2px;cursor:pointer;">REMOVE</button>
+                        <div style="margin-left:auto;display:flex;gap:8px;align-items:center;">${startNextBtn}<button onclick="escapeRunEngine.deleteRun(${run.id})" style="background:transparent;border:1px solid #2a0000;color:#FF2222;padding:2px 10px;font-family:inherit;font-size:9px;letter-spacing:2px;cursor:pointer;">REMOVE</button></div>
                     </div>`;
                 } else if (allDone) {
                     footer = `<div style="margin-top:16px;border-top:1px solid #1a1a1a;padding-top:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
@@ -2622,6 +2643,13 @@
                     } else if (state.view === 'diagnostic') {
                         container.innerHTML = app.getDiagnosticHTML();
                     } else if (state.view === 'rank') {
+                        // Load escape runs if not yet loaded (for domain clearance record on rank page)
+                        if (escapeRunEngine.runs.length === 0 && !escapeRunEngine._loading) {
+                            escapeRunEngine.load().then(() => {
+                                const el = document.getElementById('er-rank-clearances');
+                                if (el) el.innerHTML = app.getRankClearancesHTML();
+                            });
+                        }
                         container.innerHTML = app.getRankHTML();
                     } else if (state.view === 'stats') {
                         container.innerHTML = app.getStatsHTML();
@@ -4046,6 +4074,31 @@
                 </div>`;
             },
 
+            getRankClearancesHTML: () => {
+                const completedRuns = escapeRunEngine.getCompletedRuns();
+                if (completedRuns.length === 0) return '';
+                const domainMap = {};
+                completedRuns.forEach(r => {
+                    if (!domainMap[r.domain_name]) domainMap[r.domain_name] = { count: 0, lastCompleted: r.completed_at, totalShortcuts: 0 };
+                    domainMap[r.domain_name].count++;
+                    domainMap[r.domain_name].totalShortcuts += (r.shortcut_bonus || 0);
+                    if (r.completed_at > domainMap[r.domain_name].lastCompleted) domainMap[r.domain_name].lastCompleted = r.completed_at;
+                });
+                const domainCards = Object.entries(domainMap).map(([name, d]) => {
+                    const multiBadge = d.count > 1 ? `<span style="color:#FF00FF;font-size:13px;font-weight:bold;letter-spacing:1px;background:#FF00FF11;border:1px solid #FF00FF44;padding:2px 8px;border-radius:2px;">×${d.count}</span>` : '<span style="color:#39FF14;font-size:11px;">✓</span>';
+                    const shortcutStr = d.totalShortcuts > 0 ? `<span style="color:#FF8800;font-size:10px;margin-left:8px;">⚡${d.totalShortcuts}</span>` : '';
+                    return `<div style="display:flex;align-items:center;justify-content:space-between;background:#0a0a0a;border:1px solid #1a3a1a;border-radius:4px;padding:10px 14px;">
+                        <div><span style="color:#39FF14;font-size:13px;letter-spacing:2px;font-weight:bold;">⬡ ${esc(name.toUpperCase())}</span>${shortcutStr}</div>
+                        <div style="display:flex;align-items:center;gap:8px;">${multiBadge}<span style="color:#444;font-size:10px;">${d.lastCompleted ? d.lastCompleted.slice(0,10) : ''}</span></div>
+                    </div>`;
+                }).join('');
+                return `<div style="background:#000;border:1px solid rgba(57,255,20,0.15);border-radius:2.5rem;padding:2.5rem;">
+                    <h3 style="color:#39FF14;font-family:'Share Tech Mono',monospace;font-size:1rem;font-weight:bold;letter-spacing:3px;text-transform:uppercase;margin-bottom:4px;">⬡ DOMAIN CLEARANCE RECORD</h3>
+                    <p style="color:#444;font-size:0.85rem;margin-bottom:1.25rem;">Domains you have mastered. ×N = multiple clearance runs on the same domain.</p>
+                    <div style="display:grid;grid-template-columns:1fr;gap:8px;">${domainCards}</div>
+                </div>`;
+            },
+
             getRankHTML: () => {
                 const rankIdx = RANKS.indexOf(state.rank);
                 const rankIcons = {'NPC': '👾', 'Script Kiddie': '💾', 'Glitch Tech': '⚡', 'Netrunner': '🔌', 'System Admin': '💀'};
@@ -4116,6 +4169,7 @@
                             <div class="text-center p-4 bg-purple-50 dark:bg-purple-900/20 rounded-2xl"><div class="text-2xl font-serif font-bold text-purple-600">${state.yetMoments.length}</div><div class="text-[10px] font-bold uppercase tracking-widest text-stone-400 mt-1">YET Moments</div></div>
                         </div>
                     </div>
+                    <div id="er-rank-clearances">${app.getRankClearancesHTML()}</div>
                     <div class="bg-black border border-[#39FF14]/20 rounded-[2.5rem] p-10 shadow-sm">
                         <h3 class="text-lg font-bold mb-1 tracking-widest uppercase" style="color:#39FF14;font-family:'Share Tech Mono',monospace;">⬡ Clearance Badges</h3>
                         <p class="text-sm mb-5" style="color:#555;">Achievements earned through actions in the Mainframe. Each badge is proof of what you have done.</p>

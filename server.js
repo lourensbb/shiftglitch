@@ -612,6 +612,9 @@ app.patch('/api/escape-runs/:id', requireAuth, async (req, res) => {
     if (!run) return res.status(404).json({ error: 'Run not found' });
     res.json({ run });
   } catch (err) {
+    if (err.code === 'OUT_OF_SEQUENCE') {
+      return res.status(400).json({ error: 'OUT_OF_SEQUENCE', message: err.message });
+    }
     console.error('/api/escape-runs PATCH error:', err);
     res.status(500).json({ error: 'Failed to update escape run' });
   }

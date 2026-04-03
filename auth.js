@@ -611,6 +611,21 @@ async function createEscapeRun(userId, domainName) {
 async function updateEscapeRun(userId, runId, patch) {
   const allowed = ['exploit_1','exploit_2','exploit_3','exploit_4','exploit_5','exploit_6',
                    'shortcut_flags','rollback_flags','shortcut_bonus','nodes','debrief_text','linked_deck_id'];
+  // Server-side sequential enforcement: only allow setting exploit_N to true if exploit_{N-1} is already true
+  const { rows: cur } = await pool.query(
+    'SELECT * FROM escape_runs WHERE user_id = $1 AND id = $2 AND completed_at IS NULL', [userId, runId]
+  );
+  if (!cur.length) return null;
+  const current = cur[0];
+  const exploitOrder = ['exploit_1','exploit_2','exploit_3','exploit_4','exploit_5','exploit_6'];
+  for (let i = 1; i < exploitOrder.length; i++) {
+    const key = exploitOrder[i];
+    if (patch[key] === true && !current[exploitOrder[i - 1]]) {
+      const err = new Error(`Cannot complete ${key} before ${exploitOrder[i - 1]}`);
+      err.code = 'OUT_OF_SEQUENCE';
+      throw err;
+    }
+  }
   const sets = [];
   const vals = [userId, runId];
   for (const key of allowed) {
