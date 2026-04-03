@@ -6069,7 +6069,8 @@
             spSave() {
                 const cues = this._spSyncCues().filter(c=>c.cue.trim()||c.data.trim());
                 const title = state.spTitle||'';
-                if (!title.trim()&&cues.length===0) { app.showNotification('Add a title and at least one cue.'); return; }
+                if (!title.trim()) { app.showNotification('Add a title for this shadow note.'); return; }
+                if (cues.length===0) { app.showNotification('Add at least one cue before saving.'); return; }
                 const notes = JSON.parse(localStorage.getItem('sg_shadow_protocol')||'[]');
                 notes.push({ id: Date.now().toString(36), title: title.trim(), cues, date: new Date().toISOString() });
                 localStorage.setItem('sg_shadow_protocol', JSON.stringify(notes));
@@ -6106,11 +6107,12 @@
             },
             spRate(r) { state.spShadowRating=r; app.render(); },
             spFinishShadow() {
+                const rating = state.spShadowRating||0;
+                if (!rating) { app.showNotification('Select a self-rating (1–5) before transmitting results.'); return; }
                 const note = state.spReviewing;
                 const revealed = state.spShadowRevealed||{};
                 const missed = state.spShadowMissed||{};
                 const total = note.cues.length;
-                const rating = state.spShadowRating||0;
                 const missedIndices = Object.keys(missed).map(Number);
                 // Persist missed cue indices and last run rating back to localStorage
                 const notes = JSON.parse(localStorage.getItem('sg_shadow_protocol')||'[]');
