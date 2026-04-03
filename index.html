@@ -4898,7 +4898,7 @@
                             <input id="sr-topic" class="cem-input" style="margin-bottom:1rem;" placeholder="e.g. Photosynthesis, Newton's Laws..." value="${esc(state.srTopic||'')}">
                             <button onclick="app.speedRunStart()" class="cem-btn" style="width:100%;background:#39FF14;color:#000;font-size:0.9rem;padding:0.75rem;">⚡ START SPRINT</button>
                         </div>
-                        <div id="sr-active-panel" style="display:none;" class="cem-card" style="text-align:center;">
+                        <div id="sr-active-panel" style="display:none;text-align:center;" class="cem-card">
                             <div class="cem-header">SPRINT RUNNING</div>
                             <div id="sr-timer" style="font-family:'VT323',monospace;font-size:4rem;color:#39FF14;text-align:center;line-height:1;margin-bottom:0.5rem;">60</div>
                             <div id="sr-wc" style="font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:#555;text-align:center;margin-bottom:0.75rem;">0 words</div>
@@ -5215,9 +5215,9 @@
                 app.render();
             },
 
-            /* ─── 5. CHUNKING ENGINE (Script Kiddie+) ─── */
+            /* ─── 3. CHUNKING ENGINE (NPC+ / free) ─── */
             getChunkingHTML() {
-                // Modules 1-4 are NPC+ (free) — no lock
+                // Module 3 — NPC+ (free), no lock
                 const chunks = JSON.parse(localStorage.getItem('sg_chunking')||'[]');
                 const phase = state.chunkPhase||'list';
                 if (phase==='build') {
@@ -5353,13 +5353,13 @@
                 app.render();
             },
 
-            /* ─── 6. THE INTERLEAVE (Script Kiddie+) ─── */
+            /* ─── 8. THE INTERLEAVE (Glitch Tech+) ─── */
             getInterleaveHTML() {
                 if (this._cemLocked(2)) return this._cemPageShell('THE INTERLEAVE','Interleaving Practice','',this._cemLockedBanner('GLITCH TECH'));
                 const sessions = JSON.parse(localStorage.getItem('sg_interleave')||'[]');
                 const running = state.ilRunning||false;
                 const content = `
-                    <div class="cem-card" style="margin-bottom:1.5rem;" id="il-setup" style="${running?'display:none':''}">
+                    <div class="cem-card" id="il-setup" style="margin-bottom:1.5rem;${running?'display:none':''}">
                         <div class="cem-header">CONFIGURE SESSION</div>
                         <div style="color:#666;font-size:0.82rem;font-family:'Share Tech Mono',monospace;margin-bottom:1rem;line-height:1.5;">Select 2–4 knowledge domains. Set block duration. The engine cycles them with a DOMAIN SHIFT interrupt between each switch.</div>
                         ${[0,1,2,3].map(i=>`
@@ -5445,9 +5445,9 @@
                 app.render();
             },
 
-            /* ─── 7. MEMORY PALACE (Script Kiddie+) ─── */
+            /* ─── 1. MEMORY PALACE (NPC+ / free) ─── */
             getMemoryPalaceHTML() {
-                // Memory Palace is module 1 — NPC+ (free), no lock
+                // Module 1 — NPC+ (free), no lock
                 const palaces = JSON.parse(localStorage.getItem('sg_memory_palace')||'[]');
                 const phase = state.mpPhase||'list';
                 if (phase==='build') {
@@ -5582,9 +5582,9 @@
                 app.render();
             },
 
-            /* ─── 8. MIND MAP PROTOCOL (Glitch Tech+) ─── */
+            /* ─── 2. MIND MAP PROTOCOL (NPC+ / free) ─── */
             getMindMapHTML() {
-                // Mind Map Protocol is module 2 — NPC+ (free), no lock
+                // Module 2 — NPC+ (free), no lock
                 const maps = JSON.parse(localStorage.getItem('sg_mindmap')||'[]');
                 const phase = state.mmPhase||'list';
                 if (phase==='build') {
@@ -5717,7 +5717,7 @@
                 a.click();
             },
 
-            /* ─── 9. DUAL CODING STATION (Glitch Tech+) ─── */
+            /* ─── 7. DUAL CODING STATION (Script Kiddie+) ─── */
             getDualCodingHTML() {
                 if (this._cemLocked(1)) return this._cemPageShell('DUAL CODING STATION','Dual Coding Theory','',this._cemLockedBanner('SCRIPT KIDDIE'));
                 const sessions = JSON.parse(localStorage.getItem('sg_dual_coding')||'[]');
@@ -5927,7 +5927,8 @@
                                 <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:0.75rem;">
                                     <div style="flex:1;">
                                         <div style="color:#fff;font-family:'Share Tech Mono',monospace;font-size:0.9rem;font-weight:bold;margin-bottom:0.25rem;">${esc(n.title||'Untitled')}</div>
-                                        <div style="color:#555;font-size:0.75rem;font-family:'Share Tech Mono',monospace;">${n.cues.length} cues · ${new Date(n.date).toLocaleDateString()}</div>
+                                        <div style="color:#555;font-size:0.75rem;font-family:'Share Tech Mono',monospace;">${n.cues.length} cues · ${new Date(n.date).toLocaleDateString()}${n.lastRating?` · Rating: ${n.lastRating}/5`:''}</div>
+                                        ${n.missedCues&&n.missedCues.length?`<div style="color:#FF4444;font-size:0.7rem;font-family:'Share Tech Mono',monospace;margin-top:0.25rem;">⚠ ${n.missedCues.length} cue(s) flagged for priority review</div>`:''}
                                     </div>
                                     <div style="display:flex;gap:0.5rem;align-items:flex-start;">
                                         <button onclick="app.spShadow('${n.id}')" class="cem-btn" style="padding:0.3rem 0.75rem;font-size:0.65rem;border-color:#FF00FF;color:#FF00FF;">SHADOW RUN</button>
@@ -6007,6 +6008,16 @@
                 const missed = state.spShadowMissed||{};
                 const total = note.cues.length;
                 const rating = state.spShadowRating||0;
+                const missedIndices = Object.keys(missed).map(Number);
+                // Persist missed cue indices and last run rating back to localStorage
+                const notes = JSON.parse(localStorage.getItem('sg_shadow_protocol')||'[]');
+                const idx = notes.findIndex(n=>n.id===note.id);
+                if (idx>=0) {
+                    notes[idx].missedCues = missedIndices;
+                    notes[idx].lastRating = rating;
+                    notes[idx].lastRun = new Date().toISOString();
+                    localStorage.setItem('sg_shadow_protocol', JSON.stringify(notes));
+                }
                 app.cemTrackModuleUse('shadow-protocol');
                 state.spPhase='list';
                 state.spShadowRating=0;
