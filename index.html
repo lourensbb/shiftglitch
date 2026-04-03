@@ -2367,6 +2367,9 @@
             },
 
             navTo: (tabId) => {
+                // Stop any active module timers when navigating away
+                if (state._ilInterval) { clearInterval(state._ilInterval); state._ilInterval = null; }
+                if (typeof app._spStopTimer === 'function') app._spStopTimer();
                 state.view = tabId;
                 window.scrollTo(0, 0);
                 const menu = document.getElementById('mobile-menu');
@@ -5002,7 +5005,7 @@
                         <input id="mv-concept" class="cem-input" style="margin-bottom:0.75rem;" placeholder="What did you get wrong? (concept, question, fact...)">
                         <div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:0.75rem;">
                             <div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:#555;width:100%;margin-bottom:0.25rem;letter-spacing:0.1em;text-transform:uppercase;">Failure Mode:</div>
-                            ${FAILURE_MODES.map(m=>`<button onclick="app.mvSelectMode('${m}')" id="mv-mode-${m.replace(/'/g,'').replace(/ /g,'-')}" class="cem-tag ${(state.mvMode===m)?'cem-tag-orange':''}" style="cursor:pointer;border-color:${state.mvMode===m?'#FF8800':'#333'};color:${state.mvMode===m?'#FF8800':'#444'};padding:0.3rem 0.7rem;">${m}</button>`).join('')}
+                            ${FAILURE_MODES.map((m,mi)=>`<button onclick="app.mvSelectModeIdx(${mi})" id="mv-mode-${mi}" class="cem-tag ${(state.mvMode===m)?'cem-tag-orange':''}" style="cursor:pointer;border-color:${state.mvMode===m?'#FF8800':'#333'};color:${state.mvMode===m?'#FF8800':'#444'};padding:0.3rem 0.7rem;">${m}</button>`).join('')}
                         </div>
                         <textarea id="mv-patch" class="cem-input" rows="3" style="margin-bottom:0.75rem;" placeholder="Patch note: why did this happen? What will you do differently?"></textarea>
                         <button onclick="app.mvSubmit()" class="cem-btn" style="background:#FF00FF;border-color:#FF00FF;color:#000;">LOG FAILURE</button>
@@ -5026,6 +5029,11 @@
                 return this._cemPageShell('MISTAKE VAULT', 'Error Analysis & Metacognition', 'Understanding <em>why</em> a retrieval failed is as cognitively valuable as getting the right answer. Metacognition about errors is a stronger predictor of improvement than simply retrying.', content);
             },
             mvSelectMode(m) { state.mvMode = m; app.render(); },
+            mvSelectModeIdx(idx) {
+                const FAILURE_MODES = ['Blanked','Misread','Knew it wrong','Couldn\'t retrieve','Partial recall','Guessed'];
+                state.mvMode = FAILURE_MODES[idx]||FAILURE_MODES[0];
+                app.render();
+            },
             mvSubmit() {
                 const concept = (document.getElementById('mv-concept')||{}).value||'';
                 const patch = (document.getElementById('mv-patch')||{}).value||'';
