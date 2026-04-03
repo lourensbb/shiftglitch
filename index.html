@@ -1181,6 +1181,54 @@
             updateNavRank() {
                 const el = document.getElementById('nav-rank');
                 if (el) el.textContent = state.rank;
+                this._updateCemNav();
+            },
+            _updateCemNav() {
+                const idx = this._cemRankIdx ? this._cemRankIdx() : RANKS.indexOf(state.rank);
+                const skLocked = idx < 1;
+                const gtLocked = idx < 2;
+                const skNames = { chunking:'Chunking Engine', interleave:'The Interleave', 'memory-palace':'Memory Palace' };
+                const gtNames = { mindmap:'Mind Map Protocol', 'dual-coding':'Dual Coding Station', 'shadow-protocol':'Shadow Protocol' };
+                ['desktop','mobile'].forEach(device => {
+                    Object.entries(skNames).forEach(([id, label]) => {
+                        const btn = document.getElementById('nav-'+id+'-'+device);
+                        if (!btn) return;
+                        if (skLocked) {
+                            btn.innerHTML = label + ' <span style="display:block;font-size:8px;color:#FF4444;letter-spacing:0.08em;font-style:normal;opacity:0.7;">▲ SCRIPT KIDDIE</span>';
+                            btn.style.opacity = '0.45';
+                            btn.style.cursor = 'not-allowed';
+                            btn.style.color = '#666';
+                            btn.title = 'CLEARANCE REQUIRED — SCRIPT KIDDIE';
+                            btn.disabled = true;
+                        } else {
+                            btn.innerHTML = label;
+                            btn.style.opacity = '';
+                            btn.style.cursor = '';
+                            btn.style.color = '';
+                            btn.title = '';
+                            btn.disabled = false;
+                        }
+                    });
+                    Object.entries(gtNames).forEach(([id, label]) => {
+                        const btn = document.getElementById('nav-'+id+'-'+device);
+                        if (!btn) return;
+                        if (gtLocked) {
+                            btn.innerHTML = label + ' <span style="display:block;font-size:8px;color:#FF4444;letter-spacing:0.08em;font-style:normal;opacity:0.7;">▲ GLITCH TECH</span>';
+                            btn.style.opacity = '0.45';
+                            btn.style.cursor = 'not-allowed';
+                            btn.style.color = '#666';
+                            btn.title = 'CLEARANCE REQUIRED — GLITCH TECH';
+                            btn.disabled = true;
+                        } else {
+                            btn.innerHTML = label;
+                            btn.style.opacity = '';
+                            btn.style.cursor = '';
+                            btn.style.color = '';
+                            btn.title = '';
+                            btn.disabled = false;
+                        }
+                    });
+                });
             },
             getNextRank() {
                 const idx = RANKS.indexOf(state.rank);
@@ -4825,6 +4873,12 @@
                     ${content}
                 </div>`;
             },
+            cemTrackModuleUse(moduleId) {
+                if (!state.rankEvidence) return;
+                if (!state.rankEvidence.cemModulesUsed) state.rankEvidence.cemModulesUsed = {};
+                state.rankEvidence.cemModulesUsed[moduleId] = (state.rankEvidence.cemModulesUsed[moduleId]||0) + 1;
+                rankEngine.save();
+            },
 
             /* ─── 1. SPEED RUN ─── */
             getSpeedRunHTML() {
@@ -4920,6 +4974,7 @@
                 const sessions = JSON.parse(localStorage.getItem('sg_speed_run')||'[]');
                 sessions.push({ id: Date.now().toString(36), topic: state.srTopic||'', duration: state.srDuration||60, wordCount: state._srWordCount||0, rating: n, missed: missed.trim(), date: new Date().toISOString() });
                 localStorage.setItem('sg_speed_run', JSON.stringify(sessions));
+                app.cemTrackModuleUse('speed-run');
                 state.srTopic = '';
                 state._srRecall = '';
                 state._srWordCount = 0;
@@ -4974,6 +5029,7 @@
                 const entries = JSON.parse(localStorage.getItem('sg_mistake_vault')||'[]');
                 entries.push({ id: Date.now().toString(36), concept: concept.trim(), mode, patch: patch.trim(), date: new Date().toISOString() });
                 localStorage.setItem('sg_mistake_vault', JSON.stringify(entries));
+                app.cemTrackModuleUse('mistake-vault');
                 state.mvMode = null;
                 app.showNotification('Failure logged to the Vault.');
                 app.render();
@@ -5054,6 +5110,7 @@
                 const sessions = JSON.parse(localStorage.getItem('sg_teach_it')||'[]');
                 sessions.push({ id: Date.now().toString(36), concept: concept.trim(), explain: explain.trim(), gap: gap.trim(), date: new Date().toISOString() });
                 localStorage.setItem('sg_teach_it', JSON.stringify(sessions));
+                app.cemTrackModuleUse('teach-it');
                 state.teachItPhase='list'; state.teachItStep=0;
                 app.showNotification('Feynman session encoded.');
                 app.render();
@@ -5140,6 +5197,7 @@
                 const sessions = JSON.parse(localStorage.getItem('sg_concept_mapper')||'[]');
                 sessions.push({ id: Date.now().toString(36), concept: state.cmConcept, answers, date: new Date().toISOString() });
                 localStorage.setItem('sg_concept_mapper', JSON.stringify(sessions));
+                app.cemTrackModuleUse('concept-mapper');
                 state.cmPhase = 'list';
                 app.showNotification('Concept session encoded.');
                 app.render();
@@ -5249,6 +5307,7 @@
                 if (!item) return;
                 const group = groups[groups.length-1];
                 if (group.items.includes(item)) { app.showNotification('Item already in that group.'); return; }
+                if (group.items.length >= 7) { app.showNotification('⚠ MAX CAPACITY — 7 items per chunk. Split into a new group.'); return; }
                 group.items.push(item);
                 app.render();
             },
@@ -5263,10 +5322,20 @@
             chunkSave() {
                 const groups = state.chunkGroups||[];
                 if (groups.length===0) { app.showNotification('Add at least one group.'); return; }
+                const underMin = groups.filter(g=>g.items.length>0 && g.items.length<3);
+                if (underMin.length>0) {
+                    app.showNotification('⚠ PROTOCOL VIOLATION — Groups need 3–7 items. "'+underMin[0].name+'" has only '+underMin[0].items.length+'. Add more or split differently.');
+                    return;
+                }
+                const emptyGroups = groups.filter(g=>g.items.length===0);
+                if (emptyGroups.length>0) { app.showNotification('Remove empty groups before saving.'); return; }
+                const overMax = groups.filter(g=>g.items.length>7);
+                if (overMax.length>0) { app.showNotification('⚠ "'+overMax[0].name+'" exceeds 7 items. Split it first.'); return; }
                 const totalItems = groups.reduce((a,g)=>a+g.items.length,0);
                 const chunks = JSON.parse(localStorage.getItem('sg_chunking')||'[]');
                 chunks.push({ id: Date.now().toString(36), groups: groups.map(g=>({name:g.name,items:[...g.items]})), totalItems, date: new Date().toISOString() });
                 localStorage.setItem('sg_chunking', JSON.stringify(chunks));
+                app.cemTrackModuleUse('chunking');
                 state.chunkPhase='list';
                 app.showNotification('Chunk map saved.');
                 app.render();
@@ -5362,6 +5431,7 @@
                 const sessions = JSON.parse(localStorage.getItem('sg_interleave')||'[]');
                 sessions.push({ id: Date.now().toString(36), domains, blockMin: state.ilBlockMin||10, cycles: state.ilCycles||0, date: new Date().toISOString() });
                 localStorage.setItem('sg_interleave', JSON.stringify(sessions));
+                app.cemTrackModuleUse('interleave');
                 state.ilRunning = false;
                 state.ilCurrentIdx = 0;
                 app.showNotification('Interleave session logged.');
@@ -5480,6 +5550,7 @@
                 const palaces = JSON.parse(localStorage.getItem('sg_memory_palace')||'[]');
                 palaces.push({ id: Date.now().toString(36), name: state.mpBuilding.name, stops: state.mpBuilding.stops, date: new Date().toISOString() });
                 localStorage.setItem('sg_memory_palace', JSON.stringify(palaces));
+                app.cemTrackModuleUse('memory-palace');
                 state.mpPhase='list';
                 app.showNotification('Palace locked in.');
                 app.render();
@@ -5613,6 +5684,7 @@
                     maps.push({ id: Date.now().toString(36), root, branches: state.mmTree.branches, date: new Date().toISOString() });
                 }
                 localStorage.setItem('sg_mindmap', JSON.stringify(maps));
+                app.cemTrackModuleUse('mindmap');
                 state.mmPhase='list'; state.mmEditId=null;
                 app.showNotification('Mind map saved.');
                 app.render();
@@ -5739,6 +5811,7 @@
                 const sessions = JSON.parse(localStorage.getItem('sg_dual_coding')||'[]');
                 sessions.push({ id: Date.now().toString(36), title: title.trim(), text: text.trim(), canvas: imgData, labels: state.dcLabels||[], date: new Date().toISOString() });
                 localStorage.setItem('sg_dual_coding', JSON.stringify(sessions));
+                app.cemTrackModuleUse('dual-coding');
                 state.dcPhase='list'; state._dcImageData=null;
                 app.showNotification('Dual coding session saved.');
                 app.render();
@@ -5790,32 +5863,48 @@
                     const missed = state.spShadowMissed||{};
                     const done = Object.keys(revealed).length + Object.keys(missed).length;
                     const total = note.cues.length;
+                    const timedMode = state.spTimedMode !== false;
+                    const activeCue = state.spActiveCue !== undefined ? state.spActiveCue : (done < total ? parseInt(Object.keys({...revealed,...missed}).sort((a,b)=>+a-+b).at(-1)||'-1')+1 : -1);
+                    const allDone = done===total;
+                    // Find the first unanswered cue index
+                    let nextCue = -1;
+                    for (let i=0;i<total;i++) { if (!revealed[i]&&!missed[i]) { nextCue=i; break; } }
+                    const rating = state.spShadowRating||0;
                     return `<div class="animate-fade-in" style="max-width:800px;margin:0 auto;padding:1rem;">
                         <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.25rem;">
                             <button onclick="app.spExitShadow()" style="background:none;border:none;color:#39FF14;font-size:1.4rem;cursor:pointer;">&larr;</button>
                             <h1 style="font-family:'VT323',monospace;font-size:2.5rem;color:#fff;text-transform:uppercase;">SHADOW MODE</h1>
-                            <div style="margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:#555;">${done}/${total} DONE</div>
+                            <div id="sp-timer-display" style="margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:1.1rem;color:#FF8800;min-width:3ch;text-align:right;"></div>
+                            <div style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:#555;">${done}/${total} DONE</div>
                         </div>
                         <div style="font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:#555;margin-bottom:1rem;letter-spacing:0.1em;text-transform:uppercase;">${esc(note.title)}</div>
+                        ${!allDone && nextCue>=0 ? `
+                        <div class="cem-card" style="margin-bottom:1rem;border-color:#FF00FF;background:#0a050a;">
+                            <div class="cem-header" style="color:#FF00FF;">ACTIVE CUE ${nextCue+1}/${total}</div>
+                            <div style="font-size:1.2rem;color:#fff;font-family:'Share Tech Mono',monospace;margin:0.75rem 0;">${esc(note.cues[nextCue].cue)}</div>
+                            <div style="color:#444;font-size:0.8rem;font-family:'Share Tech Mono',monospace;margin-bottom:0.75rem;font-style:italic;">Recall the answer before time expires...</div>
+                            <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
+                                <button onclick="app.spRevealCue(${nextCue})" class="cem-btn" style="padding:0.4rem 1rem;font-size:0.75rem;background:#39FF14;color:#000;">RECALLED ✓</button>
+                                <button onclick="app.spMissCue(${nextCue})" class="cem-btn" style="padding:0.4rem 1rem;font-size:0.75rem;border-color:#FF4444;color:#FF4444;">MISSED ✗</button>
+                            </div>
+                        </div>` : ''}
                         <div style="display:grid;grid-template-columns:200px 1fr;gap:0;border:1px solid rgba(57,255,20,0.15);">
                             <div style="background:#080808;border-right:1px solid rgba(57,255,20,0.15);padding:0.5rem;font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:#39FF14;letter-spacing:0.1em;text-transform:uppercase;">CUE</div>
-                            <div style="background:#060606;padding:0.5rem;font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:#39FF14;letter-spacing:0.1em;text-transform:uppercase;">RECALL — DATA HIDDEN</div>
+                            <div style="background:#060606;padding:0.5rem;font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:#39FF14;letter-spacing:0.1em;text-transform:uppercase;">STATUS</div>
                             ${note.cues.map((c,i)=>`
-                            <div style="background:#080808;border-right:1px solid rgba(57,255,20,0.15);border-top:1px solid #111;padding:0.6rem;color:${missed[i]?'#FF4444':revealed[i]?'#39FF14':'#ccc'};font-family:'Share Tech Mono',monospace;font-size:0.82rem;">${esc(c.cue)}</div>
-                            <div style="background:#060606;border-top:1px solid #111;padding:0.6rem;">
-                                ${revealed[i] ? `<div style="color:#39FF14;font-size:0.85rem;margin-bottom:0.4rem;">${esc(c.data)}</div>` :
-                                missed[i] ? `<div style="color:#FF4444;font-size:0.85rem;margin-bottom:0.4rem;font-style:italic;">MISSED — ${esc(c.data)}</div>` :
-                                `<div style="color:#333;font-size:0.82rem;margin-bottom:0.4rem;font-style:italic;">[ DATA SHADOWED — recall from cue ]</div>`}
-                                ${(!revealed[i]&&!missed[i])?`<div style="display:flex;gap:0.5rem;">
-                                    <button onclick="app.spRevealCue(${i})" class="cem-btn" style="padding:0.25rem 0.65rem;font-size:0.6rem;background:#39FF14;color:#000;">RECALLED ✓</button>
-                                    <button onclick="app.spMissCue(${i})" class="cem-btn cem-btn-danger" style="padding:0.25rem 0.65rem;font-size:0.6rem;">MISSED ✗</button>
-                                </div>`:''}
+                            <div style="background:#080808;border-right:1px solid rgba(57,255,20,0.15);border-top:1px solid #111;padding:0.6rem;color:${missed[i]?'#FF4444':revealed[i]?'#39FF14':i===nextCue?'#FF00FF':'#555'};font-family:'Share Tech Mono',monospace;font-size:0.82rem;">${esc(c.cue)}</div>
+                            <div style="background:#060606;border-top:1px solid #111;padding:0.6rem;font-family:'Share Tech Mono',monospace;font-size:0.82rem;color:${missed[i]?'#FF4444':revealed[i]?'#39FF14':'#333'};">
+                                ${revealed[i] ? '✓ RECALLED' : missed[i] ? '✗ MISSED — '+esc(c.data) : i===nextCue ? '<span style="color:#FF00FF;">⬡ ACTIVE</span>' : '...'}
                             </div>`).join('')}
                         </div>
-                        ${done===total?`<div style="text-align:center;margin-top:1.5rem;">
+                        ${allDone?`<div style="text-align:center;margin-top:1.5rem;">
                             <div style="font-family:'Share Tech Mono',monospace;font-size:0.8rem;color:#39FF14;margin-bottom:0.75rem;">SHADOW RUN COMPLETE — ${Object.keys(revealed).length}/${total} recalled</div>
                             ${Object.keys(missed).length>0?`<div style="font-family:'Share Tech Mono',monospace;font-size:0.72rem;color:#FF4444;margin-bottom:0.75rem;">⚠ ${Object.keys(missed).length} cue(s) flagged for priority review</div>`:''}
-                            <button onclick="app.spExitShadow()" class="cem-btn" style="background:#39FF14;color:#000;">DONE</button>
+                            <div style="font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:#888;margin-bottom:0.75rem;letter-spacing:0.1em;">SELF-RATING — How well did you recall?</div>
+                            <div style="display:flex;justify-content:center;gap:0.5rem;margin-bottom:1rem;">
+                                ${[1,2,3,4,5].map(r=>`<button onclick="app.spRate(${r})" class="cem-btn" style="padding:0.4rem 0.75rem;font-size:0.85rem;${(state.spShadowRating||0)===r?'background:#39FF14;color:#000;':''};">${r}</button>`).join('')}
+                            </div>
+                            <button onclick="app.spFinishShadow()" class="cem-btn" style="background:#39FF14;color:#000;padding:0.6rem 2rem;">TRANSMIT RESULTS</button>
                         </div>`:''}
                     </div>`;
                 }
@@ -5884,12 +5973,73 @@
                 state.spReviewing = note;
                 state.spShadowRevealed = {};
                 state.spShadowMissed = {};
+                state.spShadowRating = 0;
+                state._spTimerSecs = 15;
                 state.spPhase = 'shadow';
                 app.render();
+                setTimeout(()=>app._spStartTimer(), 100);
             },
-            spRevealCue(i) { if (!state.spShadowRevealed) state.spShadowRevealed={}; state.spShadowRevealed[i]=true; app.render(); },
-            spMissCue(i) { if (!state.spShadowMissed) state.spShadowMissed={}; state.spShadowMissed[i]=true; app.render(); },
-            spExitShadow() { state.spPhase='list'; app.render(); },
+            spRevealCue(i) {
+                if (!state.spShadowRevealed) state.spShadowRevealed={};
+                state.spShadowRevealed[i]=true;
+                this._spStopTimer();
+                app.render();
+                this._spStartTimer();
+            },
+            spMissCue(i) {
+                if (!state.spShadowMissed) state.spShadowMissed={};
+                state.spShadowMissed[i]=true;
+                this._spStopTimer();
+                app.render();
+                this._spStartTimer();
+            },
+            spRate(r) { state.spShadowRating=r; app.render(); },
+            spFinishShadow() {
+                const note = state.spReviewing;
+                const revealed = state.spShadowRevealed||{};
+                const missed = state.spShadowMissed||{};
+                const total = note.cues.length;
+                const rating = state.spShadowRating||0;
+                app.cemTrackModuleUse('shadow-protocol');
+                state.spPhase='list';
+                state.spShadowRating=0;
+                this._spStopTimer();
+                app.showNotification('Shadow run logged. Rating: '+rating+'/5');
+                app.render();
+            },
+            _spTimerInterval: null,
+            _spTimerSecs: 0,
+            _spStartTimer() {
+                const revealed = state.spShadowRevealed||{};
+                const missed = state.spShadowMissed||{};
+                const note = state.spReviewing;
+                if (!note) return;
+                const total = note.cues.length;
+                const done = Object.keys(revealed).length + Object.keys(missed).length;
+                if (done >= total) return;
+                this._spStopTimer();
+                state._spTimerSecs = 15;
+                this._spTimerInterval = setInterval(()=>{
+                    state._spTimerSecs = (state._spTimerSecs||15) - 1;
+                    const el = document.getElementById('sp-timer-display');
+                    if (el) el.textContent = state._spTimerSecs + 's';
+                    if (state._spTimerSecs <= 0) {
+                        this._spStopTimer();
+                        // Auto-miss the active cue
+                        const note2 = state.spReviewing;
+                        if (!note2) return;
+                        const r2 = state.spShadowRevealed||{};
+                        const m2 = state.spShadowMissed||{};
+                        let nextCue = -1;
+                        for (let i=0;i<note2.cues.length;i++) { if (!r2[i]&&!m2[i]) { nextCue=i; break; } }
+                        if (nextCue>=0) { app.spMissCue(nextCue); }
+                    }
+                }, 1000);
+            },
+            _spStopTimer() {
+                if (this._spTimerInterval) { clearInterval(this._spTimerInterval); this._spTimerInterval=null; }
+            },
+            spExitShadow() { this._spStopTimer(); state.spPhase='list'; app.render(); },
             spDelete(id) {
                 if (!confirm('Delete this note?')) return;
                 const notes = JSON.parse(localStorage.getItem('sg_shadow_protocol')||'[]').filter(n=>n.id!==id);
