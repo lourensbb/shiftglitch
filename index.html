@@ -2382,9 +2382,9 @@
                     if (btn.textContent.trim().toUpperCase() === (map[tabId] || '').toUpperCase()) btn.classList.add('text-orange-600', 'font-bold');
                 });
                 const toolsViews = ['blurt','babel','quiz','matrix','recal','diagnostic',
-                    'cem-speed-run','cem-mistake-vault','cem-teach-it','cem-concept-mapper',
-                    'cem-chunking','cem-interleave','cem-memory-palace','cem-mindmap',
-                    'cem-dual-coding','cem-shadow-protocol'];
+                    'speed-run','mistake-vault','teach-it','concept-mapper',
+                    'chunking','interleave','memory-palace','mindmap',
+                    'dual-coding','shadow-protocol'];
                 const toolsBtn = document.querySelector('#tools-dropdown > button');
                 if (toolsBtn) {
                     if (toolsViews.includes(tabId)) { toolsBtn.classList.add('text-orange-600','font-bold'); }
@@ -4972,7 +4972,11 @@
                     const words = ((recallEl&&recallEl.value)||'').trim().split(/\s+/).filter(Boolean).length;
                     if (wcEl) wcEl.textContent = words + ' words';
                 };
-                if (recallEl) recallEl.addEventListener('input', wcUpdate);
+                if (recallEl) {
+                    if (recallEl._wcUpdate) recallEl.removeEventListener('input', recallEl._wcUpdate);
+                    recallEl._wcUpdate = wcUpdate;
+                    recallEl.addEventListener('input', wcUpdate);
+                }
                 state._srInterval = setInterval(() => {
                     remaining--;
                     if (timerEl) {
