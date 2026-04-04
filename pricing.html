@@ -11,6 +11,15 @@
       gtag('js', new Date());
       gtag('config', 'G-P6VQGP7B1D');
     </script>
+    <script>
+      (function captureUTMs() {
+        const p = new URLSearchParams(window.location.search);
+        const keys = ['utm_source','utm_medium','utm_campaign','utm_term','utm_content'];
+        const vals = {};
+        keys.forEach(k => { const v = p.get(k); if (v) vals[k] = v; });
+        if (Object.keys(vals).length) sessionStorage.setItem('sg_utms', JSON.stringify(vals));
+      })();
+    </script>
     <title>Pricing — ShiftGlitch | Free, Pro &amp; School Plans</title>
     <meta name="description" content="ShiftGlitch is free for individual students. Pro plans unlock AI study planning and Squad Mode. School licenses give your entire institution full access from $499/year.">
     <meta name="robots" content="index, follow">
@@ -45,11 +54,24 @@
         },
         {
           "@type": "Offer",
-          "name": "Netrunner Pro",
-          "price": "9.99",
+          "name": "Netrunner Pro — 1 Month",
+          "price": "5.50",
           "priceCurrency": "USD",
-          "billingIncrement": "month",
-          "description": "Unlock AI study planning, Squad Mode, and priority access to new features."
+          "description": "Unlock AI study planning, Squad Mode, and all Cognitive Exploit Modules for 30 days."
+        },
+        {
+          "@type": "Offer",
+          "name": "Netrunner Pro — 3 Months",
+          "price": "13.75",
+          "priceCurrency": "USD",
+          "description": "Unlock AI study planning, Squad Mode, and all Cognitive Exploit Modules for 90 days."
+        },
+        {
+          "@type": "Offer",
+          "name": "Netrunner Pro — 12 Months",
+          "price": "44.00",
+          "priceCurrency": "USD",
+          "description": "Full Pro access for 365 days — AI study planning, Squad Mode, all Cognitive Exploit Modules."
         },
         {
           "@type": "Offer",
@@ -731,9 +753,18 @@
             const params = new URLSearchParams(window.location.search);
             if (params.get('success') === '1') {
                 const packLabels = { '1m': '30 days', '3m': '90 days', '12m': '365 days' };
+                const packValues = { '1m': 99, '3m': 249, '12m': 799 };
                 const pack = params.get('pack') || '';
                 const duration = packLabels[pack] ? ` (${packLabels[pack]})` : '';
                 showToast(`// payment received — NETRUNNER_PRO access granted${duration}. Welcome.`, 'success', 10000);
+                if (typeof gtag === 'function') {
+                    gtag('event', 'purchase', {
+                        transaction_id: 'pf_' + Date.now(),
+                        currency: 'ZAR',
+                        value: packValues[pack] || 0,
+                        items: [{ item_name: 'Netrunner Pro ' + (packLabels[pack] || ''), item_category: 'Pro', quantity: 1, price: packValues[pack] || 0 }]
+                    });
+                }
                 window.history.replaceState({}, '', '/pricing');
             } else if (params.get('cancelled') === '1') {
                 showToast('// payment cancelled — no charge made', 'info', 5000);

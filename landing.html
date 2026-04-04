@@ -11,6 +11,15 @@
       gtag('js', new Date());
       gtag('config', 'G-P6VQGP7B1D');
     </script>
+    <script>
+      (function captureUTMs() {
+        const p = new URLSearchParams(window.location.search);
+        const keys = ['utm_source','utm_medium','utm_campaign','utm_term','utm_content'];
+        const vals = {};
+        keys.forEach(k => { const v = p.get(k); if (v) vals[k] = v; });
+        if (Object.keys(vals).length) sessionStorage.setItem('sg_utms', JSON.stringify(vals));
+      })();
+    </script>
     <title>ShiftGlitch — The Study OS for Students | Spaced Repetition, Active Recall & Pomodoro</title>
     <meta name="description" content="ShiftGlitch is the cyberpunk study platform built on real learning science. Spaced repetition, active recall, Pomodoro timing — the tools that actually make studying work. Free to use.">
     <meta name="keywords" content="spaced repetition app, active recall study, flashcard app, Pomodoro timer for students, study app, blurting method, study methods that work, revision tools, GCSE revision, A level study tools, evidence-based studying">

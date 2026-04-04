@@ -11,6 +11,15 @@
       gtag('js', new Date());
       gtag('config', 'G-P6VQGP7B1D');
     </script>
+    <script>
+      (function captureUTMs() {
+        const p = new URLSearchParams(window.location.search);
+        const keys = ['utm_source','utm_medium','utm_campaign','utm_term','utm_content'];
+        const vals = {};
+        keys.forEach(k => { const v = p.get(k); if (v) vals[k] = v; });
+        if (Object.keys(vals).length) sessionStorage.setItem('sg_utms', JSON.stringify(vals));
+      })();
+    </script>
     <title>ShiftGlitch — Join the Waitlist</title>
     <meta name="description" content="This waitlist is almost full. Only a limited number of Netrunners get through before the firewall drops. Jump in now.">
     <meta property="og:type" content="website">
@@ -519,15 +528,24 @@
             btn.innerHTML = '<span class="btn-loader"></span> ESTABLISHING LINK...';
 
             try {
+                const utms = JSON.parse(sessionStorage.getItem('sg_utms') || '{}');
                 const res = await fetch('/api/waitlist', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ gamertag, email })
+                    body: JSON.stringify({ gamertag, email, ...utms })
                 });
 
                 if (res.ok) {
                     formPanel.classList.add('hidden');
                     successPanel.classList.add('visible');
+                    if (typeof gtag === 'function') {
+                        gtag('event', 'generate_lead', {
+                            event_category: 'waitlist',
+                            event_label: 'waitlist_signup',
+                            currency: 'ZAR',
+                            value: 0
+                        });
+                    }
                 } else {
                     const data = await res.json().catch(() => ({}));
                     btn.disabled = false;
