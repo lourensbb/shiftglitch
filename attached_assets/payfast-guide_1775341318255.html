@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PayFast Integration Guide</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui, sans-serif; background: #f5f5f5; color: #1a1a1a; }
+  .header { background: #1a1a2e; color: white; padding: 2rem; }
+  .header h1 { font-size: 1.5rem; font-weight: 600; }
+  .header p { color: #aaa; margin-top: 4px; font-size: 0.9rem; }
+  .tabs { display: flex; flex-wrap: wrap; gap: 4px; background: #fff; padding: 1rem 2rem 0; border-bottom: 1px solid #ddd; }
+  .tab { padding: 8px 16px; border: none; background: none; cursor: pointer; font-size: 13px; color: #666; border-bottom: 2px solid transparent; margin-bottom: -1px; border-radius: 4px 4px 0 0; }
+  .tab.active { color: #1a1a2e; border-bottom-color: #1a1a2e; font-weight: 600; background: #f0f0ff; }
+  .content { max-width: 900px; margin: 0 auto; padding: 2rem; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+  h2 { font-size: 1rem; font-weight: 600; margin: 1.5rem 0 0.5rem; color: #1a1a2e; }
+  p { font-size: 13px; line-height: 1.7; color: #555; margin-bottom: 0.75rem; }
+  pre { background: #1e1e2e; color: #cdd6f4; border-radius: 8px; padding: 1.25rem; overflow-x: auto; font-size: 12px; line-height: 1.7; margin: 0.5rem 0 1rem; font-family: 'Courier New', monospace; }
+  .note { border-radius: 8px; padding: 0.75rem 1rem; font-size: 13px; margin: 0.75rem 0; line-height: 1.6; }
+  .note.green  { background: #e8f5e9; border-left: 4px solid #4caf50; color: #2e7d32; }
+  .note.yellow { background: #fff8e1; border-left: 4px solid #ffc107; color: #7a5c00; }
+  .note.red    { background: #fdecea; border-left: 4px solid #f44336; color: #c62828; }
+  .note.blue   { background: #e3f2fd; border-left: 4px solid #2196f3; color: #0d47a1; }
+  .card { background: white; border: 1px solid #ddd; border-radius: 8px; padding: 1rem; margin-bottom: 0.75rem; }
+  .card strong { font-size: 14px; }
+  .card p { margin: 4px 0 8px; }
+  .badge { font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 500; }
+  .badge.green  { background: #e8f5e9; color: #2e7d32; }
+  .badge.yellow { background: #fff8e1; color: #7a5c00; }
+  .badge.blue   { background: #e3f2fd; color: #0d47a1; }
+  .row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  code.url { font-size: 11px; color: #888; background: #f5f5f5; padding: 2px 6px; border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>PayFast Integration Guide</h1>
+  <p>Once-off payments &nbsp;·&nbsp; Subscriptions &nbsp;·&nbsp; ITN Webhook &nbsp;·&nbsp; Affiliate tracking &nbsp;·&nbsp; Task rewards &nbsp;·&nbsp; SA alternatives</p>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="show('sandbox',this)">Sandbox setup</button>
+  <button class="tab" onclick="show('oncepay',this)">Once-off payment</button>
+  <button class="tab" onclick="show('sub',this)">Subscriptions</button>
+  <button class="tab" onclick="show('itn',this)">ITN webhook</button>
+  <button class="tab" onclick="show('affiliate',this)">Affiliate tracking</button>
+  <button class="tab" onclick="show('tasks',this)">Task rewards</button>
+  <button class="tab" onclick="show('alts',this)">Alternatives</button>
+  <button class="tab" onclick="show('intl',this)">International payouts</button>
+</div>
+
+<div class="content">
+
+<!-- SANDBOX -->
+<div id="sandbox" class="panel active">
+  <div class="note green">These sandbox credentials work immediately — no account needed to start testing.</div>
+
+  <h2>Your .env file</h2>
+  <pre>PAYFAST_MERCHANT_ID=10000100
+PAYFAST_MERCHANT_KEY=46f0cd694581a
+PAYFAST_PASSPHRASE=jt7NOE43FZPn
+PAYFAST_SANDBOX=true
+
+# Sandbox payment URL:  https://sandbox.payfast.co.za/eng/process
+# Live payment URL:     https://www.payfast.co.za/eng/process</pre>
+
+  <h2>utils/payfast.js — paste this into every project</h2>
+  <p>The signature calculation is where 90% of PayFast integrations break. Three rules: alphabetical key order, PHP-style URL encoding (space = + not %20), MD5 hash including the passphrase at the end.</p>
+  <pre>const crypto = require("crypto");
+
+/**
+ * Generates a valid PayFast signature.
+ * data       = { key: "value", ... }  — all values must be strings
+ * passphrase = your PayFast passphrase (empty string if none set)
+ */
+function generateSignature(data, passphrase = "") {
+
+  // Step 1: Sort keys alphabetically
+  const sortedKeys = Object.keys(data).sort();
+
+  // Step 2: Build query string, skip empty/null values
+  const parts = sortedKeys
+    .filter(k => data[k] !== "" && data[k] != null)
+    .map(k => k + "=" + pfEncode(data[k]));
+
+  let str = parts.join("&");
+
+  // Step 3: Append passphrase if you have one
+  if (passphrase) {
+    str += "&passphrase=" + pfEncode(passphrase);
+  }
+
+  // Step 4: MD5 hash the whole string
+  return crypto.createHash("md5").update(str).digest("hex");
+}
+
+// PayFast uses PHP urlencode style: space becomes + not %20
+function pfEncode(val) {
+  return encodeURIComponent(String(val)).replace(/%20/g, "+");
+}
+
+/**
+ * Validates an incoming ITN notification from PayFast.
+ * Call this inside your POST /payfast/notify route.
+ */
+async function validateITN(pfData, rawBody) {
+
+  // Check the signature
+  const { signature, ...rest } = pfData;
+  const calculated = generateSignature(rest, process.env.PAYFAST_PASSPHRASE);
+  if (calculated !== signature) {
+    return { valid: false, reason: "Signature mismatch" };
+  }
+
+  // Ping PayFast to confirm the payment actually happened
+  const host = process.env.PAYFAST_SANDBOX === "true"
+    ? "sandbox.payfast.co.za"
+    : "www.payfast.co.za";
+
+  const res = await fetch("https://" + host + "/eng/query/validate", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: rawBody,
+  });
+
+  const txt = await res.text();
+  return txt === "VALID"
+    ? { valid: true }
+    : { valid: false, reason: "PayFast ping returned: " + txt };
+}
+
+module.exports = { generateSignature, pfEncode, validateITN };</pre>
+
+  <div class="note yellow">
+    <strong>Testing locally?</strong> Your notify_url must be publicly reachable.
+    Run <strong>ngrok http 3000</strong> and use the ngrok URL as your notify_url.
+    PayFast cannot POST to localhost.
+  </div>
+</div>
+
+<!-- ONCE-OFF -->
+<div id="oncepay" class="panel">
+  <h2>Backend — create the payment (Node.js / Express)</h2>
+  <pre>// routes/payment.js
+const express = require("express");
+const router  = express.Router();
+const { generateSignature } = require("../utils/payfast");
+
+router.post("/create-payment", async (req, res) => {
+  const { amount, itemName, userId, email, firstName, lastName } = req.body;
+
+  const isSandbox = process.env.PAYFAST_SANDBOX === "true";
+  const host      = isSandbox ? "sandbox.payfast.co.za" : "www.payfast.co.za";
+
+  const data = {
+    merchant_id:   process.env.PAYFAST_MERCHANT_ID,
+    merchant_key:  process.env.PAYFAST_MERCHANT_KEY,
+    return_url:    "https://yoursite.com/payment/success",
+    cancel_url:    "https://yoursite.com/payment/cancel",
+    notify_url:    "https://yoursite.com/api/payfast/notify",  // must be public!
+    name_first:    firstName    || "",
+    name_last:     lastName     || "",
+    email_address: email        || "",
+    m_payment_id:  "order_" + Date.now() + "_" + userId,  // your unique reference
+    amount:        parseFloat(amount).toFixed(2),          // MUST be "100.00" format
+    item_name:     itemName,
+    custom_str1:   String(userId),   // store your userId here, gets echoed in ITN
+  };
+
+  // Remove empty fields before signing
+  const clean = Object.fromEntries(
+    Object.entries(data).filter(([, v]) => v !== "")
+  );
+
+  // Add the signature last
+  clean.signature = generateSignature(clean, process.env.PAYFAST_PASSPHRASE);
+
+  res.json({
+    paymentUrl: "https://" + host + "/eng/process",
+    fields: clean,
+  });
+});
+
+module.exports = router;</pre>
+
+  <h2>Frontend — submit the payment form (React)</h2>
+  <p>PayFast requires a real HTML form POST to their server. You cannot use fetch() or a redirect. Build the form in JavaScript and submit it.</p>
+  <pre>// components/PayButton.jsx
+import { useState } from "react";
+
+export default function PayButton({ amount, itemName, userId }) {
+  const [loading, setLoading] = useState(false);
+
+  async function handlePay() {
+    setLoading(true);
+    try {
+      // Call your backend to get the signed payment data
+      const res  = await fetch("/api/create-payment", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ amount, itemName, userId }),
+      });
+      const { paymentUrl, fields } = await res.json();
+
+      // Build a hidden form and submit it to PayFast
+      const form    = document.createElement("form");
+      form.method   = "POST";
+      form.action   = paymentUrl;
+
+      Object.entries(fields).forEach(([key, value]) => {
+        const input   = document.createElement("input");
+        input.type    = "hidden";
+        input.name    = key;
+        input.value   = value;
+        form.appendChild(input);
+      });
+
+      document.body.appendChild(form);
+      form.submit(); // User is taken to PayFast's hosted payment page
+
+    } catch (err) {
+      console.error(err);
+      setLoading(false);
+    }
+  }
+
+  return (
+    &lt;button onClick={handlePay} disabled={loading}&gt;
+      {loading ? "Redirecting to PayFast..." : `Pay R${amount}`}
+    &lt;/button&gt;
+  );
+}</pre>
+
+  <div class="note blue">
+    <strong>Sandbox test card:</strong> 4000000000000002 &nbsp;·&nbsp; Any future expiry &nbsp;·&nbsp; CVV: 123<br>
+    For EFT testing: select EFT on the PayFast page and follow the sandbox bank prompts shown on screen.
+  </div>
+</div>
+
+<!-- SUBSCRIPTIONS -->
+<div id="sub" class="panel">
+  <h2>Creating a monthly subscription</h2>
+  <p>Same as a once-off payment — just add these 5 extra fields. PayFast handles all future billing automatically.</p>
+  <pre>// Add these fields to your payment data object:
+
+const data = {
+  merchant_id:   process.env.PAYFAST_MERCHANT_ID,
+  merchant_key:  process.env.PAYFAST_MERCHANT_KEY,
+  return_url:    "https://yoursite.com/success",
+  cancel_url:    "https://yoursite.com/cancel",
+  notify_url:    "https://yoursite.com/api/payfast/notify",
+  name_first:    firstName,
+  email_address: email,
+  m_payment_id:  "sub_" + userId + "_" + Date.now(),
+  amount:        parseFloat(planAmount).toFixed(2),   // first charge amount
+  item_name:     "Monthly subscription",
+  custom_str1:   String(userId),
+
+  // ── These 5 fields make it a subscription ────────────────────────
+  subscription_type: "1",                                        // 1 = recurring
+  billing_date:      new Date().toISOString().slice(0, 10),      // "YYYY-MM-DD"
+  recurring_amount:  parseFloat(planAmount).toFixed(2),          // amount each month
+  frequency:         "3",    // 3=monthly  4=quarterly  6=annually
+  cycles:            "0",    // 0=runs forever, or "12" for 12 months etc.
+  // ─────────────────────────────────────────────────────────────────
+};</pre>
+
+  <h2>Handling subscription events in your ITN webhook</h2>
+  <pre>function handleITN(pfData) {
+  const {
+    payment_status,   // "COMPLETE", "FAILED", "CANCELLED"
+    token,            // PayFast's subscription token — SAVE THIS, you need it to cancel
+    custom_str1,      // your userId
+    amount_gross,     // amount actually charged
+    billing_date,     // next billing date
+  } = pfData;
+
+  if (payment_status === "COMPLETE") {
+    db.subscriptions.upsert({
+      userId:   custom_str1,
+      token:    token,        // ← critical — save this to your database
+      status:   "active",
+      nextBill: billing_date,
+    });
+  }
+
+  if (payment_status === "FAILED") {
+    emailService.notifyPaymentFailed(custom_str1);
+  }
+
+  if (payment_status === "CANCELLED") {
+    db.subscriptions.update({ userId: custom_str1, status: "cancelled" });
+  }
+}
+
+// Cancelling a subscription programmatically
+async function cancelSubscription(token) {
+  const host = process.env.PAYFAST_SANDBOX === "true"
+    ? "sandbox.payfast.co.za" : "www.payfast.co.za";
+
+  const res = await fetch(
+    "https://" + host + "/eng/recurring/cancel/" + token,
+    { method: "PUT", headers: buildApiHeaders() }
+  );
+  return res.ok;
+}</pre>
+</div>
+
+<!-- ITN -->
+<div id="itn" class="panel">
+  <div class="note red">
+    <strong>Critical:</strong> Send HTTP 200 as the very first thing you do.
+    PayFast will retry the notification multiple times if you don't respond fast enough.
+    Process the data AFTER sending the response.
+  </div>
+
+  <h2>Complete ITN handler (Node.js / Express)</h2>
+  <pre>// routes/notify.js
+const express = require("express");
+const router  = express.Router();
+const { validateITN } = require("../utils/payfast");
+
+router.post("/payfast/notify",
+  express.urlencoded({ extended: false }),  // PayFast sends form-encoded data
+  async (req, res) => {
+
+  // STEP 1: Respond 200 immediately — do this before anything else
+  res.status(200).send("OK");
+
+  const pfData  = req.body;
+  const rawBody = new URLSearchParams(req.body).toString();
+
+  try {
+    // STEP 2: Validate the ITN (checks signature + pings PayFast)
+    const { valid, reason } = await validateITN(pfData, rawBody);
+    if (!valid) {
+      console.error("Rejected ITN:", reason, pfData);
+      return;
+    }
+
+    // STEP 3: Cross-check the amount to catch fraud
+    const expected = await db.orders.getExpectedAmount(pfData.m_payment_id);
+    const received = parseFloat(pfData.amount_gross);
+    if (Math.abs(received - expected) > 0.01) {
+      console.error("Amount mismatch! Expected:", expected, "Got:", received);
+      return;
+    }
+
+    // STEP 4: Act on the payment status
+    switch (pfData.payment_status) {
+      case "COMPLETE":
+        await db.orders.markPaid(pfData.m_payment_id);
+        await db.users.grantAccess(pfData.custom_str1);
+
+        // If it has a token, it's a subscription payment
+        if (pfData.token) {
+          await db.subscriptions.activate(pfData.custom_str1, pfData.token);
+        }
+        // If it has an affiliate code, queue a commission
+        if (pfData.custom_str2) {
+          await queueAffiliateCommission(pfData);
+        }
+        break;
+
+      case "FAILED":
+        await emailService.notifyFailed(pfData.custom_str1);
+        break;
+
+      case "PENDING":
+        // EFT payments start as PENDING — just wait for COMPLETE
+        console.log("EFT payment pending:", pfData.m_payment_id);
+        break;
+    }
+
+  } catch (err) {
+    console.error("ITN processing error:", err);
+    // Don't rethrow — we already sent the 200
+  }
+});
+
+module.exports = router;</pre>
+
+  <h2>PayFast server IPs — whitelist these in production</h2>
+  <pre>// Add this check near the top of your ITN handler
+const PAYFAST_IPS = [
+  "197.97.145.144",
+  "197.97.145.145",
+  "197.97.145.146",
+  "197.97.145.147",
+  // Check developers.payfast.co.za for the full current list
+];
+
+function isValidPayFastIP(req) {
+  const ip = (req.ip || req.connection.remoteAddress || "")
+    .replace("::ffff:", "");  // strip IPv6 prefix
+  return PAYFAST_IPS.includes(ip);
+}</pre>
+</div>
+
+<!-- AFFILIATE -->
+<div id="affiliate" class="panel">
+  <h2>Track affiliates using custom fields</h2>
+  <p>PayFast echoes custom_str1 through custom_str5 back in the ITN notification. Store your affiliate code there and act on it when payment completes.</p>
+  <pre>// When someone arrives via an affiliate link: yoursite.com/?ref=AFF123
+// Save the code in a cookie, then attach it to the payment:
+
+const data = {
+  ...basePaymentFields,
+  custom_str1: String(userId),
+  custom_str2: req.cookies.affiliateCode  || "",   // "AFF123"
+  custom_str3: req.cookies.campaignName   || "",
+};
+
+// In your ITN handler, when payment_status === "COMPLETE":
+async function queueAffiliateCommission(pfData) {
+  const affiliateCode = pfData.custom_str2;
+  if (!affiliateCode) return;
+
+  const affiliate = await db.affiliates.findByCode(affiliateCode);
+  if (!affiliate) return;
+
+  const saleAmount  = parseFloat(pfData.amount_gross);
+  const commission  = saleAmount * (affiliate.commissionRate || 0.15); // 15%
+
+  await db.commissions.create({
+    affiliateId:  affiliate.id,
+    orderId:      pfData.m_payment_id,
+    saleAmount,
+    commission,
+    status: "pending",    // becomes "payable" after your hold period (e.g. 30 days)
+  });
+
+  console.log("Commission queued: R" + commission.toFixed(2) + " for " + affiliateCode);
+}</pre>
+
+  <h2>Auto-split payments at checkout</h2>
+  <p>If your affiliate has their own PayFast merchant account, you can auto-split the payment at checkout. No manual payouts needed.</p>
+  <pre>// Both you and the affiliate must have PayFast accounts
+// The affiliate gives you their merchant_id
+
+const data = {
+  ...basePaymentFields,
+  split_payment: JSON.stringify([
+    { merchant_id: process.env.PAYFAST_MERCHANT_ID, percentage: 85 },  // your cut
+    { merchant_id: affiliateMerchantId,             percentage: 15 },  // their cut
+  ]),
+};</pre>
+
+  <div class="note yellow">
+    <strong>For paying affiliates who don't have PayFast accounts:</strong>
+    Use Ozow's Payout API to send directly to their SA bank account.
+    See the Alternatives tab for the Ozow payout code.
+  </div>
+</div>
+
+<!-- TASKS -->
+<div id="tasks" class="panel">
+  <p>Set up campaigns with a list of tasks (sign up, test a feature, submit feedback). Track user progress. When all tasks are done, the reward fires automatically.</p>
+
+  <h2>Database schema (PostgreSQL)</h2>
+  <pre>-- A campaign = a set of tasks with a total reward
+CREATE TABLE campaigns (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title       TEXT NOT NULL,
+  description TEXT,
+  reward_zar  DECIMAL(10, 2) NOT NULL,
+  is_active   BOOLEAN DEFAULT true,
+  created_at  TIMESTAMP DEFAULT NOW()
+);
+
+-- Individual tasks within a campaign
+CREATE TABLE tasks (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  campaign_id UUID REFERENCES campaigns(id) ON DELETE CASCADE,
+  title       TEXT NOT NULL,
+  description TEXT,
+  task_url    TEXT,        -- the URL the user must visit or sign up on
+  sort_order  INTEGER DEFAULT 0
+);
+
+-- Track which users completed which tasks
+CREATE TABLE completions (
+  id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id      UUID NOT NULL,
+  task_id      UUID REFERENCES tasks(id),
+  campaign_id  UUID REFERENCES campaigns(id),
+  verified     BOOLEAN DEFAULT true,
+  completed_at TIMESTAMP DEFAULT NOW(),
+  UNIQUE(user_id, task_id)   -- prevents duplicate completions
+);
+
+-- Payout queue — one row per user per campaign
+CREATE TABLE reward_payouts (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id     UUID NOT NULL,
+  campaign_id UUID REFERENCES campaigns(id),
+  amount_zar  DECIMAL(10, 2) NOT NULL,
+  status      TEXT DEFAULT 'pending',   -- pending | processing | paid | failed
+  payout_ref  TEXT,
+  created_at  TIMESTAMP DEFAULT NOW(),
+  paid_at     TIMESTAMP,
+  UNIQUE(user_id, campaign_id)   -- prevents paying the same person twice
+);</pre>
+
+  <h2>API — complete a task and trigger the reward</h2>
+  <pre>// POST /api/tasks/:taskId/complete
+router.post("/tasks/:taskId/complete", requireAuth, async (req, res) => {
+  const userId = req.user.id;
+  const task   = await db.tasks.findById(req.params.taskId);
+
+  if (!task) return res.status(404).json({ error: "Task not found" });
+
+  // Record the completion (UNIQUE constraint prevents duplicates)
+  await db.completions.upsert({
+    userId,
+    taskId:     task.id,
+    campaignId: task.campaign_id,
+    verified:   true,
+  });
+
+  // Count total tasks vs completed tasks for this campaign
+  const total     = await db.tasks.count({ where: { campaign_id: task.campaign_id } });
+  const completed = await db.completions.count({
+    where: { user_id: userId, campaign_id: task.campaign_id, verified: true },
+  });
+
+  // If all done, trigger the reward
+  if (completed >= total) {
+    await triggerReward(userId, task.campaign_id);
+  }
+
+  res.json({ completed, total, allDone: completed >= total });
+});
+
+async function triggerReward(userId, campaignId) {
+  const campaign = await db.campaigns.findById(campaignId);
+  const user     = await db.users.findById(userId);
+
+  // Create the payout record (UNIQUE constraint prevents double-paying)
+  const payout = await db.rewardPayouts.create({
+    userId,
+    campaignId,
+    amountZar: campaign.reward_zar,
+    status: "pending",
+  }).catch(() => null);  // null = already exists, skip
+
+  if (!payout) return;
+
+  // Send the money via Ozow Payouts API
+  if (user.bankAccount) {
+    await ozowPayout({
+      bankAccount: user.bankAccount,
+      branchCode:  user.branchCode,
+      amount:      campaign.reward_zar,
+      reference:   "reward_" + payout.id,
+      name:        user.fullName,
+    });
+    await db.rewardPayouts.update(payout.id, { status: "processing" });
+  } else {
+    // No bank account on file — email the user to claim their reward
+    await emailService.sendRewardNotification(user.email, {
+      amount:   campaign.reward_zar,
+      campaign: campaign.title,
+    });
+  }
+}</pre>
+
+  <h2>Paying rewards via Ozow Payouts API</h2>
+  <pre>// Ozow lets you pay directly to any South African bank account
+// Sign up at ozow.com to get your API key and site code
+
+async function ozowPayout({ bankAccount, branchCode, amount, reference, name }) {
+  const res = await fetch("https://api.ozow.com/v2/payment/payout", {
+    method: "POST",
+    headers: {
+      "ApiKey":       process.env.OZOW_API_KEY,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      SiteCode:       process.env.OZOW_SITE_CODE,
+      BankAccountNo:  bankAccount,
+      BankCode:       branchCode,      // 6-digit SA branch code
+      Amount:         amount,          // in Rands e.g. 50.00
+      TransactionRef: reference,
+      RecipientName:  name,
+      Narration:      "Beta testing reward",
+      IsTest:         process.env.NODE_ENV !== "production",
+    }),
+  });
+
+  const result = await res.json();
+  console.log("Ozow payout result:", result);
+  return result;
+}</pre>
+</div>
+
+<!-- ALTERNATIVES -->
+<div id="alts" class="panel">
+  <div class="note blue">South Africa has solid payment infrastructure. You are not stuck with PayFast.</div>
+
+  <div class="card">
+    <div class="row">
+      <strong>Peach Payments</strong>
+      <code class="url">peachpayments.com</code>
+    </div>
+    <p>Best developer experience in SA. Proper REST API — no form POST nonsense. Supports cards, EFT, Ozow, SnapScan. Works in SA, Kenya, Nigeria. Much closer to Stripe than PayFast is.</p>
+    <span class="badge green">Best overall PayFast alternative</span>
+  </div>
+
+  <div class="card">
+    <div class="row">
+      <strong>Ozow</strong>
+      <code class="url">ozow.com</code>
+    </div>
+    <p>Instant EFT — no card required. Very popular in SA. Also has a Payout API for sending money directly to SA bank accounts. This is the best solution for your task reward and affiliate payouts.</p>
+    <span class="badge green">Best for paying OUT to SA bank accounts</span>
+  </div>
+
+  <div class="card">
+    <div class="row">
+      <strong>Yoco</strong>
+      <code class="url">yoco.com</code>
+    </div>
+    <p>Clean API, payment links, card payments. Well known in SA. Good if you also sell in person or want a simple setup.</p>
+    <span class="badge blue">Card payments, simple setup</span>
+  </div>
+
+  <div class="card">
+    <div class="row">
+      <strong>Flutterwave</strong>
+      <code class="url">flutterwave.com</code>
+    </div>
+    <p>Pan-African coverage. Supports ZAR, USD, NGN, KES and 30+ other currencies. Proper REST API, webhooks, and payouts. Best option if you want to take payments from outside SA.</p>
+    <span class="badge blue">Pan-African, multi-currency</span>
+  </div>
+
+  <div class="card">
+    <div class="row">
+      <strong>DPO Pay (formerly 3G Direct Pay)</strong>
+      <code class="url">dpo.africa</code>
+    </div>
+    <p>Strong across southern and east Africa. 40+ currencies. Good for travel and tourism businesses with regional customers.</p>
+    <span class="badge blue">Southern + east Africa</span>
+  </div>
+
+  <div class="card">
+    <div class="row">
+      <strong>PayPal</strong>
+      <code class="url">paypal.com</code>
+    </div>
+    <p>You can receive payments but withdrawing to a SA bank account is slow, painful, and expensive in fees. Not recommended for local ZAR payments at all.</p>
+    <span class="badge yellow">International customers only — avoid for local SA</span>
+  </div>
+
+  <div class="note green" style="margin-top: 1rem;">
+    <strong>Recommended stack for your use case:</strong><br><br>
+    &nbsp;→ <strong>PayFast</strong> for once-off payments and subscriptions from SA customers<br>
+    &nbsp;→ <strong>Ozow Payouts</strong> for paying task rewards and affiliate commissions to SA bank accounts<br>
+    &nbsp;→ <strong>Flutterwave</strong> if you need to take payments from international customers<br><br>
+    Stripe will likely reach SA in the next few years. Until then, Peach Payments is the closest equivalent in terms of developer experience.
+  </div>
+</div>
+
+<!-- INTERNATIONAL PAYOUTS -->
+<div id="intl" class="panel">
+
+  <div class="note green">
+    You already have a PayPal account — that is the easiest path for paying international affiliates.
+    PayPal Payouts API lets you send money to anyone with a PayPal account or email address, in 200+ countries.
+  </div>
+
+  <h2>How it works</h2>
+  <p>
+    PayPal Payouts is completely separate from the normal PayPal checkout flow.
+    It is a server-to-server API where <em>you</em> push money out to your affiliates.
+    No invoice, no request — you just send it. All you need is their PayPal email address.
+  </p>
+
+  <h2>Step 1 — Enable Payouts on your PayPal account</h2>
+  <pre>1. Log into developer.paypal.com
+2. Go to your app → under "Features" enable "Payouts"
+   (you may need to request this from PayPal support if not visible)
+3. Get your Client ID and Client Secret from the app dashboard
+4. Add them to your .env file:</pre>
+
+  <pre>PAYPAL_CLIENT_ID=your_client_id_here
+PAYPAL_CLIENT_SECRET=your_client_secret_here
+PAYPAL_SANDBOX=true   # set to false when going live
+
+# Sandbox API:  https://api-m.sandbox.paypal.com
+# Live API:     https://api-m.paypal.com</pre>
+
+  <h2>Step 2 — utils/paypal.js — authentication helper</h2>
+  <p>PayPal uses OAuth2. You get a token first, then use it for all API calls. Tokens last 9 hours so cache them.</p>
+  <pre>// utils/paypal.js
+
+let cachedToken     = null;
+let tokenExpiresAt  = 0;
+
+async function getPayPalToken() {
+  // Return cached token if still valid
+  if (cachedToken && Date.now() < tokenExpiresAt) {
+    return cachedToken;
+  }
+
+  const base = process.env.PAYPAL_SANDBOX === "true"
+    ? "https://api-m.sandbox.paypal.com"
+    : "https://api-m.paypal.com";
+
+  const credentials = Buffer.from(
+    process.env.PAYPAL_CLIENT_ID + ":" + process.env.PAYPAL_CLIENT_SECRET
+  ).toString("base64");
+
+  const res = await fetch(base + "/v1/oauth2/token", {
+    method:  "POST",
+    headers: {
+      "Authorization": "Basic " + credentials,
+      "Content-Type":  "application/x-www-form-urlencoded",
+    },
+    body: "grant_type=client_credentials",
+  });
+
+  const data         = await res.json();
+  cachedToken        = data.access_token;
+  tokenExpiresAt     = Date.now() + (data.expires_in - 60) * 1000; // 60s buffer
+
+  return cachedToken;
+}
+
+module.exports = { getPayPalToken };</pre>
+
+  <h2>Step 3 — Send a single payout to one affiliate</h2>
+  <pre>// utils/paypalPayout.js
+const { getPayPalToken } = require("./paypal");
+
+/**
+ * Pay one affiliate via PayPal.
+ *
+ * recipientEmail  = their PayPal email address
+ * amount          = number e.g. 25.00
+ * currency        = "USD", "EUR", "GBP", "ZAR" etc.
+ * note            = message the recipient sees
+ * senderItemId    = your internal reference (e.g. commission ID)
+ */
+async function sendPayPalPayout({ recipientEmail, amount, currency = "USD", note, senderItemId }) {
+  const base  = process.env.PAYPAL_SANDBOX === "true"
+    ? "https://api-m.sandbox.paypal.com"
+    : "https://api-m.paypal.com";
+
+  const token = await getPayPalToken();
+
+  const body = {
+    sender_batch_header: {
+      sender_batch_id: "batch_" + Date.now(),   // must be unique per batch
+      email_subject:   "You have a payment from us!",
+      email_message:   "Your affiliate commission has been paid.",
+    },
+    items: [
+      {
+        recipient_type: "EMAIL",
+        receiver:       recipientEmail,
+        amount: {
+          value:    amount.toFixed(2),
+          currency: currency,
+        },
+        note:           note || "Affiliate commission",
+        sender_item_id: String(senderItemId),
+      },
+    ],
+  };
+
+  const res = await fetch(base + "/v1/payments/payouts", {
+    method:  "POST",
+    headers: {
+      "Authorization": "Bearer " + token,
+      "Content-Type":  "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+
+  const result = await res.json();
+
+  if (!res.ok) {
+    throw new Error("PayPal Payout failed: " + JSON.stringify(result));
+  }
+
+  // result.batch_header.payout_batch_id = PayPal's reference for this payout
+  return result;
+}
+
+module.exports = { sendPayPalPayout };</pre>
+
+  <h2>Step 4 — Batch payout (pay many affiliates at once)</h2>
+  <p>More efficient than sending one at a time. PayPal processes the whole batch and handles each recipient individually.</p>
+  <pre>async function sendBatchPayouts(commissions) {
+  // commissions = array of { email, amount, currency, commissionId }
+
+  const base  = process.env.PAYPAL_SANDBOX === "true"
+    ? "https://api-m.sandbox.paypal.com"
+    : "https://api-m.paypal.com";
+
+  const token = await getPayPalToken();
+
+  const items = commissions.map((c, index) => ({
+    recipient_type: "EMAIL",
+    receiver:       c.email,
+    amount: {
+      value:    c.amount.toFixed(2),
+      currency: c.currency || "USD",
+    },
+    note:           "Affiliate commission payment",
+    sender_item_id: String(c.commissionId),
+  }));
+
+  const res = await fetch(base + "/v1/payments/payouts", {
+    method:  "POST",
+    headers: {
+      "Authorization": "Bearer " + token,
+      "Content-Type":  "application/json",
+    },
+    body: JSON.stringify({
+      sender_batch_header: {
+        sender_batch_id: "batch_" + Date.now(),
+        email_subject:   "Your affiliate commission is here",
+      },
+      items,
+    }),
+  });
+
+  return res.json();
+}
+
+// Example: run every Monday to pay the previous week's commissions
+async function weeklyPayoutJob() {
+  const pending = await db.commissions.findAll({
+    where: { status: "payable" },   // "payable" = past your hold period
+    include: ["affiliate"],
+  });
+
+  if (pending.length === 0) return;
+
+  const result = await sendBatchPayouts(
+    pending.map(c => ({
+      email:        c.affiliate.paypalEmail,
+      amount:       c.commission,
+      currency:     c.affiliate.currency || "USD",
+      commissionId: c.id,
+    }))
+  );
+
+  // Mark them as paid
+  await db.commissions.updateMany(
+    { id: { in: pending.map(c => c.id) } },
+    { status: "paid", paidAt: new Date(), payoutBatchId: result.batch_header.payout_batch_id }
+  );
+
+  console.log("Batch payout sent:", result.batch_header.payout_batch_id);
+}</pre>
+
+  <h2>Step 5 — Check payout status (webhook or polling)</h2>
+  <pre>// Check the status of a batch payout
+async function getPayoutStatus(payoutBatchId) {
+  const base  = process.env.PAYPAL_SANDBOX === "true"
+    ? "https://api-m.sandbox.paypal.com"
+    : "https://api-m.paypal.com";
+
+  const token = await getPayPalToken();
+
+  const res = await fetch(base + "/v1/payments/payouts/" + payoutBatchId, {
+    headers: { "Authorization": "Bearer " + token },
+  });
+
+  const data = await res.json();
+
+  // data.batch_header.batch_status = "PENDING" | "PROCESSING" | "SUCCESS" | "DENIED" | "CANCELED"
+  // data.items = array of individual payout items with their own status
+  return data;
+}
+
+// Individual item statuses:
+// SUCCESS     = money delivered to recipient
+// FAILED      = delivery failed (bad email, unclaimed, etc.)
+// UNCLAIMED   = recipient has no PayPal account — they get an email to claim it
+// RETURNED    = unclaimed for 30 days, money returned to you
+// BLOCKED     = PayPal blocked it (compliance etc.)</pre>
+
+  <h2>The complete routing logic — SA vs international</h2>
+  <pre>// This is the single function you call for ALL affiliate payouts.
+// It automatically routes to the right provider.
+
+const { sendPayPalPayout }  = require("./utils/paypalPayout");
+const { ozowPayout }        = require("./utils/ozow");
+
+async function payAffiliate(affiliate, commission) {
+  const isSouthAfrican = affiliate.country === "ZA";
+
+  if (isSouthAfrican && affiliate.bankAccount) {
+    // SA affiliate with bank account → Ozow direct bank transfer
+    await ozowPayout({
+      bankAccount: affiliate.bankAccount,
+      branchCode:  affiliate.branchCode,
+      amount:      commission.amount,
+      reference:   "comm_" + commission.id,
+      name:        affiliate.fullName,
+    });
+    await db.commissions.update(commission.id, { status: "paid", method: "ozow" });
+
+  } else if (affiliate.paypalEmail) {
+    // Everyone else (or SA affiliates who prefer PayPal) → PayPal Payouts
+    await sendPayPalPayout({
+      recipientEmail: affiliate.paypalEmail,
+      amount:         commission.amount,
+      currency:       affiliate.currency || "USD",
+      note:           "Commission for order " + commission.orderId,
+      senderItemId:   commission.id,
+    });
+    await db.commissions.update(commission.id, { status: "paid", method: "paypal" });
+
+  } else {
+    // No payout method on file — notify them to add one
+    await emailService.sendAddPayoutMethodEmail(affiliate.email, commission.amount);
+    await db.commissions.update(commission.id, { status: "on_hold", reason: "no_payout_method" });
+  }
+}</pre>
+
+  <h2>What to collect from affiliates when they sign up</h2>
+  <pre>// Affiliate registration form — collect this info:
+const affiliateProfile = {
+  fullName:     "required",
+  email:        "required",
+  country:      "required",            // determines payout route
+  currency:     "USD by default",      // what currency they want to be paid in
+  paypalEmail:  "required for non-SA", // PayPal account email
+  bankAccount:  "SA affiliates only",  // SA bank account number
+  branchCode:   "SA affiliates only",  // 6-digit branch code
+  taxNumber:    "optional",            // for your records
+};</pre>
+
+  <div class="note yellow">
+    <strong>PayPal Payouts fees:</strong> PayPal charges you (the sender) a small fee per payout —
+    currently around 2% capped at $1 USD per transaction for domestic US, and slightly more for
+    international. Check paypal.com/us/webapps/mpp/merchant-fees for current rates.
+    Factor this into your commission calculations.
+  </div>
+
+  <div class="note blue">
+    <strong>Sandbox testing:</strong> Create two sandbox accounts at developer.paypal.com —
+    one Business (your account) and one Personal (the affiliate receiving money).
+    Use the Personal account's sandbox email as the recipient in your test payouts.
+  </div>
+
+</div><!-- end intl panel -->
+
+</div><!-- end .content -->
+
+<script>
+function show(id, btn) {
+  document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  btn.classList.add("active");
+}
+</script>
+</body>
+</html>

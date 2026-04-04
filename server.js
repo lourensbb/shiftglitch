@@ -135,14 +135,19 @@ function getBaseUrl(req) {
   return `https://${host}`;
 }
 
-function payfastSignature(data, passphrase) {
-  const pfOutput = Object.entries(data)
-    .filter(([, v]) => v !== '' && v !== undefined && v !== null)
-    .map(([k, v]) => `${k}=${encodeURIComponent(String(v).trim()).replace(/%20/g, '+')}`)
-    .join('&');
-  const str = passphrase
-    ? `${pfOutput}&passphrase=${encodeURIComponent(passphrase.trim()).replace(/%20/g, '+')}`
-    : pfOutput;
+function pfEncode(val) {
+  return encodeURIComponent(String(val)).replace(/%20/g, '+');
+}
+
+function payfastSignature(data, passphrase = '') {
+  const sortedKeys = Object.keys(data).sort();
+  const parts = sortedKeys
+    .filter(k => data[k] !== '' && data[k] !== undefined && data[k] !== null)
+    .map(k => k + '=' + pfEncode(data[k]));
+  let str = parts.join('&');
+  if (passphrase) {
+    str += '&passphrase=' + pfEncode(passphrase);
+  }
   return crypto.createHash('md5').update(str).digest('hex');
 }
 
@@ -170,12 +175,23 @@ app.get('/api/health', (req, res) => {
 });
 
 app.post('/api/payfast-itn', express.urlencoded({ extended: false }), async (req, res) => {
+  // Guide: send 200 immediately — PayFast will retry if it doesn't get one fast enough
+  res.status(200).end();
+
   try {
     const data = req.body;
     console.log('[payfast-itn] Received:', JSON.stringify(data));
 
-    const pfHost = PAYFAST_HOST;
-    const validationRes = await fetch(`https://${pfHost}/eng/query/validate`, {
+    // Step 1: Verify signature
+    const { signature, ...pfData } = data;
+    const calculated = payfastSignature(pfData, process.env.PAYFAST_PASSPHRASE || '');
+    if (calculated !== signature) {
+      console.warn('[payfast-itn] Signature mismatch — ignoring. Got:', signature, 'Calculated:', calculated);
+      return;
+    }
+
+    // Step 2: Ping PayFast to confirm the payment actually happened
+    const validationRes = await fetch(`https://${PAYFAST_HOST}/eng/query/validate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams(data).toString()
@@ -183,40 +199,41 @@ app.post('/api/payfast-itn', express.urlencoded({ extended: false }), async (req
     const validation = await validationRes.text();
     if (validation !== 'VALID') {
       console.warn('[payfast-itn] PayFast validation returned:', validation);
-      return res.status(400).end();
+      return;
     }
 
     if (data.payment_status !== 'COMPLETE') {
       console.log('[payfast-itn] Non-COMPLETE status, ignoring:', data.payment_status);
-      return res.status(200).end();
+      return;
     }
 
+    // Step 3: Identify the user — custom_str1 is the userId set at checkout
     const userId = (data.custom_str1 || '').trim() || (data.m_payment_id || '').split('_')[0];
     if (!userId) {
       console.warn('[payfast-itn] Could not identify user — no custom_str1 or m_payment_id');
-      return res.status(400).end();
+      return;
     }
 
+    // Step 4: Match the pack by amount
     const grossAmount = parseFloat(data.amount_gross || '0');
     const matchedPack = Object.values(PAYFAST_PACKS).find(p => Math.abs(parseFloat(p.amount) - grossAmount) < 1.0);
     if (!matchedPack) {
       console.warn(`[payfast-itn] Unrecognised amount R${grossAmount} — no matching pack`);
-      return res.status(400).end();
+      return;
     }
 
     const itemName = data.item_name || '';
     if (!itemName.toLowerCase().includes('netrunner pro')) {
       console.warn(`[payfast-itn] Unexpected item_name: "${itemName}" — ignoring`);
-      return res.status(400).end();
+      return;
     }
 
+    // Step 5: Upgrade the user
     const expiresAt = new Date(Date.now() + matchedPack.days * 24 * 60 * 60 * 1000);
     await updateMembershipTier(userId, 'pro', `payfast_${data.pf_payment_id || data.m_payment_id || Date.now()}`, expiresAt);
     console.log(`[payfast-itn] User ${userId} upgraded to pro for ${matchedPack.days} days (R${grossAmount}) — expires ${expiresAt.toISOString().slice(0,10)}`);
-    return res.status(200).end();
   } catch (err) {
     console.error('[payfast-itn] Error:', err.message);
-    return res.status(500).end();
   }
 });
 
@@ -340,7 +357,8 @@ app.post('/api/payfast-checkout', requireAuth, checkoutLimiter, async (req, res)
     notify_url:   `${baseUrl}/api/payfast-itn`,
     m_payment_id: mPaymentId,
     amount:       selected.amount,
-    item_name:    selected.label
+    item_name:    selected.label,
+    custom_str1:  String(userId)
   };
   fields.signature = payfastSignature(fields, passphrase);
   const action = `https://${PAYFAST_HOST}/eng/process`;
