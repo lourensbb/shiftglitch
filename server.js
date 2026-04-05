@@ -4,7 +4,7 @@ const crypto = require('crypto');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
-const { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, getUserGamertag, updateGamertag, updateMembershipTier, checkAndExpireUser, getUserByPaymentRef, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount, getUserBadges, setUserBadges, getEscapeRuns, createEscapeRun, updateEscapeRun, completeEscapeRun, deleteEscapeRun, applyRollbackIfStale, saveFunnelLead, queueFunnelEmails, getDueQueuedEmails, markEmailSent, getAffiliateByCode, recordAffiliateClick, queueAffiliateCommission, promotePayableCommissions } = require('./auth');
+const { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, getUserGamertag, updateGamertag, updateMembershipTier, checkAndExpireUser, getUserByPaymentRef, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount, getUserBadges, setUserBadges, getEscapeRuns, createEscapeRun, updateEscapeRun, completeEscapeRun, deleteEscapeRun, applyRollbackIfStale, saveFunnelLead, queueFunnelEmails, getDueQueuedEmails, markEmailSent, getAffiliateByCode, recordAffiliateClick, queueAffiliateCommission, promotePayableCommissions, getAffiliateByPromoCode } = require('./auth');
 const { generateEbook } = require('./ebook-generator');
 
 async function requirePro(req, res, next) {
@@ -157,9 +157,13 @@ const PAYFAST_SANDBOX = process.env.PAYFAST_SANDBOX === 'true';
 const PAYFAST_HOST = PAYFAST_SANDBOX ? 'sandbox.payfast.co.za' : 'www.payfast.co.za';
 
 const PAYFAST_PACKS = {
-  '1m':  { amount: '99.00',  days: 30,  label: 'Netrunner Pro 1 Month'  },
-  '3m':  { amount: '249.00', days: 90,  label: 'Netrunner Pro 3 Months' },
-  '12m': { amount: '799.00', days: 365, label: 'Netrunner Pro 12 Months' }
+  '1m':      { amount: '99.00',  days: 30,  label: 'Netrunner Pro 1 Month'              },
+  '3m':      { amount: '249.00', days: 90,  label: 'Netrunner Pro 3 Months'             },
+  '12m':     { amount: '799.00', days: 365, label: 'Netrunner Pro 12 Months'            },
+  // Referral-discounted variants (10% off) — used when buyer arrives via affiliate link or promo code
+  '1m-ref':  { amount: '89.10',  days: 30,  label: 'Netrunner Pro 1-Month (Referral)'  },
+  '3m-ref':  { amount: '224.10', days: 90,  label: 'Netrunner Pro 3-Month (Referral)'  },
+  '12m-ref': { amount: '719.10', days: 365, label: 'Netrunner Pro 12-Month (Referral)' }
 };
 
 const app = express();
@@ -418,11 +422,30 @@ app.post('/api/payfast-checkout', requireAuth, checkoutLimiter, async (req, res)
     console.error('[payfast] PAYFAST_PASSPHRASE required in production');
     return res.status(503).json({ error: 'Payment gateway misconfiguration. Contact admin@shiftglitch.com.' });
   }
-  const { pack } = req.body;
-  if (!pack || !PAYFAST_PACKS[pack]) {
+  const { pack: rawPack, promoCode: rawPromoCode } = req.body;
+  const BASE_PACKS = ['1m', '3m', '12m'];
+  if (!rawPack || !BASE_PACKS.includes(rawPack)) {
     return res.status(400).json({ error: 'Pack must be "1m", "3m", or "12m".' });
   }
+
+  // Resolve affiliate tracking code: promo code (manual entry) overrides cookie
+  let affiliateCode = (req.cookies.sg_ref || '').trim();
+  if (rawPromoCode) {
+    try {
+      const promoAffiliate = await getAffiliateByPromoCode(String(rawPromoCode).trim());
+      if (promoAffiliate && promoAffiliate.status === 'active') {
+        affiliateCode = promoAffiliate.code;
+      }
+    } catch (e) {
+      console.warn('[payfast] promo code lookup error:', e.message);
+    }
+  }
+
+  // Use discounted -ref pack variant when buyer has a valid referral
+  const hasReferral = Boolean(affiliateCode);
+  const pack = (hasReferral && PAYFAST_PACKS[rawPack + '-ref']) ? rawPack + '-ref' : rawPack;
   const selected = PAYFAST_PACKS[pack];
+
   const userId = req.session.userId;
   const baseUrl = getBaseUrl(req);
   const passphrase = process.env.PAYFAST_PASSPHRASE || '';
@@ -430,19 +453,19 @@ app.post('/api/payfast-checkout', requireAuth, checkoutLimiter, async (req, res)
   const fields = {
     merchant_id:  merchantId,
     merchant_key: merchantKey,
-    return_url:   `${baseUrl}/pricing?success=1&provider=payfast&pack=${pack}`,
+    return_url:   `${baseUrl}/pricing?success=1&provider=payfast&pack=${rawPack}`,
     cancel_url:   `${baseUrl}/pricing?cancelled=1`,
     notify_url:   `${baseUrl}/api/payfast-itn`,
     m_payment_id: mPaymentId,
     amount:       selected.amount,
     item_name:    selected.label,
     custom_str1:  String(userId),
-    custom_str2:  req.cookies.sg_ref || '',
+    custom_str2:  affiliateCode,
     custom_str3:  ''
   };
   fields.signature = payfastSignature(fields, passphrase);
   const action = `https://${PAYFAST_HOST}/eng/process`;
-  console.log(`[payfast] Checkout for user ${userId}, pack ${pack} (R${selected.amount})`);
+  console.log(`[payfast] Checkout for user ${userId}, pack ${pack} (R${selected.amount})${hasReferral ? ' [referral: ' + affiliateCode + ']' : ''}`);
   res.json({ action, fields });
 });
 

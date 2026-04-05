@@ -201,6 +201,7 @@ async function ensureSchema() {
         created_by TEXT
       );
       ALTER TABLE affiliates ADD COLUMN IF NOT EXISTS recruited_by_id INT REFERENCES affiliates(id) ON DELETE SET NULL;
+      ALTER TABLE affiliates ADD COLUMN IF NOT EXISTS promo_code VARCHAR(12) UNIQUE;
     `);
     console.log('[auth] DB schema ready');
   } catch (err) {
@@ -987,6 +988,8 @@ async function queueAffiliateCommission(affiliateCode, orderId, saleAmount) {
       [affiliate.id, orderId, saleAmount, commission.toFixed(2)]
     );
     await pool.query('UPDATE affiliates SET sales_count = sales_count + 1 WHERE id = $1', [affiliate.id]);
+    // Check and apply tier upgrade after incrementing sales_count
+    await checkAndUpgradeAffiliateTier(affiliate.id);
     return rows[0];
   } catch (err) {
     console.error('[affiliate] queueAffiliateCommission error:', err.message);
@@ -1012,6 +1015,7 @@ async function promotePayableCommissions() {
 
 async function createAffiliate({ userId, displayName, email, payoutMethod, payoutDetails, recruitedById }) {
   const crypto = require('crypto');
+  // Generate unique 8-char tracking code
   let code;
   for (let attempt = 0; attempt < 5; attempt++) {
     const candidate = crypto.randomBytes(4).toString('hex').toUpperCase();
@@ -1019,10 +1023,25 @@ async function createAffiliate({ userId, displayName, email, payoutMethod, payou
     if (!rows.length) { code = candidate; break; }
   }
   if (!code) throw new Error('[affiliate] Could not generate unique affiliate code after 5 attempts');
+
+  // Generate memorable promo code: first 5 alphanumeric chars of displayName (padded) + 2-digit number
+  const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  const stripped = displayName.replace(/[^a-z0-9]/gi, '').toUpperCase();
+  let base = stripped.slice(0, 5);
+  while (base.length < 5) base += CHARS[Math.floor(Math.random() * CHARS.length)];
+  let promoCode;
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const suffix = String(Math.floor(Math.random() * 90) + 10);
+    const candidate = base + suffix;
+    const { rows } = await pool.query('SELECT 1 FROM affiliates WHERE promo_code = $1', [candidate]);
+    if (!rows.length) { promoCode = candidate; break; }
+  }
+  if (!promoCode) promoCode = null; // fallback — insert without promo code rather than fail
+
   const { rows } = await pool.query(
-    `INSERT INTO affiliates (user_id, code, display_name, email, payout_method, payout_details, recruited_by_id)
-     VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-    [userId, code, displayName, email, payoutMethod || 'paypal', JSON.stringify(payoutDetails || {}), recruitedById || null]
+    `INSERT INTO affiliates (user_id, code, promo_code, display_name, email, payout_method, payout_details, recruited_by_id)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
+    [userId, code, promoCode, displayName, email, payoutMethod || 'paypal', JSON.stringify(payoutDetails || {}), recruitedById || null]
   );
   return rows[0];
 }
@@ -1077,8 +1096,8 @@ async function getAllAffiliatesWithStats() {
       GROUP BY affiliate_id
     )
     SELECT
-      a.id, a.display_name AS "displayName", a.email, a.code, a.tier, a.status,
-      a.sales_count AS "salesCount", a.created_at AS "createdAt",
+      a.id, a.display_name AS "displayName", a.email, a.code, a.promo_code AS "promoCode",
+      a.tier, a.status, a.sales_count AS "salesCount", a.created_at AS "createdAt",
       COALESCE(ct.click_count, 0)::int AS "clickCount",
       COALESCE(cm.pending, 0) AS pending_commission,
       COALESCE(cm.payable, 0) AS payable_commission,
@@ -1093,6 +1112,7 @@ async function getAllAffiliatesWithStats() {
     displayName: r.displayName,
     email: r.email,
     code: r.code,
+    promoCode: r.promoCode || null,
     tier: r.tier,
     status: r.status,
     salesCount: r.salesCount,
@@ -1151,6 +1171,49 @@ async function getActiveSurge() {
   return rows[0] || null;
 }
 
+// ─── Affiliate DB helpers (Task 22) ──────────────────────────────────────────
+
+async function getAffiliateByPromoCode(promoCode) {
+  const { rows } = await pool.query(
+    'SELECT * FROM affiliates WHERE promo_code = $1',
+    [String(promoCode).toUpperCase().trim()]
+  );
+  return rows[0] || null;
+}
+
+async function checkAndUpgradeAffiliateTier(affiliateId) {
+  try {
+    const { rows } = await pool.query(
+      'SELECT sales_count, tier FROM affiliates WHERE id = $1',
+      [affiliateId]
+    );
+    if (!rows[0]) return null;
+    const { sales_count, tier } = rows[0];
+
+    let newTier, newRate;
+    if (sales_count >= 10) {
+      newTier = 'ghost'; newRate = 0.25;
+    } else if (sales_count >= 5) {
+      newTier = 'operative'; newRate = 0.20;
+    } else {
+      newTier = 'recruit'; newRate = 0.15;
+    }
+
+    if (newTier !== tier) {
+      await pool.query(
+        'UPDATE affiliates SET tier = $1, commission_rate = $2 WHERE id = $3',
+        [newTier, newRate, affiliateId]
+      );
+      console.log(`[affiliate] ${affiliateId} tier upgraded: ${tier} → ${newTier} (${Math.round(newRate * 100)}%)`);
+      return newTier;
+    }
+    return null;
+  } catch (err) {
+    console.error('[affiliate] checkAndUpgradeAffiliateTier error:', err.message);
+    return null;
+  }
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 
-module.exports = { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, updateGamertag, getUserGamertag, updateMembershipTier, checkAndExpireUser, getUserByPaymentRef, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount, getUserBadges, setUserBadges, getEscapeRuns, createEscapeRun, updateEscapeRun, completeEscapeRun, deleteEscapeRun, applyRollbackIfStale, saveFunnelLead, queueFunnelEmails, getDueQueuedEmails, markEmailSent, getAffiliateByCode, recordAffiliateClick, queueAffiliateCommission, promotePayableCommissions, createAffiliate, getAffiliateByUserId, getAffiliateStats, getAffiliateLeaderboard, getAllAffiliatesWithStats, approveAffiliate, suspendAffiliate, markCommissionsPaid, createSurgeEvent, getActiveSurge };
+module.exports = { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, updateGamertag, getUserGamertag, updateMembershipTier, checkAndExpireUser, getUserByPaymentRef, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount, getUserBadges, setUserBadges, getEscapeRuns, createEscapeRun, updateEscapeRun, completeEscapeRun, deleteEscapeRun, applyRollbackIfStale, saveFunnelLead, queueFunnelEmails, getDueQueuedEmails, markEmailSent, getAffiliateByCode, recordAffiliateClick, queueAffiliateCommission, promotePayableCommissions, createAffiliate, getAffiliateByUserId, getAffiliateStats, getAffiliateLeaderboard, getAllAffiliatesWithStats, approveAffiliate, suspendAffiliate, markCommissionsPaid, createSurgeEvent, getActiveSurge, getAffiliateByPromoCode, checkAndUpgradeAffiliateTier };
