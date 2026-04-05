@@ -76,6 +76,30 @@
         .orb-magenta { width:45vw;height:45vw;background:var(--magenta); bottom:-10vw;right:-10vw; opacity:0.07; }
         .orb-purple  { width:40vw;height:40vw;background:var(--purple);  top:40%;left:60%;        opacity:0.06; }
 
+        /* ── Boot screen ────────────────────────────────────── */
+        #boot-screen {
+            position: fixed; inset: 0; z-index: 100;
+            background: #000;
+            display: flex; flex-direction: column; justify-content: flex-end;
+            padding: 2rem 1.5rem;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: clamp(11px, 2vw, 13px);
+            color: var(--green); overflow: hidden;
+            transition: opacity 0.6s ease;
+        }
+        #boot-screen.fade-out { opacity: 0; pointer-events: none; }
+        #boot-log { display: flex; flex-direction: column; gap: 3px; }
+        .boot-line { opacity: 0; animation: bootFadeIn 0.08s forwards; white-space: pre; }
+        @keyframes bootFadeIn { to { opacity: 1; } }
+        .boot-line.dim  { color: rgba(57,255,20,0.35); }
+        .boot-line.warn { color: #FFD700; }
+        .boot-line.err  { color: var(--magenta); }
+        .boot-line.ok   { color: var(--green); }
+
+        /* ── Page content (fades in after boot) ─────────────── */
+        #page-content { opacity: 0; transition: opacity 0.8s ease; }
+        #page-content.visible { opacity: 1; }
+
         /* ── Nav ────────────────────────────────────────────── */
         .nav {
             position: relative; z-index: 20;
@@ -477,6 +501,13 @@
     <div class="orb orb-green"></div>
     <div class="orb orb-magenta"></div>
     <div class="orb orb-purple"></div>
+
+    <!-- Boot screen -->
+    <div id="boot-screen">
+        <div id="boot-log"></div>
+    </div>
+
+    <div id="page-content">
 
     <!-- Surge event banner — shown via JS if surge is active -->
     <div id="surge-banner" role="alert" aria-live="polite">
@@ -933,7 +964,8 @@
 
                 msg.className = 'form-msg ok';
                 msg.innerHTML = '// APPLICATION RECEIVED — Your tracking code: <strong>' + escHtml(data.code) + '</strong><br>' +
-                    '// Review within 48 hours. Watch for your clearance email.';
+                    '// Review within 48 hours. Watch for your clearance email.<br>' +
+                    '<a href="/affiliate-portal.html" style="color:#39FF14;text-decoration:none;">Open Affiliate Portal &rarr;</a>';
                 document.getElementById('register-form').style.display = 'none';
             } catch (err) {
                 msg.className = 'form-msg err';
@@ -943,10 +975,55 @@
             }
         });
 
-        // ── Boot ─────────────────────────────────────────────
+        // ── Boot sequence ─────────────────────────────────────
+        const BOOT_LINES = [
+            { t: 'dim',  txt: 'BIOS v4.2.1 — ShiftGlitch Systems' },
+            { t: 'dim',  txt: '>>> Initialising affiliate module...' },
+            { t: 'ok',   txt: '[  OK  ] commission_engine.ko loaded' },
+            { t: 'ok',   txt: '[  OK  ] promo_code_gen.ko loaded' },
+            { t: 'dim',  txt: '>>> Scanning operative network...' },
+            { t: 'warn', txt: '[ WARN ] Ghost-tier operatives detected — masked' },
+            { t: 'ok',   txt: '[  OK  ] Leaderboard decrypted' },
+            { t: 'dim',  txt: '>>> Mounting payout relay...' },
+            { t: 'ok',   txt: '[  OK  ] Ozow relay — ONLINE' },
+            { t: 'ok',   txt: '[  OK  ] PayPal bridge — ONLINE' },
+            { t: 'dim',  txt: '>>> Loading recruitment terminal...' },
+            { t: 'ok',   txt: '[  OK  ] All channels nominal. Ready to recruit.' },
+            { t: 'ok',   txt: 'AFFILIATE MODULE BOOT COMPLETE ▋' },
+        ];
+        const INTERVALS = [0, 80, 150, 220, 300, 400, 460, 540, 600, 660, 740, 850, 980];
+
+        const logEl  = document.getElementById('boot-log');
+        const bootEl = document.getElementById('boot-screen');
+        const pageEl = document.getElementById('page-content');
+
+        let maxDelay = 0;
+        BOOT_LINES.forEach(function (line, i) {
+            var delay = INTERVALS[i] !== undefined ? INTERVALS[i] : i * 90;
+            maxDelay = Math.max(maxDelay, delay);
+            setTimeout(function () {
+                var el = document.createElement('div');
+                el.className = 'boot-line ' + line.t;
+                el.textContent = line.txt;
+                el.style.animationDelay = '0ms';
+                logEl.appendChild(el);
+                logEl.scrollTop = logEl.scrollHeight;
+            }, delay);
+        });
+
+        setTimeout(function () {
+            bootEl.classList.add('fade-out');
+            setTimeout(function () {
+                bootEl.style.display = 'none';
+                pageEl.classList.add('visible');
+            }, 620);
+        }, maxDelay + 600);
+
         Promise.all([loadSurge(), loadLeaderboard(), initAuthState()]);
         initRecruiterField();
     })();
     </script>
+
+    </div><!-- /#page-content -->
 </body>
 </html>
