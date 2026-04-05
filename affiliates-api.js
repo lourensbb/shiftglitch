@@ -37,6 +37,8 @@ const EFFECTIVE_ADMIN_ID = process.env.ADMIN_USER_ID || HARDCODED_OWNER_ID || nu
 
 if (!EFFECTIVE_ADMIN_ID) {
   console.warn('[affiliate-api] WARNING: ADMIN_USER_ID env var not set and no hardcoded owner ID — admin routes are disabled');
+} else if (!process.env.ADMIN_USER_ID) {
+  console.warn('[affiliate-api] WARNING: ADMIN_USER_ID env var not set — using hardcoded owner ID fallback (' + HARDCODED_OWNER_ID + '). Set ADMIN_USER_ID in production.');
 }
 
 function requireAdmin(req, res, next) {

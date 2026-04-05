@@ -373,7 +373,9 @@ app.get('/affiliate-portal', (req, res) => {
 const _HARDCODED_OWNER_ID_PAGE = '54503873';  // lourensbb Replit user ID (mirrors affiliates-api.js)
 const ADMIN_PAGE_ID = process.env.ADMIN_USER_ID || _HARDCODED_OWNER_ID_PAGE || '';
 if (!ADMIN_PAGE_ID) {
-  console.warn('[server] WARNING: ADMIN_USER_ID env var not set — admin panel at /admin-panel/affiliates will deny all access');
+  console.warn('[server] WARNING: ADMIN_USER_ID env var not set and no hardcoded owner ID — admin panel will deny all access');
+} else if (!process.env.ADMIN_USER_ID) {
+  console.warn('[server] WARNING: ADMIN_USER_ID env var not set — using hardcoded owner ID fallback. Set ADMIN_USER_ID in production.');
 }
 app.get('/admin-panel/affiliates', (req, res) => {
   if (!req.session || !req.session.userId) {
