@@ -843,6 +843,11 @@ app.delete('/api/escape-runs/:id', requireAuth, async (req, res) => {
 
 app.use('/', require('./affiliates-api'));
 
+// Block direct static file access to admin-only HTML files.
+// These pages are served only via their authenticated route (/admin-panel/affiliates).
+// Without this guard, express.static below would serve them to anyone.
+app.get('/admin-affiliates.html', (req, res) => res.redirect(302, '/app'));
+
 app.use(express.static(path.join(__dirname)));
 
 app.use((req, res) => {
