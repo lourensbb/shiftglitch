@@ -355,6 +355,11 @@ app.get('/more-info', (req, res) => {
   res.sendFile(path.join(__dirname, 'more-info.html'));
 });
 
+app.get('/affiliates', (req, res) => {
+  trackPageView('affiliates').catch(() => {});
+  res.sendFile(path.join(__dirname, 'affiliates.html'));
+});
+
 app.get('/download-ebook', (req, res) => {
   try {
     generateEbook(res);

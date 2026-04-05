@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('consent', 'default', {
+        analytics_storage: 'denied',
+        ad_storage: 'denied',
+        ad_user_data: 'denied',
+        ad_personalization: 'denied',
+        wait_for_update: 500
+      });
+    </script>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-P6VQGP7B1D"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-P6VQGP7B1D');
+    </script>
+    <script src="/consent.js" defer></script>
+    <script>
+      (function captureUTMs() {
+        const p = new URLSearchParams(window.location.search);
+        const keys = ['utm_source','utm_medium','utm_campaign','utm_term','utm_content'];
+        const vals = {};
+        keys.forEach(k => { const v = p.get(k); if (v) vals[k] = v; });
+        if (Object.keys(vals).length) sessionStorage.setItem('sg_utms', JSON.stringify(vals));
+      })();
+    </script>
+    <title>Become an Operative — ShiftGlitch Affiliate Programme</title>
+    <meta name="description" content="Earn 15–25% commission recommending ShiftGlitch. Free to join. No approval fees. ZAR payouts for SA affiliates.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://shiftglitch.replit.app/affiliates">
+    <link rel="icon" href="/assets/shiftglitch-logo-only.png" type="image/png">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://shiftglitch.replit.app/affiliates">
+    <meta property="og:title" content="Become a ShiftGlitch Operative — Earn 15–25% Commission">
+    <meta property="og:description" content="Earn up to 25% commission on every sale. Your buyers get 10% off. ZAR payouts. Free to join.">
+    <meta property="og:image" content="https://shiftglitch.replit.app/og-image.png">
+    <meta property="og:site_name" content="ShiftGlitch">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="https://shiftglitch.replit.app/og-image.png">
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --green: #39FF14;
+            --magenta: #FF00FF;
+            --purple: #8A2BE2;
+            --bg: #050505;
+        }
+        html { scroll-behavior: smooth; }
+        html, body {
+            width: 100%; min-height: 100%;
+            background: var(--bg); color: #fff;
+            overflow-x: hidden;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        body::after {
+            content: '';
+            position: fixed; inset: 0;
+            pointer-events: none; z-index: 1;
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px);
+        }
+        .orb {
+            position: fixed; border-radius: 50%;
+            filter: blur(130px); pointer-events: none; z-index: 0;
+        }
+        .orb-green   { width:55vw;height:55vw;background:var(--green);   top:-15vw;left:-12vw;   opacity:0.1; }
+        .orb-magenta { width:45vw;height:45vw;background:var(--magenta); bottom:-10vw;right:-10vw; opacity:0.07; }
+        .orb-purple  { width:40vw;height:40vw;background:var(--purple);  top:40%;left:60%;        opacity:0.06; }
+
+        /* ── Nav ────────────────────────────────────────────── */
+        .nav {
+            position: relative; z-index: 20;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .nav-logo { font-family:'VT323',monospace; font-size:1.8rem; color:#fff; text-decoration:none; letter-spacing:0.08em; }
+        .nav-logo span { color:var(--green); }
+        .nav-links { display:flex; gap:2rem; }
+        .nav-link {
+            font-family:'Share Tech Mono',monospace; font-size:0.8rem; letter-spacing:0.1em;
+            text-transform:uppercase; text-decoration:none; color:rgba(255,255,255,0.45);
+            transition:color 0.2s ease;
+        }
+        .nav-link:hover { color:rgba(255,255,255,0.8); }
+        .nav-link.active { color:var(--green); }
+
+        /* ── Surge banner ───────────────────────────────────── */
+        #surge-banner {
+            display: none;
+            position: relative; z-index: 15;
+            background: rgba(255,0,255,0.08);
+            border-bottom: 2px solid rgba(255,0,255,0.4);
+            padding: 0.75rem 1.5rem;
+            text-align: center;
+        }
+        #surge-banner.active { display: block; }
+        .surge-inner {
+            display: flex; align-items: center; justify-content: center;
+            flex-wrap: wrap; gap: 0.75rem;
+        }
+        .surge-pulse {
+            display: inline-block;
+            width: 10px; height: 10px; background: var(--magenta);
+            border-radius: 50%; margin-right: 4px;
+            animation: pulseDot 1.2s ease-in-out infinite;
+        }
+        @keyframes pulseDot {
+            0%,100% { opacity:1; transform:scale(1); }
+            50%      { opacity:0.4; transform:scale(0.7); }
+        }
+        .surge-label {
+            font-family:'Share Tech Mono',monospace; font-size:0.82rem;
+            color:var(--magenta); letter-spacing:0.1em; text-transform:uppercase;
+        }
+        .surge-countdown {
+            font-family:'VT323',monospace; font-size:1.4rem; color:#fff;
+        }
+
+        /* ── Hero ───────────────────────────────────────────── */
+        .hero {
+            position: relative; z-index: 10;
+            padding: 5rem 1.5rem 4rem;
+            max-width: 900px; margin: 0 auto;
+            text-align: center;
+        }
+        .hero-label {
+            font-family:'Share Tech Mono',monospace; font-size:0.8rem;
+            color:var(--green); letter-spacing:0.2em; text-transform:uppercase;
+            margin-bottom: 1.25rem; opacity:0.8;
+        }
+        .hero-title {
+            font-family:'VT323',monospace;
+            font-size: clamp(2.8rem,9vw,5.5rem);
+            color:#fff; text-transform:uppercase;
+            letter-spacing:0.04em; line-height:1.05;
+            margin-bottom: 1.5rem;
+        }
+        .hero-title span { color: var(--green); }
+        .hero-sub {
+            font-size: clamp(1rem,2.5vw,1.15rem); color:#bbb; line-height:1.85;
+            max-width:680px; margin: 0 auto 2rem;
+        }
+        .hero-sub strong { color:#fff; }
+        .hero-stats {
+            display: flex; justify-content: center; flex-wrap: wrap; gap: 1rem;
+            margin-bottom: 2.5rem;
+        }
+        .hero-stat {
+            border: 1px solid rgba(57,255,20,0.25);
+            background: rgba(57,255,20,0.04);
+            padding: 1rem 1.5rem;
+            text-align: center;
+        }
+        .hero-stat-num {
+            font-family:'VT323',monospace; font-size:2.5rem; color:var(--green); line-height:1;
+        }
+        .hero-stat-label {
+            font-family:'Share Tech Mono',monospace; font-size:0.75rem;
+            color:#666; letter-spacing:0.08em; text-transform:uppercase;
+            margin-top: 0.25rem;
+        }
+        .hero-cta {
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            font-family:'Share Tech Mono',monospace; font-size:0.9rem;
+            font-weight:bold; letter-spacing:0.15em; text-transform:uppercase;
+            background:var(--green); color:#000;
+            text-decoration:none; cursor:pointer;
+            border:2px solid var(--green);
+            transition: box-shadow 0.2s ease;
+            box-shadow: 0 0 24px rgba(57,255,20,0.25);
+        }
+        .hero-cta:hover { box-shadow: 0 0 50px rgba(57,255,20,0.5); }
+
+        /* ── Section layout ─────────────────────────────────── */
+        .section {
+            position: relative; z-index: 10;
+            max-width: 1100px; margin: 0 auto;
+            padding: 4rem 1.5rem;
+        }
+        .section + .section { padding-top: 0; }
+        .divider {
+            width: 100%; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(57,255,20,0.12), transparent);
+            margin: 0;
+        }
+        .section-label {
+            font-family:'Share Tech Mono',monospace; font-size:0.8rem;
+            color:var(--green); letter-spacing:0.2em; text-transform:uppercase;
+            margin-bottom:0.75rem; opacity:0.75;
+        }
+        .section-title {
+            font-family:'VT323',monospace;
+            font-size:clamp(2rem,6vw,3.2rem); color:#fff;
+            text-transform:uppercase; letter-spacing:0.04em; line-height:1.05;
+            margin-bottom:0.75rem;
+        }
+        .section-body {
+            font-size:0.95rem; color:#888; line-height:1.85;
+            max-width:680px; margin-bottom:2rem;
+        }
+
+        /* ── Commission table ───────────────────────────────── */
+        .commission-table-wrap { overflow-x: auto; }
+        .commission-table {
+            width:100%; border-collapse:collapse;
+            font-family:'Share Tech Mono',monospace;
+            min-width: 600px;
+        }
+        .commission-table thead tr {
+            background: rgba(57,255,20,0.08);
+            border-bottom: 2px solid rgba(57,255,20,0.3);
+        }
+        .commission-table th {
+            padding:0.9rem 1rem; text-align:left;
+            font-size:0.78rem; letter-spacing:0.1em; text-transform:uppercase;
+            color:var(--green);
+        }
+        .commission-table th.center { text-align:center; }
+        .commission-table td {
+            padding:0.9rem 1rem;
+            font-size:0.88rem; color:#aaa;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .commission-table td.center { text-align:center; }
+        .commission-table tbody tr:hover { background:rgba(255,255,255,0.02); }
+        .tier-badge {
+            display:inline-block;
+            font-family:'Share Tech Mono',monospace; font-size:0.72rem;
+            letter-spacing:0.08em; text-transform:uppercase;
+            padding:0.2rem 0.5rem; border:1px solid;
+        }
+        .tier-badge.recruit  { color:#888; border-color:#444; }
+        .tier-badge.operative { color:var(--green); border-color:rgba(57,255,20,0.4); }
+        .tier-badge.ghost    { color:var(--magenta); border-color:rgba(255,0,255,0.4); }
+        .tier-rate { font-family:'VT323',monospace; font-size:1.5rem; }
+        .tier-rate.recruit  { color:#888; }
+        .tier-rate.operative { color:var(--green); }
+        .tier-rate.ghost    { color:var(--magenta); }
+        .earn { color:#fff; font-weight:600; }
+
+        /* ── Two-sided discount callout ──────────────────────── */
+        .discount-callout {
+            border: 1px solid rgba(57,255,20,0.3);
+            background: rgba(57,255,20,0.04);
+            padding: 2rem 2.5rem;
+            display: flex; align-items: flex-start; gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        .discount-icon {
+            font-family:'VT323',monospace; font-size:3rem; color:var(--green);
+            flex-shrink:0; line-height:1;
+        }
+        .discount-text h3 {
+            font-family:'Share Tech Mono',monospace; font-size:0.85rem;
+            letter-spacing:0.12em; text-transform:uppercase; color:var(--green);
+            margin-bottom:0.5rem;
+        }
+        .discount-text p { font-size:0.92rem; color:#aaa; line-height:1.7; }
+        .discount-text strong { color:#fff; }
+
+        /* ── Leaderboard ────────────────────────────────────── */
+        .leaderboard-list { list-style:none; }
+        .lb-row {
+            display:flex; align-items:center; gap:1rem;
+            padding:0.85rem 1rem;
+            border-bottom:1px solid rgba(255,255,255,0.04);
+            transition:background 0.15s ease;
+        }
+        .lb-row:hover { background:rgba(255,255,255,0.02); }
+        .lb-rank {
+            font-family:'VT323',monospace; font-size:1.4rem; color:#444;
+            width:2rem; text-align:center; flex-shrink:0;
+        }
+        .lb-rank.top1 { color:var(--green); }
+        .lb-rank.top3 { color:var(--magenta); }
+        .lb-alias { flex:1; font-size:0.9rem; color:#ccc; }
+        .lb-sales { font-family:'Share Tech Mono',monospace; font-size:0.78rem; color:#666; letter-spacing:0.06em; }
+        .lb-empty {
+            padding:2rem; text-align:center;
+            font-family:'Share Tech Mono',monospace; font-size:0.82rem;
+            color:#444; letter-spacing:0.08em;
+        }
+
+        /* ── Payout cards ───────────────────────────────────── */
+        .payout-grid {
+            display:grid; grid-template-columns:repeat(3,1fr); gap:1.25rem;
+        }
+        @media (max-width:700px) { .payout-grid { grid-template-columns:1fr; } }
+        .payout-card {
+            border:1px solid rgba(255,255,255,0.07);
+            background:rgba(255,255,255,0.015);
+            padding:1.75rem 1.5rem;
+        }
+        .payout-card-icon {
+            font-family:'VT323',monospace; font-size:2.2rem; margin-bottom:0.75rem;
+        }
+        .payout-card-icon.green { color:var(--green); }
+        .payout-card-icon.purple { color:var(--purple); }
+        .payout-card-icon.magenta { color:var(--magenta); }
+        .payout-card h3 {
+            font-family:'Share Tech Mono',monospace; font-size:0.82rem;
+            letter-spacing:0.1em; text-transform:uppercase; color:#ccc;
+            margin-bottom:0.5rem;
+        }
+        .payout-card p { font-size:0.85rem; color:#666; line-height:1.7; }
+
+        /* ── Recruit section ────────────────────────────────── */
+        .recruit-box {
+            border:1px solid rgba(138,43,226,0.3);
+            background:rgba(138,43,226,0.04);
+            padding:2rem 2.5rem;
+        }
+        .recruit-box h3 {
+            font-family:'VT323',monospace; font-size:2rem; color:var(--purple);
+            text-transform:uppercase; letter-spacing:0.04em; margin-bottom:0.75rem;
+        }
+        .recruit-box p { font-size:0.92rem; color:#888; line-height:1.8; margin-bottom:0.75rem; }
+        .recruit-box p:last-child { margin-bottom:0; }
+        .recruit-box strong { color:#ccc; }
+
+        /* ── FAQ accordion ──────────────────────────────────── */
+        .faq-list { list-style:none; }
+        details.faq-item {
+            border-bottom:1px solid rgba(255,255,255,0.05);
+        }
+        summary.faq-q {
+            list-style:none; cursor:pointer;
+            display:flex; align-items:center; justify-content:space-between;
+            padding:1.25rem 0;
+            font-family:'Share Tech Mono',monospace; font-size:0.85rem;
+            letter-spacing:0.04em; color:rgba(255,255,255,0.7);
+            transition:color 0.15s ease;
+            user-select:none;
+        }
+        summary.faq-q::-webkit-details-marker { display:none; }
+        summary.faq-q::after {
+            content:'[+]'; font-family:'Share Tech Mono',monospace;
+            font-size:0.82rem; color:var(--green); flex-shrink:0; margin-left:1rem;
+            transition:transform 0.15s ease;
+        }
+        details[open] summary.faq-q { color:#fff; }
+        details[open] summary.faq-q::after { content:'[–]'; }
+        summary.faq-q:hover { color:#fff; }
+        .faq-a {
+            padding:0 0 1.25rem;
+            font-size:0.88rem; color:#666; line-height:1.8;
+        }
+        .faq-a a { color:var(--green); text-decoration:none; }
+        .faq-a a:hover { text-decoration:underline; }
+
+        /* ── Sign-up form ───────────────────────────────────── */
+        #apply-section { scroll-margin-top: 5rem; }
+        .form-card {
+            border:1px solid rgba(57,255,20,0.25);
+            background:rgba(57,255,20,0.03);
+            padding:2.5rem;
+            max-width:560px;
+        }
+        .form-title {
+            font-family:'VT323',monospace; font-size:1.8rem;
+            color:var(--green); text-transform:uppercase; letter-spacing:0.04em;
+            margin-bottom:0.5rem;
+        }
+        .form-sub { font-size:0.85rem; color:#666; margin-bottom:1.75rem; }
+        .form-group { margin-bottom:1.25rem; }
+        .form-label {
+            display:block;
+            font-family:'Share Tech Mono',monospace; font-size:0.78rem;
+            letter-spacing:0.1em; text-transform:uppercase; color:#888;
+            margin-bottom:0.4rem;
+        }
+        .form-input {
+            width:100%; background:rgba(255,255,255,0.05);
+            border:1px solid rgba(57,255,20,0.2); color:#e0e0e0;
+            font-family:'Share Tech Mono',monospace; font-size:0.88rem;
+            padding:0.75rem 0.9rem; outline:none;
+            transition:border-color 0.2s;
+        }
+        .form-input::placeholder { color:#444; }
+        .form-input:focus { border-color:rgba(57,255,20,0.5); }
+        .radio-group { display:flex; gap:1rem; flex-wrap:wrap; }
+        .radio-label {
+            display:flex; align-items:center; gap:0.5rem; cursor:pointer;
+            font-family:'Share Tech Mono',monospace; font-size:0.82rem;
+            letter-spacing:0.06em; text-transform:uppercase; color:#888;
+            transition:color 0.15s;
+        }
+        .radio-label input[type=radio] { accent-color:var(--green); }
+        .radio-label:hover { color:#ccc; }
+        .recruiter-field { display:none; }
+        .recruiter-field.visible { display:block; }
+        .form-submit {
+            display:block; width:100%;
+            padding:0.9rem 1.5rem;
+            font-family:'Share Tech Mono',monospace; font-size:0.85rem;
+            font-weight:bold; letter-spacing:0.15em; text-transform:uppercase;
+            background:var(--green); color:#000;
+            border:2px solid var(--green); cursor:pointer;
+            transition:box-shadow 0.2s ease;
+            box-shadow:0 0 18px rgba(57,255,20,0.2);
+        }
+        .form-submit:hover { box-shadow:0 0 40px rgba(57,255,20,0.45); }
+        .form-submit:disabled { opacity:0.4; cursor:not-allowed; }
+        .form-msg {
+            margin-top:1rem;
+            font-family:'Share Tech Mono',monospace; font-size:0.82rem;
+            letter-spacing:0.04em; line-height:1.6;
+        }
+        .form-msg.ok  { color:var(--green); }
+        .form-msg.err { color:#ff8080; }
+        .login-cta-wrap { text-align:center; padding:2.5rem 1.5rem; }
+        .login-cta {
+            display:inline-block;
+            padding:1rem 2.5rem;
+            font-family:'Share Tech Mono',monospace; font-size:0.9rem;
+            font-weight:bold; letter-spacing:0.15em; text-transform:uppercase;
+            color:var(--magenta); text-decoration:none;
+            border:2px solid var(--magenta);
+            transition: all 0.2s ease;
+            box-shadow:0 0 18px rgba(255,0,255,0.15);
+        }
+        .login-cta:hover {
+            background:rgba(255,0,255,0.1);
+            box-shadow:0 0 40px rgba(255,0,255,0.35);
+        }
+        .login-cta-sub {
+            margin-top:0.75rem;
+            font-family:'Share Tech Mono',monospace; font-size:0.78rem;
+            color:#555; letter-spacing:0.06em; text-transform:uppercase;
+        }
+
+        /* ── Footer ─────────────────────────────────────────── */
+        .page-footer {
+            position:relative; z-index:10;
+            text-align:center; padding:2rem 1.5rem;
+            border-top:1px solid rgba(255,255,255,0.04);
+        }
+        .page-footer p {
+            font-family:'Share Tech Mono',monospace; font-size:0.78rem;
+            color:#333; letter-spacing:0.06em;
+        }
+        .page-footer a { color:#555; text-decoration:none; }
+        .page-footer a:hover { color:#888; }
+
+        /* ── Responsive ─────────────────────────────────────── */
+        @media (max-width:600px) {
+            .nav-links { gap:1.25rem; }
+            .nav-link { font-size:0.72rem; }
+            .hero { padding:4rem 1rem 3rem; }
+            .section { padding:3rem 1rem; }
+            .discount-callout { flex-direction:column; gap:1rem; padding:1.5rem; }
+            .form-card { padding:1.75rem 1.25rem; }
+            .recruit-box { padding:1.5rem 1.25rem; }
+            .hero-stats { gap:0.75rem; }
+            .hero-stat { padding:0.75rem 1rem; }
+        }
+        @media (max-width:400px) {
+            .hero-title { font-size:2.5rem; }
+            .commission-table th, .commission-table td { padding:0.65rem 0.5rem; font-size:0.78rem; }
+            .faq-q { font-size:0.78rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="orb orb-green"></div>
+    <div class="orb orb-magenta"></div>
+    <div class="orb orb-purple"></div>
+
+    <!-- Surge event banner — shown via JS if surge is active -->
+    <div id="surge-banner" role="alert" aria-live="polite">
+        <div class="surge-inner">
+            <span class="surge-pulse"></span>
+            <span class="surge-label">SURGE EVENT LIVE — DOUBLE PAYOUT ACTIVE — ends in </span>
+            <span class="surge-countdown" id="surge-countdown">--h --m</span>
+        </div>
+    </div>
+
+    <nav class="nav" aria-label="Site navigation">
+        <a href="/" class="nav-logo">SHIFT<span>GLITCH</span></a>
+        <div class="nav-links">
+            <a href="/" class="nav-link">Home</a>
+            <a href="/pricing" class="nav-link">Pricing</a>
+            <a href="/affiliates" class="nav-link active">Operatives</a>
+            <a href="/login" class="nav-link">Jack In</a>
+        </div>
+    </nav>
+
+    <!-- ── Hero ────────────────────────────────────────────── -->
+    <section class="hero" aria-labelledby="hero-headline">
+        <p class="hero-label">// affiliate.programme.active</p>
+        <h1 class="hero-title" id="hero-headline">BECOME A SHIFTGLITCH<br><span>OPERATIVE</span></h1>
+        <p class="hero-sub">
+            Earn <strong>15–25% commission</strong> on every sale you drive.<br>
+            Your buyers get <strong>10% off</strong> their first Pro pack.<br>
+            No monthly fees. No minimum sales. Just results.
+        </p>
+        <div class="hero-stats" aria-label="Programme highlights">
+            <div class="hero-stat">
+                <div class="hero-stat-num">15–25%</div>
+                <div class="hero-stat-label">Commission</div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-num">10%</div>
+                <div class="hero-stat-label">Buyer Discount</div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-num">30</div>
+                <div class="hero-stat-label">Day Payout Hold</div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-num">ZAR</div>
+                <div class="hero-stat-label">SA Payouts</div>
+            </div>
+        </div>
+        <a href="#apply-section" class="hero-cta">APPLY NOW &rarr;</a>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ── Commission structure ─────────────────────────────── -->
+    <section class="section" aria-labelledby="commission-heading">
+        <p class="section-label">// commission.matrix</p>
+        <h2 class="section-title" id="commission-heading">What You Earn</h2>
+        <p class="section-body">Commission scales automatically as your sales grow. There are no applications for tier upgrades — the system promotes you the moment you hit the threshold.</p>
+
+        <div class="commission-table-wrap">
+            <table class="commission-table" role="table" aria-label="Commission rates by tier and pack">
+                <thead>
+                    <tr>
+                        <th>Tier</th>
+                        <th>Threshold</th>
+                        <th class="center">Rate</th>
+                        <th class="center">R99 Pack</th>
+                        <th class="center">R249 Pack</th>
+                        <th class="center">R799 Pack</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="tier-badge recruit">Recruit</span></td>
+                        <td>0 sales</td>
+                        <td class="center"><span class="tier-rate recruit">15%</span></td>
+                        <td class="center"><span class="earn">R14.85</span></td>
+                        <td class="center"><span class="earn">R37.35</span></td>
+                        <td class="center"><span class="earn">R119.85</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="tier-badge operative">Operative</span></td>
+                        <td>5 sales</td>
+                        <td class="center"><span class="tier-rate operative">20%</span></td>
+                        <td class="center"><span class="earn">R19.80</span></td>
+                        <td class="center"><span class="earn">R49.80</span></td>
+                        <td class="center"><span class="earn">R159.80</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="tier-badge ghost">Ghost</span></td>
+                        <td>10 sales</td>
+                        <td class="center"><span class="tier-rate ghost">25%</span></td>
+                        <td class="center"><span class="earn">R24.75</span></td>
+                        <td class="center"><span class="earn">R62.25</span></td>
+                        <td class="center"><span class="earn">R199.75</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Two-sided discount callout -->
+        <div class="discount-callout" role="note" aria-label="Two-sided discount">
+            <div class="discount-icon" aria-hidden="true">⇄</div>
+            <div class="discount-text">
+                <h3>// Two-sided referral discount</h3>
+                <p>
+                    Anyone you refer gets <strong>10% off</strong> their first Pro pack — automatically applied when they arrive through your link or enter your promo code at checkout.<br>
+                    You still earn your full commission on the discounted price. Everyone wins.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ── Leaderboard ───────────────────────────────────────── -->
+    <section class="section" aria-labelledby="leaderboard-heading">
+        <p class="section-label">// top.operatives</p>
+        <h2 class="section-title" id="leaderboard-heading">Ranked Operatives</h2>
+        <p class="section-body">Top 10 active affiliates ranked by confirmed sales. Updated in real time.</p>
+
+        <ul class="leaderboard-list" id="leaderboard" aria-label="Affiliate leaderboard" role="list">
+            <li class="lb-empty">// Loading intel feed...</li>
+        </ul>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ── Payout methods ─────────────────────────────────────── -->
+    <section class="section" aria-labelledby="payout-heading">
+        <p class="section-label">// payout.protocols</p>
+        <h2 class="section-title" id="payout-heading">How You Get Paid</h2>
+        <p class="section-body">Commission becomes payable 30 days after the sale (standard refund window). Payouts processed on request once your balance is payable.</p>
+
+        <div class="payout-grid">
+            <div class="payout-card">
+                <div class="payout-card-icon green">🏦</div>
+                <h3>SA Bank — Ozow</h3>
+                <p>South African affiliates receive instant EFT via Ozow. ZAR payouts direct to your account. Minimum payout R50.</p>
+            </div>
+            <div class="payout-card">
+                <div class="payout-card-icon purple">🌐</div>
+                <h3>PayPal — International</h3>
+                <p>International operatives are paid via PayPal within 5 business days of payout request. No minimum for international.</p>
+            </div>
+            <div class="payout-card">
+                <div class="payout-card-icon magenta">⚡</div>
+                <h3>PayFast Split — On Request</h3>
+                <p>Affiliates with their own PayFast merchant account can request direct commission splits. Contact admin to configure.</p>
+            </div>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ── Recruit other affiliates ──────────────────────────── -->
+    <section class="section">
+        <p class="section-label">// squad.protocol</p>
+        <div class="recruit-box">
+            <h3>Recruit Other Operatives</h3>
+            <p>Active affiliates can recruit other affiliates into the programme using a special recruitment link. When the affiliates you recruit make sales, <strong>you earn a bonus commission</strong> on top of your own sales performance.</p>
+            <p>This is network-level income. One well-placed recruit can multiply your earnings without any extra content from you. Once you're approved, your recruitment link is in the Affiliate Portal.</p>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ── FAQ ───────────────────────────────────────────────── -->
+    <section class="section" aria-labelledby="faq-heading">
+        <p class="section-label">// intel.briefing</p>
+        <h2 class="section-title" id="faq-heading">FAQ</h2>
+
+        <ul class="faq-list" role="list">
+            <li>
+                <details class="faq-item">
+                    <summary class="faq-q">When do I get paid?</summary>
+                    <p class="faq-a">Commissions enter a 30-day hold after the sale — this covers the refund window. After 30 days your commissions become payable. Request a payout from the Affiliate Portal and we process within 5 business days. SA affiliates are paid via Ozow, international via PayPal.</p>
+                </details>
+            </li>
+            <li>
+                <details class="faq-item">
+                    <summary class="faq-q">How do I track my clicks and sales?</summary>
+                    <p class="faq-a">Every click on your referral link is recorded and visible in the <a href="/affiliate-portal.html">Affiliate Portal</a>. You can see total clicks, conversion rate, pending commissions, and payable balance. Sale notification emails are also sent the instant a commission is queued.</p>
+                </details>
+            </li>
+            <li>
+                <details class="faq-item">
+                    <summary class="faq-q">What commission rate do I start at?</summary>
+                    <p class="faq-a">You start at <strong>15% (Recruit tier)</strong>. Hit 5 confirmed sales and you automatically upgrade to <strong>Operative — 20%</strong>. Hit 10 sales and you unlock <strong>Ghost — 25%</strong>. No application required — the system upgrades you instantly when you cross the threshold. The new rate applies to all future sales.</p>
+                </details>
+            </li>
+            <li>
+                <details class="faq-item">
+                    <summary class="faq-q">Can I refer other affiliates?</summary>
+                    <p class="faq-a">Yes. Once your account is approved and active, you get a recruitment link. Operatives you recruit into the programme earn you a bonus on their sales. Your recruitment link is separate from your product referral link — you'll find both in the Affiliate Portal.</p>
+                </details>
+            </li>
+            <li>
+                <details class="faq-item">
+                    <summary class="faq-q">What payout methods are available?</summary>
+                    <p class="faq-a">South African operatives receive ZAR direct via <strong>Ozow bank transfer</strong> (minimum R50). International operatives are paid via <strong>PayPal</strong> within 5 business days of payout request. Affiliates with a PayFast merchant account can request a direct PayFast split — contact <a href="mailto:admin@shiftglitch.com">admin@shiftglitch.com</a> to set this up.</p>
+                </details>
+            </li>
+            <li>
+                <details class="faq-item">
+                    <summary class="faq-q">Is there a minimum payout threshold?</summary>
+                    <p class="faq-a">SA bank payouts (Ozow) have a minimum of <strong>R50</strong>. PayPal payouts have no minimum. There's no limit on how much you can accumulate before requesting a payout — your balance is safe and visible in the portal at all times.</p>
+                </details>
+            </li>
+            <li>
+                <details class="faq-item">
+                    <summary class="faq-q">Does my referral link give buyers a discount?</summary>
+                    <p class="faq-a">Yes. When a buyer arrives via your referral link or enters your promo code at checkout, they automatically get <strong>10% off their first Pro pack</strong>. You earn commission on the discounted price — it's a genuine two-sided deal. Your promo code is shown in the Affiliate Portal once approved.</p>
+                </details>
+            </li>
+            <li>
+                <details class="faq-item">
+                    <summary class="faq-q">How long does approval take?</summary>
+                    <p class="faq-a">Applications are reviewed manually. We aim to approve or decline within <strong>48 hours</strong>. Once approved you'll receive a clearance email with your unique referral link, promo code, and portal access instructions.</p>
+                </details>
+            </li>
+        </ul>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ── Sign-up section ────────────────────────────────────── -->
+    <section class="section" id="apply-section" aria-labelledby="apply-heading">
+        <p class="section-label">// apply.now</p>
+        <h2 class="section-title" id="apply-heading">Join the Programme</h2>
+
+        <!-- Shown when checking session -->
+        <div id="auth-loading" style="font-family:'Share Tech Mono',monospace;font-size:0.82rem;color:#444;letter-spacing:0.08em;">
+            // Loading access terminal...
+        </div>
+
+        <!-- Shown when NOT logged in -->
+        <div id="not-logged-in" style="display:none;">
+            <div class="login-cta-wrap">
+                <a href="/login?next=/affiliates%23apply-section" class="login-cta">JACK IN TO APPLY &rarr;</a>
+                <p class="login-cta-sub">// free account required — takes 30 seconds</p>
+            </div>
+        </div>
+
+        <!-- Shown when logged in -->
+        <div id="logged-in" style="display:none;">
+            <div id="already-registered" style="display:none;">
+                <div class="form-card">
+                    <p class="form-title">ALREADY REGISTERED</p>
+                    <p class="form-sub">Your affiliate application is in the system. Check your portal for status and stats.</p>
+                    <a href="/affiliate-portal.html" class="form-submit" style="text-decoration:none;display:block;text-align:center;">OPEN AFFILIATE PORTAL &rarr;</a>
+                </div>
+            </div>
+
+            <div id="register-form-wrap" style="display:none;">
+                <div class="form-card">
+                    <p class="form-title">OPERATIVE APPLICATION</p>
+                    <p class="form-sub">// Fill in your details below. We review applications within 48 hours.</p>
+                    <form id="register-form" novalidate>
+                        <div class="form-group">
+                            <label for="displayName" class="form-label">Display Name / Alias</label>
+                            <input type="text" id="displayName" name="displayName" class="form-input" placeholder="Your public affiliate alias" maxlength="50" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Payout Method</label>
+                            <div class="radio-group" role="radiogroup" aria-label="Payout method">
+                                <label class="radio-label">
+                                    <input type="radio" name="payoutMethod" value="paypal" checked> PayPal (International)
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="payoutMethod" value="ozow"> SA Bank (Ozow)
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group recruiter-field" id="recruiter-field">
+                            <label for="recruiterCode" class="form-label">Recruiter Code (optional)</label>
+                            <input type="text" id="recruiterCode" name="recruiterCode" class="form-input" placeholder="XXXXXXXX" maxlength="12" style="text-transform:uppercase;">
+                        </div>
+                        <button type="submit" class="form-submit" id="submit-btn">SUBMIT APPLICATION &rarr;</button>
+                    </form>
+                    <div class="form-msg" id="form-msg" role="status" aria-live="polite"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="page-footer">
+        <p>SHIFTGLITCH &mdash; shiftglitch.com &mdash; &copy; 2026 Lourens Breytenbach &mdash; <a href="mailto:admin@shiftglitch.com">admin@shiftglitch.com</a></p>
+    </footer>
+
+    <script>
+    (function () {
+        'use strict';
+
+        // ── Surge banner ────────────────────────────────────
+        let surgeEndsAt = null;
+
+        async function loadSurge() {
+            try {
+                const res = await fetch('/api/affiliate/surge');
+                if (!res.ok) return;
+                const surge = await res.json();
+                if (!surge || !surge.ends_at) return;
+                surgeEndsAt = new Date(surge.ends_at);
+                if (surgeEndsAt <= new Date()) return;
+                document.getElementById('surge-banner').classList.add('active');
+                updateSurgeCountdown();
+                setInterval(updateSurgeCountdown, 30000);
+            } catch (_) {}
+        }
+
+        function updateSurgeCountdown() {
+            if (!surgeEndsAt) return;
+            const msLeft = surgeEndsAt - Date.now();
+            if (msLeft <= 0) {
+                document.getElementById('surge-banner').classList.remove('active');
+                return;
+            }
+            const hLeft = Math.floor(msLeft / 3600000);
+            const mLeft = Math.floor((msLeft % 3600000) / 60000);
+            document.getElementById('surge-countdown').textContent = hLeft + 'h ' + mLeft + 'm';
+        }
+
+        // ── Leaderboard ─────────────────────────────────────
+        async function loadLeaderboard() {
+            const el = document.getElementById('leaderboard');
+            try {
+                const res = await fetch('/api/affiliate/leaderboard');
+                if (!res.ok) throw new Error('status ' + res.status);
+                const rows = await res.json();
+                if (!Array.isArray(rows) || rows.length === 0) {
+                    el.innerHTML = '<li class="lb-empty">// No operatives ranked yet — be the first.</li>';
+                    return;
+                }
+                const tierColors = { recruit: '#888', operative: '#39FF14', ghost: '#FF00FF' };
+                el.innerHTML = rows.map(function (r, i) {
+                    var rank = i + 1;
+                    var rankClass = rank === 1 ? 'top1' : rank <= 3 ? 'top3' : '';
+                    var tierColor = tierColors[r.tier] || '#888';
+                    var tierName = (r.tier || 'recruit').charAt(0).toUpperCase() + (r.tier || 'recruit').slice(1);
+                    return '<li class="lb-row" role="listitem">' +
+                        '<span class="lb-rank ' + rankClass + '" aria-label="Rank ' + rank + '">' + rank + '</span>' +
+                        '<span class="lb-alias">' + escHtml(r.alias || r.displayName || '—') + '</span>' +
+                        '<span class="tier-badge" style="color:' + tierColor + ';border-color:' + tierColor + '40;">' + tierName + '</span>' +
+                        '<span class="lb-sales">' + (r.salesCount || 0) + ' sales</span>' +
+                        '</li>';
+                }).join('');
+            } catch (_) {
+                el.innerHTML = '<li class="lb-empty">// Intel feed unavailable.</li>';
+            }
+        }
+
+        function escHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        // ── Session / auth state ─────────────────────────────
+        async function initAuthState() {
+            const loading = document.getElementById('auth-loading');
+            const notLoggedIn = document.getElementById('not-logged-in');
+            const loggedIn = document.getElementById('logged-in');
+
+            try {
+                const res = await fetch('/api/me');
+                loading.style.display = 'none';
+                if (!res.ok) {
+                    notLoggedIn.style.display = 'block';
+                    return;
+                }
+                loggedIn.style.display = 'block';
+                await checkExistingRegistration();
+            } catch (_) {
+                loading.style.display = 'none';
+                notLoggedIn.style.display = 'block';
+            }
+        }
+
+        async function checkExistingRegistration() {
+            try {
+                const res = await fetch('/api/affiliate/me');
+                if (res.status === 404) {
+                    document.getElementById('register-form-wrap').style.display = 'block';
+                    return;
+                }
+                if (res.ok) {
+                    document.getElementById('already-registered').style.display = 'block';
+                    return;
+                }
+                document.getElementById('register-form-wrap').style.display = 'block';
+            } catch (_) {
+                document.getElementById('register-form-wrap').style.display = 'block';
+            }
+        }
+
+        // ── Pre-fill recruiter code from URL ─────────────────
+        function initRecruiterField() {
+            var params = new URLSearchParams(window.location.search);
+            var recruiter = params.get('recruiter');
+            var field = document.getElementById('recruiter-field');
+            if (recruiter) {
+                field.classList.add('visible');
+                document.getElementById('recruiterCode').value = recruiter.toUpperCase();
+            } else {
+                // Always show recruiter field - let user optionally fill it
+                field.classList.add('visible');
+            }
+        }
+
+        // ── Form submission ──────────────────────────────────
+        document.getElementById('register-form').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            var btn = document.getElementById('submit-btn');
+            var msg = document.getElementById('form-msg');
+            var displayName = document.getElementById('displayName').value.trim();
+            var payoutMethod = document.querySelector('input[name="payoutMethod"]:checked').value;
+            var recruiterCode = document.getElementById('recruiterCode').value.trim();
+
+            if (!displayName) {
+                msg.className = 'form-msg err';
+                msg.textContent = '// Display name is required.';
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = '// TRANSMITTING...';
+            msg.className = 'form-msg';
+            msg.textContent = '';
+
+            try {
+                var body = { displayName, payoutMethod };
+                if (recruiterCode) body.recruiterCode = recruiterCode;
+
+                var res = await fetch('/api/affiliate/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                var data = await res.json();
+
+                if (res.status === 409) {
+                    msg.className = 'form-msg err';
+                    msg.innerHTML = '// Already registered. <a href="/affiliate-portal.html" style="color:#39FF14;">Open your portal &rarr;</a>';
+                    btn.disabled = false;
+                    btn.textContent = 'SUBMIT APPLICATION \u2192';
+                    return;
+                }
+
+                if (!res.ok) {
+                    throw new Error(data.error || 'Server error');
+                }
+
+                msg.className = 'form-msg ok';
+                msg.innerHTML = '// APPLICATION RECEIVED — Your tracking code: <strong>' + escHtml(data.code) + '</strong><br>' +
+                    '// Review within 48 hours. Watch for your clearance email.';
+                document.getElementById('register-form').style.display = 'none';
+            } catch (err) {
+                msg.className = 'form-msg err';
+                msg.textContent = '// Error: ' + (err.message || 'Transmission failed.');
+                btn.disabled = false;
+                btn.textContent = 'SUBMIT APPLICATION \u2192';
+            }
+        });
+
+        // ── Boot ─────────────────────────────────────────────
+        Promise.all([loadSurge(), loadLeaderboard(), initAuthState()]);
+        initRecruiterField();
+    })();
+    </script>
+</body>
+</html>
