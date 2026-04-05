@@ -6,6 +6,7 @@ const { Pool } = require('pg');
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
 let oidcConfig = null;
+let googleOidcConfig = null;
 
 async function getOidcConfig() {
   if (!oidcConfig) {
@@ -15,6 +16,17 @@ async function getOidcConfig() {
     );
   }
   return oidcConfig;
+}
+
+async function getGoogleOidcConfig() {
+  if (!googleOidcConfig) {
+    googleOidcConfig = await oidc.discovery(
+      new URL('https://accounts.google.com'),
+      process.env.GOOGLE_CLIENT_ID,
+      { client_secret: process.env.GOOGLE_CLIENT_SECRET }
+    );
+  }
+  return googleOidcConfig;
 }
 
 async function ensureSchema() {
@@ -150,6 +162,13 @@ async function ensureSchema() {
         sent_at TIMESTAMP,
         created_at TIMESTAMP DEFAULT NOW()
       );
+      CREATE TABLE IF NOT EXISTS magic_tokens (
+        token VARCHAR(64) PRIMARY KEY,
+        email VARCHAR(254) NOT NULL,
+        expires_at TIMESTAMP NOT NULL,
+        used_at TIMESTAMP,
+        created_at TIMESTAMP DEFAULT NOW()
+      );
     `);
     console.log('[auth] DB schema ready');
   } catch (err) {
@@ -199,6 +218,59 @@ async function upsertUser(claims) {
 async function getUser(id) {
   const { rows } = await pool.query('SELECT * FROM users WHERE id = $1', [id]);
   return rows[0] || null;
+}
+
+async function upsertUserFromProvider(id, email, firstName, lastName, profileImageUrl) {
+  if (email) {
+    const { rows: byEmail } = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
+    if (byEmail.length > 0 && byEmail[0].id !== id) {
+      const { rows } = await pool.query(
+        `UPDATE users SET
+           first_name = COALESCE($2, first_name),
+           last_name  = COALESCE($3, last_name),
+           profile_image_url = COALESCE($4, profile_image_url),
+           updated_at = NOW()
+         WHERE id = $1 RETURNING *`,
+        [byEmail[0].id, firstName, lastName, profileImageUrl]
+      );
+      return rows[0];
+    }
+  }
+  const { rows } = await pool.query(
+    `INSERT INTO users (id, email, first_name, last_name, profile_image_url, updated_at)
+     VALUES ($1, $2, $3, $4, $5, NOW())
+     ON CONFLICT (id) DO UPDATE SET
+       email             = COALESCE(EXCLUDED.email, users.email),
+       first_name        = COALESCE(EXCLUDED.first_name, users.first_name),
+       last_name         = COALESCE(EXCLUDED.last_name, users.last_name),
+       profile_image_url = COALESCE(EXCLUDED.profile_image_url, users.profile_image_url),
+       updated_at        = NOW()
+     RETURNING *`,
+    [id, email || null, firstName || null, lastName || null, profileImageUrl || null]
+  );
+  return rows[0];
+}
+
+async function sendMagicLinkEmail(email, link, expiresAt) {
+  const key = process.env.RESEND_SG_KEY || process.env.RESEND_API_KEY;
+  if (!key) { console.warn('[email-auth] No Resend key — magic link:', link); return; }
+  const fromAddress = process.env.RESEND_FROM_ADDRESS || 'ShiftGlitch <admin@shiftglitch.com>';
+  await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      from: fromAddress,
+      to: [email],
+      subject: '// ACCESS_TOKEN: Your ShiftGlitch login link',
+      html: `<!DOCTYPE html><html><body style="background:#000;color:#39FF14;font-family:'Courier New',monospace;padding:40px;max-width:600px;margin:0 auto;">
+<h1 style="color:#39FF14;font-size:2rem;margin:0 0 4px;">SHIFTGLITCH</h1>
+<p style="color:#555;font-size:0.85rem;margin:0 0 32px;letter-spacing:0.1em;">// ACCESS_TOKEN_GENERATED</p>
+<p style="color:#e0e0e0;margin:0 0 8px;">Your secure login link — expires in 15 minutes:</p>
+<p style="margin:0 0 32px;"><a href="${link}" style="display:inline-block;padding:14px 32px;background:#39FF14;color:#000;text-decoration:none;font-weight:bold;font-size:1.1rem;letter-spacing:0.1em;border-radius:2px;">JACK IN &gt;&gt;</a></p>
+<p style="color:#555;font-size:0.8rem;margin:0;">If you didn't request this, ignore this email — no account will be created.<br>Expires: ${expiresAt.toUTCString()}</p>
+</body></html>`
+    })
+  });
 }
 
 function setupAuthRoutes(app) {
@@ -254,6 +326,116 @@ function setupAuthRoutes(app) {
 
   app.get('/api/login', handleLogin);
   app.get('/api/auth/login', handleLogin);
+
+  app.get('/auth/google', async (req, res) => {
+    if (!process.env.GOOGLE_CLIENT_ID) return res.redirect('/login?error=google_not_configured');
+    try {
+      const config = await getGoogleOidcConfig();
+      const host = (process.env.REPLIT_DOMAINS || process.env.REPLIT_DEV_DOMAIN || req.get('x-forwarded-host') || req.hostname).split(',')[0].trim();
+      const callbackUrl = `https://${host}/auth/google/callback`;
+      const state = oidc.randomState();
+      const nonce = oidc.randomNonce();
+      const codeVerifier = oidc.randomPKCECodeVerifier();
+      const codeChallenge = await oidc.calculatePKCECodeChallenge(codeVerifier);
+      req.session.googleState = state;
+      req.session.googleNonce = nonce;
+      req.session.googleCodeVerifier = codeVerifier;
+      req.session.googleCallback = callbackUrl;
+      await new Promise((resolve, reject) => req.session.save(e => e ? reject(e) : resolve()));
+      const url = oidc.buildAuthorizationUrl(config, {
+        redirect_uri: callbackUrl,
+        scope: 'openid email profile',
+        state, nonce,
+        code_challenge: codeChallenge,
+        code_challenge_method: 'S256'
+      });
+      res.redirect(url.href);
+    } catch (err) {
+      console.error('[Google auth] error:', err);
+      res.redirect('/login?error=google_failed');
+    }
+  });
+
+  app.get('/auth/google/callback', async (req, res) => {
+    try {
+      const config = await getGoogleOidcConfig();
+      const host = (process.env.REPLIT_DOMAINS || process.env.REPLIT_DEV_DOMAIN || req.get('x-forwarded-host') || req.hostname).split(',')[0].trim();
+      const callbackUrl = req.session.googleCallback || `https://${host}/auth/google/callback`;
+      const tokens = await oidc.authorizationCodeGrant(config, new URL(req.url, `https://${host}`), {
+        expectedState: req.session.googleState,
+        expectedNonce: req.session.googleNonce,
+        pkceCodeVerifier: req.session.googleCodeVerifier,
+        redirectUri: callbackUrl
+      });
+      const claims = tokens.claims();
+      const userId = `google_${claims.sub}`;
+      const nameParts = (claims.name || '').split(' ');
+      const user = await upsertUserFromProvider(
+        userId, claims.email || null,
+        nameParts[0] || null,
+        nameParts.slice(1).join(' ') || null,
+        claims.picture || null
+      );
+      req.session.userId = user.id;
+      req.session.userProfile = { id: user.id, email: user.email, firstName: user.first_name, lastName: user.last_name, profileImageUrl: user.profile_image_url };
+      delete req.session.googleState;
+      delete req.session.googleNonce;
+      delete req.session.googleCallback;
+      delete req.session.googleCodeVerifier;
+      await new Promise((resolve, reject) => req.session.save(e => e ? reject(e) : resolve()));
+      res.redirect('/app');
+    } catch (err) {
+      console.error('[Google callback] error:', err);
+      res.redirect('/login?error=google_failed');
+    }
+  });
+
+  app.post('/auth/email', async (req, res) => {
+    const { email } = req.body || {};
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      return res.status(400).json({ error: 'Valid email required' });
+    }
+    const cleanEmail = email.trim().toLowerCase().slice(0, 254);
+    try {
+      const { randomBytes } = require('crypto');
+      const token = randomBytes(32).toString('hex');
+      const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
+      await pool.query(
+        `INSERT INTO magic_tokens (token, email, expires_at) VALUES ($1, $2, $3)`,
+        [token, cleanEmail, expiresAt]
+      );
+      const host = (process.env.REPLIT_DOMAINS || process.env.REPLIT_DEV_DOMAIN || req.get('x-forwarded-host') || req.hostname).split(',')[0].trim();
+      const link = `https://${host}/auth/email/verify?token=${token}`;
+      await sendMagicLinkEmail(cleanEmail, link, expiresAt);
+      res.json({ ok: true });
+    } catch (err) {
+      console.error('[email-auth] send error:', err);
+      res.status(500).json({ error: 'Failed to send login link' });
+    }
+  });
+
+  app.get('/auth/email/verify', async (req, res) => {
+    const { token } = req.query;
+    if (!token) return res.redirect('/login?error=invalid_token');
+    try {
+      const { rows } = await pool.query(
+        `SELECT * FROM magic_tokens WHERE token = $1 AND used_at IS NULL AND expires_at > NOW()`,
+        [token]
+      );
+      if (!rows.length) return res.redirect('/login?error=token_expired');
+      const { email } = rows[0];
+      await pool.query(`UPDATE magic_tokens SET used_at = NOW() WHERE token = $1`, [token]);
+      const userId = `email_${email}`;
+      const user = await upsertUserFromProvider(userId, email, null, null, null);
+      req.session.userId = user.id;
+      req.session.userProfile = { id: user.id, email: user.email };
+      await new Promise((resolve, reject) => req.session.save(e => e ? reject(e) : resolve()));
+      res.redirect('/app');
+    } catch (err) {
+      console.error('[email-verify] error:', err);
+      res.redirect('/login?error=verify_failed');
+    }
+  });
 
   app.get('/api/logout', handleLogout);
   app.get('/api/auth/logout', handleLogout);
