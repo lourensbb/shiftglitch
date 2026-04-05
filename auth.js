@@ -1037,10 +1037,11 @@ async function createAffiliate({ userId, displayName, email, payoutMethod, payou
     if (!rows.length) { promoCode = candidate; break; }
   }
   if (!promoCode) {
-    // Extend base with more randomness and try 5 more times before failing
+    // Retry with fully random 5-char base to escape collision cluster
     for (let attempt = 0; attempt < 5; attempt++) {
-      const fallbackBase = CHARS.slice(0, 3) + String(Math.floor(Math.random() * 100)).padStart(2, '0');
-      const candidate = fallbackBase + String(Math.floor(Math.random() * 90) + 10);
+      let randomBase = '';
+      for (let i = 0; i < 5; i++) randomBase += CHARS[Math.floor(Math.random() * CHARS.length)];
+      const candidate = randomBase + String(Math.floor(Math.random() * 90) + 10);
       const { rows } = await pool.query('SELECT 1 FROM affiliates WHERE promo_code = $1', [candidate]);
       if (!rows.length) { promoCode = candidate; break; }
     }
