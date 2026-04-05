@@ -361,26 +361,29 @@
 
     // ── Init ──────────────────────────────────────────────────────────────────
     async function init() {
-      // 1. Auth check
+      // 1. Auth + admin identity check via /api/me (isAdmin flag set server-side)
       let me;
       try {
         const r = await fetch('/api/me', { headers: { 'Accept': 'application/json' } });
-        if (!r.ok) { window.location.href = '/app'; return; }
+        if (!r.ok) { window.location.href = '/api/login'; return; }
         me = await r.json();
       } catch {
+        window.location.href = '/api/login'; return;
+      }
+
+      if (!me.isAdmin) {
         window.location.href = '/app'; return;
       }
 
-      // 2. Admin identity check — call a known admin endpoint
-      // We ping GET /admin/affiliates; a 401/403 means not admin → redirect
-      const probe = await fetch('/admin/affiliates', { headers: { 'Accept': 'application/json' } });
-      if (probe.status === 401 || probe.status === 403 || probe.status === 503) {
-        window.location.href = '/app'; return;
-      }
-
-      // 3. Parse affiliate data (re-use the probe response)
+      // 2. Fetch affiliate list from the admin API (different path from this page)
       let data = [];
-      try { data = await probe.json(); } catch {}
+      try {
+        const r = await fetch('/admin/affiliates', { headers: { 'Accept': 'application/json' } });
+        if (r.status === 403 || r.status === 401 || r.status === 503) {
+          window.location.href = '/app'; return;
+        }
+        if (r.ok) data = await r.json();
+      } catch {}
       _affiliates = Array.isArray(data) ? data : [];
 
       document.getElementById('loading-screen').style.display = 'none';
@@ -545,7 +548,9 @@
     }
 
     function viewPortal(code) {
-      window.open(`/affiliate-portal`, '_blank');
+      if (code) {
+        window.open(`/affiliate-card/${encodeURIComponent(code)}`, '_blank');
+      }
     }
 
     // ── Surge ─────────────────────────────────────────────────────────────────

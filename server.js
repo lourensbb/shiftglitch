@@ -366,7 +366,16 @@ app.get('/affiliate-portal', (req, res) => {
 });
 
 // Admin affiliate panel — not linked from any public page
-app.get('/admin/affiliates', (req, res) => {
+// Served at a different path than the API (/admin-panel/affiliates vs /admin/affiliates).
+// Server-side: requires auth session + matching ADMIN_USER_ID.
+const ADMIN_PAGE_ID = process.env.ADMIN_USER_ID || '';
+app.get('/admin-panel/affiliates', (req, res) => {
+  if (!req.session || !req.session.userId) {
+    return res.redirect('/api/login');
+  }
+  if (ADMIN_PAGE_ID && req.session.userId !== ADMIN_PAGE_ID) {
+    return res.redirect('/app');
+  }
   res.sendFile(path.join(__dirname, 'admin-affiliates.html'));
 });
 

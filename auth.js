@@ -523,6 +523,7 @@ function setupAuthRoutes(app) {
       const user = await getUser(req.session.userId);
       if (!user) return res.status(401).json({ error: 'User not found' });
       const profile = req.session.userProfile || {};
+      const adminId = process.env.ADMIN_USER_ID || '';
       res.json({
         id: user.id,
         email: user.email,
@@ -531,7 +532,8 @@ function setupAuthRoutes(app) {
         profileImageUrl: user.profile_image_url || profile.profileImageUrl,
         createdAt: user.created_at,
         membershipTier: user.membership_tier || 'free',
-        proExpiresAt: user.pro_expires_at || null
+        proExpiresAt: user.pro_expires_at || null,
+        isAdmin: adminId ? user.id === adminId : false,
       });
     } catch (err) {
       console.error('/api/me error:', err);
