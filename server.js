@@ -103,9 +103,9 @@ async function sendWelcomeEmail(gamertag, email) {
     </body>
     </html>
   `;
-  const fromAddress = process.env.RESEND_FROM_ADDRESS || 'ShiftGlitch <onboarding@resend.dev>';
+  const fromAddress = process.env.RESEND_FROM_ADDRESS || 'ShiftGlitch <admin@shiftglitch.com>';
   if (!process.env.RESEND_FROM_ADDRESS) {
-    console.warn('[email] WARNING: RESEND_FROM_ADDRESS not set — using shared onboarding@resend.dev test address. Emails will only deliver to verified addresses in your Resend account. Set RESEND_FROM_ADDRESS to a verified domain to send to anyone.');
+    console.warn('[email] WARNING: RESEND_FROM_ADDRESS not set — using admin@shiftglitch.com — ensure shiftglitch.com domain is verified in Resend for reliable delivery.');
   }
   console.log(`[email] Sending welcome email to ${email} via sender: ${fromAddress}`);
   try {
@@ -840,7 +840,7 @@ async function sendFunnelEmail(email, name, step) {
   if (!key) { console.warn('[funnel-email] No Resend key — skipping step', step, 'for', email); return; }
   const built = buildFunnelEmail(step, name);
   if (!built) { console.warn('[funnel-email] No template for step', step); return; }
-  const fromAddress = process.env.RESEND_FROM_ADDRESS || 'ShiftGlitch <onboarding@resend.dev>';
+  const fromAddress = process.env.RESEND_FROM_ADDRESS || 'ShiftGlitch <admin@shiftglitch.com>';
   try {
     const r = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -872,7 +872,7 @@ setTimeout(processFunnelEmailQueue, 10 * 1000);
 async function sendProUpgradeEmail(email, gamertag, daysAdded) {
   const key = process.env.RESEND_SG_KEY || process.env.RESEND_API_KEY;
   if (!key || !email) return;
-  const fromAddress = process.env.RESEND_FROM_ADDRESS || 'ShiftGlitch <onboarding@resend.dev>';
+  const fromAddress = process.env.RESEND_FROM_ADDRESS || 'ShiftGlitch <admin@shiftglitch.com>';
   const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body style="margin:0;padding:0;background:#0a0a0a;font-family:'Courier New',monospace;"><table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0a;padding:32px 16px;"><tr><td align="center"><table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;border:1px solid #FF00FF;background:#111;"><tr><td style="padding:0;background:#000;border-bottom:3px solid #FF00FF;"><div style="padding:24px 36px;"><div style="font-family:'Courier New',monospace;font-size:11px;color:#FF00FF;letter-spacing:3px;text-transform:uppercase;margin-bottom:6px;">// SHIFTGLITCH — PRO UPGRADE CONFIRMED</div><div style="font-family:'Courier New',monospace;font-size:36px;color:#fff;letter-spacing:4px;font-weight:bold;line-height:1;">SHIFTGLITCH</div></div></td></tr><tr><td style="padding:36px;"><div style="font-family:'Courier New',monospace;font-size:22px;color:#FF00FF;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">NETRUNNER PRO — ACTIVATED</div><p style="font-family:'Courier New',monospace;font-size:14px;color:#cccccc;line-height:1.9;margin:0 0 16px;">Operative ${(gamertag||'').toUpperCase()} — your Pro access is now live. ${daysAdded} days of Netrunner Pro added to your account.</p><div style="background:#1a1a1a;border:1px solid rgba(255,0,255,0.3);padding:20px 24px;margin-bottom:22px;"><div style="font-family:'Courier New',monospace;font-size:12px;color:#FF00FF;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;">// PRO ACCESS UNLOCKED</div><div style="font-family:'Courier New',monospace;font-size:13px;color:#aaaaaa;line-height:2.2;"><span style="color:#39FF14;">&gt;</span> AI Mission Architect — now active<br><span style="color:#39FF14;">&gt;</span> Squad Mode — now active<br><span style="color:#39FF14;">&gt;</span> Extended analytics — now active</div></div><div style="text-align:center;margin:28px 0;"><a href="https://shiftglitch.replit.app/app" style="display:inline-block;background:#FF00FF;color:#000;font-family:'Courier New',monospace;font-size:15px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;padding:14px 36px;text-decoration:none;">JACK IN NOW &rarr;</a></div><p style="font-family:'Courier New',monospace;font-size:13px;color:#555;line-height:1.8;border-top:1px solid #222;padding-top:20px;">Questions: <a href="mailto:admin@shiftglitch.com" style="color:#39FF14;">admin@shiftglitch.com</a></p></td></tr><tr><td style="padding:14px 36px;border-top:1px solid #1a1a1a;"><div style="font-family:'Courier New',monospace;font-size:11px;color:#444;letter-spacing:1px;">SHIFTGLITCH &mdash; shiftglitch.com &mdash; &copy; 2026 Lourens Breytenbach</div></td></tr></table></td></tr></table></body></html>`;
   try {
     const r = await fetch('https://api.resend.com/emails', {
