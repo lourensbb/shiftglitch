@@ -759,6 +759,8 @@ app.delete('/api/escape-runs/:id', requireAuth, async (req, res) => {
   }
 });
 
+app.use('/', require('./affiliates-api'));
+
 app.use(express.static(path.join(__dirname)));
 
 app.use((req, res) => {

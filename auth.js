@@ -192,6 +192,14 @@ async function ensureSchema() {
         affiliate_id INT NOT NULL REFERENCES affiliates(id),
         created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
       );
+      CREATE TABLE IF NOT EXISTS affiliate_surges (
+        id SERIAL PRIMARY KEY,
+        bonus_multiplier NUMERIC(4,2) NOT NULL DEFAULT 2.0,
+        started_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        ends_at TIMESTAMPTZ NOT NULL,
+        message TEXT,
+        created_by TEXT
+      );
     `);
     console.log('[auth] DB schema ready');
   } catch (err) {
@@ -999,4 +1007,127 @@ async function promotePayableCommissions() {
   }
 }
 
-module.exports = { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, updateGamertag, getUserGamertag, updateMembershipTier, checkAndExpireUser, getUserByPaymentRef, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount, getUserBadges, setUserBadges, getEscapeRuns, createEscapeRun, updateEscapeRun, completeEscapeRun, deleteEscapeRun, applyRollbackIfStale, saveFunnelLead, queueFunnelEmails, getDueQueuedEmails, markEmailSent, getAffiliateByCode, recordAffiliateClick, queueAffiliateCommission, promotePayableCommissions };
+// ─── Affiliate DB helpers (Task 21) ──────────────────────────────────────────
+
+async function createAffiliate({ userId, displayName, email, payoutMethod, payoutDetails, recruitedById }) {
+  const crypto = require('crypto');
+  let code;
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const candidate = crypto.randomBytes(4).toString('hex').toUpperCase();
+    const { rows } = await pool.query('SELECT 1 FROM affiliates WHERE code = $1', [candidate]);
+    if (!rows.length) { code = candidate; break; }
+  }
+  if (!code) throw new Error('[affiliate] Could not generate unique affiliate code after 5 attempts');
+  const { rows } = await pool.query(
+    `INSERT INTO affiliates (user_id, code, display_name, email, payout_method, payout_details, recruited_by_id)
+     VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+    [userId, code, displayName, email, payoutMethod || 'paypal', JSON.stringify(payoutDetails || {}), recruitedById || null]
+  );
+  return rows[0];
+}
+
+async function getAffiliateByUserId(userId) {
+  const { rows } = await pool.query('SELECT * FROM affiliates WHERE user_id = $1', [userId]);
+  return rows[0] || null;
+}
+
+async function getAffiliateStats(affiliateId) {
+  const [clickRes, commRes] = await Promise.all([
+    pool.query('SELECT COUNT(*) AS count FROM affiliate_clicks WHERE affiliate_id = $1', [affiliateId]),
+    pool.query(
+      `SELECT status, COALESCE(SUM(commission), 0) AS total
+       FROM affiliate_commissions WHERE affiliate_id = $1 GROUP BY status`,
+      [affiliateId]
+    )
+  ]);
+  const clickCount = parseInt(clickRes.rows[0].count, 10);
+  const byStatus = {};
+  for (const row of commRes.rows) { byStatus[row.status] = parseFloat(row.total); }
+  return {
+    clickCount,
+    pendingCommission: byStatus.pending || 0,
+    payableCommission: byStatus.payable || 0,
+    paidCommission: byStatus.paid || 0,
+  };
+}
+
+async function getAffiliateLeaderboard() {
+  const { rows } = await pool.query(
+    `SELECT display_name AS alias, tier, sales_count AS "salesCount"
+     FROM affiliates WHERE status = 'active' ORDER BY sales_count DESC LIMIT 10`
+  );
+  return rows;
+}
+
+async function getAllAffiliatesWithStats() {
+  const { rows } = await pool.query(`
+    SELECT
+      a.id, a.display_name AS "displayName", a.email, a.code, a.tier, a.status,
+      a.sales_count AS "salesCount", a.created_at AS "createdAt",
+      COUNT(DISTINCT ac.id)::int AS "clickCount",
+      COALESCE(SUM(c.commission) FILTER (WHERE c.status = 'pending'),  0) AS "pendingCommission",
+      COALESCE(SUM(c.commission) FILTER (WHERE c.status = 'payable'),  0) AS "payableCommission",
+      COALESCE(SUM(c.commission) FILTER (WHERE c.status = 'paid'),     0) AS "paidCommission"
+    FROM affiliates a
+    LEFT JOIN affiliate_commissions c  ON c.affiliate_id = a.id
+    LEFT JOIN affiliate_clicks     ac ON ac.affiliate_id = a.id
+    GROUP BY a.id
+    ORDER BY a.created_at DESC
+  `);
+  return rows.map(r => ({
+    ...r,
+    clickCount: parseInt(r.clickCount, 10),
+    pendingCommission: parseFloat(r.pendingCommission),
+    payableCommission: parseFloat(r.payableCommission),
+    paidCommission: parseFloat(r.paidCommission),
+  }));
+}
+
+async function approveAffiliate(id) {
+  const { rows } = await pool.query(
+    `UPDATE affiliates SET status = 'active' WHERE id = $1 RETURNING *`,
+    [id]
+  );
+  return rows[0] || null;
+}
+
+async function suspendAffiliate(id) {
+  const { rows } = await pool.query(
+    `UPDATE affiliates SET status = 'suspended' WHERE id = $1 RETURNING *`,
+    [id]
+  );
+  return rows[0] || null;
+}
+
+async function markCommissionsPaid(affiliateId) {
+  const { rows, rowCount } = await pool.query(
+    `UPDATE affiliate_commissions
+     SET status = 'paid', paid_at = NOW()
+     WHERE affiliate_id = $1 AND status = 'payable'
+     RETURNING commission`,
+    [affiliateId]
+  );
+  const totalPaid = rows.reduce((sum, r) => sum + parseFloat(r.commission), 0);
+  return { rowCount, totalPaid: totalPaid.toFixed(2) };
+}
+
+async function createSurgeEvent({ bonusMultiplier, durationHours, message, createdBy }) {
+  const endsAt = new Date(Date.now() + durationHours * 60 * 60 * 1000);
+  const { rows } = await pool.query(
+    `INSERT INTO affiliate_surges (bonus_multiplier, ends_at, message, created_by)
+     VALUES ($1, $2, $3, $4) RETURNING *`,
+    [bonusMultiplier, endsAt.toISOString(), message || '', createdBy || null]
+  );
+  return rows[0];
+}
+
+async function getActiveSurge() {
+  const { rows } = await pool.query(
+    `SELECT * FROM affiliate_surges WHERE ends_at > NOW() ORDER BY started_at DESC LIMIT 1`
+  );
+  return rows[0] || null;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+module.exports = { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, updateGamertag, getUserGamertag, updateMembershipTier, checkAndExpireUser, getUserByPaymentRef, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount, getUserBadges, setUserBadges, getEscapeRuns, createEscapeRun, updateEscapeRun, completeEscapeRun, deleteEscapeRun, applyRollbackIfStale, saveFunnelLead, queueFunnelEmails, getDueQueuedEmails, markEmailSent, getAffiliateByCode, recordAffiliateClick, queueAffiliateCommission, promotePayableCommissions, createAffiliate, getAffiliateByUserId, getAffiliateStats, getAffiliateLeaderboard, getAllAffiliatesWithStats, approveAffiliate, suspendAffiliate, markCommissionsPaid, createSurgeEvent, getActiveSurge };
