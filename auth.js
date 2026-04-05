@@ -202,6 +202,14 @@ async function ensureSchema() {
       );
       ALTER TABLE affiliates ADD COLUMN IF NOT EXISTS recruited_by_id INT REFERENCES affiliates(id) ON DELETE SET NULL;
       ALTER TABLE affiliates ADD COLUMN IF NOT EXISTS promo_code VARCHAR(12) UNIQUE;
+      CREATE TABLE IF NOT EXISTS affiliate_email_queue (
+        id SERIAL PRIMARY KEY,
+        affiliate_id INT NOT NULL REFERENCES affiliates(id),
+        template VARCHAR(40) NOT NULL,
+        scheduled_for TIMESTAMPTZ NOT NULL,
+        sent_at TIMESTAMPTZ,
+        metadata JSONB DEFAULT '{}'
+      );
     `);
     console.log('[auth] DB schema ready');
   } catch (err) {
@@ -988,9 +996,23 @@ async function queueAffiliateCommission(affiliateCode, orderId, saleAmount) {
       [affiliate.id, orderId, saleAmount, commission.toFixed(2)]
     );
     await pool.query('UPDATE affiliates SET sales_count = sales_count + 1 WHERE id = $1', [affiliate.id]);
-    // Check and apply tier upgrade after incrementing sales_count
+    // Check and apply tier upgrade after incrementing sales_count (may update commission_rate)
     await checkAndUpgradeAffiliateTier(affiliate.id);
-    return rows[0];
+    // Re-fetch affiliate to get updated tier/sales_count for sale notification email
+    const updatedAffiliate = await getAffiliateByCode(affiliateCode);
+    const paidTotal = await pool.query(
+      `SELECT COALESCE(SUM(commission), 0) AS total FROM affiliate_commissions WHERE affiliate_id = $1 AND status = 'paid'`,
+      [affiliate.id]
+    );
+    return {
+      ...rows[0],
+      affiliate_email: affiliate.email,
+      affiliate_display_name: affiliate.display_name,
+      affiliate_tier: (updatedAffiliate || affiliate).tier,
+      commission_rate: parseFloat((updatedAffiliate || affiliate).commission_rate),
+      sales_count: (updatedAffiliate || affiliate).sales_count,
+      cumulative_paid: parseFloat(paidTotal.rows[0].total),
+    };
   } catch (err) {
     console.error('[affiliate] queueAffiliateCommission error:', err.message);
     return null;
@@ -1181,6 +1203,47 @@ async function getActiveSurge() {
   return rows[0] || null;
 }
 
+// ─── Affiliate DB helpers (Task 23) — email queue ────────────────────────────
+
+async function scheduleAffiliateEmail(affiliateId, template, scheduledFor, metadata) {
+  const { rows } = await pool.query(
+    `INSERT INTO affiliate_email_queue (affiliate_id, template, scheduled_for, metadata)
+     VALUES ($1, $2, $3, $4) RETURNING *`,
+    [affiliateId, template, scheduledFor, JSON.stringify(metadata || {})]
+  );
+  return rows[0];
+}
+
+async function getDueAffiliateEmails() {
+  const { rows } = await pool.query(
+    `SELECT q.*, a.email AS affiliate_email, a.display_name AS affiliate_display_name,
+            a.code AS affiliate_code, a.promo_code AS affiliate_promo_code,
+            a.tier AS affiliate_tier, a.sales_count AS affiliate_sales_count,
+            a.commission_rate AS affiliate_commission_rate
+     FROM affiliate_email_queue q
+     JOIN affiliates a ON a.id = q.affiliate_id
+     WHERE q.sent_at IS NULL AND q.scheduled_for <= NOW()
+     ORDER BY q.scheduled_for ASC`
+  );
+  return rows;
+}
+
+async function markAffiliateEmailSent(id) {
+  const { rows } = await pool.query(
+    `UPDATE affiliate_email_queue SET sent_at = NOW() WHERE id = $1 RETURNING *`,
+    [id]
+  );
+  return rows[0];
+}
+
+async function getAllActiveAffiliateEmails() {
+  const { rows } = await pool.query(
+    `SELECT id, email, display_name, code, promo_code, tier, sales_count, commission_rate
+     FROM affiliates WHERE status = 'active'`
+  );
+  return rows;
+}
+
 // ─── Affiliate DB helpers (Task 22) ──────────────────────────────────────────
 
 async function getAffiliateByPromoCode(promoCode) {
@@ -1226,4 +1289,4 @@ async function checkAndUpgradeAffiliateTier(affiliateId) {
 
 // ─────────────────────────────────────────────────────────────────────────────
 
-module.exports = { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, updateGamertag, getUserGamertag, updateMembershipTier, checkAndExpireUser, getUserByPaymentRef, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount, getUserBadges, setUserBadges, getEscapeRuns, createEscapeRun, updateEscapeRun, completeEscapeRun, deleteEscapeRun, applyRollbackIfStale, saveFunnelLead, queueFunnelEmails, getDueQueuedEmails, markEmailSent, getAffiliateByCode, recordAffiliateClick, queueAffiliateCommission, promotePayableCommissions, createAffiliate, getAffiliateByUserId, getAffiliateStats, getAffiliateLeaderboard, getAllAffiliatesWithStats, approveAffiliate, suspendAffiliate, markCommissionsPaid, createSurgeEvent, getActiveSurge, getAffiliateByPromoCode, checkAndUpgradeAffiliateTier };
+module.exports = { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, updateGamertag, getUserGamertag, updateMembershipTier, checkAndExpireUser, getUserByPaymentRef, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount, getUserBadges, setUserBadges, getEscapeRuns, createEscapeRun, updateEscapeRun, completeEscapeRun, deleteEscapeRun, applyRollbackIfStale, saveFunnelLead, queueFunnelEmails, getDueQueuedEmails, markEmailSent, getAffiliateByCode, recordAffiliateClick, queueAffiliateCommission, promotePayableCommissions, createAffiliate, getAffiliateByUserId, getAffiliateStats, getAffiliateLeaderboard, getAllAffiliatesWithStats, approveAffiliate, suspendAffiliate, markCommissionsPaid, createSurgeEvent, getActiveSurge, getAffiliateByPromoCode, checkAndUpgradeAffiliateTier, scheduleAffiliateEmail, getDueAffiliateEmails, markAffiliateEmailSent, getAllActiveAffiliateEmails };

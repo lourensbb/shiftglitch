@@ -16,6 +16,13 @@ const {
   getActiveSurge,
 } = require('./auth');
 
+const {
+  sendAffiliateApplicationEmail,
+  sendAffiliateApprovalEmail,
+  sendAffiliateSurgeBlastEmail,
+  startAffiliateEmailDrip,
+} = require('./affiliate-emails');
+
 const SITE_URL = process.env.SITE_URL || 'https://shiftglitch.replit.app';
 
 // Primary: ADMIN_USER_ID env var. Secondary: hardcoded owner Replit userId (set below as fallback).
@@ -77,11 +84,7 @@ router.post('/api/affiliate/register', requireAuth, async (req, res) => {
       recruitedById,
     });
 
-    // Conditional email — silently skipped if affiliate-emails.js doesn't exist yet (Task 4)
-    try {
-      const { sendAffiliateApplicationEmail } = require('./affiliate-emails');
-      sendAffiliateApplicationEmail(affiliate.email, affiliate.display_name).catch(() => {});
-    } catch (_) {}
+    sendAffiliateApplicationEmail(affiliate.email, affiliate.display_name).catch(() => {});
 
     res.json({
       ok: true,
@@ -199,21 +202,13 @@ router.post('/admin/affiliates/:id/approve', requireAdmin, async (req, res) => {
     const affiliate = await approveAffiliate(id);
     if (!affiliate) return res.status(404).json({ error: 'Affiliate not found' });
 
-    // Conditional email + drip — silently skipped if affiliate-emails.js doesn't exist yet
-    try {
-      const emails = require('./affiliate-emails');
-      if (emails.sendAffiliateApprovalEmail) {
-        emails.sendAffiliateApprovalEmail(
-          affiliate.email,
-          affiliate.display_name,
-          affiliate.code,
-          affiliate.promo_code || null
-        ).catch(() => {});
-      }
-      if (emails.startAffiliateEmailDrip) {
-        emails.startAffiliateEmailDrip(affiliate.id).catch(() => {});
-      }
-    } catch (_) {}
+    sendAffiliateApprovalEmail(
+      affiliate.email,
+      affiliate.display_name,
+      affiliate.code,
+      affiliate.promo_code || null
+    ).catch(() => {});
+    startAffiliateEmailDrip(affiliate.id).catch(() => {});
 
     res.json({ ok: true, affiliate });
   } catch (err) {
@@ -269,11 +264,8 @@ router.post('/admin/affiliates/surge', requireAdmin, async (req, res) => {
       createdBy: req.session.userId,
     });
 
-    // Conditional surge blast email — fire and forget
-    try {
-      const { sendAffiliateSurgeBlastEmail } = require('./affiliate-emails');
-      sendAffiliateSurgeBlastEmail(surge).catch(() => {});
-    } catch (_) {}
+    // Surge blast email to all active affiliates — fire and forget
+    sendAffiliateSurgeBlastEmail(surge).catch(() => {});
 
     res.json({ ok: true, surge });
   } catch (err) {

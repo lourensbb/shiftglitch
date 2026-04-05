@@ -6,6 +6,7 @@ const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
 const { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, getUserGamertag, updateGamertag, updateMembershipTier, checkAndExpireUser, getUserByPaymentRef, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount, getUserBadges, setUserBadges, getEscapeRuns, createEscapeRun, updateEscapeRun, completeEscapeRun, deleteEscapeRun, applyRollbackIfStale, saveFunnelLead, queueFunnelEmails, getDueQueuedEmails, markEmailSent, getAffiliateByCode, recordAffiliateClick, queueAffiliateCommission, promotePayableCommissions, getAffiliateByPromoCode } = require('./auth');
 const { generateEbook } = require('./ebook-generator');
+const { sendAffiliateSaleNotificationEmail, processDueAffiliateEmails } = require('./affiliate-emails');
 
 async function requirePro(req, res, next) {
   try {
@@ -253,6 +254,16 @@ app.post('/api/payfast-itn', express.urlencoded({ extended: false }), async (req
         const commission = await queueAffiliateCommission(affiliateCode, orderId, grossAmount);
         if (commission) {
           console.log(`[payfast-itn] Affiliate commission queued — code: ${affiliateCode}, amount: R${commission.commission}, payable: ${commission.payable_at}`);
+          // Send instant sale notification to the affiliate — fire and forget
+          sendAffiliateSaleNotificationEmail(commission.affiliate_email, {
+            displayName: commission.affiliate_display_name,
+            packLabel: matchedPack.label,
+            commissionAmount: commission.commission,
+            cumulativePaid: commission.cumulative_paid || 0,
+            tier: commission.affiliate_tier,
+            commissionRate: commission.commission_rate,
+            salesCount: commission.sales_count,
+          }).catch(e => console.warn('[payfast-itn] Sale notification email error:', e.message));
         }
       }
     } catch (e) { console.warn('[payfast-itn] Affiliate commission error:', e.message); }
@@ -949,6 +960,10 @@ async function processFunnelEmailQueue() {
 
 setInterval(processFunnelEmailQueue, 15 * 60 * 1000);
 setTimeout(processFunnelEmailQueue, 10 * 1000);
+
+// Affiliate onboarding drip scheduler — runs every 15 min alongside the funnel drip
+setInterval(processDueAffiliateEmails, 15 * 60 * 1000);
+setTimeout(processDueAffiliateEmails, 12 * 1000);
 
 // Hourly scheduler — promote pending affiliate commissions to payable once 30-day hold period passes
 setInterval(promotePayableCommissions, 60 * 60 * 1000);
