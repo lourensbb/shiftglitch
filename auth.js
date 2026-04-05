@@ -985,4 +985,18 @@ async function queueAffiliateCommission(affiliateCode, orderId, saleAmount) {
   }
 }
 
-module.exports = { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, updateGamertag, getUserGamertag, updateMembershipTier, checkAndExpireUser, getUserByPaymentRef, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount, getUserBadges, setUserBadges, getEscapeRuns, createEscapeRun, updateEscapeRun, completeEscapeRun, deleteEscapeRun, applyRollbackIfStale, saveFunnelLead, queueFunnelEmails, getDueQueuedEmails, markEmailSent, getAffiliateByCode, recordAffiliateClick, queueAffiliateCommission };
+async function promotePayableCommissions() {
+  try {
+    const result = await pool.query(
+      `UPDATE affiliate_commissions SET status = 'payable'
+       WHERE status = 'pending' AND payable_at <= NOW()`
+    );
+    if (result.rowCount > 0) {
+      console.log(`[affiliate-scheduler] ${result.rowCount} commission(s) promoted to payable`);
+    }
+  } catch (err) {
+    console.error('[affiliate-scheduler] Error promoting commissions:', err.message);
+  }
+}
+
+module.exports = { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, updateGamertag, getUserGamertag, updateMembershipTier, checkAndExpireUser, getUserByPaymentRef, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount, getUserBadges, setUserBadges, getEscapeRuns, createEscapeRun, updateEscapeRun, completeEscapeRun, deleteEscapeRun, applyRollbackIfStale, saveFunnelLead, queueFunnelEmails, getDueQueuedEmails, markEmailSent, getAffiliateByCode, recordAffiliateClick, queueAffiliateCommission, promotePayableCommissions };

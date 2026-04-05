@@ -4,7 +4,7 @@ const crypto = require('crypto');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
-const { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, getUserGamertag, updateGamertag, updateMembershipTier, checkAndExpireUser, getUserByPaymentRef, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount, getUserBadges, setUserBadges, getEscapeRuns, createEscapeRun, updateEscapeRun, completeEscapeRun, deleteEscapeRun, applyRollbackIfStale, saveFunnelLead, queueFunnelEmails, getDueQueuedEmails, markEmailSent, getAffiliateByCode, recordAffiliateClick, queueAffiliateCommission } = require('./auth');
+const { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, getUserGamertag, updateGamertag, updateMembershipTier, checkAndExpireUser, getUserByPaymentRef, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount, getUserBadges, setUserBadges, getEscapeRuns, createEscapeRun, updateEscapeRun, completeEscapeRun, deleteEscapeRun, applyRollbackIfStale, saveFunnelLead, queueFunnelEmails, getDueQueuedEmails, markEmailSent, getAffiliateByCode, recordAffiliateClick, queueAffiliateCommission, promotePayableCommissions } = require('./auth');
 const { generateEbook } = require('./ebook-generator');
 
 async function requirePro(req, res, next) {
@@ -268,9 +268,8 @@ app.use((req, res, next) => {
 app.use(cookieParser());
 app.use(getSessionMiddleware());
 
-setupAuthRoutes(app);
-
 // Referral tracking middleware — reads ?ref=CODE, sets sg_ref cookie for 30 days
+// Registered before setupAuthRoutes so it applies to every request from the start
 app.use(async (req, res, next) => {
   const refCode = req.query.ref;
   if (refCode) {
@@ -291,6 +290,8 @@ app.use(async (req, res, next) => {
   }
   next();
 });
+
+setupAuthRoutes(app);
 
 app.post('/api/gemini', requireAuth, requirePro, async (req, res) => {
   const apiKey = process.env.GEMINI_API_KEY;
@@ -908,21 +909,6 @@ setInterval(processFunnelEmailQueue, 15 * 60 * 1000);
 setTimeout(processFunnelEmailQueue, 10 * 1000);
 
 // Hourly scheduler — promote pending affiliate commissions to payable once 30-day hold period passes
-const { Pool: _pgPool } = require('pg');
-const _affPool = new _pgPool({ connectionString: process.env.DATABASE_URL });
-async function promotePayableCommissions() {
-  try {
-    const result = await _affPool.query(
-      `UPDATE affiliate_commissions SET status = 'payable'
-       WHERE status = 'pending' AND payable_at <= NOW()`
-    );
-    if (result.rowCount > 0) {
-      console.log(`[affiliate-scheduler] ${result.rowCount} commission(s) promoted to payable`);
-    }
-  } catch (err) {
-    console.error('[affiliate-scheduler] Error promoting commissions:', err.message);
-  }
-}
 setInterval(promotePayableCommissions, 60 * 60 * 1000);
 setTimeout(promotePayableCommissions, 30 * 1000);
 
