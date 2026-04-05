@@ -331,8 +331,8 @@ function setupAuthRoutes(app) {
     if (!process.env.GOOGLE_CLIENT_ID) return res.redirect('/login?error=google_not_configured');
     try {
       const config = await getGoogleOidcConfig();
-      const host = (process.env.REPLIT_DOMAINS || process.env.REPLIT_DEV_DOMAIN || req.get('x-forwarded-host') || req.hostname).split(',')[0].trim();
-      const callbackUrl = `https://${host}/auth/google/callback`;
+      const siteBase = process.env.SITE_URL || (() => { const host = (process.env.REPLIT_DOMAINS || process.env.REPLIT_DEV_DOMAIN || req.get('x-forwarded-host') || req.hostname).split(',')[0].trim(); return `https://${host}`; })();
+      const callbackUrl = `${siteBase}/auth/google/callback`;
       const state = oidc.randomState();
       const nonce = oidc.randomNonce();
       const codeVerifier = oidc.randomPKCECodeVerifier();
@@ -359,9 +359,9 @@ function setupAuthRoutes(app) {
   app.get('/auth/google/callback', async (req, res) => {
     try {
       const config = await getGoogleOidcConfig();
-      const host = (process.env.REPLIT_DOMAINS || process.env.REPLIT_DEV_DOMAIN || req.get('x-forwarded-host') || req.hostname).split(',')[0].trim();
-      const callbackUrl = req.session.googleCallback || `https://${host}/auth/google/callback`;
-      const tokens = await oidc.authorizationCodeGrant(config, new URL(req.url, `https://${host}`), {
+      const siteBase = process.env.SITE_URL || (() => { const host = (process.env.REPLIT_DOMAINS || process.env.REPLIT_DEV_DOMAIN || req.get('x-forwarded-host') || req.hostname).split(',')[0].trim(); return `https://${host}`; })();
+      const callbackUrl = req.session.googleCallback || `${siteBase}/auth/google/callback`;
+      const tokens = await oidc.authorizationCodeGrant(config, new URL(req.url, siteBase), {
         expectedState: req.session.googleState,
         expectedNonce: req.session.googleNonce,
         pkceCodeVerifier: req.session.googleCodeVerifier,
