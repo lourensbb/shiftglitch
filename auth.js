@@ -1258,7 +1258,17 @@ async function getAffiliateMonthlyCommissions(affiliateId) {
      ORDER BY DATE_TRUNC('month', created_at) ASC`,
     [affiliateId]
   );
-  return rows.map(r => ({ month: r.month, total: parseFloat(r.total) }));
+  const dataMap = {};
+  rows.forEach(r => { dataMap[r.month] = parseFloat(r.total); });
+  const months = [];
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(1);
+    d.setMonth(d.getMonth() - i);
+    const label = d.toLocaleString('en-ZA', { month: 'short', year: 'numeric' });
+    months.push({ month: label, total: dataMap[label] || 0 });
+  }
+  return months;
 }
 
 async function getAffiliateRecruitCount(affiliateId) {

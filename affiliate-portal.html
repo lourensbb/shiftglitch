@@ -521,7 +521,7 @@
             </div>
             <div class="rc-url" id="rc-url">—</div>
             <div class="rc-divider2"></div>
-            <div class="rc-recruits"><span id="rc-recruit-count">0</span> OPERATIVES IN NETWORK</div>
+            <div class="rc-recruits"><span id="rc-recruit-count">0</span> OPERATIVES RECRUITED</div>
             <a class="rc-cta" id="rc-cta-link" href="#">JOIN THE NETWORK →</a>
           </div>
           <div class="rc-screenshot-label">// SCREENSHOT &amp; SHARE</div>
@@ -898,9 +898,9 @@
         return;
       }
       const url = new URL(_baseReferralUrl);
-      url.searchParams.set('utm_source', platform);
-      if (campaign) url.searchParams.set('utm_campaign', campaign);
-      if (medium)   url.searchParams.set('utm_medium', medium);
+      url.searchParams.set('utm_source', platform || 'unknown');
+      url.searchParams.set('utm_campaign', campaign || 'general');
+      url.searchParams.set('utm_medium', medium || 'social');
       outUrl.textContent = url.toString();
       copyBtn.style.display = '';
     }
