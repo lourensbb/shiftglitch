@@ -523,9 +523,9 @@ function setupAuthRoutes(app) {
       const user = await getUser(req.session.userId);
       if (!user) return res.status(401).json({ error: 'User not found' });
       const profile = req.session.userProfile || {};
-      // Same cascade as affiliates-api.js: ADMIN_USER_ID env → HARDCODED_OWNER_ID literal → empty.
-      // HARDCODED_OWNER_ID: replace '' with owner's Replit user ID if env var is not used.
-      const HARDCODED_OWNER_ID_ME = '';   // mirrors HARDCODED_OWNER_ID in affiliates-api.js
+      // Same cascade as affiliates-api.js: ADMIN_USER_ID env → HARDCODED_OWNER_ID → empty.
+      // HARDCODED_OWNER_ID: lourensbb Replit OIDC sub (same value as in affiliates-api.js).
+      const HARDCODED_OWNER_ID_ME = '54503873';   // lourensbb Replit user ID (OIDC sub)
       const effectiveAdminId = process.env.ADMIN_USER_ID || HARDCODED_OWNER_ID_ME || '';
       res.json({
         id: user.id,

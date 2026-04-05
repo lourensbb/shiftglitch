@@ -27,11 +27,12 @@ const {
 
 const SITE_URL = process.env.SITE_URL || 'https://shiftglitch.replit.app';
 
-// Primary: ADMIN_USER_ID env var.
-// Secondary: hardcoded owner ID — replace the empty string with the owner's Replit user ID
-// (visible in the response body of /api/me as "id" when the owner is logged in).
-// When both are absent the admin panel is disabled (fail-closed).
-const HARDCODED_OWNER_ID = '';          // <-- set this to enable admin without the env var
+// Admin identity resolution — three-tier cascade (fail-closed):
+// 1. ADMIN_USER_ID env var (highest priority — use this in production)
+// 2. HARDCODED_OWNER_ID — Replit OIDC sub for the platform owner (lourensbb, id=54503873)
+//    When the owner logs in via Replit auth their session userId === this value.
+// 3. null → admin routes disabled, 503 returned
+const HARDCODED_OWNER_ID = '54503873';  // lourensbb Replit user ID (OIDC sub claim)
 const EFFECTIVE_ADMIN_ID = process.env.ADMIN_USER_ID || HARDCODED_OWNER_ID || null;
 
 if (!EFFECTIVE_ADMIN_ID) {

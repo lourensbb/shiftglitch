@@ -551,12 +551,14 @@
     }
 
     function viewPortal(code) {
-      // Opens the affiliate portal page in a new tab.
-      // The portal page (/affiliate-portal) is the operative's dashboard and is
-      // the canonical "portal link" for any affiliate. Session determines which
-      // affiliate's data loads — admin can QA the portal UX, or direct the
-      // affiliate to this URL to access their own dashboard.
-      window.open('/affiliate-portal', '_blank');
+      // Opens the affiliate's portal link in a new tab.
+      // URL includes the affiliate's code so the link is affiliate-specific.
+      // The portal is session-bound: the affiliate uses this URL to access
+      // their own dashboard; admin use is for QA verification of the portal UX.
+      const url = code
+        ? `/affiliate-portal?code=${encodeURIComponent(code)}`
+        : '/affiliate-portal';
+      window.open(url, '_blank');
     }
 
     // ── Surge ─────────────────────────────────────────────────────────────────
