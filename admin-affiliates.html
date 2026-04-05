@@ -361,7 +361,7 @@
 
     // ── Init ──────────────────────────────────────────────────────────────────
     async function init() {
-      // 1. Auth + admin identity check via /api/me (isAdmin flag set server-side)
+      // 1. Auth check + explicit admin identity comparison (task spec: compare userId to ADMIN_USER_ID)
       let me;
       try {
         const r = await fetch('/api/me', { headers: { 'Accept': 'application/json' } });
@@ -371,11 +371,14 @@
         window.location.href = '/api/login'; return;
       }
 
-      if (!me.isAdmin) {
+      // Explicit userId === adminUserId check per task requirement.
+      // adminUserId is set server-side from ADMIN_USER_ID env or HARDCODED_ADMIN_ID fallback.
+      // Empty adminUserId means no admin is configured → deny access.
+      if (!me.adminUserId || me.id !== me.adminUserId) {
         window.location.href = '/app'; return;
       }
 
-      // 2. Fetch affiliate list from the admin API (different path from this page)
+      // 2. Fetch affiliate list from admin API endpoint
       let data = [];
       try {
         const r = await fetch('/admin/affiliates', { headers: { 'Accept': 'application/json' } });
@@ -548,10 +551,12 @@
     }
 
     function viewPortal(code) {
-      // Opens the affiliate portal in a new tab.
-      // Admin is already logged in — portal will load showing the affiliate
-      // data for the admin's own session (useful for QA/review).
-      window.open('/affiliate-portal', '_blank');
+      // Opens a new tab to the affiliate's referral link (their portal entry point).
+      // The affiliate portal itself (/affiliate-portal) is session-bound to each operative.
+      // We open the referral URL with their code so the admin can verify it works.
+      const siteUrl = window.location.origin;
+      const url = code ? `${siteUrl}/?ref=${encodeURIComponent(code)}` : `${siteUrl}/affiliate-portal`;
+      window.open(url, '_blank');
     }
 
     // ── Surge ─────────────────────────────────────────────────────────────────

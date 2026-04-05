@@ -27,9 +27,10 @@ const {
 
 const SITE_URL = process.env.SITE_URL || 'https://shiftglitch.replit.app';
 
-// Primary: ADMIN_USER_ID env var. Secondary: hardcoded owner Replit userId (set below as fallback).
-// Replace the empty string with your Replit user ID if you prefer not to use an env var.
-const HARDCODED_OWNER_ID = '';
+// Primary: ADMIN_USER_ID env var. Secondary: hardcoded owner Replit userId.
+// To use the fallback without the env var, replace the empty string below with the
+// account's Replit user ID (visible in /api/me as "id" when logged in as the owner).
+const HARDCODED_OWNER_ID = process.env.HARDCODED_ADMIN_ID || '';
 const EFFECTIVE_ADMIN_ID = process.env.ADMIN_USER_ID || HARDCODED_OWNER_ID || null;
 
 if (!EFFECTIVE_ADMIN_ID) {

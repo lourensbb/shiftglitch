@@ -523,9 +523,9 @@ function setupAuthRoutes(app) {
       const user = await getUser(req.session.userId);
       if (!user) return res.status(401).json({ error: 'User not found' });
       const profile = req.session.userProfile || {};
-      // isAdmin: fail-closed — only true when ADMIN_USER_ID is set AND matches.
-      // When env var is unset, isAdmin is always false (no hardcoded fallback accepted here).
-      const adminId = process.env.ADMIN_USER_ID || '';
+      // Determine effective admin ID using same cascade as affiliates-api.js:
+      // env ADMIN_USER_ID → env HARDCODED_ADMIN_ID → empty (no admin configured).
+      const effectiveAdminId = process.env.ADMIN_USER_ID || process.env.HARDCODED_ADMIN_ID || '';
       res.json({
         id: user.id,
         email: user.email,
@@ -535,7 +535,11 @@ function setupAuthRoutes(app) {
         createdAt: user.created_at,
         membershipTier: user.membership_tier || 'free',
         proExpiresAt: user.pro_expires_at || null,
-        isAdmin: (adminId !== '' && user.id === adminId),
+        // isAdmin: fail-closed — only true when an admin ID is configured AND matches.
+        isAdmin: (effectiveAdminId !== '' && user.id === effectiveAdminId),
+        // adminUserId: exposed so client can perform explicit ID comparison per task spec.
+        // Empty string when no admin ID is configured.
+        adminUserId: effectiveAdminId,
       });
     } catch (err) {
       console.error('/api/me error:', err);
