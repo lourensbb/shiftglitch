@@ -18,10 +18,16 @@ async function getOidcConfig() {
   return oidcConfig;
 }
 
-async function getGoogleOidcConfig() {
+function getGoogleOidcConfig() {
   if (!googleOidcConfig) {
-    googleOidcConfig = await oidc.discovery(
-      new URL('https://accounts.google.com'),
+    googleOidcConfig = new oidc.Configuration(
+      {
+        issuer: 'https://accounts.google.com',
+        authorization_endpoint: 'https://accounts.google.com/o/oauth2/v2/auth',
+        token_endpoint: 'https://oauth2.googleapis.com/token',
+        jwks_uri: 'https://www.googleapis.com/oauth2/v3/certs',
+        userinfo_endpoint: 'https://openidconnect.googleapis.com/v1/userinfo'
+      },
       process.env.GOOGLE_CLIENT_ID,
       { client_secret: process.env.GOOGLE_CLIENT_SECRET }
     );
@@ -330,7 +336,7 @@ function setupAuthRoutes(app) {
   app.get('/auth/google', async (req, res) => {
     if (!process.env.GOOGLE_CLIENT_ID) return res.redirect('/login?error=google_not_configured');
     try {
-      const config = await getGoogleOidcConfig();
+      const config = getGoogleOidcConfig();
       const siteBase = process.env.SITE_URL || (() => { const host = (process.env.REPLIT_DOMAINS || process.env.REPLIT_DEV_DOMAIN || req.get('x-forwarded-host') || req.hostname).split(',')[0].trim(); return `https://${host}`; })();
       const callbackUrl = `${siteBase}/auth/google/callback`;
       const state = oidc.randomState();
@@ -358,7 +364,7 @@ function setupAuthRoutes(app) {
 
   app.get('/auth/google/callback', async (req, res) => {
     try {
-      const config = await getGoogleOidcConfig();
+      const config = getGoogleOidcConfig();
       const siteBase = process.env.SITE_URL || (() => { const host = (process.env.REPLIT_DOMAINS || process.env.REPLIT_DEV_DOMAIN || req.get('x-forwarded-host') || req.hostname).split(',')[0].trim(); return `https://${host}`; })();
       const callbackUrl = req.session.googleCallback || `${siteBase}/auth/google/callback`;
       const tokens = await oidc.authorizationCodeGrant(config, new URL(req.url, siteBase), {
