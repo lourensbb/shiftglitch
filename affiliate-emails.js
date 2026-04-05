@@ -13,9 +13,8 @@ function getResendKey() {
   return process.env.RESEND_SG_KEY || process.env.RESEND_API_KEY || null;
 }
 
-function getFromAddress() {
-  return process.env.RESEND_FROM_ADDRESS || 'ShiftGlitch <admin@shiftglitch.com>';
-}
+// From address is always hardcoded for affiliate emails — never overridden by env vars
+const AFFILIATE_FROM = 'ShiftGlitch <admin@shiftglitch.com>';
 
 async function sendEmail({ to, subject, html }) {
   const key = getResendKey();
@@ -27,7 +26,7 @@ async function sendEmail({ to, subject, html }) {
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ from: getFromAddress(), to: [to], subject, html })
+      body: JSON.stringify({ from: AFFILIATE_FROM, to: [to], subject, html })
     });
     if (!res.ok) {
       const body = await res.text();
@@ -258,7 +257,7 @@ async function sendAffiliateSurgeBlastEmail(surge) {
     emailFooter()
   );
 
-  const subject = `// SURGE EVENT \u2014 ${surge.bonus_multiplier}\u00d7 commissions for ${durationHours}h`;
+  const subject = `// SURGE EVENT \u2014 Double commissions for ${durationHours}h`;
 
   let sent = 0;
   for (const affiliate of affiliates) {
