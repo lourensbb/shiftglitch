@@ -200,6 +200,7 @@ async function ensureSchema() {
         message TEXT,
         created_by TEXT
       );
+      ALTER TABLE affiliates ADD COLUMN IF NOT EXISTS recruited_by_id INT REFERENCES affiliates(id) ON DELETE SET NULL;
     `);
     console.log('[auth] DB schema ready');
   } catch (err) {
@@ -1061,25 +1062,47 @@ async function getAffiliateLeaderboard() {
 
 async function getAllAffiliatesWithStats() {
   const { rows } = await pool.query(`
+    WITH comm_totals AS (
+      SELECT
+        affiliate_id,
+        COALESCE(SUM(commission) FILTER (WHERE status = 'pending'), 0) AS pending,
+        COALESCE(SUM(commission) FILTER (WHERE status = 'payable'), 0) AS payable,
+        COALESCE(SUM(commission) FILTER (WHERE status = 'paid'),    0) AS paid
+      FROM affiliate_commissions
+      GROUP BY affiliate_id
+    ),
+    click_totals AS (
+      SELECT affiliate_id, COUNT(*)::int AS click_count
+      FROM affiliate_clicks
+      GROUP BY affiliate_id
+    )
     SELECT
       a.id, a.display_name AS "displayName", a.email, a.code, a.tier, a.status,
       a.sales_count AS "salesCount", a.created_at AS "createdAt",
-      COUNT(DISTINCT ac.id)::int AS "clickCount",
-      COALESCE(SUM(c.commission) FILTER (WHERE c.status = 'pending'),  0) AS "pendingCommission",
-      COALESCE(SUM(c.commission) FILTER (WHERE c.status = 'payable'),  0) AS "payableCommission",
-      COALESCE(SUM(c.commission) FILTER (WHERE c.status = 'paid'),     0) AS "paidCommission"
+      COALESCE(ct.click_count, 0)::int AS "clickCount",
+      COALESCE(cm.pending, 0) AS pending_commission,
+      COALESCE(cm.payable, 0) AS payable_commission,
+      COALESCE(cm.paid, 0)    AS paid_commission
     FROM affiliates a
-    LEFT JOIN affiliate_commissions c  ON c.affiliate_id = a.id
-    LEFT JOIN affiliate_clicks     ac ON ac.affiliate_id = a.id
-    GROUP BY a.id
+    LEFT JOIN comm_totals  cm ON cm.affiliate_id = a.id
+    LEFT JOIN click_totals ct ON ct.affiliate_id = a.id
     ORDER BY a.created_at DESC
   `);
   return rows.map(r => ({
-    ...r,
+    id: r.id,
+    displayName: r.displayName,
+    email: r.email,
+    code: r.code,
+    tier: r.tier,
+    status: r.status,
+    salesCount: r.salesCount,
+    createdAt: r.createdAt,
     clickCount: parseInt(r.clickCount, 10),
-    pendingCommission: parseFloat(r.pendingCommission),
-    payableCommission: parseFloat(r.payableCommission),
-    paidCommission: parseFloat(r.paidCommission),
+    commissions: {
+      pending: parseFloat(r.pending_commission),
+      payable: parseFloat(r.payable_commission),
+      paid: parseFloat(r.paid_commission),
+    },
   }));
 }
 

@@ -18,17 +18,20 @@ const {
 
 const SITE_URL = process.env.SITE_URL || 'https://shiftglitch.replit.app';
 
-// Startup admin check
-if (!process.env.ADMIN_USER_ID) {
-  console.warn('[affiliate-api] WARNING: ADMIN_USER_ID env var not set — admin routes will reject all requests');
+// Primary: ADMIN_USER_ID env var. Secondary: hardcoded owner Replit userId (set below as fallback).
+// Replace the empty string with your Replit user ID if you prefer not to use an env var.
+const HARDCODED_OWNER_ID = '';
+const EFFECTIVE_ADMIN_ID = process.env.ADMIN_USER_ID || HARDCODED_OWNER_ID || null;
+
+if (!EFFECTIVE_ADMIN_ID) {
+  console.warn('[affiliate-api] WARNING: ADMIN_USER_ID env var not set and no hardcoded owner ID — admin routes are disabled');
 }
 
 function requireAdmin(req, res, next) {
-  const adminId = process.env.ADMIN_USER_ID;
-  if (!adminId) {
+  if (!EFFECTIVE_ADMIN_ID) {
     return res.status(503).json({ error: 'Admin not configured — set ADMIN_USER_ID env var' });
   }
-  if (!req.session || req.session.userId !== adminId) {
+  if (!req.session || req.session.userId !== EFFECTIVE_ADMIN_ID) {
     return res.status(403).json({ error: 'Forbidden' });
   }
   next();
