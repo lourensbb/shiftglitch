@@ -1,11 +1,10 @@
 const PDFDocument = require('pdfkit');
 
-const BLACK = '#0a0a0a';
-const GREEN = '#39FF14';
+const GREEN   = '#39FF14';
 const MAGENTA = '#FF00FF';
-const PURPLE = '#8A2BE2';
-const WHITE = '#ffffff';
-const GREY = '#888888';
+const PURPLE  = '#8A2BE2';
+const WHITE   = '#ffffff';
+const SITE    = 'https://shiftglitch.replit.app';
 
 const EXPLOITS = [
   {
@@ -17,7 +16,7 @@ const EXPLOITS = [
     what: 'The Memory Palace is one of the oldest cognitive exploits on record. You take a familiar physical space — your house, a route you walk every day — and you plant the information you need to retain at specific locations within it. Your brain evolved to remember places and spatial layouts. This exploit hijacks that survival system and repurposes it for knowledge storage.',
     protocol: [
       'Select a physical location you know perfectly (your home, a regular commute).',
-      'Walk through it mentally and identify 10-15 fixed anchor points in sequence.',
+      'Walk through it mentally and identify 10–15 fixed anchor points in sequence.',
       'At each anchor point, place a vivid, bizarre, or emotional image representing the concept you need to remember.',
       'To retrieve the information, mentally walk the route and "collect" each image.',
       'Repeat the walk 3 times immediately after encoding, then again 24 hours later.',
@@ -158,7 +157,7 @@ const EXPLOITS = [
     subtitle: 'Metacognition Protocol',
     color: WHITE,
     tagline: 'Review your own performance after every session. The debrief is where real growth happens.',
-    what: 'Most operatives finish a session and move on. High performers spend 5-10 minutes debriefing: what worked, what didn\'t, what was harder than expected, what new questions emerged. This metacognitive habit turns experience into learning about learning — progressively improving not just your knowledge, but the efficiency of your entire knowledge acquisition system.',
+    what: 'Most operatives finish a session and move on. High performers spend 5–10 minutes debriefing: what worked, what didn\'t, what was harder than expected, what new questions emerged. This metacognitive habit turns experience into learning about learning — progressively improving not just your knowledge, but the efficiency of your entire knowledge acquisition system.',
     protocol: [
       'At the end of every session, spend 5 minutes writing a debrief.',
       'Record: What did I actually absorb today? What confused me? What needs more depth?',
@@ -170,25 +169,26 @@ const EXPLOITS = [
   }
 ];
 
-function hexToRgb(hex) {
-  const r = parseInt(hex.slice(1, 3), 16) / 255;
-  const g = parseInt(hex.slice(3, 5), 16) / 255;
-  const b = parseInt(hex.slice(5, 7), 16) / 255;
-  return [r, g, b];
-}
-
-function setFill(doc, hex) {
-  const [r, g, b] = hexToRgb(hex);
-  doc.fillColor([r, g, b]);
-}
-
-function setStroke(doc, hex) {
-  const [r, g, b] = hexToRgb(hex);
-  doc.strokeColor([r, g, b]);
+function exploitColor(exploit) {
+  if (exploit.color === GREEN)   return '#39FF14';
+  if (exploit.color === MAGENTA) return '#FF00FF';
+  if (exploit.color === PURPLE)  return '#8A2BE2';
+  return '#ffffff';
 }
 
 function drawPageBg(doc) {
   doc.rect(0, 0, doc.page.width, doc.page.height).fill('#0a0a0a');
+}
+
+function pageFooterLink(doc) {
+  const W = doc.page.width;
+  const H = doc.page.height;
+  const linkText = 'shiftglitch.replit.app';
+  doc.font('Courier').fontSize(9).fillColor('#39FF14').fillOpacity(0.55)
+    .text(linkText, 0, H - 26, { width: W, align: 'center' });
+  const tw = doc.widthOfString(linkText);
+  doc.link((W - tw) / 2, H - 28, tw, 14, SITE);
+  doc.fillOpacity(1);
 }
 
 function addCoverPage(doc) {
@@ -202,47 +202,42 @@ function addCoverPage(doc) {
   doc.rect(0, 0, 6, H).fill('#39FF14');
   doc.rect(W - 6, 0, 6, H).fill('#39FF14');
 
-  doc.font('Courier').fontSize(10).fillColor('#39FF14').fillOpacity(0.4)
+  doc.font('Courier').fontSize(10).fillColor('#39FF14').fillOpacity(0.6)
     .text('// SHIFTGLITCH SYSTEMS — CLASSIFIED INTEL PACKAGE — OPERATIVE EYES ONLY //', 40, 30, { width: W - 80, align: 'center' });
-
   doc.fillOpacity(1);
 
-  doc.font('Courier-Bold').fontSize(52).fillColor('#ffffff')
-    .text('SHIFT', 60, 130);
-  doc.font('Courier-Bold').fontSize(52).fillColor('#39FF14')
-    .text('GLITCH', 60 + doc.widthOfString('SHIFT'), 130);
+  doc.font('Courier-Bold').fontSize(52).fillColor('#ffffff').text('SHIFT', 60, 130);
+  const shiftW = doc.widthOfString('SHIFT');
+  doc.font('Courier-Bold').fontSize(52).fillColor('#39FF14').text('GLITCH', 60 + shiftW, 130);
 
-  doc.font('Courier').fontSize(11).fillColor('#39FF14').fillOpacity(0.6)
-    .text('COGNITIVE EXPLOIT MANUAL', 60, 200, { characterSpacing: 4 });
-
+  doc.font('Courier').fontSize(12).fillColor('#39FF14').fillOpacity(0.8)
+    .text('COGNITIVE EXPLOIT MANUAL', 60, 204, { characterSpacing: 3 });
   doc.fillOpacity(1);
 
   const titleY = 260;
-  doc.font('Courier-Bold').fontSize(30).fillColor('#ffffff')
-    .text('THE', 60, titleY);
-  doc.font('Courier-Bold').fontSize(30).fillColor('#ffffff')
-    .text('COGNITIVE', 60, titleY + 36);
-  doc.font('Courier-Bold').fontSize(30).fillColor('#FF00FF')
-    .text('EXPLOIT', 60, titleY + 72);
-  doc.font('Courier-Bold').fontSize(30).fillColor('#ffffff')
-    .text('MANUAL', 60, titleY + 108);
+  doc.font('Courier-Bold').fontSize(32).fillColor('#ffffff').text('THE',       60, titleY);
+  doc.font('Courier-Bold').fontSize(32).fillColor('#ffffff').text('COGNITIVE', 60, titleY + 40);
+  doc.font('Courier-Bold').fontSize(32).fillColor('#FF00FF').text('EXPLOIT',   60, titleY + 80);
+  doc.font('Courier-Bold').fontSize(32).fillColor('#ffffff').text('MANUAL',    60, titleY + 120);
 
-  doc.rect(60, titleY + 154, W - 120, 2).fill('#39FF14');
+  doc.rect(60, titleY + 170, W - 120, 2).fill('#39FF14');
 
-  doc.font('Courier').fontSize(12).fillColor('#aaaaaa')
-    .text('10 battle-tested cognitive protocols that rewire how you absorb,\nretain, and deploy knowledge. For operatives serious about\nadvancing beyond NPC status.', 60, titleY + 172, { width: W - 120, lineGap: 4 });
+  doc.font('Courier').fontSize(13).fillColor('#d0d0d0')
+    .text('10 battle-tested cognitive protocols that rewire how you absorb,\nretain, and deploy knowledge. For operatives serious about\nadvancing beyond NPC status.', 60, titleY + 186, { width: W - 120, lineGap: 5 });
 
-  const infoY = 520;
-  doc.font('Courier').fontSize(10).fillColor('#39FF14').fillOpacity(0.5)
+  const infoY = 545;
+  doc.font('Courier').fontSize(10).fillColor('#39FF14').fillOpacity(0.65)
     .text('// CLASSIFICATION: OPEN SOURCE — SHARE FREELY //', 60, infoY);
   doc.fillOpacity(1);
-  doc.font('Courier').fontSize(10).fillColor('#555555')
-    .text('Compiled by ShiftGlitch Systems', 60, infoY + 18);
-  doc.font('Courier').fontSize(10).fillColor('#555555')
-    .text('shiftglitch.com', 60, infoY + 32);
 
-  const rankY = H - 100;
-  doc.font('Courier').fontSize(9).fillColor('#333333')
+  doc.font('Courier').fontSize(11).fillColor('#aaaaaa')
+    .text('Compiled by ShiftGlitch Systems — ', 60, infoY + 20, { continued: true });
+  doc.font('Courier').fontSize(11).fillColor('#39FF14')
+    .text('shiftglitch.replit.app');
+  doc.link(60, infoY + 20, W - 120, 16, SITE);
+
+  const rankY = H - 84;
+  doc.font('Courier').fontSize(10).fillColor('#777777')
     .text('RANK PROGRESSION: NPC  →  SCRIPT KIDDIE  →  GLITCH TECH  →  NETRUNNER  →  SYSTEM ADMIN', 60, rankY, { width: W - 120, align: 'center', characterSpacing: 1 });
 }
 
@@ -252,35 +247,40 @@ function addTocPage(doc) {
 
   const W = doc.page.width;
 
-  doc.font('Courier').fontSize(10).fillColor('#39FF14').fillOpacity(0.5)
+  doc.font('Courier').fontSize(10).fillColor('#39FF14').fillOpacity(0.7)
     .text('// TABLE OF CONTENTS //', 60, 40, { characterSpacing: 3 });
   doc.fillOpacity(1);
 
-  doc.font('Courier-Bold').fontSize(24).fillColor('#ffffff')
-    .text('EXPLOIT INDEX', 60, 70);
-  doc.rect(60, 104, W - 120, 1).fill('#39FF14').fillOpacity(0.3);
+  doc.font('Courier-Bold').fontSize(26).fillColor('#ffffff').text('EXPLOIT INDEX', 60, 72);
+  doc.rect(60, 108, W - 120, 1.5).fill('#39FF14').fillOpacity(0.4);
   doc.fillOpacity(1);
 
-  let y = 120;
-  EXPLOITS.forEach((e, i) => {
-    const col = e.color === GREEN ? '#39FF14' : e.color === MAGENTA ? '#FF00FF' : e.color === PURPLE ? '#8A2BE2' : '#ffffff';
-    doc.font('Courier-Bold').fontSize(11).fillColor(col)
-      .text(`${e.id}`, 60, y);
-    doc.font('Courier-Bold').fontSize(11).fillColor('#ffffff')
-      .text(e.name, 105, y);
-    doc.font('Courier').fontSize(9).fillColor('#666666')
-      .text(e.subtitle, 105, y + 14);
-    y += 44;
+  let y = 124;
+  EXPLOITS.forEach(e => {
+    const col = exploitColor(e);
+    doc.font('Courier-Bold').fontSize(12).fillColor(col).text(e.id, 60, y);
+    doc.font('Courier-Bold').fontSize(12).fillColor('#ffffff').text(e.name, 110, y);
+    doc.font('Courier').fontSize(10).fillColor('#999999').text(e.subtitle, 110, y + 16);
+    y += 46;
   });
 
-  y += 10;
-  doc.rect(60, y, W - 120, 1).fill('#333333');
+  y += 8;
+  doc.rect(60, y, W - 120, 1).fill('#444444');
   y += 16;
-  doc.font('Courier').fontSize(10).fillColor('#555555')
-    .text('Introduction ..... 3', 60, y);
-  y += 16;
-  doc.font('Courier').fontSize(10).fillColor('#555555')
-    .text('Rank Progression Guide ..... 14', 60, y);
+  doc.font('Courier').fontSize(11).fillColor('#888888').text('Introduction ......................... p.3', 60, y);
+  y += 18;
+  doc.font('Courier').fontSize(11).fillColor('#888888').text('Rank Progression Guide ............... p.14', 60, y);
+  y += 18;
+  doc.font('Courier').fontSize(11).fillColor('#888888').text('Final Transmission ................... p.15', 60, y);
+
+  y += 32;
+  doc.font('Courier').fontSize(11).fillColor('#39FF14').fillOpacity(0.7)
+    .text('Deploy every exploit at  shiftglitch.replit.app', 60, y);
+  const linkStart = 60 + doc.widthOfString('Deploy every exploit at  ');
+  doc.link(linkStart, y, doc.widthOfString('shiftglitch.replit.app'), 14, SITE);
+  doc.fillOpacity(1);
+
+  pageFooterLink(doc);
 }
 
 function addIntroPage(doc) {
@@ -289,13 +289,13 @@ function addIntroPage(doc) {
 
   const W = doc.page.width;
 
-  doc.font('Courier').fontSize(10).fillColor('#39FF14').fillOpacity(0.5)
+  doc.font('Courier').fontSize(11).fillColor('#39FF14').fillOpacity(0.8)
     .text('// INTRODUCTION //', 60, 40, { characterSpacing: 3 });
   doc.fillOpacity(1);
 
-  doc.font('Courier-Bold').fontSize(22).fillColor('#ffffff')
-    .text('YOU\'VE BEEN\nJACKED IN.', 60, 70);
-  doc.rect(60, 136, W - 120, 2).fill('#39FF14');
+  doc.font('Courier-Bold').fontSize(26).fillColor('#ffffff')
+    .text('YOU\'VE BEEN\nJACKED IN.', 60, 72);
+  doc.rect(60, 142, W - 120, 2).fill('#39FF14');
 
   const intro = [
     'Welcome, operative. You are holding intelligence that most people never find.',
@@ -308,11 +308,13 @@ function addIntroPage(doc) {
     'The Mainframe is waiting.',
   ];
 
-  let y = 152;
+  let y = 158;
   intro.forEach(para => {
-    doc.font('Courier').fontSize(11).fillColor('#cccccc').text(para, 60, y, { width: W - 120, lineGap: 3 });
-    y += doc.heightOfString(para, { width: W - 120, lineGap: 3 }) + 14;
+    doc.font('Courier').fontSize(12).fillColor('#dedede').text(para, 60, y, { width: W - 120, lineGap: 4 });
+    y += doc.heightOfString(para, { width: W - 120, lineGap: 4 }) + 16;
   });
+
+  pageFooterLink(doc);
 }
 
 function addExploitPage(doc, exploit) {
@@ -320,60 +322,65 @@ function addExploitPage(doc, exploit) {
   drawPageBg(doc);
 
   const W = doc.page.width;
-  const col = exploit.color === GREEN ? '#39FF14' : exploit.color === MAGENTA ? '#FF00FF' : exploit.color === PURPLE ? '#8A2BE2' : '#ffffff';
+  const H = doc.page.height;
+  const col = exploitColor(exploit);
 
-  doc.rect(0, 0, 8, doc.page.height).fill(col);
+  doc.rect(0, 0, 8, H).fill(col);
 
-  doc.font('Courier').fontSize(48).fillColor(col).fillOpacity(0.12)
-    .text(exploit.id, W - 130, 20);
+  doc.font('Courier').fontSize(52).fillColor(col).fillOpacity(0.1)
+    .text(exploit.id, W - 120, 18);
   doc.fillOpacity(1);
 
-  doc.font('Courier-Bold').fontSize(10).fillColor(col).fillOpacity(0.7)
-    .text(`// EXPLOIT ${exploit.id} //${' '.repeat(50)}`, 30, 40, { characterSpacing: 2 });
-  doc.fillOpacity(1);
-
-  doc.font('Courier-Bold').fontSize(26).fillColor('#ffffff')
-    .text(exploit.name, 30, 68);
-  doc.font('Courier').fontSize(11).fillColor(col).fillOpacity(0.8)
-    .text(exploit.subtitle, 30, 102, { characterSpacing: 1 });
-  doc.fillOpacity(1);
-
-  doc.rect(30, 124, W - 60, 1.5).fill(col).fillOpacity(0.5);
-  doc.fillOpacity(1);
-
-  doc.rect(30, 134, W - 60, 36).fill('#111111');
   doc.font('Courier-Bold').fontSize(11).fillColor(col)
-    .text(`"${exploit.tagline}"`, 42, 143, { width: W - 84 });
+    .text(`// EXPLOIT ${exploit.id}`, 24, 40, { characterSpacing: 2 });
 
-  let y = 186;
+  doc.font('Courier-Bold').fontSize(28).fillColor('#ffffff').text(exploit.name, 24, 62);
 
-  doc.font('Courier-Bold').fontSize(10).fillColor(col).fillOpacity(0.7)
-    .text('// WHAT IT IS', 30, y, { characterSpacing: 2 });
+  doc.font('Courier').fontSize(12).fillColor(col)
+    .text(exploit.subtitle, 24, 100, { characterSpacing: 1 });
+
+  doc.rect(24, 122, W - 48, 1.5).fill(col).fillOpacity(0.5);
   doc.fillOpacity(1);
-  y += 18;
-  doc.font('Courier').fontSize(10.5).fillColor('#bbbbbb')
-    .text(exploit.what, 30, y, { width: W - 60, lineGap: 3 });
-  y += doc.heightOfString(exploit.what, { width: W - 60, lineGap: 3 }) + 16;
 
-  doc.font('Courier-Bold').fontSize(10).fillColor(col).fillOpacity(0.7)
-    .text('// THE PROTOCOL', 30, y, { characterSpacing: 2 });
-  doc.fillOpacity(1);
-  y += 18;
+  doc.rect(24, 130, W - 48, 40).fill('#141414');
+  doc.font('Courier-Bold').fontSize(12).fillColor(col)
+    .text(`"${exploit.tagline}"`, 36, 141, { width: W - 72 });
+
+  let y = 184;
+
+  doc.font('Courier-Bold').fontSize(11).fillColor(col)
+    .text('// WHAT IT IS', 24, y, { characterSpacing: 2 });
+  y += 20;
+  doc.font('Courier').fontSize(12).fillColor('#e0e0e0')
+    .text(exploit.what, 24, y, { width: W - 48, lineGap: 4 });
+  y += doc.heightOfString(exploit.what, { width: W - 48, lineGap: 4 }) + 20;
+
+  doc.font('Courier-Bold').fontSize(11).fillColor(col)
+    .text('// THE PROTOCOL', 24, y, { characterSpacing: 2 });
+  y += 20;
 
   exploit.protocol.forEach((step, i) => {
     const stepText = `${i + 1}.  ${step}`;
-    doc.font('Courier').fontSize(10).fillColor('#cccccc')
-      .text(stepText, 30, y, { width: W - 60, lineGap: 2 });
-    y += doc.heightOfString(stepText, { width: W - 60, lineGap: 2 }) + 8;
+    doc.font('Courier').fontSize(11).fillColor('#e8e8e8')
+      .text(stepText, 24, y, { width: W - 48, lineGap: 3 });
+    y += doc.heightOfString(stepText, { width: W - 48, lineGap: 3 }) + 10;
   });
 
-  y += 6;
-  doc.rect(30, y, W - 60, 1).fill('#222222');
-  y += 10;
-  doc.font('Courier-Bold').fontSize(9).fillColor('#555555')
-    .text('FIELD APPLICATION: ', 30, y, { continued: true });
-  doc.font('Courier').fontSize(9).fillColor('#777777')
-    .text(exploit.field);
+  y += 8;
+  doc.rect(24, y, W - 48, 1).fill('#2a2a2a');
+  y += 12;
+  doc.font('Courier-Bold').fontSize(10).fillColor('#999999')
+    .text('FIELD APPLICATION:  ', 24, y, { continued: true });
+  doc.font('Courier').fontSize(10).fillColor('#bbbbbb').text(exploit.field);
+
+  y += 26;
+  const linkLabel = `→  Deploy this exploit at  shiftglitch.replit.app`;
+  doc.font('Courier').fontSize(10).fillColor('#39FF14').fillOpacity(0.7).text(linkLabel, 24, y);
+  const linkX = 24 + doc.widthOfString('→  Deploy this exploit at  ');
+  doc.link(linkX, y, doc.widthOfString('shiftglitch.replit.app'), 13, SITE);
+  doc.fillOpacity(1);
+
+  pageFooterLink(doc);
 }
 
 function addRankPage(doc) {
@@ -381,42 +388,51 @@ function addRankPage(doc) {
   drawPageBg(doc);
 
   const W = doc.page.width;
+  const H = doc.page.height;
 
-  doc.font('Courier').fontSize(10).fillColor('#39FF14').fillOpacity(0.5)
+  doc.font('Courier').fontSize(11).fillColor('#39FF14').fillOpacity(0.8)
     .text('// RANK PROGRESSION //', 60, 40, { characterSpacing: 3 });
   doc.fillOpacity(1);
-  doc.font('Courier-Bold').fontSize(22).fillColor('#ffffff')
-    .text('THE ESCAPE ROUTE', 60, 70);
-  doc.rect(60, 104, W - 120, 2).fill('#39FF14');
+
+  doc.font('Courier-Bold').fontSize(26).fillColor('#ffffff').text('THE ESCAPE ROUTE', 60, 72);
+  doc.rect(60, 108, W - 120, 2).fill('#39FF14');
 
   const ranks = [
-    { id: '00', name: 'NPC', color: '#555555', req: 'Starting rank. You are jacked in but not yet aware of your situation.' },
-    { id: '01', name: 'SCRIPT KIDDIE', color: '#3a7a3a', req: 'Complete 5 focus sessions. Run 10 active recall rounds. Build your first flashcard deck (20+ cards).' },
-    { id: '02', name: 'GLITCH TECH', color: '#8A2BE2', req: 'Achieve a 7-day focus streak. Complete 3 Diagnostic missions. Deploy 3 different cognitive exploits.' },
-    { id: '03', name: 'NETRUNNER', color: '#39FF14', req: 'Complete a Mission Debrief for every session for 14 consecutive days. Maintain 80%+ flashcard success rate over 30 days.' },
-    { id: '04', name: 'SYSTEM ADMIN', color: '#FF00FF', req: 'Complete a full Escape Run. Demonstrate mastery across all 10 cognitive exploits. Operate at Netrunner level for 30 days.' },
+    { id: '00', name: 'NPC',           color: '#777777', req: 'Starting rank. You are jacked in but not yet aware of your situation.' },
+    { id: '01', name: 'SCRIPT KIDDIE', color: '#3a9a3a', req: 'Complete 5 focus sessions. Run 10 active recall rounds. Build your first flashcard deck (20+ cards).' },
+    { id: '02', name: 'GLITCH TECH',   color: '#8A2BE2', req: 'Achieve a 7-day focus streak. Complete 3 Diagnostic missions. Deploy 3 different cognitive exploits.' },
+    { id: '03', name: 'NETRUNNER',     color: '#39FF14', req: 'Complete a Mission Debrief for every session for 14 consecutive days. Maintain 80%+ flashcard success rate over 30 days.' },
+    { id: '04', name: 'SYSTEM ADMIN',  color: '#FF00FF', req: 'Complete a full Escape Run. Demonstrate mastery across all 10 cognitive exploits. Operate at Netrunner level for 30 days.' },
   ];
 
   let y = 120;
   ranks.forEach(rank => {
-    doc.rect(60, y, W - 120, 60).fill('#111111');
-    doc.rect(60, y, 4, 60).fill(rank.color);
+    doc.rect(60, y, W - 120, 66).fill('#111111');
+    doc.rect(60, y, 5, 66).fill(rank.color);
 
-    doc.font('Courier').fontSize(9).fillColor('#444444')
-      .text(`RANK ${rank.id}`, 76, y + 10, { characterSpacing: 2 });
-    doc.font('Courier-Bold').fontSize(14).fillColor(rank.color)
-      .text(rank.name, 76, y + 24);
-    doc.font('Courier').fontSize(9).fillColor('#888888')
-      .text(rank.req, 76, y + 42, { width: W - 152 });
+    doc.font('Courier').fontSize(10).fillColor('#888888')
+      .text(`RANK ${rank.id}`, 78, y + 10, { characterSpacing: 2 });
+    doc.font('Courier-Bold').fontSize(15).fillColor(rank.color).text(rank.name, 78, y + 24);
+    doc.font('Courier').fontSize(10).fillColor('#cccccc')
+      .text(rank.req, 78, y + 44, { width: W - 160 });
 
-    y += 72;
+    y += 76;
   });
 
-  y += 10;
-  doc.rect(60, y, W - 120, 1).fill('#333333');
+  y += 14;
+  doc.rect(60, y, W - 120, 1).fill('#444444');
   y += 16;
-  doc.font('Courier').fontSize(10).fillColor('#555555')
-    .text('Ranks are earned through sustained consistent effort. They cannot be purchased, bypassed, or simulated.', 60, y, { width: W - 120, lineGap: 3 });
+  doc.font('Courier').fontSize(11).fillColor('#cccccc')
+    .text('Ranks are earned through sustained consistent effort. They cannot be purchased, bypassed, or simulated.', 60, y, { width: W - 120, lineGap: 4 });
+
+  y += 40;
+  const rankLinkLabel = 'Start your rank climb — free — at  shiftglitch.replit.app';
+  doc.font('Courier').fontSize(11).fillColor('#39FF14').fillOpacity(0.8).text(rankLinkLabel, 60, y);
+  const rankLinkX = 60 + doc.widthOfString('Start your rank climb — free — at  ');
+  doc.link(rankLinkX, y, doc.widthOfString('shiftglitch.replit.app'), 14, SITE);
+  doc.fillOpacity(1);
+
+  pageFooterLink(doc);
 }
 
 function addClosingPage(doc) {
@@ -429,18 +445,37 @@ function addClosingPage(doc) {
   doc.rect(0, 0, W, 6).fill('#39FF14');
   doc.rect(0, H - 6, W, 6).fill('#39FF14');
 
-  doc.font('Courier-Bold').fontSize(28).fillColor('#ffffff')
-    .text('FINAL\nTRANSMISSION', 60, 80);
+  doc.font('Courier-Bold').fontSize(30).fillColor('#ffffff').text('FINAL\nTRANSMISSION', 60, 80);
+  doc.rect(60, 168, W - 120, 2).fill('#FF00FF');
 
-  doc.rect(60, 164, W - 120, 2).fill('#FF00FF');
+  const paras = [
+    'You now hold more practical knowledge about how human memory works than most people will ever encounter. The question is not whether these exploits work — the research is conclusive. The question is whether you will deploy them.',
+    'Consistency is the only differentiator. A mediocre operative who shows up every day will outrun a brilliant one who doesn\'t.',
+    'The Mainframe is waiting. Jack in.',
+  ];
 
-  const closing = 'You now hold more practical knowledge about how human memory works than most people will ever encounter. The question is not whether these exploits work — the research is conclusive. The question is whether you will deploy them.\n\nConsistency is the only differentiator. A mediocre operative who shows up every day will outrun a brilliant one who doesn\'t.\n\nThe Mainframe is waiting. Jack in.\n\nshiftglitch.com';
+  let y = 186;
+  paras.forEach(para => {
+    doc.font('Courier').fontSize(13).fillColor('#e0e0e0').text(para, 60, y, { width: W - 120, lineGap: 5 });
+    y += doc.heightOfString(para, { width: W - 120, lineGap: 5 }) + 20;
+  });
 
-  doc.font('Courier').fontSize(12).fillColor('#cccccc')
-    .text(closing, 60, 186, { width: W - 120, lineGap: 5 });
+  y += 8;
+  doc.rect(60, y, W - 120, 1).fill('#333333');
+  y += 20;
 
-  doc.font('Courier').fontSize(10).fillColor('#39FF14').fillOpacity(0.4)
-    .text('// END TRANSMISSION — SHIFTGLITCH SYSTEMS — © 2026 LOURENS BREYTENBACH //', 60, H - 60, { width: W - 120, align: 'center' });
+  doc.font('Courier-Bold').fontSize(13).fillColor('#39FF14').text('shiftglitch.replit.app', 60, y);
+  doc.link(60, y, doc.widthOfString('shiftglitch.replit.app'), 16, SITE);
+  y += 20;
+  doc.font('Courier').fontSize(12).fillColor('#bbbbbb').text('Free to start. No credit card. No trial period.', 60, y);
+  y += 20;
+  doc.font('Courier').fontSize(12).fillColor('#888888')
+    .text('Questions: ', 60, y, { continued: true });
+  doc.font('Courier').fontSize(12).fillColor('#39FF14').text('admin@shiftglitch.com');
+  doc.link(60 + doc.widthOfString('Questions: '), y, doc.widthOfString('admin@shiftglitch.com'), 14, 'mailto:admin@shiftglitch.com');
+
+  doc.font('Courier').fontSize(9).fillColor('#39FF14').fillOpacity(0.4)
+    .text('// END TRANSMISSION — SHIFTGLITCH SYSTEMS — © 2026 LOURENS BREYTENBACH //', 60, H - 48, { width: W - 120, align: 'center' });
   doc.fillOpacity(1);
 }
 
