@@ -6,7 +6,7 @@ ShiftGlitch is a cyberpunk cognitive adventure platform by Lourens Breytenbach. 
 
 **Critical language rule:** Zero school/exam/teacher/homework language anywhere in the UI or docs. Use "knowledge domains" not "subjects."
 
-Key features: Learning Governor (Pomodoro), Flashcard Decks (Leitner), Blurting Method (BrainDump), MCQ Diagnostics (Boss Fights), 10 Cognitive Exploit Modules (CEM), Repeatable Escape Run system, System Interrupt engine, The Warden + Snakes & Ladders progression, Leaderboard, Squad Mode, PayFast ZAR payments, Resend email, PostgreSQL + Replit Auth.
+Key features: Learning Governor (Pomodoro), Flashcard Decks (Leitner), Blurting Method (BrainDump), MCQ Diagnostics (Boss Fights), 10 Cognitive Exploit Modules (CEM), Repeatable Escape Run system, System Interrupt engine, The Warden + Snakes & Ladders progression, Leaderboard, Squad Mode, PayFast ZAR payments, Resend email, PostgreSQL + Replit Auth, Sales funnel with free ebook download, 7-email drip sequence.
 
 ---
 
@@ -27,6 +27,56 @@ Preferred communication style: Simple, everyday language.
 
 ---
 
+## File Structure
+
+### Public HTML Pages
+
+| File | Route | Description |
+|------|-------|-------------|
+| `landing.html` | `/` | Main landing page with hero, boot animation, slogans, CTA |
+| `index.html` | `/app` | Full SPA — all in-app features (~7,200 lines) |
+| `more-info.html` | `/more-info` | Sales funnel page — 7-section explainer + lead capture |
+| `pricing.html` | `/pricing` | Pricing tiers — Free, Pro packs, School License |
+| `waitlist.html` | `/waitlist` | Email + gamertag waitlist signup |
+| `teacher.html` | `/teacher` | School/institution landing page |
+| `demo.html` | `/demo` | Interactive demo for non-logged-in visitors |
+| `privacy.html` | `/privacy` | Privacy policy |
+| `terms.html` | `/terms` | Terms of service |
+| `404.html` | `*` | 404 error page |
+
+### Backend Files
+
+| File | Purpose |
+|------|---------|
+| `server.js` | Express.js server — all routes, middleware, PayFast, email, scheduler |
+| `auth.js` | Replit OIDC auth, session management, all DB functions |
+| `ebook-generator.js` | pdfkit-based PDF generator — "The Cognitive Exploit Manual" |
+| `consent.js` | GA4 consent management (served at `/consent.js`) |
+
+### Asset Files
+
+| File | Purpose |
+|------|---------|
+| `mainframe-hero.png` | Hero image served at `/mainframe-hero.png` |
+| `og-image.png` | Open Graph / social share image |
+| `sitemap.xml` | SEO sitemap |
+| `robots.txt` | Crawler directives |
+| `assets/` | Fonts, icons, supplementary images |
+
+### Documentation Files
+
+| File | Purpose |
+|------|---------|
+| `replit.md` | This file — developer reference, always loaded into agent memory |
+| `README.md` | Project readme |
+| `PLANNING_EBOOK.md` | Planning document for ebook content |
+| `PRO-INSTRUCTIONS.md` | Instructions for Pro features |
+| `REPORT.md` | Feature/progress report |
+| `SHIFTGLITCH_QUICK_MAR...` | Quick-start marketing guide |
+| `revamp_vision.md` | Design and feature vision document |
+
+---
+
 ## System Architecture
 
 ### Frontend Architecture
@@ -43,8 +93,10 @@ Express.js v5 server (`server.js`):
 - Static file serving
 - Replit Auth (OpenID Connect) via `auth.js`
 - Session management via `express-session` + `connect-pg-simple`
-- REST API: leaderboard, squad, waitlist, stats, PayFast ITN, escape runs
+- REST API: leaderboard, squad, waitlist, lead capture, stats, PayFast ITN, escape runs, ebook download
 - Security: `helmet` middleware, `express-rate-limit`
+- Email: Resend API for welcome, pro upgrade, and 7-step drip sequence
+- Scheduler: `setInterval` every 15 min → processes due `email_queue` rows
 
 **Authentication (`auth.js`):**
 - Replit Auth (OIDC) via `openid-client` v6
@@ -53,7 +105,56 @@ Express.js v5 server (`server.js`):
 
 **Data Storage:**
 - Primary: `localStorage` for all study data (offline-first), `sg_` key prefix
-- Server-side: PostgreSQL (users, sessions, leaderboard, squads, escape_runs)
+- Server-side: PostgreSQL (users, sessions, leaderboard, squads, escape_runs, funnel_leads, email_queue)
+
+---
+
+## Key Routes
+
+### Public Pages
+| Route | File Served |
+|-------|-------------|
+| `GET /` | `landing.html` |
+| `GET /more-info` | `more-info.html` |
+| `GET /pricing` | `pricing.html` |
+| `GET /waitlist` | `waitlist.html` |
+| `GET /teacher` | `teacher.html` |
+| `GET /demo` | `demo.html` |
+| `GET /privacy` | `privacy.html` |
+| `GET /terms` | `terms.html` |
+| `GET /download-ebook` | Streams PDF via `ebook-generator.js` — no sign-up required |
+
+### Auth Routes (via `setupAuthRoutes`)
+| Route | Purpose |
+|-------|---------|
+| `GET /login` | Replit OIDC login redirect |
+| `GET /auth/callback` | OIDC callback → session set → redirect `/app` |
+| `GET /logout` | Session destroy |
+| `GET /api/me` | Returns current user JSON |
+
+### API Routes
+| Route | Auth | Purpose |
+|-------|------|---------|
+| `POST /api/waitlist` | No | Save waitlist lead |
+| `POST /api/lead` | No | Save funnel lead → queue 7 emails |
+| `POST /api/payfast-checkout` | Yes | Sign PayFast payment form server-side |
+| `POST /api/payfast-itn` | No (signature-verified) | Payment webhook → upgrade user + send pro email |
+| `GET /api/leaderboard` | Yes | Get top 50 leaderboard |
+| `POST /api/leaderboard/sync` | Yes | Sync user's focus score |
+| `GET /api/squad` | Yes | Get user's squad |
+| `POST /api/squad/create` | Yes | Create new squad |
+| `POST /api/squad/join` | Yes | Join squad by invite code |
+| `POST /api/squad/leave` | Yes | Leave current squad |
+| `GET /api/stats` | No | Public page views + waitlist count |
+| `GET /api/escape-runs` | Yes | Get user's escape runs |
+| `POST /api/escape-runs` | Yes | Create escape run |
+| `PATCH /api/escape-runs/:id` | Yes | Update escape run |
+| `POST /api/escape-runs/:id/complete` | Yes | Complete escape run |
+| `DELETE /api/escape-runs/:id` | Yes | Delete escape run |
+| `GET /api/gamertag` | Yes | Get current gamertag |
+| `PUT /api/gamertag` | Yes | Set gamertag |
+| `GET /api/badges` | Yes | Get user badges |
+| `PUT /api/badges` | Yes | Set user badges |
 
 ---
 
@@ -100,6 +201,37 @@ Promotion is evidence-based. `checkPromotion()` runs after every activity. `roll
 
 - **Leaderboard:** Global Focus Score rankings in PostgreSQL. Formula: `(Pomodoros × 10) + (Streak × 25) + (Cards × 2) + (Blurts × 15)`. Top 50 shown.
 - **Squad Mode:** Async co-op groups up to 4. 6-char invite codes. Squad streak = minimum member streak.
+
+---
+
+### Sales Funnel — more-info.html + Email Drip
+
+**`/more-info` page** (7 sections):
+1. Hero with `mainframe-hero.png`, tagline, intro paragraph
+2. Animated terminal demo — pure CSS/JS loop showing boot → flashcard → XP → rank advancement
+3. Problem/Solution pitch + 6 benefit cards
+4. Free ebook download (no sign-up required)
+5. 5-slide auto-advancing carousel — system overview
+6. Lead capture form → POST `/api/lead`
+7. CTA with free Jack In + Pro PayFast pack buttons
+
+**Free ebook — `/download-ebook`:**
+- Generated on demand by `ebook-generator.js` (pdfkit)
+- 14-page A4 PDF: cover, TOC, intro, 10 exploit chapters, rank guide, closing
+- `Content-Disposition: attachment; filename="ShiftGlitch-Cognitive-Exploit-Manual.pdf"`
+- No sign-up required
+
+**7-email drip sequence** (stored in `email_queue`, dispatched by 15-min scheduler):
+
+| Step | Delay | Subject |
+|------|-------|---------|
+| 1 | Immediate | `// TRANSMISSION_001: Your Cognitive Exploit Manual is ready` |
+| 2 | Day 1 | `// TRANSMISSION_002: Deploy your first exploit — Memory Palace` |
+| 3 | Day 3 | `// TRANSMISSION_003: The rank system decoded` |
+| 4 | Day 5 | `// TRANSMISSION_004: The #1 exploit that changes everything` |
+| 5 | Day 7 | `// TRANSMISSION_005: Free vs Netrunner Pro — the full comparison` |
+| 6 | Day 10 | `// TRANSMISSION_006: [48H WINDOW] — Operative upgrade offer` |
+| 7 | Day 14 | `// TRANSMISSION_007: Final brief + your bonus intel` |
 
 ---
 
@@ -195,9 +327,11 @@ PayFast only (ZAR). One-time purchase packs — no auto-renewal.
 | 1 Month Pro | R99 | 30 days |
 | 3 Month Pro | R249 | 90 days |
 | 12 Month Pro | R799 | 365 days |
-| School License | R499/yr | Institution |
+| School License | $499/yr USD | Institution-wide |
 
-PayFast ITN handler at `/api/payfast-itn`. Reads `custom_str1` for user ID, sets `pro_expires_at` in DB.
+PayFast ITN handler at `/api/payfast-itn`. Reads `custom_str1` for user ID, sets `pro_expires_at` in DB, sends pro upgrade email via Resend.
+
+School License: contact enquiry via `mailto:admin@shiftglitch.com?subject=School%20License%20Enquiry`.
 
 ---
 
@@ -210,10 +344,27 @@ PayFast ITN handler at `/api/payfast-itn`. Reads `custom_str1` for user ID, sets
 | `leaderboard` | Focus Score per user |
 | `squads` | Squad records + invite codes + streak |
 | `squad_members` | Membership + last ping timestamps |
-| `waitlist` | Email + gamertag for pre-launch signups |
-| `page_views` | Analytics |
-| `user_badges` | Earned achievement badges |
+| `waitlist_leads` | Email + gamertag for pre-launch signups |
+| `page_views` | Analytics — page hit counts |
+| `user_badges` | Earned achievement badges (JSONB) |
 | `escape_runs` | Named domain runs with exploit progress + `cem_modules_used` JSONB |
+| `funnel_leads` | Sales funnel email capture (name, email, institution) |
+| `email_queue` | Drip sequence queue — 7 rows per lead, `scheduled_for` + `sent_at` |
+
+---
+
+## Email System
+
+All email via Resend API. Key: `RESEND_SG_KEY` or `RESEND_API_KEY`.
+From address: `RESEND_FROM_ADDRESS` (falls back to `onboarding@resend.dev` — only delivers to verified addresses until domain is verified).
+
+| Email Type | Trigger | Template Location |
+|-----------|---------|------------------|
+| Welcome (app signup) | Replit OIDC login (new user) | `sendWelcomeEmail()` in `server.js` |
+| Pro Upgrade | PayFast ITN COMPLETE | `sendProUpgradeEmail()` in `server.js` |
+| Drip Step 1–7 | Scheduler via `email_queue` | `buildFunnelEmail(step, name)` in `server.js` |
+
+**Scheduler:** `setInterval(processFunnelEmailQueue, 15 * 60 * 1000)` + immediate 10s boot run.
 
 ---
 
@@ -226,8 +377,9 @@ PayFast ITN handler at `/api/payfast-itn`. Reads `custom_str1` for user ID, sets
 | `REPL_ID` | Yes (auto) | Replit env ID for OIDC |
 | `ISSUER_URL` | Yes (auto) | Replit OIDC issuer |
 | `REPLIT_DOMAINS` | Yes (auto) | Allowed redirect domains |
-| `RESEND_API_KEY` | No | Resend transactional email |
-| `RESEND_SG_KEY` | No | Secondary Resend key |
+| `RESEND_API_KEY` | No | Resend transactional email (fallback key) |
+| `RESEND_SG_KEY` | No | Primary Resend key |
+| `RESEND_FROM_ADDRESS` | No | Sender address — set to verified domain address |
 | `PAYFAST_MERCHANT_ID` | Payments | PayFast dashboard |
 | `PAYFAST_MERCHANT_KEY` | Payments | PayFast dashboard |
 | `PAYFAST_PASSPHRASE` | Payments | PayFast salt passphrase |
@@ -302,7 +454,7 @@ PayFast ITN handler at `/api/payfast-itn`. Reads `custom_str1` for user ID, sets
 | `pg` | PostgreSQL queries |
 | `helmet` | Security headers |
 | `express-rate-limit` | API rate limiting |
-| `resend` | Transactional email |
+| `pdfkit` | PDF generation for ebook |
 
 ### CDN Dependencies (Frontend)
 - Tailwind CSS
@@ -316,8 +468,8 @@ PayFast ITN handler at `/api/payfast-itn`. Reads `custom_str1` for user ID, sets
 | Replit Auth (OIDC) | User authentication |
 | PostgreSQL | Server-side data storage |
 | PayFast | ZAR payment processing |
-| Resend | Transactional email |
-| Open Trivia Database | (Legacy — Quiz Arena removed) |
+| Resend | Transactional email + drip sequences |
+| Google Analytics 4 (G-P6VQGP7B1D) | Page analytics with consent gate |
 
 ---
 
@@ -326,9 +478,21 @@ PayFast ITN handler at `/api/payfast-itn`. Reads `custom_str1` for user ID, sets
 | Integration | Purpose | Status |
 |-------------|---------|--------|
 | Replit Auth (`javascript_log_in_with_replit`) | OIDC authentication | Installed and active |
-| PostgreSQL (`javascript_database`) | Users, sessions, leaderboard, squads, escape runs, badges | Installed and active |
-| Resend | Welcome + onboarding email | Active when `RESEND_API_KEY` set |
+| PostgreSQL (`javascript_database`) | Users, sessions, leaderboard, squads, escape runs, badges, funnel leads, email queue | Installed and active |
+| Resend | Welcome + pro upgrade + 7-step drip emails | Active when `RESEND_API_KEY` or `RESEND_SG_KEY` set |
 | PayFast | ZAR payment processing | Active when merchant credentials set |
+
+---
+
+## GA4 / Analytics
+
+Measurement ID: `G-P6VQGP7B1D`. In all public HTML files.
+
+`consent.js` (at project root, served as `/consent.js`) manages GA4 consent:
+- Default-deny before user consent
+- `sg_consent` in localStorage tracks decision
+- Cookie banner shown on all public pages
+- All pages include the consent default block before the GA4 script tag
 
 ---
 
@@ -346,10 +510,14 @@ Server starts on port 5000. Workflow: `Start application` → `node server.js`.
 ## Key Architectural Notes
 
 - **Monolithic HTML:** All frontend in `index.html`. Intentional — no build step.
-- **Offline-first:** All study data in `localStorage`. Server only for auth, leaderboard, squads, escape runs, payments.
+- **Offline-first:** All study data in `localStorage`. Server only for auth, leaderboard, squads, escape runs, payments, email.
 - **Pre-login snapshot:** `_preLoginLastActive` captured before `rankEngine.trackActiveDay()` — used by Warden inactivity checks so today's login doesn't mask absence.
 - **App session counter:** `sg_app_sessions` increments on every login — used for Warden Trap cadence (every 5-7 sessions).
 - **Trap lock format:** `sg_warden_trap_lock` stores `{moduleId, lockUntil}` JSON, not a bare timestamp. `isTrapLocked(moduleId)` checks module-specific lock.
 - **Memory Wipe timing:** Runs after `escapeRunEngine.load()` resolves, not at boot (runs would be empty at boot).
 - **Consistency bonus:** Cleared in `checkPromotion()` when rank-up occurs; must re-earn with another 7-day streak.
 - **`esc()` utility:** Used everywhere for XSS protection on user-rendered content.
+- **Ebook generation:** On-demand via pdfkit — no file stored on disk. Streams directly to response.
+- **Email drip scheduler:** 15-min `setInterval` + 10s boot run. Processes up to 50 due `email_queue` rows per tick. One row per step per lead — `sent_at` set when dispatched.
+- **PayFast form signing:** Done server-side in `/api/payfast-checkout`. No credentials in frontend HTML.
+- **`RESEND_FROM_ADDRESS` warning:** Until `shiftglitch.com` domain is verified in Resend, emails only deliver to addresses verified in the Resend dashboard.
