@@ -428,9 +428,12 @@ app.post('/api/payfast-checkout', requireAuth, checkoutLimiter, async (req, res)
     return res.status(400).json({ error: 'Pack must be "1m", "3m", or "12m".' });
   }
 
-  // Resolve affiliate tracking code: promo code (manual entry) overrides cookie
-  let affiliateCode = (req.cookies.sg_ref || '').trim();
+  // Resolve affiliate tracking code — must be a verified active affiliate, not just any cookie value
+  let affiliateCode = '';
+  const cookieRef = (req.cookies.sg_ref || '').trim();
+
   if (rawPromoCode) {
+    // Promo code entry takes priority: look up by promo code
     try {
       const promoAffiliate = await getAffiliateByPromoCode(String(rawPromoCode).trim());
       if (promoAffiliate && promoAffiliate.status === 'active') {
@@ -441,7 +444,21 @@ app.post('/api/payfast-checkout', requireAuth, checkoutLimiter, async (req, res)
     }
   }
 
-  // Use discounted -ref pack variant when buyer has a valid referral
+  if (!affiliateCode && cookieRef) {
+    // Validate cookie-based referral code against DB before granting discount
+    try {
+      const cookieAffiliate = await getAffiliateByCode(cookieRef);
+      if (cookieAffiliate && cookieAffiliate.status === 'active') {
+        affiliateCode = cookieAffiliate.code;
+      } else {
+        console.log(`[payfast] sg_ref cookie value "${cookieRef}" not found or not active — ignoring`);
+      }
+    } catch (e) {
+      console.warn('[payfast] cookie affiliate lookup error:', e.message);
+    }
+  }
+
+  // Use discounted -ref pack variant only when a verified affiliate is present
   const hasReferral = Boolean(affiliateCode);
   const pack = (hasReferral && PAYFAST_PACKS[rawPack + '-ref']) ? rawPack + '-ref' : rawPack;
   const selected = PAYFAST_PACKS[pack];

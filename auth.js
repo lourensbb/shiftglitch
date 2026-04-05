@@ -1036,7 +1036,16 @@ async function createAffiliate({ userId, displayName, email, payoutMethod, payou
     const { rows } = await pool.query('SELECT 1 FROM affiliates WHERE promo_code = $1', [candidate]);
     if (!rows.length) { promoCode = candidate; break; }
   }
-  if (!promoCode) promoCode = null; // fallback — insert without promo code rather than fail
+  if (!promoCode) {
+    // Extend base with more randomness and try 5 more times before failing
+    for (let attempt = 0; attempt < 5; attempt++) {
+      const fallbackBase = CHARS.slice(0, 3) + String(Math.floor(Math.random() * 100)).padStart(2, '0');
+      const candidate = fallbackBase + String(Math.floor(Math.random() * 90) + 10);
+      const { rows } = await pool.query('SELECT 1 FROM affiliates WHERE promo_code = $1', [candidate]);
+      if (!rows.length) { promoCode = candidate; break; }
+    }
+    if (!promoCode) throw new Error('[affiliate] Could not generate unique promo code after 10 attempts');
+  }
 
   const { rows } = await pool.query(
     `INSERT INTO affiliates (user_id, code, promo_code, display_name, email, payout_method, payout_details, recruited_by_id)
