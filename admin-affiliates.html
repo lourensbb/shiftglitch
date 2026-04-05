@@ -548,9 +548,10 @@
     }
 
     function viewPortal(code) {
-      if (code) {
-        window.open(`/affiliate-card/${encodeURIComponent(code)}`, '_blank');
-      }
+      // Opens the affiliate portal in a new tab.
+      // Admin is already logged in — portal will load showing the affiliate
+      // data for the admin's own session (useful for QA/review).
+      window.open('/affiliate-portal', '_blank');
     }
 
     // ── Surge ─────────────────────────────────────────────────────────────────

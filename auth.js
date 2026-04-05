@@ -523,6 +523,8 @@ function setupAuthRoutes(app) {
       const user = await getUser(req.session.userId);
       if (!user) return res.status(401).json({ error: 'User not found' });
       const profile = req.session.userProfile || {};
+      // isAdmin: fail-closed — only true when ADMIN_USER_ID is set AND matches.
+      // When env var is unset, isAdmin is always false (no hardcoded fallback accepted here).
       const adminId = process.env.ADMIN_USER_ID || '';
       res.json({
         id: user.id,
@@ -533,7 +535,7 @@ function setupAuthRoutes(app) {
         createdAt: user.created_at,
         membershipTier: user.membership_tier || 'free',
         proExpiresAt: user.pro_expires_at || null,
-        isAdmin: adminId ? user.id === adminId : false,
+        isAdmin: (adminId !== '' && user.id === adminId),
       });
     } catch (err) {
       console.error('/api/me error:', err);
