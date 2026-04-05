@@ -3,7 +3,8 @@ const path = require('path');
 const crypto = require('crypto');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-const { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, getUserGamertag, updateGamertag, updateMembershipTier, checkAndExpireUser, getUserByPaymentRef, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount, getUserBadges, setUserBadges, getEscapeRuns, createEscapeRun, updateEscapeRun, completeEscapeRun, deleteEscapeRun, applyRollbackIfStale } = require('./auth');
+const { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, getUserGamertag, updateGamertag, updateMembershipTier, checkAndExpireUser, getUserByPaymentRef, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount, getUserBadges, setUserBadges, getEscapeRuns, createEscapeRun, updateEscapeRun, completeEscapeRun, deleteEscapeRun, applyRollbackIfStale, saveFunnelLead, queueFunnelEmails, getDueQueuedEmails, markEmailSent } = require('./auth');
+const { generateEbook } = require('./ebook-generator');
 
 async function requirePro(req, res, next) {
   try {
@@ -232,6 +233,12 @@ app.post('/api/payfast-itn', express.urlencoded({ extended: false }), async (req
     const expiresAt = new Date(Date.now() + matchedPack.days * 24 * 60 * 60 * 1000);
     await updateMembershipTier(userId, 'pro', `payfast_${data.pf_payment_id || data.m_payment_id || Date.now()}`, expiresAt);
     console.log(`[payfast-itn] User ${userId} upgraded to pro for ${matchedPack.days} days (R${grossAmount}) — expires ${expiresAt.toISOString().slice(0,10)}`);
+    try {
+      const upgradedUser = await getUser(userId);
+      if (upgradedUser && upgradedUser.email) {
+        sendProUpgradeEmail(upgradedUser.email, upgradedUser.gamertag || upgradedUser.username || 'Operative', matchedPack.days).catch(() => {});
+      }
+    } catch (e) { console.warn('[payfast-itn] Could not send pro upgrade email:', e.message); }
   } catch (err) {
     console.error('[payfast-itn] Error:', err.message);
   }
@@ -291,6 +298,20 @@ app.get('/pricing', (req, res) => {
   res.sendFile(path.join(__dirname, 'pricing.html'));
 });
 
+app.get('/more-info', (req, res) => {
+  trackPageView('more-info').catch(() => {});
+  res.sendFile(path.join(__dirname, 'more-info.html'));
+});
+
+app.get('/download-ebook', (req, res) => {
+  try {
+    generateEbook(res);
+  } catch (err) {
+    console.error('[ebook] Generation error:', err.message);
+    if (!res.headersSent) res.status(500).send('Ebook generation failed');
+  }
+});
+
 app.get('/privacy', (req, res) => {
   res.sendFile(path.join(__dirname, 'privacy.html'));
 });
@@ -316,6 +337,26 @@ app.post('/api/waitlist', waitlistLimiter, async (req, res) => {
   } catch (err) {
     if (err.code === 'DUPLICATE') return res.status(409).json({ error: 'DUPLICATE' });
     console.error('/api/waitlist error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+const leadLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 8, standardHeaders: true, legacyHeaders: false });
+
+app.post('/api/lead', leadLimiter, async (req, res) => {
+  try {
+    const { name, email, institution } = req.body || {};
+    if (!name || typeof name !== 'string' || !name.trim()) return res.status(400).json({ error: 'Name required' });
+    if (!email || typeof email !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) return res.status(400).json({ error: 'Valid email required' });
+    const cleanName = name.trim().slice(0, 100);
+    const cleanEmail = email.trim().toLowerCase().slice(0, 254);
+    const cleanInstitution = (institution || '').trim().slice(0, 200) || null;
+    const lead = await saveFunnelLead(cleanName, cleanEmail, cleanInstitution);
+    await queueFunnelEmails(lead.id, cleanEmail, cleanName);
+    res.json({ ok: true });
+  } catch (err) {
+    if (err.code === 'DUPLICATE') return res.status(409).json({ ok: true, note: 'already subscribed' });
+    console.error('/api/lead error:', err);
     res.status(500).json({ error: 'Server error' });
   }
 });
@@ -684,6 +725,165 @@ app.use(express.static(path.join(__dirname)));
 app.use((req, res) => {
   res.status(404).sendFile(path.join(__dirname, '404.html'));
 });
+
+function buildFunnelEmail(step, name) {
+  const N = name || 'Operative';
+  const fromLine = `<div style="font-family:'Courier New',monospace;font-size:11px;color:#444;letter-spacing:1px;">SHIFTGLITCH &mdash; shiftglitch.com &mdash; &copy; 2026 Lourens Breytenbach</div>`;
+  const header = `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head><body style="margin:0;padding:0;background:#0a0a0a;font-family:'Courier New',monospace;"><table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0a;padding:32px 16px;"><tr><td align="center"><table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;border:1px solid #39FF14;background:#111;">`;
+  const hdrBlock = (stepStr) => `<tr><td style="padding:0;background:#000;border-bottom:3px solid #39FF14;"><div style="padding:24px 36px;"><div style="font-family:'Courier New',monospace;font-size:11px;color:#39FF14;letter-spacing:3px;text-transform:uppercase;margin-bottom:6px;">// SHIFTGLITCH &mdash; ${stepStr}</div><div style="font-family:'Courier New',monospace;font-size:36px;color:#fff;letter-spacing:4px;font-weight:bold;line-height:1;">SHIFTGLITCH</div></div></td></tr>`;
+  const footer = `<tr><td style="padding:14px 36px;border-top:1px solid #1a1a1a;">${fromLine}</td></tr></table></td></tr></table></body></html>`;
+  const cta = (label, url) => `<div style="text-align:center;margin:28px 0;"><a href="${url}" style="display:inline-block;background:#39FF14;color:#000;font-family:'Courier New',monospace;font-size:15px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;padding:14px 36px;text-decoration:none;">${label} &rarr;</a></div>`;
+  const body = (inner) => `<tr><td style="padding:36px;">${inner}</td></tr>`;
+  const p = (txt, color = '#aaaaaa', size = '14px') => `<p style="font-family:'Courier New',monospace;font-size:${size};color:${color};line-height:1.9;margin:0 0 16px;">${txt}</p>`;
+  const h = (txt) => `<div style="font-family:'Courier New',monospace;font-size:22px;color:#39FF14;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">${txt}</div>`;
+  const box = (inner, borderColor = '#39FF14') => `<div style="background:#1a1a1a;border:1px solid ${borderColor};padding:20px 24px;margin-bottom:22px;">${inner}</div>`;
+  const li = (items) => items.map(i => `<div style="font-family:'Courier New',monospace;font-size:13px;color:#aaaaaa;line-height:2.2;"><span style="color:#39FF14;">&gt;</span> ${i}</div>`).join('');
+
+  if (step === 1) {
+    const subject = `// TRANSMISSION_001: Your Cognitive Exploit Manual is ready`;
+    const html = header + hdrBlock('TRANSMISSION 001 OF 007') + body(
+      h(`OPERATIVE: ${N.toUpperCase()} — ACCESS CONFIRMED`) +
+      p(`You signed up for the ShiftGlitch intel feed. This is Transmission 001.`, '#cccccc', '15px') +
+      p(`Your free Cognitive Exploit Manual is attached to this transmission. 10 protocols. 14 pages. The playbook that changes how you absorb knowledge — permanently.`) +
+      box(`<div style="font-family:'Courier New',monospace;font-size:12px;color:#39FF14;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;">// FREE INTEL PACKAGE — DOWNLOAD NOW</div>${li(['The Cognitive Exploit Manual (PDF)', '10 cognitive protocols', 'Memory Palace · Active Recall · Spaced Repetition', 'Feynman · Dual Coding · Interleaving + more'])}`) +
+      cta('DOWNLOAD YOUR FREE EBOOK', 'https://shiftglitch.replit.app/download-ebook') +
+      p(`Over the next 14 days you will receive 6 more transmissions — the full operative brief. The next one arrives tomorrow.`) +
+      p(`<span style="color:#39FF14;">&gt;</span> Jack in for free at <a href="https://shiftglitch.replit.app" style="color:#39FF14;">shiftglitch.replit.app</a>`, '#666')
+    ) + footer;
+    return { subject, html };
+  }
+
+  if (step === 2) {
+    const subject = `// TRANSMISSION_002: Deploy your first exploit — Memory Palace`;
+    const html = header + hdrBlock('TRANSMISSION 002 OF 007') + body(
+      h(`EXPLOIT 001: MEMORY PALACE`) +
+      p(`Memory Palace is one of the oldest cognitive exploits in existence. It works by hijacking your brain's spatial navigation system — which evolved over millions of years to remember environments — and repurposing it for knowledge storage.`, '#cccccc', '14px') +
+      box(`<div style="font-family:'Courier New',monospace;font-size:12px;color:#39FF14;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;">// THE PROTOCOL</div>${li(['Select a familiar location (your home, a regular route)', 'Identify 10–15 fixed anchor points in sequence', 'At each point, place a vivid image representing the info', 'Walk the route mentally to retrieve the information', 'Repeat 3× immediately, then again 24 hours later'])}`) +
+      p(`This exploit is in your free Cognitive Exploit Manual with full detail. Tomorrow: the rank system decoded.`) +
+      cta('JACK IN FREE', 'https://shiftglitch.replit.app/login')
+    ) + footer;
+    return { subject, html };
+  }
+
+  if (step === 3) {
+    const subject = `// TRANSMISSION_003: The rank system decoded`;
+    const html = header + hdrBlock('TRANSMISSION 003 OF 007') + body(
+      h(`FROM NPC TO SYSTEM ADMIN`) +
+      p(`There are 5 ranks in ShiftGlitch. Each one is earned through demonstrated performance — not time logged, not money spent.`, '#cccccc', '14px') +
+      box(`<div style="font-family:'Courier New',monospace;font-size:12px;color:#39FF14;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;">// RANK PROGRESSION</div>${li(['<span style="color:#555;">NPC</span> — Starting status. Jacked in, not yet aware.', '<span style="color:#3a7a3a;">Script Kiddie</span> — First exploits deployed. Habits forming.', '<span style="color:#8A2BE2;">Glitch Tech</span> — Consistent operator. Multi-exploit user.', '<span style="color:#39FF14;">Netrunner</span> — High-performance, long-run consistency.', '<span style="color:#FF00FF;">System Admin</span> — Full mastery. The exploit is complete.'])}`) +
+      p(`You advance by doing the work. Build your flashcard deck. Run Focus Sessions. Complete Mission Debriefs. The system tracks everything.`) +
+      cta('START YOUR RANK CLIMB', 'https://shiftglitch.replit.app/login')
+    ) + footer;
+    return { subject, html };
+  }
+
+  if (step === 4) {
+    const subject = `// TRANSMISSION_004: The #1 exploit that changes everything`;
+    const html = header + hdrBlock('TRANSMISSION 004 OF 007') + body(
+      h(`EXPLOIT 002: ACTIVE RECALL`) +
+      p(`If you only adopt one exploit from the manual, make it this one. Active Recall is the highest-ROI cognitive protocol in existence. The research on this has been clear since 1909.`, '#cccccc', '14px') +
+      p(`Re-reading feels productive. It produces almost zero long-term retention. Every time you try to retrieve information instead of passively recognise it, the memory trace strengthens. Every failed retrieval tells you exactly where to focus next.`) +
+      box(`<div style="font-family:'Courier New',monospace;font-size:12px;color:#39FF14;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;">// HOW SHIFTGLITCH AUTOMATES THIS</div>${li(['Flashcard system forces retrieval, not re-reading', 'Algorithm schedules each card at the exact right time', 'Your recall accuracy is tracked and used to adapt the schedule', 'Fail a card → it comes back sooner. Ace it → delayed review.'])}`) +
+      p(`ShiftGlitch does not just tell you about Active Recall. It builds every feature on top of it.`) +
+      cta('DEPLOY THE EXPLOIT', 'https://shiftglitch.replit.app/login')
+    ) + footer;
+    return { subject, html };
+  }
+
+  if (step === 5) {
+    const subject = `// TRANSMISSION_005: Free vs Netrunner Pro — the full comparison`;
+    const html = header + hdrBlock('TRANSMISSION 005 OF 007') + body(
+      h(`THE FULL INTEL REPORT`) +
+      p(`Free is genuinely free. Not a trial. Not a limited tier with a paywall after 7 days. The core system — flashcards, focus sessions, diagnostics, all 10 exploits — is free forever.`, '#cccccc', '14px') +
+      box(`<div style="font-family:'Courier New',monospace;font-size:12px;color:#39FF14;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;">// NETRUNNER PRO ADDS</div>${li(['AI Mission Architect — auto-generates study plans from your deadlines', 'Squad Mode — operate with up to 4 others, shared progress visibility', 'Extended session analytics and rank acceleration tools', 'Priority access to new exploits and features as they drop'])}`) +
+      p(`Pro is a one-time ZAR payment. No subscription. R99 for 1 month, R249 for 3 months, R799 for a full year.`) +
+      p(`If you are based in South Africa and you are serious about advancing your rank, Pro is worth it.`) +
+      cta('VIEW PRO OPTIONS', 'https://shiftglitch.replit.app/pricing')
+    ) + footer;
+    return { subject, html };
+  }
+
+  if (step === 6) {
+    const subject = `// TRANSMISSION_006: [48H WINDOW] — Operative upgrade offer`;
+    const html = header + hdrBlock('TRANSMISSION 006 OF 007') + body(
+      `<div style="font-family:'Courier New',monospace;font-size:12px;color:#FF00FF;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">// 48-HOUR TRANSMISSION WINDOW</div>` +
+      h(`THE UPGRADE WINDOW`) +
+      p(`${N} — this is your second-to-last transmission. If you have been reading the brief and you are considering going Pro, now is the right time.`, '#cccccc', '14px') +
+      p(`The rank system does not move on its own. Every day you are not in active recall sessions, you are falling behind operatives who are. Pro removes the friction.`) +
+      box(`<div style="font-family:'Courier New',monospace;font-size:12px;color:#39FF14;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;">// PRO PACKS — ONE-TIME ZAR PAYMENT</div>${li(['R99 — 1 Month Netrunner Pro (30 days)', 'R249 — 3 Months Netrunner Pro (90 days) ← best value', 'R799 — 12 Months Netrunner Pro (365 days)'])}`) +
+      p(`No subscription. No recurring charges. Pay once, use the full system.`) +
+      cta('UPGRADE TO NETRUNNER PRO', 'https://shiftglitch.replit.app/pricing')
+    ) + footer;
+    return { subject, html };
+  }
+
+  if (step === 7) {
+    const subject = `// TRANSMISSION_007: Final brief + your bonus intel`;
+    const html = header + hdrBlock('TRANSMISSION 007 OF 007 — FINAL') + body(
+      `<div style="font-family:'Courier New',monospace;font-size:12px;color:#FF00FF;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">// FINAL TRANSMISSION</div>` +
+      h(`END OF SEQUENCE`) +
+      p(`This is your 7th and final transmission in the ShiftGlitch intel feed. 14 days. 7 protocols covered. One objective: get you operating at a level that actually produces results.`, '#cccccc', '14px') +
+      p(`Here is your bonus: the single most important thing you can do starting today.`) +
+      box(`<div style="font-family:'Courier New',monospace;font-size:12px;color:#FF00FF;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;">// BONUS INTEL — THE 1% RULE</div><p style="font-family:'Courier New',monospace;font-size:13px;color:#aaaaaa;line-height:1.9;margin:0;">Build a 20-card flashcard deck on the one topic you find hardest. Run it every day for 14 days using Active Recall. Do not re-read. Do not highlight. Just test, fail, check, repeat. In 14 days you will not recognise the level of mastery you have on that topic. This is not theory. It is the mechanism.</p>`) +
+      p(`Thank you for reading every transmission. If ShiftGlitch has been useful, share it — the ebook is open-source and free to distribute.`) +
+      p(`If you have questions: <a href="mailto:admin@shiftglitch.com" style="color:#39FF14;">admin@shiftglitch.com</a>`) +
+      cta('JACK IN NOW — IT\'S FREE', 'https://shiftglitch.replit.app/login')
+    ) + footer;
+    return { subject, html };
+  }
+
+  return null;
+}
+
+async function sendFunnelEmail(email, name, step) {
+  const key = process.env.RESEND_SG_KEY || process.env.RESEND_API_KEY;
+  if (!key) { console.warn('[funnel-email] No Resend key — skipping step', step, 'for', email); return; }
+  const built = buildFunnelEmail(step, name);
+  if (!built) { console.warn('[funnel-email] No template for step', step); return; }
+  const fromAddress = process.env.RESEND_FROM_ADDRESS || 'ShiftGlitch <onboarding@resend.dev>';
+  try {
+    const r = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ from: fromAddress, to: [email], subject: built.subject, html: built.html })
+    });
+    if (!r.ok) { const e = await r.text(); console.error(`[funnel-email] Resend error step ${step}:`, e); }
+    else { const d = await r.json(); console.log(`[funnel-email] Step ${step} sent to ${email} — ID:`, d.id); }
+  } catch (err) { console.error('[funnel-email] Network error step', step, ':', err.message); }
+}
+
+async function processFunnelEmailQueue() {
+  try {
+    const due = await getDueQueuedEmails();
+    if (!due.length) return;
+    console.log(`[funnel-scheduler] Processing ${due.length} due emails`);
+    for (const row of due) {
+      await sendFunnelEmail(row.email, row.name, row.step);
+      await markEmailSent(row.id);
+    }
+  } catch (err) {
+    console.error('[funnel-scheduler] Error:', err.message);
+  }
+}
+
+setInterval(processFunnelEmailQueue, 15 * 60 * 1000);
+setTimeout(processFunnelEmailQueue, 10 * 1000);
+
+async function sendProUpgradeEmail(email, gamertag, daysAdded) {
+  const key = process.env.RESEND_SG_KEY || process.env.RESEND_API_KEY;
+  if (!key || !email) return;
+  const fromAddress = process.env.RESEND_FROM_ADDRESS || 'ShiftGlitch <onboarding@resend.dev>';
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body style="margin:0;padding:0;background:#0a0a0a;font-family:'Courier New',monospace;"><table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0a;padding:32px 16px;"><tr><td align="center"><table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;border:1px solid #FF00FF;background:#111;"><tr><td style="padding:0;background:#000;border-bottom:3px solid #FF00FF;"><div style="padding:24px 36px;"><div style="font-family:'Courier New',monospace;font-size:11px;color:#FF00FF;letter-spacing:3px;text-transform:uppercase;margin-bottom:6px;">// SHIFTGLITCH — PRO UPGRADE CONFIRMED</div><div style="font-family:'Courier New',monospace;font-size:36px;color:#fff;letter-spacing:4px;font-weight:bold;line-height:1;">SHIFTGLITCH</div></div></td></tr><tr><td style="padding:36px;"><div style="font-family:'Courier New',monospace;font-size:22px;color:#FF00FF;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">NETRUNNER PRO — ACTIVATED</div><p style="font-family:'Courier New',monospace;font-size:14px;color:#cccccc;line-height:1.9;margin:0 0 16px;">Operative ${(gamertag||'').toUpperCase()} — your Pro access is now live. ${daysAdded} days of Netrunner Pro added to your account.</p><div style="background:#1a1a1a;border:1px solid rgba(255,0,255,0.3);padding:20px 24px;margin-bottom:22px;"><div style="font-family:'Courier New',monospace;font-size:12px;color:#FF00FF;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;">// PRO ACCESS UNLOCKED</div><div style="font-family:'Courier New',monospace;font-size:13px;color:#aaaaaa;line-height:2.2;"><span style="color:#39FF14;">&gt;</span> AI Mission Architect — now active<br><span style="color:#39FF14;">&gt;</span> Squad Mode — now active<br><span style="color:#39FF14;">&gt;</span> Extended analytics — now active</div></div><div style="text-align:center;margin:28px 0;"><a href="https://shiftglitch.replit.app/app" style="display:inline-block;background:#FF00FF;color:#000;font-family:'Courier New',monospace;font-size:15px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;padding:14px 36px;text-decoration:none;">JACK IN NOW &rarr;</a></div><p style="font-family:'Courier New',monospace;font-size:13px;color:#555;line-height:1.8;border-top:1px solid #222;padding-top:20px;">Questions: <a href="mailto:admin@shiftglitch.com" style="color:#39FF14;">admin@shiftglitch.com</a></p></td></tr><tr><td style="padding:14px 36px;border-top:1px solid #1a1a1a;"><div style="font-family:'Courier New',monospace;font-size:11px;color:#444;letter-spacing:1px;">SHIFTGLITCH &mdash; shiftglitch.com &mdash; &copy; 2026 Lourens Breytenbach</div></td></tr></table></td></tr></table></body></html>`;
+  try {
+    const r = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ from: fromAddress, to: [email], subject: '// PRO ACTIVATED — Netrunner Pro access confirmed', html })
+    });
+    if (!r.ok) { const e = await r.text(); console.error('[pro-email] Resend error:', e); }
+    else { const d = await r.json(); console.log('[pro-email] Sent to', email, '— ID:', d.id); }
+  } catch (err) { console.error('[pro-email] Error:', err.message); }
+}
 
 app.listen(5000, '0.0.0.0', () => {
   console.log('Server running on port 5000');

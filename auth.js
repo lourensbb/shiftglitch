@@ -132,6 +132,24 @@ async function ensureSchema() {
       ALTER TABLE escape_runs ADD COLUMN IF NOT EXISTS rollback_applied_at TIMESTAMP;
       ALTER TABLE escape_runs DROP COLUMN IF EXISTS debrief_archived;
       ALTER TABLE escape_runs ADD COLUMN IF NOT EXISTS cem_modules_used JSONB DEFAULT '[]'::jsonb;
+      CREATE TABLE IF NOT EXISTS funnel_leads (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(100) NOT NULL,
+        email VARCHAR(254) UNIQUE NOT NULL,
+        institution VARCHAR(200),
+        source VARCHAR(50) DEFAULT 'more-info',
+        created_at TIMESTAMP DEFAULT NOW()
+      );
+      CREATE TABLE IF NOT EXISTS email_queue (
+        id SERIAL PRIMARY KEY,
+        lead_id INTEGER REFERENCES funnel_leads(id) ON DELETE CASCADE,
+        email VARCHAR(254) NOT NULL,
+        name VARCHAR(100) NOT NULL,
+        step INTEGER NOT NULL,
+        scheduled_for TIMESTAMP NOT NULL,
+        sent_at TIMESTAMP,
+        created_at TIMESTAMP DEFAULT NOW()
+      );
     `);
     console.log('[auth] DB schema ready');
   } catch (err) {
@@ -566,6 +584,39 @@ async function getWaitlistCount() {
   return parseInt(res.rows[0].count, 10);
 }
 
+async function saveFunnelLead(name, email, institution) {
+  const res = await pool.query(
+    `INSERT INTO funnel_leads (name, email, institution) VALUES ($1, $2, $3)
+     ON CONFLICT (email) DO NOTHING RETURNING id`,
+    [name, email, institution || null]
+  );
+  if (res.rows.length === 0) throw Object.assign(new Error('DUPLICATE'), { code: 'DUPLICATE' });
+  return res.rows[0];
+}
+
+async function queueFunnelEmails(leadId, email, name) {
+  const delays = [0, 1, 3, 5, 7, 10, 14];
+  const now = Date.now();
+  for (let i = 0; i < delays.length; i++) {
+    const scheduledFor = new Date(now + delays[i] * 24 * 60 * 60 * 1000);
+    await pool.query(
+      `INSERT INTO email_queue (lead_id, email, name, step, scheduled_for) VALUES ($1, $2, $3, $4, $5)`,
+      [leadId, email, name, i + 1, scheduledFor]
+    );
+  }
+}
+
+async function getDueQueuedEmails() {
+  const res = await pool.query(
+    `SELECT * FROM email_queue WHERE sent_at IS NULL AND scheduled_for <= NOW() ORDER BY scheduled_for LIMIT 50`
+  );
+  return res.rows;
+}
+
+async function markEmailSent(id) {
+  await pool.query(`UPDATE email_queue SET sent_at = NOW() WHERE id = $1`, [id]);
+}
+
 async function getUserBadges(userId) {
   try {
     const { rows } = await pool.query('SELECT COALESCE(badges, \'[]\'::jsonb) AS badges FROM users WHERE id = $1', [userId]);
@@ -702,4 +753,4 @@ async function deleteEscapeRun(userId, runId) {
   await pool.query('DELETE FROM escape_runs WHERE user_id = $1 AND id = $2', [userId, runId]);
 }
 
-module.exports = { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, updateGamertag, getUserGamertag, updateMembershipTier, checkAndExpireUser, getUserByPaymentRef, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount, getUserBadges, setUserBadges, getEscapeRuns, createEscapeRun, updateEscapeRun, completeEscapeRun, deleteEscapeRun, applyRollbackIfStale };
+module.exports = { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, updateGamertag, getUserGamertag, updateMembershipTier, checkAndExpireUser, getUserByPaymentRef, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount, getUserBadges, setUserBadges, getEscapeRuns, createEscapeRun, updateEscapeRun, completeEscapeRun, deleteEscapeRun, applyRollbackIfStale, saveFunnelLead, queueFunnelEmails, getDueQueuedEmails, markEmailSent };
