@@ -3,7 +3,8 @@ const path = require('path');
 const crypto = require('crypto');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-const { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, getUserGamertag, updateGamertag, updateMembershipTier, checkAndExpireUser, getUserByPaymentRef, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount, getUserBadges, setUserBadges, getEscapeRuns, createEscapeRun, updateEscapeRun, completeEscapeRun, deleteEscapeRun, applyRollbackIfStale, saveFunnelLead, queueFunnelEmails, getDueQueuedEmails, markEmailSent } = require('./auth');
+const cookieParser = require('cookie-parser');
+const { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, getUserGamertag, updateGamertag, updateMembershipTier, checkAndExpireUser, getUserByPaymentRef, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount, getUserBadges, setUserBadges, getEscapeRuns, createEscapeRun, updateEscapeRun, completeEscapeRun, deleteEscapeRun, applyRollbackIfStale, saveFunnelLead, queueFunnelEmails, getDueQueuedEmails, markEmailSent, getAffiliateByCode, recordAffiliateClick, queueAffiliateCommission } = require('./auth');
 const { generateEbook } = require('./ebook-generator');
 
 async function requirePro(req, res, next) {
@@ -239,6 +240,18 @@ app.post('/api/payfast-itn', express.urlencoded({ extended: false }), async (req
         sendProUpgradeEmail(upgradedUser.email, upgradedUser.gamertag || upgradedUser.username || 'Operative', matchedPack.days).catch(() => {});
       }
     } catch (e) { console.warn('[payfast-itn] Could not send pro upgrade email:', e.message); }
+
+    // Step 6: Queue affiliate commission if a referral code was attached
+    try {
+      const affiliateCode = (data.custom_str2 || '').trim();
+      if (affiliateCode) {
+        const orderId = data.pf_payment_id || data.m_payment_id || String(Date.now());
+        const commission = await queueAffiliateCommission(affiliateCode, orderId, grossAmount);
+        if (commission) {
+          console.log(`[payfast-itn] Affiliate commission queued — code: ${affiliateCode}, amount: R${commission.commission}, payable: ${commission.payable_at}`);
+        }
+      }
+    } catch (e) { console.warn('[payfast-itn] Affiliate commission error:', e.message); }
   } catch (err) {
     console.error('[payfast-itn] Error:', err.message);
   }
@@ -252,9 +265,32 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(cookieParser());
 app.use(getSessionMiddleware());
 
 setupAuthRoutes(app);
+
+// Referral tracking middleware — reads ?ref=CODE, sets sg_ref cookie for 30 days
+app.use(async (req, res, next) => {
+  const refCode = req.query.ref;
+  if (refCode) {
+    try {
+      const affiliate = await getAffiliateByCode(refCode);
+      if (affiliate && affiliate.status === 'active') {
+        res.cookie('sg_ref', affiliate.code, {
+          maxAge: 30 * 24 * 60 * 60 * 1000,
+          httpOnly: true,
+          sameSite: 'lax'
+        });
+        recordAffiliateClick(affiliate.id).catch(() => {});
+        console.log(`[affiliate] Referral click tracked — code: ${affiliate.code}`);
+      }
+    } catch (err) {
+      console.warn('[affiliate] Referral middleware error:', err.message);
+    }
+  }
+  next();
+});
 
 app.post('/api/gemini', requireAuth, requirePro, async (req, res) => {
   const apiKey = process.env.GEMINI_API_KEY;
@@ -399,7 +435,9 @@ app.post('/api/payfast-checkout', requireAuth, checkoutLimiter, async (req, res)
     m_payment_id: mPaymentId,
     amount:       selected.amount,
     item_name:    selected.label,
-    custom_str1:  String(userId)
+    custom_str1:  String(userId),
+    custom_str2:  req.cookies.sg_ref || '',
+    custom_str3:  ''
   };
   fields.signature = payfastSignature(fields, passphrase);
   const action = `https://${PAYFAST_HOST}/eng/process`;
@@ -868,6 +906,25 @@ async function processFunnelEmailQueue() {
 
 setInterval(processFunnelEmailQueue, 15 * 60 * 1000);
 setTimeout(processFunnelEmailQueue, 10 * 1000);
+
+// Hourly scheduler — promote pending affiliate commissions to payable once 30-day hold period passes
+const { Pool: _pgPool } = require('pg');
+const _affPool = new _pgPool({ connectionString: process.env.DATABASE_URL });
+async function promotePayableCommissions() {
+  try {
+    const result = await _affPool.query(
+      `UPDATE affiliate_commissions SET status = 'payable'
+       WHERE status = 'pending' AND payable_at <= NOW()`
+    );
+    if (result.rowCount > 0) {
+      console.log(`[affiliate-scheduler] ${result.rowCount} commission(s) promoted to payable`);
+    }
+  } catch (err) {
+    console.error('[affiliate-scheduler] Error promoting commissions:', err.message);
+  }
+}
+setInterval(promotePayableCommissions, 60 * 60 * 1000);
+setTimeout(promotePayableCommissions, 30 * 1000);
 
 async function sendProUpgradeEmail(email, gamertag, daysAdded) {
   const key = process.env.RESEND_SG_KEY || process.env.RESEND_API_KEY;

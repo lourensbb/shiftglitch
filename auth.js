@@ -161,6 +161,37 @@ async function ensureSchema() {
         used_at TIMESTAMP,
         created_at TIMESTAMP DEFAULT NOW()
       );
+      CREATE TABLE IF NOT EXISTS affiliates (
+        id SERIAL PRIMARY KEY,
+        user_id TEXT REFERENCES users(id) ON DELETE SET NULL,
+        code VARCHAR(12) UNIQUE NOT NULL,
+        display_name TEXT,
+        email TEXT NOT NULL,
+        commission_rate NUMERIC(4,2) NOT NULL DEFAULT 0.15,
+        payout_method VARCHAR(10) NOT NULL DEFAULT 'paypal' CHECK (payout_method IN ('paypal','ozow')),
+        payout_details JSONB DEFAULT '{}',
+        status VARCHAR(12) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','active','suspended')),
+        tier VARCHAR(12) NOT NULL DEFAULT 'recruit' CHECK (tier IN ('recruit','operative','ghost')),
+        sales_count INT NOT NULL DEFAULT 0,
+        recruited_by_id INT REFERENCES affiliates(id) ON DELETE SET NULL,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+      CREATE TABLE IF NOT EXISTS affiliate_commissions (
+        id SERIAL PRIMARY KEY,
+        affiliate_id INT NOT NULL REFERENCES affiliates(id),
+        order_id TEXT NOT NULL,
+        sale_amount NUMERIC(10,2) NOT NULL,
+        commission NUMERIC(10,2) NOT NULL,
+        status VARCHAR(12) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','payable','paid','cancelled')),
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        payable_at TIMESTAMPTZ NOT NULL,
+        paid_at TIMESTAMPTZ
+      );
+      CREATE TABLE IF NOT EXISTS affiliate_clicks (
+        id SERIAL PRIMARY KEY,
+        affiliate_id INT NOT NULL REFERENCES affiliates(id),
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
     `);
     console.log('[auth] DB schema ready');
   } catch (err) {
@@ -924,4 +955,34 @@ async function deleteEscapeRun(userId, runId) {
   await pool.query('DELETE FROM escape_runs WHERE user_id = $1 AND id = $2', [userId, runId]);
 }
 
-module.exports = { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, updateGamertag, getUserGamertag, updateMembershipTier, checkAndExpireUser, getUserByPaymentRef, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount, getUserBadges, setUserBadges, getEscapeRuns, createEscapeRun, updateEscapeRun, completeEscapeRun, deleteEscapeRun, applyRollbackIfStale, saveFunnelLead, queueFunnelEmails, getDueQueuedEmails, markEmailSent };
+async function getAffiliateByCode(code) {
+  if (!code || typeof code !== 'string') return null;
+  const { rows } = await pool.query('SELECT * FROM affiliates WHERE code = $1', [code.toUpperCase().trim()]);
+  return rows[0] || null;
+}
+
+async function recordAffiliateClick(affiliateId) {
+  await pool.query('INSERT INTO affiliate_clicks (affiliate_id) VALUES ($1)', [affiliateId]);
+}
+
+async function queueAffiliateCommission(affiliateCode, orderId, saleAmount) {
+  try {
+    const affiliate = await getAffiliateByCode(affiliateCode);
+    if (!affiliate || affiliate.status !== 'active') return null;
+    const commission = parseFloat(saleAmount) * parseFloat(affiliate.commission_rate);
+    const { rows } = await pool.query(
+      `INSERT INTO affiliate_commissions
+         (affiliate_id, order_id, sale_amount, commission, status, payable_at)
+       VALUES ($1, $2, $3, $4, 'pending', NOW() + INTERVAL '30 days')
+       RETURNING *`,
+      [affiliate.id, orderId, saleAmount, commission.toFixed(2)]
+    );
+    await pool.query('UPDATE affiliates SET sales_count = sales_count + 1 WHERE id = $1', [affiliate.id]);
+    return rows[0];
+  } catch (err) {
+    console.error('[affiliate] queueAffiliateCommission error:', err.message);
+    return null;
+  }
+}
+
+module.exports = { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, updateGamertag, getUserGamertag, updateMembershipTier, checkAndExpireUser, getUserByPaymentRef, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount, getUserBadges, setUserBadges, getEscapeRuns, createEscapeRun, updateEscapeRun, completeEscapeRun, deleteEscapeRun, applyRollbackIfStale, saveFunnelLead, queueFunnelEmails, getDueQueuedEmails, markEmailSent, getAffiliateByCode, recordAffiliateClick, queueAffiliateCommission };
