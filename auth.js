@@ -1130,6 +1130,7 @@ async function getAllAffiliatesWithStats() {
     SELECT
       a.id, a.display_name AS "displayName", a.email, a.code, a.promo_code AS "promoCode",
       a.tier, a.status, a.sales_count AS "salesCount", a.created_at AS "createdAt",
+      a.payout_method AS "payoutMethod", a.payout_details AS "payoutDetails",
       COALESCE(ct.click_count, 0)::int AS "clickCount",
       COALESCE(cm.pending, 0) AS pending_commission,
       COALESCE(cm.payable, 0) AS payable_commission,
@@ -1150,6 +1151,8 @@ async function getAllAffiliatesWithStats() {
     salesCount: r.salesCount,
     createdAt: r.createdAt,
     clickCount: parseInt(r.clickCount, 10),
+    payoutMethod: r.payoutMethod || 'paypal',
+    payoutDetails: r.payoutDetails || {},
     commissions: {
       pending: parseFloat(r.pending_commission),
       payable: parseFloat(r.payable_commission),

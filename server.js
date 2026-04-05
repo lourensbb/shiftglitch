@@ -365,6 +365,11 @@ app.get('/affiliate-portal', (req, res) => {
   res.sendFile(path.join(__dirname, 'affiliate-portal.html'));
 });
 
+// Admin affiliate panel — not linked from any public page
+app.get('/admin/affiliates', (req, res) => {
+  res.sendFile(path.join(__dirname, 'admin-affiliates.html'));
+});
+
 app.get('/download-ebook', (req, res) => {
   try {
     generateEbook(res);

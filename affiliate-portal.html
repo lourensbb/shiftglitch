@@ -527,6 +527,16 @@
           <div class="rc-screenshot-label">// SCREENSHOT &amp; SHARE</div>
         </div>
         <button class="card-copy-btn" id="card-copy-btn" onclick="copyRecruiterLink(this)">Copy Recruit Link</button>
+
+        <!-- SVG Operative Card — shareable across any platform -->
+        <div id="svg-card-section" style="margin-top:2rem;display:none">
+          <p style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;letter-spacing:0.15em;color:rgba(255,255,255,0.3);text-transform:uppercase;margin-bottom:0.75rem">// PORTABLE SVG BADGE — DOWNLOAD &amp; POST ANYWHERE</p>
+          <img id="svg-card-img" src="" alt="ShiftGlitch Operative Badge" style="max-width:600px;width:100%;border:1px solid rgba(255,0,255,0.2);display:block;border-radius:2px">
+          <div style="margin-top:0.75rem;display:flex;gap:0.75rem;flex-wrap:wrap;align-items:center">
+            <a id="svg-card-download" href="#" download="shiftglitch-operative-badge.svg" class="card-copy-btn" style="text-decoration:none;display:inline-block">Download SVG</a>
+            <span style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:rgba(255,255,255,0.18);letter-spacing:0.08em">Saves as a crisp vector — works on any background at any size</span>
+          </div>
+        </div>
       </section>
 
       <div class="section-divider"></div>
@@ -1078,6 +1088,14 @@
       document.getElementById('rc-recruit-count').textContent = aff.recruitCount || 0;
       const rcCta = document.getElementById('rc-cta-link');
       rcCta.href = aff.recruitUrl || '#';
+
+      // SVG Operative Card
+      if (aff.code) {
+        const cardUrl = `/affiliate-card/${encodeURIComponent(aff.code)}`;
+        document.getElementById('svg-card-img').src       = cardUrl;
+        document.getElementById('svg-card-download').href = cardUrl;
+        document.getElementById('svg-card-section').style.display = 'block';
+      }
 
       // Captions
       buildCaptions(aff.referralUrl || 'https://shiftglitch.replit.app');

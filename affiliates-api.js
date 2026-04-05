@@ -300,4 +300,101 @@ router.post('/admin/affiliates/surge', requireAdmin, async (req, res) => {
   }
 });
 
+// ─── Recruiter Card SVG endpoint ─────────────────────────────────────────────
+// GET /affiliate-card/:code
+// Returns a 600×300 SVG badge for the affiliate identified by :code.
+// Cached for 5 minutes (stats can change).
+
+router.get('/affiliate-card/:code', async (req, res) => {
+  try {
+    const code = String(req.params.code).toUpperCase().trim();
+    const affiliate = await getAffiliateByCode(code);
+    if (!affiliate || affiliate.status !== 'active') {
+      return res.status(404).send('Not found');
+    }
+
+    const [stats, recruitCount] = await Promise.all([
+      getAffiliateStats(affiliate.id),
+      getAffiliateRecruitCount(affiliate.id),
+    ]);
+
+    const alias   = (affiliate.display_name || 'OPERATIVE').toUpperCase().slice(0, 22);
+    const tier    = (affiliate.tier || 'recruit').toUpperCase();
+    const sales   = affiliate.sales_count || 0;
+    const recruits = recruitCount || 0;
+    const refUrl  = `${SITE_URL}/?ref=${code}`;
+
+    const tierColors = { RECRUIT: '#888888', OPERATIVE: '#39FF14', GHOST: '#FF00FF' };
+    const tierColor = tierColors[tier] || '#888888';
+    const commRate  = tier === 'GHOST' ? '25%' : tier === 'OPERATIVE' ? '20%' : '15%';
+
+    const nameFontSize = alias.length > 16 ? 28 : alias.length > 10 ? 34 : 42;
+
+    const svg = `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="300" viewBox="0 0 600 300">
+  <rect width="600" height="300" fill="#0a0a0a"/>
+  <rect x="1" y="1" width="598" height="298" fill="none" stroke="#FF00FF" stroke-width="1.5"/>
+  <rect x="6" y="6" width="588" height="288" fill="none" stroke="rgba(255,0,255,0.18)" stroke-width="1"/>
+
+  <!-- Top accent bar -->
+  <rect x="0" y="0" width="600" height="3" fill="url(#topGrad)"/>
+  <defs>
+    <linearGradient id="topGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#39FF14"/>
+      <stop offset="100%" stop-color="#FF00FF"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Brand -->
+  <text x="32" y="42" font-family="'Courier New', Courier, monospace" font-size="22" font-weight="bold" letter-spacing="4" fill="#39FF14">SHIFTGLITCH</text>
+  <text x="32" y="60" font-family="'Courier New', Courier, monospace" font-size="10" letter-spacing="3" fill="rgba(57,255,20,0.4)">// OPERATIVE CARD</text>
+
+  <!-- Divider -->
+  <line x1="32" y1="72" x2="568" y2="72" stroke="rgba(57,255,20,0.18)" stroke-width="1"/>
+
+  <!-- Alias -->
+  <text x="32" y="${72 + 12 + nameFontSize}" font-family="'Courier New', Courier, monospace" font-size="${nameFontSize}" font-weight="bold" letter-spacing="2" fill="#ffffff">${escXml(alias)}</text>
+
+  <!-- Tier badge -->
+  <rect x="32" y="${72 + 12 + nameFontSize + 12}" width="${30 + tier.length * 8}" height="20" rx="1" fill="none" stroke="${tierColor}" stroke-width="1"/>
+  <text x="${32 + 8}" y="${72 + 12 + nameFontSize + 26}" font-family="'Courier New', Courier, monospace" font-size="10" letter-spacing="2" fill="${tierColor}">${tier}</text>
+
+  <!-- Commission rate -->
+  <text x="${32 + 30 + tier.length * 8 + 12}" y="${72 + 12 + nameFontSize + 26}" font-family="'Courier New', Courier, monospace" font-size="10" letter-spacing="1" fill="rgba(255,255,255,0.3)">${commRate} COMMISSION</text>
+
+  <!-- Stats row -->
+  <text x="32" y="220" font-family="'Courier New', Courier, monospace" font-size="11" letter-spacing="2" fill="rgba(255,255,255,0.25)">${sales} SALES</text>
+  <text x="150" y="220" font-family="'Courier New', Courier, monospace" font-size="11" letter-spacing="2" fill="rgba(255,255,255,0.25)">${recruits} OPERATIVES RECRUITED</text>
+
+  <!-- Divider -->
+  <line x1="32" y1="232" x2="568" y2="232" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+
+  <!-- Ref code + URL -->
+  <text x="32" y="252" font-family="'Courier New', Courier, monospace" font-size="10" letter-spacing="2" fill="rgba(57,255,20,0.5)">CODE: ${escXml(code)}</text>
+  <text x="32" y="272" font-family="'Courier New', Courier, monospace" font-size="10" letter-spacing="1" fill="rgba(57,255,20,0.7)">${escXml(refUrl)}</text>
+
+  <!-- Footer right -->
+  <text x="568" y="252" text-anchor="end" font-family="'Courier New', Courier, monospace" font-size="9" letter-spacing="1" fill="rgba(255,255,255,0.15)">shiftglitch.com</text>
+</svg>`;
+
+    res.set({
+      'Content-Type': 'image/svg+xml',
+      'Cache-Control': 'public, max-age=300',
+    });
+    res.send(svg);
+  } catch (err) {
+    console.error('[affiliate-api] card error:', err.message);
+    res.status(500).send('Server error');
+  }
+});
+
+function escXml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+}
+
 module.exports = router;

@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Affiliate Control Panel // ShiftGlitch</title>
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="icon" href="/assets/shiftglitch-logo-only.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --green:   #39FF14;
+      --magenta: #FF00FF;
+      --purple:  #8A2BE2;
+      --bg:      #0a0a0a;
+      --surface: #0d0d0d;
+      --border:  rgba(57,255,20,0.12);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg); color: #fff;
+      font-family: 'Space Grotesk', sans-serif;
+      min-height: 100vh; overflow-x: hidden;
+    }
+    ::selection { background: rgba(57,255,20,0.25); }
+    body::after {
+      content: ''; position: fixed; inset: 0;
+      pointer-events: none; z-index: 1;
+      background: repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.06) 2px,rgba(0,0,0,0.06) 4px);
+    }
+    .orb { position: fixed; border-radius: 50%; filter: blur(120px); pointer-events: none; z-index: 0; }
+    .orb-green   { width:600px;height:600px;background:rgba(57,255,20,0.03);  top:-200px;left:-200px; }
+    .orb-magenta { width:400px;height:400px;background:rgba(255,0,255,0.03);  bottom:5%;right:-100px; }
+
+    /* ── Nav ── */
+    .nav {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 2rem;
+      background: rgba(5,5,5,0.92); backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .nav-logo { font-family: 'VT323', monospace; font-size: 1.6rem; color: #fff; text-decoration: none; letter-spacing: 0.08em; }
+    .nav-logo span { color: var(--green); }
+    .admin-badge {
+      font-family: 'Share Tech Mono', monospace; font-size: 0.7rem; letter-spacing: 0.18em;
+      text-transform: uppercase; color: #000; background: var(--magenta);
+      padding: 0.25rem 0.75rem; border-radius: 2px;
+    }
+    .nav-back {
+      font-family: 'Share Tech Mono', monospace; font-size: 0.7rem; letter-spacing: 0.1em;
+      text-transform: uppercase; color: rgba(255,255,255,0.35); text-decoration: none;
+      transition: color 0.2s ease;
+    }
+    .nav-back:hover { color: rgba(255,255,255,0.7); }
+
+    /* ── Page ── */
+    .page { position: relative; z-index: 10; max-width: 1280px; margin: 0 auto; padding: 3rem 1.5rem 8rem; }
+
+    /* ── Section ── */
+    .section-label { font-family: 'Share Tech Mono', monospace; font-size: 0.68rem; letter-spacing: 0.22em; color: rgba(57,255,20,0.5); text-transform: uppercase; margin-bottom: 0.5rem; }
+    .section-title { font-family: 'VT323', monospace; font-size: clamp(2rem,5vw,3rem); color: #fff; line-height: 1; margin-bottom: 1.5rem; }
+    .section-divider { height: 1px; background: linear-gradient(90deg,transparent,rgba(57,255,20,0.1),transparent); margin: 3rem 0; }
+
+    /* ── Gate screens ── */
+    #loading-screen { min-height: 60vh; display: flex; align-items: center; justify-content: center; }
+    #admin-panel    { display: none; }
+    .loading-spinner { width: 36px; height: 36px; border-radius: 50%; border: 2px solid rgba(57,255,20,0.15); border-top-color: var(--green); animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Stats bar ── */
+    .stats-bar { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2.5rem; }
+    .stat-card { background: rgba(57,255,20,0.02); border: 1px solid rgba(57,255,20,0.12); border-radius: 2px; padding: 1.25rem 1.5rem; position: relative; overflow: hidden; }
+    .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--green), transparent); }
+    .stat-card-label { font-family: 'Share Tech Mono', monospace; font-size: 0.62rem; letter-spacing: 0.18em; color: rgba(255,255,255,0.3); text-transform: uppercase; margin-bottom: 0.4rem; }
+    .stat-card-value { font-family: 'VT323', monospace; font-size: 2.4rem; color: var(--green); line-height: 1; }
+    .stat-card.magenta .stat-card-value { color: var(--magenta); }
+    .stat-card.magenta::before { background: linear-gradient(90deg, transparent, var(--magenta), transparent); }
+    .stat-card.purple .stat-card-value  { color: var(--purple); }
+    .stat-card.purple::before  { background: linear-gradient(90deg, transparent, var(--purple), transparent); }
+
+    /* ── Toolbar ── */
+    .toolbar { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap; }
+    .search-input {
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 2px;
+      padding: 0.6rem 1rem; font-family: 'Share Tech Mono', monospace; font-size: 0.78rem; color: #fff;
+      outline: none; transition: border-color 0.2s ease; width: 260px;
+    }
+    .search-input::placeholder { color: rgba(255,255,255,0.2); }
+    .search-input:focus { border-color: rgba(57,255,20,0.3); }
+    .filter-select {
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 2px;
+      padding: 0.6rem 0.85rem; font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; color: rgba(255,255,255,0.6);
+      outline: none; cursor: pointer;
+    }
+    .filter-select option { background: #111; }
+    .refresh-btn {
+      font-family: 'Share Tech Mono', monospace; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase;
+      background: transparent; color: rgba(57,255,20,0.6); border: 1px solid rgba(57,255,20,0.2);
+      padding: 0.55rem 1rem; border-radius: 2px; cursor: pointer; transition: all 0.2s ease;
+    }
+    .refresh-btn:hover { border-color: var(--green); color: var(--green); }
+
+    /* ── Table ── */
+    .table-wrap { overflow-x: auto; }
+    .aff-table { width: 100%; border-collapse: collapse; min-width: 820px; }
+    .aff-table th {
+      font-family: 'Share Tech Mono', monospace; font-size: 0.62rem; letter-spacing: 0.15em;
+      text-transform: uppercase; color: rgba(255,255,255,0.3);
+      padding: 0.75rem 1rem; text-align: left;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      white-space: nowrap;
+    }
+    .aff-table td { padding: 0.9rem 1rem; border-bottom: 1px solid rgba(255,255,255,0.03); vertical-align: middle; }
+    .aff-table tr:hover td { background: rgba(255,255,255,0.015); }
+    .aff-table .name-cell { font-size: 0.9rem; color: rgba(255,255,255,0.85); font-weight: 500; }
+    .aff-table .code-cell { font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; color: rgba(57,255,20,0.7); }
+    .aff-table .email-cell { font-family: 'Share Tech Mono', monospace; font-size: 0.7rem; color: rgba(255,255,255,0.3); }
+    .aff-table .num-cell { font-family: 'VT323', monospace; font-size: 1.3rem; color: rgba(255,255,255,0.6); }
+    .aff-table .amount-cell { font-family: 'VT323', monospace; font-size: 1.3rem; }
+
+    .status-badge { display: inline-block; font-family: 'Share Tech Mono', monospace; font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; padding: 0.18rem 0.55rem; border-radius: 1px; border: 1px solid; white-space: nowrap; }
+    .status-badge.pending   { color: #FFD700; border-color: rgba(255,215,0,0.3); }
+    .status-badge.active    { color: var(--green); border-color: rgba(57,255,20,0.3); }
+    .status-badge.suspended { color: var(--magenta); border-color: rgba(255,0,255,0.3); }
+
+    .tier-pill { display: inline-block; font-family: 'Share Tech Mono', monospace; font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.15rem 0.45rem; border-radius: 1px; border: 1px solid; }
+    .tier-pill.recruit   { color: #888; border-color: #444; }
+    .tier-pill.operative { color: var(--green); border-color: rgba(57,255,20,0.3); }
+    .tier-pill.ghost     { color: var(--magenta); border-color: rgba(255,0,255,0.3); }
+
+    /* ── Action buttons ── */
+    .action-btns { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+    .action-btn {
+      font-family: 'Share Tech Mono', monospace; font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase;
+      border: 1px solid; border-radius: 1px; padding: 0.3rem 0.65rem; cursor: pointer;
+      transition: all 0.2s ease; background: transparent; white-space: nowrap;
+    }
+    .action-btn.approve  { color: var(--green); border-color: rgba(57,255,20,0.3); }
+    .action-btn.approve:hover  { background: rgba(57,255,20,0.12); }
+    .action-btn.suspend  { color: var(--magenta); border-color: rgba(255,0,255,0.2); }
+    .action-btn.suspend:hover  { background: rgba(255,0,255,0.08); }
+    .action-btn.paid     { color: var(--purple); border-color: rgba(138,43,226,0.3); }
+    .action-btn.paid:hover     { background: rgba(138,43,226,0.1); }
+    .action-btn.view     { color: rgba(255,255,255,0.4); border-color: rgba(255,255,255,0.1); }
+    .action-btn.view:hover     { color: rgba(255,255,255,0.7); border-color: rgba(255,255,255,0.25); }
+    .action-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .empty-row td { text-align: center; padding: 3rem; font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; color: rgba(255,255,255,0.2); letter-spacing: 0.1em; }
+
+    /* ── Surge panel ── */
+    .surge-panel { background: rgba(255,0,255,0.02); border: 1px solid rgba(255,0,255,0.18); border-radius: 2px; padding: 2rem; }
+    .surge-active-banner { background: rgba(255,0,255,0.08); border: 1px solid rgba(255,0,255,0.3); border-radius: 2px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; display: none; }
+    .surge-active-text { font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; letter-spacing: 0.08em; color: var(--magenta); }
+    .surge-countdown { font-family: 'VT323', monospace; font-size: 1.8rem; color: var(--magenta); margin-top: 0.25rem; }
+    .surge-form { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap: 1rem; margin-top: 1rem; }
+    .surge-field { display: flex; flex-direction: column; gap: 0.35rem; }
+    .surge-label { font-family: 'Share Tech Mono', monospace; font-size: 0.65rem; letter-spacing: 0.14em; color: rgba(255,255,255,0.35); text-transform: uppercase; }
+    .surge-input {
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,0,255,0.15); border-radius: 2px;
+      padding: 0.7rem 0.85rem; font-family: 'Share Tech Mono', monospace; font-size: 0.82rem; color: #fff; outline: none;
+      transition: border-color 0.2s ease;
+    }
+    .surge-input:focus { border-color: rgba(255,0,255,0.4); }
+    .surge-msg { grid-column: 1 / -1; }
+    .surge-launch-btn {
+      margin-top: 1.25rem; font-family: 'Share Tech Mono', monospace; font-size: 0.78rem; font-weight: bold;
+      letter-spacing: 0.18em; text-transform: uppercase; cursor: pointer;
+      background: var(--magenta); color: #000; border: none;
+      padding: 0.9rem 2rem; border-radius: 2px; transition: all 0.2s ease;
+    }
+    .surge-launch-btn:hover { box-shadow: 0 0 28px rgba(255,0,255,0.5); }
+    .surge-launch-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .surge-feedback { margin-top: 1rem; font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; color: rgba(57,255,20,0.7); display: none; }
+
+    /* ── Modals ── */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 500;
+      background: rgba(0,0,0,0.82); display: none;
+      align-items: center; justify-content: center;
+      padding: 1.5rem;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: #0f0f0f; border: 1px solid rgba(255,0,255,0.3); border-radius: 2px;
+      padding: 2.5rem; max-width: 480px; width: 100%; position: relative;
+    }
+    .modal-title { font-family: 'VT323', monospace; font-size: 2rem; color: var(--magenta); margin-bottom: 0.75rem; }
+    .modal-body { font-family: 'Share Tech Mono', monospace; font-size: 0.78rem; color: rgba(255,255,255,0.5); line-height: 1.9; margin-bottom: 1.5rem; }
+    .modal-amount { font-family: 'VT323', monospace; font-size: 2.6rem; color: var(--green); }
+    .modal-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+    .modal-btn {
+      font-family: 'Share Tech Mono', monospace; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase;
+      padding: 0.65rem 1.5rem; border-radius: 2px; cursor: pointer; border: 1px solid; transition: all 0.2s ease;
+    }
+    .modal-btn.confirm { background: var(--green); color: #000; border-color: var(--green); }
+    .modal-btn.confirm:hover { box-shadow: 0 0 20px rgba(57,255,20,0.4); }
+    .modal-btn.cancel  { background: transparent; color: rgba(255,255,255,0.4); border-color: rgba(255,255,255,0.12); }
+    .modal-btn.cancel:hover  { color: rgba(255,255,255,0.7); }
+
+    /* PayPal reminder modal */
+    #paypal-modal .modal-box { border-color: rgba(255,165,0,0.4); }
+    #paypal-modal .modal-title { color: #FFD700; }
+    .modal-btn.paypal-ok { background: #FFD700; color: #000; border-color: #FFD700; }
+    .modal-btn.paypal-ok:hover { box-shadow: 0 0 20px rgba(255,215,0,0.3); }
+
+    /* ── Toast ── */
+    #toast {
+      position: fixed; bottom: 2rem; right: 2rem; z-index: 600;
+      background: #111; border: 1px solid var(--green);
+      font-family: 'Share Tech Mono', monospace; font-size: 0.75rem;
+      color: var(--green); padding: 0.75rem 1.25rem; border-radius: 2px;
+      opacity: 0; transform: translateY(8px);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      pointer-events: none; max-width: 320px;
+    }
+    #toast.show { opacity: 1; transform: translateY(0); }
+    #toast.error { border-color: var(--magenta); color: var(--magenta); }
+
+    @media(max-width:640px) {
+      .stats-bar { grid-template-columns: 1fr 1fr; }
+      .surge-form { grid-template-columns: 1fr; }
+      .page { padding: 2rem 1rem 6rem; }
+      .nav { padding: 1rem 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="orb orb-green"></div>
+  <div class="orb orb-magenta"></div>
+
+  <!-- Nav -->
+  <nav class="nav">
+    <a href="/app" class="nav-logo">SHIFT<span>GLITCH</span></a>
+    <span class="admin-badge">// ADMIN — AFFILIATE CONTROL PANEL</span>
+    <a href="/app" class="nav-back">← Back to App</a>
+  </nav>
+
+  <!-- Toast -->
+  <div id="toast"></div>
+
+  <!-- Loading -->
+  <div id="loading-screen">
+    <div class="loading-spinner"></div>
+  </div>
+
+  <!-- Admin panel (shown after auth check) -->
+  <div id="admin-panel" class="page">
+
+    <!-- ── Stats Bar ── -->
+    <section>
+      <p class="section-label">// MAINFRAME STATUS</p>
+      <h1 class="section-title">AFFILIATE CONTROL</h1>
+      <div class="stats-bar" id="stats-bar">
+        <div class="stat-card"><div class="stat-card-label">Total Affiliates</div><div class="stat-card-value" id="stat-total">—</div></div>
+        <div class="stat-card"><div class="stat-card-label">Active Operatives</div><div class="stat-card-value" id="stat-active">—</div></div>
+        <div class="stat-card magenta"><div class="stat-card-label">Payable Commissions</div><div class="stat-card-value" id="stat-payable">—</div></div>
+        <div class="stat-card purple"><div class="stat-card-label">Total Paid Out</div><div class="stat-card-value" id="stat-paid">—</div></div>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ── Affiliate Table ── -->
+    <section>
+      <p class="section-label">// OPERATIVE REGISTRY</p>
+      <h2 class="section-title">ALL AFFILIATES</h2>
+      <div class="toolbar">
+        <input type="text" class="search-input" id="search-input" placeholder="Search name, code or email…" oninput="filterTable()">
+        <select class="filter-select" id="status-filter" onchange="filterTable()">
+          <option value="">All statuses</option>
+          <option value="pending">Pending</option>
+          <option value="active">Active</option>
+          <option value="suspended">Suspended</option>
+        </select>
+        <button class="refresh-btn" onclick="reload()">↺ Refresh</button>
+      </div>
+      <div class="table-wrap">
+        <table class="aff-table" id="aff-table">
+          <thead>
+            <tr>
+              <th>Operative</th>
+              <th>Code</th>
+              <th>Tier</th>
+              <th>Status</th>
+              <th>Sales</th>
+              <th>Clicks</th>
+              <th>Payable</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="aff-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ── Surge Campaign ── -->
+    <section>
+      <p class="section-label">// SURGE PROTOCOL</p>
+      <h2 class="section-title">SURGE CAMPAIGNS</h2>
+      <p style="font-size:0.9rem;color:rgba(255,255,255,0.4);line-height:1.7;max-width:580px;margin-bottom:1.5rem">Launch a time-limited bonus payout window. All commissions earned during the surge are multiplied by the configured factor. A blast email is sent immediately to all active affiliates.</p>
+
+      <div class="surge-panel">
+        <div class="surge-active-banner" id="surge-active-banner">
+          <div class="surge-active-text" id="surge-active-text">SURGE ACTIVE</div>
+          <div class="surge-countdown" id="surge-countdown">—</div>
+        </div>
+
+        <div class="surge-form">
+          <div class="surge-field">
+            <label class="surge-label">Bonus Multiplier</label>
+            <input type="number" class="surge-input" id="surge-multiplier" value="2" min="1.1" max="10" step="0.1" placeholder="e.g. 2">
+          </div>
+          <div class="surge-field">
+            <label class="surge-label">Duration (hours)</label>
+            <input type="number" class="surge-input" id="surge-hours" value="48" min="1" max="720" placeholder="e.g. 48">
+          </div>
+          <div class="surge-field surge-msg">
+            <label class="surge-label">Message to affiliates</label>
+            <input type="text" class="surge-input" id="surge-message" placeholder="e.g. Black Friday surge — push your links!" maxlength="200">
+          </div>
+        </div>
+
+        <button class="surge-launch-btn" id="surge-launch-btn" onclick="launchSurge()">⚡ LAUNCH SURGE</button>
+        <div class="surge-feedback" id="surge-feedback"></div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ── Mark Paid Modal ── -->
+  <div class="modal-overlay" id="paid-modal">
+    <div class="modal-box">
+      <div class="modal-title">MARK COMMISSIONS PAID</div>
+      <div class="modal-body" id="paid-modal-body">—</div>
+      <div class="modal-actions">
+        <button class="modal-btn confirm" id="paid-modal-confirm">CONFIRM PAYMENT</button>
+        <button class="modal-btn cancel" onclick="closeModal('paid-modal')">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PayPal Reminder Modal ── -->
+  <div class="modal-overlay" id="paypal-modal">
+    <div class="modal-box">
+      <div class="modal-title">MANUAL PAYPAL STEP</div>
+      <div class="modal-body" id="paypal-modal-body">—</div>
+      <div class="modal-actions">
+        <button class="modal-btn paypal-ok" onclick="closeModal('paypal-modal')">ACKNOWLEDGED</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ── State ─────────────────────────────────────────────────────────────────
+    let _affiliates = [];
+    let _surgeTimer  = null;
+
+    // ── Init ──────────────────────────────────────────────────────────────────
+    async function init() {
+      // 1. Auth check
+      let me;
+      try {
+        const r = await fetch('/api/me', { headers: { 'Accept': 'application/json' } });
+        if (!r.ok) { window.location.href = '/app'; return; }
+        me = await r.json();
+      } catch {
+        window.location.href = '/app'; return;
+      }
+
+      // 2. Admin identity check — call a known admin endpoint
+      // We ping GET /admin/affiliates; a 401/403 means not admin → redirect
+      const probe = await fetch('/admin/affiliates', { headers: { 'Accept': 'application/json' } });
+      if (probe.status === 401 || probe.status === 403 || probe.status === 503) {
+        window.location.href = '/app'; return;
+      }
+
+      // 3. Parse affiliate data (re-use the probe response)
+      let data = [];
+      try { data = await probe.json(); } catch {}
+      _affiliates = Array.isArray(data) ? data : [];
+
+      document.getElementById('loading-screen').style.display = 'none';
+      document.getElementById('admin-panel').style.display = 'block';
+
+      renderStats();
+      renderTable(_affiliates);
+      checkSurge();
+    }
+
+    // ── Stats ─────────────────────────────────────────────────────────────────
+    function renderStats() {
+      const total   = _affiliates.length;
+      const active  = _affiliates.filter(a => a.status === 'active').length;
+      const payable = _affiliates.reduce((s, a) => s + (a.commissions?.payable || 0), 0);
+      const paid    = _affiliates.reduce((s, a) => s + (a.commissions?.paid    || 0), 0);
+
+      document.getElementById('stat-total').textContent   = total;
+      document.getElementById('stat-active').textContent  = active;
+      document.getElementById('stat-payable').textContent = `R${payable.toFixed(2)}`;
+      document.getElementById('stat-paid').textContent    = `R${paid.toFixed(2)}`;
+    }
+
+    // ── Table ─────────────────────────────────────────────────────────────────
+    function renderTable(affiliates) {
+      const tbody = document.getElementById('aff-tbody');
+      tbody.innerHTML = '';
+
+      if (!affiliates.length) {
+        tbody.innerHTML = '<tr class="empty-row"><td colspan="8">NO OPERATIVES FOUND — MAINFRAME CLEAR</td></tr>';
+        return;
+      }
+
+      affiliates.forEach(a => {
+        const tr = document.createElement('tr');
+        tr.dataset.id     = a.id;
+        tr.dataset.status = a.status;
+
+        const payable = (a.commissions?.payable || 0).toFixed(2);
+        const isPending   = a.status === 'pending';
+        const isActive    = a.status === 'active';
+        const isSuspended = a.status === 'suspended';
+        const hasPayable  = parseFloat(payable) > 0;
+
+        tr.innerHTML = `
+          <td>
+            <div class="name-cell">${escHtml(a.displayName || '—')}</div>
+            <div class="email-cell">${escHtml(a.email || '—')}</div>
+          </td>
+          <td><span class="code-cell">${escHtml(a.code || '—')}</span></td>
+          <td><span class="tier-pill ${a.tier || 'recruit'}">${(a.tier || 'recruit').toUpperCase()}</span></td>
+          <td><span class="status-badge ${a.status || 'pending'}">${(a.status || 'pending').toUpperCase()}</span></td>
+          <td class="num-cell">${a.salesCount || 0}</td>
+          <td class="num-cell">${a.clickCount || 0}</td>
+          <td class="amount-cell" style="color:${hasPayable ? 'var(--magenta)' : 'rgba(255,255,255,0.3)'}">R${payable}</td>
+          <td>
+            <div class="action-btns">
+              ${isPending   ? `<button class="action-btn approve" onclick="approve(${a.id})">Approve</button>` : ''}
+              ${isActive    ? `<button class="action-btn suspend" onclick="suspend(${a.id})">Suspend</button>` : ''}
+              ${isSuspended ? `<button class="action-btn approve" onclick="approve(${a.id})">Reinstate</button>` : ''}
+              ${isActive && hasPayable ? `<button class="action-btn paid" onclick="openPaidModal(${a.id})">Mark Paid</button>` : ''}
+              <button class="action-btn view" onclick="viewPortal('${escHtml(a.code || '')}')">Portal →</button>
+            </div>
+          </td>`;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // ── Filter ────────────────────────────────────────────────────────────────
+    function filterTable() {
+      const q      = document.getElementById('search-input').value.toLowerCase().trim();
+      const status = document.getElementById('status-filter').value;
+      const filtered = _affiliates.filter(a => {
+        const matchQ = !q ||
+          (a.displayName || '').toLowerCase().includes(q) ||
+          (a.code || '').toLowerCase().includes(q) ||
+          (a.email || '').toLowerCase().includes(q);
+        const matchS = !status || a.status === status;
+        return matchQ && matchS;
+      });
+      renderTable(filtered);
+    }
+
+    // ── Actions ───────────────────────────────────────────────────────────────
+    async function approve(id) {
+      disableRowBtns(id);
+      try {
+        const r = await fetch(`/admin/affiliates/${id}/approve`, { method: 'POST', headers: { 'Accept': 'application/json' } });
+        if (!r.ok) throw new Error((await r.json()).error || 'API error');
+        const data = await r.json();
+        updateLocalAffiliate(data.affiliate || { id, status: 'active' });
+        toast('Affiliate approved — approval email sent');
+      } catch (e) { toast('Error: ' + e.message, true); }
+    }
+
+    async function suspend(id) {
+      disableRowBtns(id);
+      try {
+        const r = await fetch(`/admin/affiliates/${id}/suspend`, { method: 'POST', headers: { 'Accept': 'application/json' } });
+        if (!r.ok) throw new Error((await r.json()).error || 'API error');
+        const data = await r.json();
+        updateLocalAffiliate(data.affiliate || { id, status: 'suspended' });
+        toast('Affiliate suspended');
+      } catch (e) { toast('Error: ' + e.message, true); }
+    }
+
+    let _pendingPaidId = null;
+
+    function openPaidModal(id) {
+      _pendingPaidId = id;
+      const a = _affiliates.find(x => x.id === id);
+      if (!a) return;
+      const payable = (a.commissions?.payable || 0).toFixed(2);
+      const method  = (a.payoutMethod || 'paypal').toUpperCase();
+      const details = a.payoutDetails || {};
+      let detailStr = '';
+      if (method === 'PAYPAL' && details.email) {
+        detailStr = `<br>PayPal: <strong style="color:#fff">${escHtml(details.email)}</strong>`;
+      } else if (method === 'OZOW' && (details.bank || details.accountNumber)) {
+        detailStr = `<br>Bank: <strong style="color:#fff">${escHtml(details.bank || '')} ${escHtml(details.accountNumber || '')}</strong>`;
+      }
+
+      document.getElementById('paid-modal-body').innerHTML =
+        `Operative: <strong style="color:#fff">${escHtml(a.displayName)}</strong>` +
+        `<br>Method: <strong style="color:#fff">${method}</strong>${detailStr}` +
+        `<br>Payable: <span class="modal-amount">R${payable}</span>` +
+        `<br><br><span style="color:rgba(255,255,255,0.3);font-size:0.7rem">This records the payment in the database. Process the transfer manually.</span>`;
+
+      document.getElementById('paid-modal-confirm').onclick = () => confirmPaid(id, parseFloat(payable), a.payoutMethod, a.payoutDetails);
+      openModal('paid-modal');
+    }
+
+    async function confirmPaid(id, amount, method, details) {
+      closeModal('paid-modal');
+      try {
+        const r = await fetch(`/admin/affiliates/${id}/mark-paid`, { method: 'POST', headers: { 'Accept': 'application/json' } });
+        if (!r.ok) throw new Error((await r.json()).error || 'API error');
+
+        const idx = _affiliates.findIndex(x => x.id === id);
+        if (idx >= 0) {
+          _affiliates[idx].commissions.paid    += _affiliates[idx].commissions.payable;
+          _affiliates[idx].commissions.payable  = 0;
+        }
+        renderStats();
+        filterTable();
+        toast('Commissions marked as paid');
+
+        if ((method || 'paypal') === 'paypal') {
+          const email = (details && details.email) ? details.email : 'their PayPal';
+          document.getElementById('paypal-modal-body').innerHTML =
+            `Remember to send <strong style="color:var(--green)">R${amount.toFixed(2)}</strong> to <strong style="color:#fff">${escHtml(email)}</strong> via PayPal manually.<br><br>` +
+            `<span style="color:rgba(255,255,255,0.3);font-size:0.7rem">This action only records the payment in the database. The actual PayPal transfer must be done through your PayPal dashboard.</span>`;
+          openModal('paypal-modal');
+        } else {
+          // Ozow: remind admin to process manually — automated integration is out of scope
+          document.getElementById('paypal-modal-body').innerHTML =
+            `Remember to process <strong style="color:var(--green)">R${amount.toFixed(2)}</strong> through your Ozow dashboard manually.<br><br>` +
+            `<span style="color:rgba(255,255,255,0.3);font-size:0.7rem">Automated Ozow payouts are not yet implemented — please log into your Ozow merchant account and process the transfer.</span>`;
+          openModal('paypal-modal');
+        }
+      } catch (e) { toast('Error: ' + e.message, true); }
+    }
+
+    function viewPortal(code) {
+      window.open(`/affiliate-portal`, '_blank');
+    }
+
+    // ── Surge ─────────────────────────────────────────────────────────────────
+    async function checkSurge() {
+      try {
+        const r = await fetch('/api/affiliate/surge', { headers: { 'Accept': 'application/json' } });
+        if (!r.ok) return;
+        const surge = await r.json();
+        if (surge && surge.ends_at) {
+          const endsAt = new Date(surge.ends_at);
+          if (endsAt > Date.now()) {
+            showSurgeBanner(surge, endsAt);
+          }
+        }
+      } catch {}
+    }
+
+    function showSurgeBanner(surge, endsAt) {
+      const banner = document.getElementById('surge-active-banner');
+      const txt    = document.getElementById('surge-active-text');
+      const cdEl   = document.getElementById('surge-countdown');
+      banner.style.display = 'block';
+      txt.textContent = `SURGE ACTIVE — ${surge.bonus_multiplier}× COMMISSIONS`;
+
+      if (_surgeTimer) clearInterval(_surgeTimer);
+      function tick() {
+        const diff = endsAt - Date.now();
+        if (diff <= 0) { cdEl.textContent = 'EXPIRED'; clearInterval(_surgeTimer); return; }
+        const h = Math.floor(diff / 3600000);
+        const m = Math.floor((diff % 3600000) / 60000);
+        const s = Math.floor((diff % 60000) / 1000);
+        cdEl.textContent = `${h}h ${m}m ${s}s REMAINING`;
+      }
+      tick();
+      _surgeTimer = setInterval(tick, 1000);
+    }
+
+    async function launchSurge() {
+      const mult = parseFloat(document.getElementById('surge-multiplier').value);
+      const hrs  = parseInt(document.getElementById('surge-hours').value, 10);
+      const msg  = document.getElementById('surge-message').value.trim();
+
+      if (!mult || mult < 1.1) { toast('Multiplier must be ≥ 1.1', true); return; }
+      if (!hrs  || hrs < 1)   { toast('Duration must be ≥ 1 hour', true); return; }
+
+      const btn = document.getElementById('surge-launch-btn');
+      btn.disabled = true;
+      btn.textContent = 'LAUNCHING…';
+
+      try {
+        const r = await fetch('/admin/affiliates/surge', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({ bonusMultiplier: mult, durationHours: hrs, message: msg }),
+        });
+        if (!r.ok) throw new Error((await r.json()).error || 'API error');
+        const data = await r.json();
+        const fb   = document.getElementById('surge-feedback');
+        const endsAt = new Date(data.surge.ends_at);
+        fb.textContent = `// SURGE LAUNCHED — ${mult}× commissions until ${endsAt.toLocaleString('en-ZA', { timeZone: 'Africa/Johannesburg' })} SAST. Blast email sent.`;
+        fb.style.display = 'block';
+        showSurgeBanner(data.surge, endsAt);
+        toast(`Surge event launched — ${mult}× for ${hrs}h`);
+      } catch (e) {
+        toast('Launch failed: ' + e.message, true);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '⚡ LAUNCH SURGE';
+      }
+    }
+
+    // ── Helpers ───────────────────────────────────────────────────────────────
+    function updateLocalAffiliate(updated) {
+      const idx = _affiliates.findIndex(x => x.id === updated.id);
+      if (idx >= 0) {
+        _affiliates[idx] = { ..._affiliates[idx], status: updated.status };
+      }
+      renderStats();
+      filterTable();
+    }
+
+    function disableRowBtns(id) {
+      const tr = document.querySelector(`tr[data-id="${id}"]`);
+      if (tr) tr.querySelectorAll('.action-btn').forEach(b => { b.disabled = true; });
+    }
+
+    function openModal(id)  { document.getElementById(id).classList.add('open'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+    let _toastTimer;
+    function toast(msg, isError = false) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.className = 'show' + (isError ? ' error' : '');
+      clearTimeout(_toastTimer);
+      _toastTimer = setTimeout(() => { el.className = ''; }, 3200);
+    }
+
+    function escHtml(s) {
+      return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    async function reload() {
+      document.getElementById('aff-tbody').innerHTML = '<tr class="empty-row"><td colspan="8">REFRESHING…</td></tr>';
+      try {
+        const r = await fetch('/admin/affiliates', { headers: { 'Accept': 'application/json' } });
+        if (!r.ok) throw new Error('Refresh failed');
+        _affiliates = await r.json();
+        renderStats();
+        filterTable();
+        toast('Data refreshed');
+      } catch (e) { toast('Refresh error: ' + e.message, true); }
+    }
+
+    // ── Boot ──────────────────────────────────────────────────────────────────
+    init();
+  </script>
+</body>
+</html>
