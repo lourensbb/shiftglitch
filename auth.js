@@ -6,7 +6,6 @@ const { Pool } = require('pg');
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
 let oidcConfig = null;
-let googleOidcConfig = null;
 
 async function getOidcConfig() {
   if (!oidcConfig) {
@@ -18,21 +17,8 @@ async function getOidcConfig() {
   return oidcConfig;
 }
 
-function getGoogleOidcConfig() {
-  if (!googleOidcConfig) {
-    googleOidcConfig = new oidc.Configuration(
-      {
-        issuer: 'https://accounts.google.com',
-        authorization_endpoint: 'https://accounts.google.com/o/oauth2/v2/auth',
-        token_endpoint: 'https://oauth2.googleapis.com/token',
-        jwks_uri: 'https://www.googleapis.com/oauth2/v3/certs',
-        userinfo_endpoint: 'https://openidconnect.googleapis.com/v1/userinfo'
-      },
-      process.env.GOOGLE_CLIENT_ID,
-      { client_secret: process.env.GOOGLE_CLIENT_SECRET }
-    );
-  }
-  return googleOidcConfig;
+function googleCallbackUrl() {
+  return `${process.env.SITE_URL || 'https://shiftglitch.replit.app'}/auth/google/callback`;
 }
 
 async function ensureSchema() {
@@ -333,61 +319,58 @@ function setupAuthRoutes(app) {
   app.get('/api/login', handleLogin);
   app.get('/api/auth/login', handleLogin);
 
-  app.get('/auth/google', async (req, res) => {
+  app.get('/auth/google', (req, res) => {
     if (!process.env.GOOGLE_CLIENT_ID) return res.redirect('/login?error=google_not_configured');
-    try {
-      const config = getGoogleOidcConfig();
-      const siteBase = process.env.SITE_URL || (() => { const host = (process.env.REPLIT_DOMAINS || process.env.REPLIT_DEV_DOMAIN || req.get('x-forwarded-host') || req.hostname).split(',')[0].trim(); return `https://${host}`; })();
-      const callbackUrl = `${siteBase}/auth/google/callback`;
-      const state = oidc.randomState();
-      const nonce = oidc.randomNonce();
-      const codeVerifier = oidc.randomPKCECodeVerifier();
-      const codeChallenge = await oidc.calculatePKCECodeChallenge(codeVerifier);
-      req.session.googleState = state;
-      req.session.googleNonce = nonce;
-      req.session.googleCodeVerifier = codeVerifier;
-      req.session.googleCallback = callbackUrl;
-      await new Promise((resolve, reject) => req.session.save(e => e ? reject(e) : resolve()));
-      const url = oidc.buildAuthorizationUrl(config, {
-        redirect_uri: callbackUrl,
+    const { randomBytes } = require('crypto');
+    const state = randomBytes(16).toString('hex');
+    req.session.googleState = state;
+    req.session.save(err => {
+      if (err) { console.error('[Google auth] session save error:', err); return res.redirect('/login?error=google_failed'); }
+      const params = new URLSearchParams({
+        client_id: process.env.GOOGLE_CLIENT_ID,
+        redirect_uri: googleCallbackUrl(),
+        response_type: 'code',
         scope: 'openid email profile',
-        state, nonce,
-        code_challenge: codeChallenge,
-        code_challenge_method: 'S256'
+        state,
+        access_type: 'online'
       });
-      res.redirect(url.href);
-    } catch (err) {
-      console.error('[Google auth] error:', err);
-      res.redirect('/login?error=google_failed');
-    }
+      res.redirect(`https://accounts.google.com/o/oauth2/v2/auth?${params}`);
+    });
   });
 
   app.get('/auth/google/callback', async (req, res) => {
+    const { code, state, error } = req.query;
+    if (error) { console.warn('[Google callback] user denied:', error); return res.redirect('/login?error=google_failed'); }
+    if (!code || !state || state !== req.session.googleState) {
+      console.warn('[Google callback] state mismatch or missing code', { hasCode: !!code, state, expected: req.session.googleState });
+      return res.redirect('/login?error=google_failed');
+    }
     try {
-      const config = getGoogleOidcConfig();
-      const siteBase = process.env.SITE_URL || (() => { const host = (process.env.REPLIT_DOMAINS || process.env.REPLIT_DEV_DOMAIN || req.get('x-forwarded-host') || req.hostname).split(',')[0].trim(); return `https://${host}`; })();
-      const callbackUrl = req.session.googleCallback || `${siteBase}/auth/google/callback`;
-      const tokens = await oidc.authorizationCodeGrant(config, new URL(req.url, siteBase), {
-        expectedState: req.session.googleState,
-        expectedNonce: req.session.googleNonce,
-        pkceCodeVerifier: req.session.googleCodeVerifier,
-        redirectUri: callbackUrl
+      const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          code,
+          client_id: process.env.GOOGLE_CLIENT_ID,
+          client_secret: process.env.GOOGLE_CLIENT_SECRET,
+          redirect_uri: googleCallbackUrl(),
+          grant_type: 'authorization_code'
+        })
       });
-      const claims = tokens.claims();
-      const userId = `google_${claims.sub}`;
-      const nameParts = (claims.name || '').split(' ');
+      const tokens = await tokenRes.json();
+      if (!tokens.id_token) { console.error('[Google callback] no id_token:', tokens); return res.redirect('/login?error=google_failed'); }
+      const payload = JSON.parse(Buffer.from(tokens.id_token.split('.')[1], 'base64url').toString());
+      const userId = `google_${payload.sub}`;
+      const nameParts = (payload.name || '').split(' ');
       const user = await upsertUserFromProvider(
-        userId, claims.email || null,
+        userId, payload.email || null,
         nameParts[0] || null,
         nameParts.slice(1).join(' ') || null,
-        claims.picture || null
+        payload.picture || null
       );
       req.session.userId = user.id;
       req.session.userProfile = { id: user.id, email: user.email, firstName: user.first_name, lastName: user.last_name, profileImageUrl: user.profile_image_url };
       delete req.session.googleState;
-      delete req.session.googleNonce;
-      delete req.session.googleCallback;
-      delete req.session.googleCodeVerifier;
       await new Promise((resolve, reject) => req.session.save(e => e ? reject(e) : resolve()));
       res.redirect('/app');
     } catch (err) {
