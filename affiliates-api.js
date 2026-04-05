@@ -14,6 +14,8 @@ const {
   markCommissionsPaid,
   createSurgeEvent,
   getActiveSurge,
+  getAffiliateMonthlyCommissions,
+  getAffiliateRecruitCount,
 } = require('./auth');
 
 const {
@@ -107,7 +109,10 @@ router.get('/api/affiliate/me', requireAuth, async (req, res) => {
       return res.status(404).json({ error: 'Not registered as an affiliate' });
     }
 
-    const stats = await getAffiliateStats(affiliate.id);
+    const [stats, recruitCount] = await Promise.all([
+      getAffiliateStats(affiliate.id),
+      getAffiliateRecruitCount(affiliate.id),
+    ]);
     const salesCount = affiliate.sales_count;
     const nextTierAt = affiliate.tier === 'recruit' ? 5 : affiliate.tier === 'operative' ? 10 : null;
 
@@ -116,12 +121,14 @@ router.get('/api/affiliate/me', requireAuth, async (req, res) => {
       promoCode: affiliate.promo_code || null,
       status: affiliate.status,
       tier: affiliate.tier,
+      displayName: affiliate.display_name,
       salesCount,
       clickCount: stats.clickCount,
       conversionRate: stats.clickCount > 0
         ? ((salesCount / stats.clickCount) * 100).toFixed(1) + '%'
         : 'N/A',
       nextTierAt,
+      recruitCount,
       commissions: {
         pending: stats.pendingCommission,
         payable: stats.payableCommission,
@@ -175,6 +182,25 @@ router.post('/api/affiliate/recruit', requireAuth, async (req, res) => {
     res.json({ recruitUrl: `${SITE_URL}/affiliates?recruiter=${affiliate.code}` });
   } catch (err) {
     console.error('[affiliate-api] recruit error:', err.message);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// GET /api/affiliate/monthly-commissions
+// Requires login + active affiliate. Returns last 6 months of commission totals.
+router.get('/api/affiliate/monthly-commissions', requireAuth, async (req, res) => {
+  try {
+    const affiliate = await getAffiliateByUserId(req.session.userId);
+    if (!affiliate) {
+      return res.status(404).json({ error: 'Not registered as an affiliate' });
+    }
+    if (affiliate.status !== 'active') {
+      return res.status(403).json({ error: 'Affiliate account is not active' });
+    }
+    const months = await getAffiliateMonthlyCommissions(affiliate.id);
+    res.json(months);
+  } catch (err) {
+    console.error('[affiliate-api] monthly-commissions error:', err.message);
     res.status(500).json({ error: 'Server error' });
   }
 });

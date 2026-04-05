@@ -1244,6 +1244,31 @@ async function getAllActiveAffiliateEmails() {
   return rows;
 }
 
+// ─── Affiliate DB helpers (Task 25) — monthly commissions ────────────────────
+
+async function getAffiliateMonthlyCommissions(affiliateId) {
+  const { rows } = await pool.query(
+    `SELECT
+       TO_CHAR(DATE_TRUNC('month', created_at), 'Mon YYYY') AS month,
+       DATE_TRUNC('month', created_at) AS month_ts,
+       COALESCE(SUM(commission), 0)::numeric AS total
+     FROM affiliate_commissions
+     WHERE affiliate_id = $1 AND created_at >= NOW() - INTERVAL '6 months'
+     GROUP BY DATE_TRUNC('month', created_at)
+     ORDER BY DATE_TRUNC('month', created_at) ASC`,
+    [affiliateId]
+  );
+  return rows.map(r => ({ month: r.month, total: parseFloat(r.total) }));
+}
+
+async function getAffiliateRecruitCount(affiliateId) {
+  const { rows } = await pool.query(
+    'SELECT COUNT(*)::int AS cnt FROM affiliates WHERE recruited_by_id = $1',
+    [affiliateId]
+  );
+  return parseInt(rows[0].cnt, 10);
+}
+
 // ─── Affiliate DB helpers (Task 22) ──────────────────────────────────────────
 
 async function getAffiliateByPromoCode(promoCode) {
@@ -1289,4 +1314,4 @@ async function checkAndUpgradeAffiliateTier(affiliateId) {
 
 // ─────────────────────────────────────────────────────────────────────────────
 
-module.exports = { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, updateGamertag, getUserGamertag, updateMembershipTier, checkAndExpireUser, getUserByPaymentRef, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount, getUserBadges, setUserBadges, getEscapeRuns, createEscapeRun, updateEscapeRun, completeEscapeRun, deleteEscapeRun, applyRollbackIfStale, saveFunnelLead, queueFunnelEmails, getDueQueuedEmails, markEmailSent, getAffiliateByCode, recordAffiliateClick, queueAffiliateCommission, promotePayableCommissions, createAffiliate, getAffiliateByUserId, getAffiliateStats, getAffiliateLeaderboard, getAllAffiliatesWithStats, approveAffiliate, suspendAffiliate, markCommissionsPaid, createSurgeEvent, getActiveSurge, getAffiliateByPromoCode, checkAndUpgradeAffiliateTier, scheduleAffiliateEmail, getDueAffiliateEmails, markAffiliateEmailSent, getAllActiveAffiliateEmails };
+module.exports = { getSessionMiddleware, setupAuthRoutes, requireAuth, getUser, updateGamertag, getUserGamertag, updateMembershipTier, checkAndExpireUser, getUserByPaymentRef, upsertLeaderboard, getLeaderboard, getMyLeaderboardEntry, createSquad, joinSquad, leaveSquad, getUserSquad, getSquadStats, updateSquadLastActive, saveWaitlistLead, trackPageView, getPageStats, getWaitlistCount, getUserBadges, setUserBadges, getEscapeRuns, createEscapeRun, updateEscapeRun, completeEscapeRun, deleteEscapeRun, applyRollbackIfStale, saveFunnelLead, queueFunnelEmails, getDueQueuedEmails, markEmailSent, getAffiliateByCode, recordAffiliateClick, queueAffiliateCommission, promotePayableCommissions, createAffiliate, getAffiliateByUserId, getAffiliateStats, getAffiliateLeaderboard, getAllAffiliatesWithStats, approveAffiliate, suspendAffiliate, markCommissionsPaid, createSurgeEvent, getActiveSurge, getAffiliateByPromoCode, checkAndUpgradeAffiliateTier, scheduleAffiliateEmail, getDueAffiliateEmails, markAffiliateEmailSent, getAllActiveAffiliateEmails, getAffiliateMonthlyCommissions, getAffiliateRecruitCount };

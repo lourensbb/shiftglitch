@@ -360,6 +360,11 @@ app.get('/affiliates', (req, res) => {
   res.sendFile(path.join(__dirname, 'affiliates.html'));
 });
 
+app.get('/affiliate-portal', (req, res) => {
+  trackPageView('affiliate-portal').catch(() => {});
+  res.sendFile(path.join(__dirname, 'affiliate-portal.html'));
+});
+
 app.get('/download-ebook', (req, res) => {
   try {
     generateEbook(res);

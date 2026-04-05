@@ -1,0 +1,1479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('consent', 'default', {
+      analytics_storage: 'denied', ad_storage: 'denied',
+      ad_user_data: 'denied', ad_personalization: 'denied', wait_for_update: 500
+    });
+  </script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-P6VQGP7B1D"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-P6VQGP7B1D');
+  </script>
+  <script src="/consent.js" defer></script>
+  <title>Affiliate Portal — ShiftGlitch</title>
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="icon" href="/assets/shiftglitch-logo-only.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --green: #39FF14;
+      --magenta: #FF00FF;
+      --purple: #8A2BE2;
+      --bg: #050505;
+      --surface: #0d0d0d;
+      --border: rgba(57,255,20,0.12);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: #fff;
+      font-family: 'Space Grotesk', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    ::selection { background: rgba(57,255,20,0.25); color: #fff; }
+
+    /* ── Scanline ── */
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 1;
+      background: repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.06) 2px,rgba(0,0,0,0.06) 4px);
+    }
+
+    /* ── Orbs ── */
+    .orb { position: fixed; border-radius: 50%; filter: blur(120px); pointer-events: none; z-index: 0; }
+    .orb-green  { width: 600px; height: 600px; background: rgba(57,255,20,0.04); top: -200px; left: -200px; }
+    .orb-magenta{ width: 400px; height: 400px; background: rgba(255,0,255,0.04); bottom: 10%; right: -100px; }
+    .orb-purple { width: 500px; height: 500px; background: rgba(138,43,226,0.05); top: 50%; left: 40%; }
+
+    /* ── Boot screen ── */
+    #boot-screen {
+      position: fixed; inset: 0; z-index: 200;
+      background: #000;
+      display: flex; flex-direction: column; justify-content: flex-end;
+      padding: 2rem 1.5rem;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: clamp(11px,2vw,13px);
+      color: var(--green);
+      transition: opacity 0.5s ease;
+    }
+    #boot-screen.fade-out { opacity: 0; pointer-events: none; }
+    #boot-log { display: flex; flex-direction: column; gap: 3px; }
+    .boot-line { opacity: 0; animation: bootFadeIn 0.08s forwards; white-space: pre; }
+    @keyframes bootFadeIn { to { opacity: 1; } }
+    .boot-line.dim  { color: rgba(57,255,20,0.35); }
+    .boot-line.warn { color: #FFD700; }
+    .boot-line.err  { color: var(--magenta); }
+    .boot-line.ok   { color: var(--green); }
+
+    /* ── Nav ── */
+    .nav {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.25rem 2rem;
+      background: rgba(5,5,5,0.9);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .nav-logo {
+      font-family: 'VT323', monospace;
+      font-size: 1.8rem; color: #fff;
+      text-decoration: none; letter-spacing: 0.08em;
+    }
+    .nav-logo span { color: var(--green); }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap; }
+    .nav-link {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase;
+      text-decoration: none; color: rgba(255,255,255,0.4);
+      transition: color 0.2s ease;
+    }
+    .nav-link:hover { color: rgba(255,255,255,0.8); }
+    .nav-link.active { color: var(--green); }
+    @media(max-width:600px){
+      .nav { padding: 1rem 1.25rem; }
+      .nav-links { gap: 1rem; }
+    }
+
+    /* ── Surge banner ── */
+    #surge-banner {
+      position: relative; z-index: 10;
+      background: linear-gradient(90deg, rgba(255,0,255,0.18), rgba(138,43,226,0.18));
+      border-bottom: 1px solid rgba(255,0,255,0.3);
+      padding: 0.65rem 1.5rem;
+      text-align: center;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.8rem; letter-spacing: 0.12em;
+      color: var(--magenta);
+      animation: surgePulse 2.5s ease-in-out infinite;
+    }
+    @keyframes surgePulse {
+      0%,100% { text-shadow: 0 0 8px rgba(255,0,255,0.4); }
+      50%      { text-shadow: 0 0 22px rgba(255,0,255,0.9); }
+    }
+
+    /* ── Gate screen ── */
+    #portal-gate {
+      position: relative; z-index: 10;
+      min-height: 60vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 4rem 1.5rem; text-align: center;
+    }
+    .gate-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.75rem; letter-spacing: 0.25em;
+      color: rgba(57,255,20,0.5); text-transform: uppercase; margin-bottom: 1rem;
+    }
+    .gate-title {
+      font-family: 'VT323', monospace;
+      font-size: clamp(2.5rem, 8vw, 5rem);
+      color: #fff; margin-bottom: 1rem; line-height: 1;
+    }
+    .gate-body { font-size: 1rem; color: rgba(255,255,255,0.5); line-height: 1.7; max-width: 480px; margin-bottom: 2rem; }
+    .gate-btn {
+      display: inline-block;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.85rem; letter-spacing: 0.15em; text-transform: uppercase;
+      text-decoration: none; color: #000;
+      background: var(--green);
+      padding: 0.8rem 2rem; border-radius: 2px;
+      border: none; cursor: pointer;
+      transition: box-shadow 0.2s ease;
+    }
+    .gate-btn:hover { box-shadow: 0 0 24px rgba(57,255,20,0.5); }
+    .gate-btn.magenta { background: transparent; color: var(--magenta); border: 1px solid var(--magenta); }
+    .gate-btn.magenta:hover { box-shadow: 0 0 20px rgba(255,0,255,0.4); }
+    .gate-spinner {
+      width: 40px; height: 40px; border-radius: 50%;
+      border: 2px solid rgba(57,255,20,0.2);
+      border-top-color: var(--green);
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 1.5rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Portal main ── */
+    #portal-main { position: relative; z-index: 10; }
+
+    /* ── Page container ── */
+    .page { max-width: 1060px; margin: 0 auto; padding: 0 1.5rem 8rem; }
+
+    /* ── Section shared ── */
+    .portal-section { padding: 4rem 0 0; }
+    .section-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.7rem; letter-spacing: 0.22em;
+      color: rgba(57,255,20,0.5); text-transform: uppercase; margin-bottom: 0.6rem;
+    }
+    .section-title {
+      font-family: 'VT323', monospace;
+      font-size: clamp(2rem, 6vw, 3.2rem);
+      color: #fff; line-height: 1; margin-bottom: 1.5rem;
+    }
+    .section-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(57,255,20,0.12), transparent);
+      margin: 3.5rem 0 0;
+    }
+
+    /* ── Tier badge + status ribbon ── */
+    .status-grid {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 2rem; align-items: start;
+      margin-top: 1.5rem;
+    }
+    @media(max-width:640px){ .status-grid { grid-template-columns: 1fr; } }
+    .tier-badge {
+      padding: 1.5rem 2rem;
+      border: 2px solid;
+      border-radius: 2px;
+      text-align: center;
+      min-width: 180px;
+      position: relative;
+    }
+    .tier-badge.recruit  { border-color: #888; }
+    .tier-badge.operative{ border-color: var(--green); box-shadow: 0 0 24px rgba(57,255,20,0.15); }
+    .tier-badge.ghost    { border-color: var(--magenta); box-shadow: 0 0 24px rgba(255,0,255,0.2); }
+    .tier-badge-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+      margin-bottom: 0.4rem;
+    }
+    .tier-badge.recruit  .tier-badge-label { color: #888; }
+    .tier-badge.operative .tier-badge-label{ color: var(--green); }
+    .tier-badge.ghost    .tier-badge-label { color: var(--magenta); }
+    .tier-badge-name {
+      font-family: 'VT323', monospace;
+      font-size: 2.2rem; line-height: 1;
+    }
+    .tier-badge.recruit  .tier-badge-name { color: #aaa; }
+    .tier-badge.operative .tier-badge-name{ color: var(--green); }
+    .tier-badge.ghost    .tier-badge-name { color: var(--magenta); }
+    .tier-badge-rate {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 1.4rem; margin-top: 0.25rem;
+    }
+    .tier-badge.recruit  .tier-badge-rate { color: #888; }
+    .tier-badge.operative .tier-badge-rate{ color: var(--green); }
+    .tier-badge.ghost    .tier-badge-rate { color: var(--magenta); }
+    .tier-badge-note {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem; color: rgba(255,255,255,0.3);
+      margin-top: 0.2rem; letter-spacing: 0.05em;
+    }
+
+    .status-right { display: flex; flex-direction: column; gap: 1rem; }
+    .stats-ribbon {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 0.75rem;
+    }
+    .stat-chip {
+      background: rgba(57,255,20,0.03);
+      border: 1px solid rgba(57,255,20,0.12);
+      border-radius: 2px; padding: 1rem;
+    }
+    .stat-chip-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.15em; color: rgba(255,255,255,0.35);
+      text-transform: uppercase; margin-bottom: 0.35rem;
+    }
+    .stat-chip-value {
+      font-family: 'VT323', monospace;
+      font-size: 2rem; color: var(--green); line-height: 1;
+    }
+    .stat-chip-value.dim { color: rgba(57,255,20,0.5); }
+
+    /* Tier progress bar */
+    .tier-progress-wrap { margin-top: 0.25rem; }
+    .tier-progress-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 0.1em; color: rgba(255,255,255,0.3);
+      text-transform: uppercase; margin-bottom: 0.4rem;
+    }
+    .tier-progress-track {
+      background: rgba(255,255,255,0.07);
+      border-radius: 2px; height: 6px; overflow: hidden;
+    }
+    .tier-progress-fill {
+      height: 100%; background: var(--green);
+      border-radius: 2px;
+      box-shadow: 0 0 8px rgba(57,255,20,0.5);
+      transition: width 1.2s ease;
+    }
+
+    /* Status pill */
+    .status-pill {
+      display: inline-block;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase;
+      padding: 0.25rem 0.75rem; border-radius: 2px;
+    }
+    .status-pill.active   { background: rgba(57,255,20,0.12); color: var(--green); border: 1px solid rgba(57,255,20,0.3); }
+    .status-pill.pending  { background: rgba(255,215,0,0.08); color: #FFD700; border: 1px solid rgba(255,215,0,0.25); }
+    .status-pill.suspended{ background: rgba(255,0,255,0.08); color: var(--magenta); border: 1px solid rgba(255,0,255,0.25); }
+
+    /* ── Earnings section ── */
+    .earnings-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem; margin-top: 1.5rem;
+    }
+    .earn-card {
+      background: rgba(57,255,20,0.02);
+      border: 1px solid rgba(57,255,20,0.12);
+      border-radius: 2px; padding: 1.5rem;
+      position: relative; overflow: hidden;
+    }
+    .earn-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--green), transparent);
+    }
+    .earn-card.payable::before { background: linear-gradient(90deg, transparent, var(--magenta), transparent); }
+    .earn-card.paid::before    { background: linear-gradient(90deg, transparent, var(--purple), transparent); }
+    .earn-card-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 0.15em; color: rgba(255,255,255,0.35);
+      text-transform: uppercase; margin-bottom: 0.5rem;
+    }
+    .earn-card-amount {
+      font-family: 'VT323', monospace;
+      font-size: 2.4rem; color: var(--green); line-height: 1;
+    }
+    .earn-card.payable .earn-card-amount { color: var(--magenta); }
+    .earn-card.paid    .earn-card-amount { color: var(--purple); }
+    .earn-card-note {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.6rem; color: rgba(255,255,255,0.2);
+      margin-top: 0.3rem; letter-spacing: 0.05em;
+    }
+
+    /* Chart */
+    .chart-wrap {
+      margin-top: 2rem;
+      background: rgba(57,255,20,0.02);
+      border: 1px solid rgba(57,255,20,0.1);
+      border-radius: 2px; padding: 1.5rem;
+    }
+    .chart-title {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.7rem; letter-spacing: 0.15em; color: rgba(57,255,20,0.5);
+      text-transform: uppercase; margin-bottom: 1rem;
+    }
+    #commissions-chart { max-height: 220px; }
+
+    /* ── Links section ── */
+    .links-grid {
+      display: flex; flex-direction: column; gap: 1rem; margin-top: 1.5rem;
+    }
+    .link-row {
+      background: rgba(57,255,20,0.02);
+      border: 1px solid rgba(57,255,20,0.1);
+      border-radius: 2px; padding: 1rem 1.25rem;
+      display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+    }
+    .link-row-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 0.15em; color: rgba(255,255,255,0.3);
+      text-transform: uppercase; flex-shrink: 0; min-width: 110px;
+    }
+    .link-row-value {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.8rem; color: rgba(57,255,20,0.8);
+      flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .copy-btn {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase;
+      background: transparent; color: rgba(57,255,20,0.7);
+      border: 1px solid rgba(57,255,20,0.25);
+      padding: 0.3rem 0.75rem; border-radius: 2px; cursor: pointer; flex-shrink: 0;
+      transition: all 0.2s ease;
+    }
+    .copy-btn:hover  { border-color: var(--green); color: var(--green); }
+    .copy-btn.copied { color: #fff; border-color: rgba(57,255,20,0.6); background: rgba(57,255,20,0.12); }
+
+    .promo-chip {
+      display: inline-flex; align-items: center; gap: 0.75rem;
+      background: rgba(255,0,255,0.05);
+      border: 1px solid rgba(255,0,255,0.25);
+      border-radius: 2px; padding: 0.6rem 1rem;
+      margin-top: 0.5rem;
+    }
+    .promo-chip-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.15em; color: rgba(255,0,255,0.5);
+      text-transform: uppercase;
+    }
+    .promo-chip-code {
+      font-family: 'VT323', monospace;
+      font-size: 1.5rem; color: var(--magenta); letter-spacing: 0.08em;
+    }
+
+    /* ── Recruiter card ── */
+    #recruiter-card-wrap { margin-top: 1.5rem; }
+    .recruiter-card {
+      display: inline-block;
+      background: #050505;
+      border: 1px solid rgba(57,255,20,0.25);
+      border-radius: 2px;
+      padding: 1.75rem 2rem;
+      min-width: 300px; max-width: 400px;
+      position: relative; overflow: hidden;
+    }
+    .recruiter-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--green), var(--magenta));
+    }
+    .rc-brand {
+      font-family: 'VT323', monospace;
+      font-size: 1.4rem; color: #fff; letter-spacing: 0.1em;
+      margin-bottom: 0.25rem;
+    }
+    .rc-brand span { color: var(--green); }
+    .rc-tagline {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.2em; color: rgba(57,255,20,0.4);
+      text-transform: uppercase; margin-bottom: 1.25rem;
+    }
+    .rc-divider { height: 1px; background: rgba(57,255,20,0.12); margin-bottom: 1.25rem; }
+    .rc-invite {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.7rem; color: rgba(255,255,255,0.4);
+      text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 0.35rem;
+    }
+    .rc-name {
+      font-family: 'VT323', monospace;
+      font-size: 1.8rem; color: var(--green); margin-bottom: 0.5rem;
+    }
+    .rc-url {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem; color: rgba(57,255,20,0.6);
+      word-break: break-all; margin-bottom: 1.25rem;
+    }
+    .rc-divider2 { height: 1px; background: rgba(57,255,20,0.08); margin-bottom: 1rem; }
+    .rc-recruits {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 0.12em;
+      color: rgba(255,255,255,0.25); text-transform: uppercase;
+    }
+    .rc-recruits span { color: var(--magenta); font-size: 1rem; font-family: 'VT323', monospace; }
+    .rc-cta {
+      margin-top: 1rem;
+      display: inline-block;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase;
+      color: #000; background: var(--green);
+      padding: 0.45rem 1rem; border-radius: 1px;
+    }
+    .card-copy-btn {
+      display: block; margin-top: 1rem;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase;
+      background: transparent; color: rgba(57,255,20,0.6);
+      border: 1px solid rgba(57,255,20,0.2);
+      padding: 0.5rem 1rem; border-radius: 2px; cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .card-copy-btn:hover { border-color: var(--green); color: var(--green); }
+
+    /* ── UTM builder ── */
+    .utm-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 0.75rem; margin-top: 1.5rem;
+    }
+    .utm-field { display: flex; flex-direction: column; gap: 0.35rem; }
+    .utm-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 0.12em; color: rgba(255,255,255,0.35);
+      text-transform: uppercase;
+    }
+    .utm-input {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 2px; padding: 0.7rem 0.85rem;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.8rem; color: #fff; outline: none;
+      transition: border-color 0.2s ease;
+    }
+    .utm-input::placeholder { color: rgba(255,255,255,0.18); }
+    .utm-input:focus { border-color: rgba(57,255,20,0.35); }
+    .utm-output-wrap {
+      margin-top: 1.25rem;
+      background: rgba(57,255,20,0.02);
+      border: 1px solid rgba(57,255,20,0.12);
+      border-radius: 2px; padding: 1rem 1.25rem;
+      display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+    }
+    .utm-output-url {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.75rem; color: rgba(57,255,20,0.7);
+      flex: 1; word-break: break-all;
+    }
+
+    /* ── Marketing kit ── */
+    .kit-tabs {
+      display: flex; gap: 0.5rem; flex-wrap: wrap;
+      margin-top: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.07);
+      padding-bottom: 0;
+    }
+    .kit-tab {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+      background: none; border: none; border-bottom: 2px solid transparent;
+      padding: 0.65rem 1rem; cursor: pointer; margin-bottom: -1px;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+    .kit-tab:hover { color: rgba(255,255,255,0.6); }
+    .kit-tab.active { color: var(--green); border-bottom-color: var(--green); }
+
+    .kit-panel { display: none; padding-top: 2rem; }
+    .kit-panel.active { display: block; }
+
+    /* Captions */
+    .platform-block { margin-bottom: 2.5rem; }
+    .platform-name {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.7rem; letter-spacing: 0.2em; color: rgba(255,255,255,0.4);
+      text-transform: uppercase; margin-bottom: 0.75rem;
+      display: flex; align-items: center; gap: 0.6rem;
+    }
+    .platform-name::after {
+      content: ''; flex: 1; height: 1px;
+      background: rgba(255,255,255,0.06);
+    }
+    .caption-card {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 2px; padding: 1rem 1.25rem;
+      margin-bottom: 0.6rem;
+      position: relative;
+    }
+    .caption-card:last-child { margin-bottom: 0; }
+    .caption-text {
+      font-size: 0.9rem; color: rgba(255,255,255,0.7); line-height: 1.65;
+      margin-bottom: 0.75rem;
+    }
+    .caption-copy {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase;
+      background: none; color: rgba(255,255,255,0.25);
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 0.25rem 0.6rem; border-radius: 2px; cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .caption-copy:hover { color: var(--green); border-color: rgba(57,255,20,0.3); }
+
+    /* Video scripts */
+    .script-card {
+      background: rgba(57,255,20,0.02);
+      border: 1px solid rgba(57,255,20,0.1);
+      border-radius: 2px; margin-bottom: 1rem; overflow: hidden;
+    }
+    .script-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 1.25rem; cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    .script-header:hover { background: rgba(57,255,20,0.03); }
+    .script-title {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.85rem; letter-spacing: 0.08em; color: rgba(255,255,255,0.75);
+    }
+    .script-toggle {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.8rem; color: var(--green);
+      transition: transform 0.2s ease;
+    }
+    .script-card.open .script-toggle { transform: rotate(90deg); }
+    .script-body { display: none; padding: 0 1.25rem 1.25rem; }
+    .script-card.open .script-body { display: block; }
+    .script-beat {
+      margin-bottom: 1.25rem;
+    }
+    .script-beat-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--magenta); margin-bottom: 0.35rem;
+    }
+    .script-beat-text {
+      font-size: 0.9rem; color: rgba(255,255,255,0.7); line-height: 1.65;
+    }
+    .script-beat-text strong { color: var(--green); font-weight: 600; }
+
+    /* Brand assets */
+    .brand-section { margin-bottom: 2rem; }
+    .brand-section-title {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem; letter-spacing: 0.2em; color: rgba(255,255,255,0.3);
+      text-transform: uppercase; margin-bottom: 0.75rem;
+    }
+    .color-swatches { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+    .swatch {
+      display: flex; flex-direction: column; align-items: center; gap: 0.4rem;
+    }
+    .swatch-box {
+      width: 56px; height: 56px; border-radius: 2px;
+      border: 1px solid rgba(255,255,255,0.12); cursor: pointer;
+      transition: transform 0.15s ease;
+    }
+    .swatch-box:hover { transform: scale(1.06); }
+    .swatch-hex {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.6rem; color: rgba(255,255,255,0.35);
+      letter-spacing: 0.05em;
+    }
+    .font-list { display: flex; flex-direction: column; gap: 0.5rem; }
+    .font-row {
+      display: flex; align-items: baseline; gap: 1rem;
+      border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.5rem;
+    }
+    .font-sample { font-size: 1.2rem; color: #fff; }
+    .font-name {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem; color: rgba(255,255,255,0.25);
+    }
+    .font-use {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.6rem; color: rgba(57,255,20,0.4);
+      margin-left: auto;
+    }
+    .brand-download-row { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+    .brand-dl-btn {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase;
+      text-decoration: none;
+      color: rgba(255,255,255,0.5);
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 0.5rem 1rem; border-radius: 2px;
+      transition: all 0.2s ease;
+    }
+    .brand-dl-btn:hover { color: var(--green); border-color: rgba(57,255,20,0.3); }
+    .voice-grid {
+      display: flex; flex-direction: column; gap: 0.5rem;
+    }
+    .voice-rule {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.78rem; color: rgba(255,255,255,0.5); line-height: 1.6;
+    }
+    .voice-rule span { color: var(--green); }
+
+    /* ── Pending state overlay ── */
+    #pending-overlay {
+      padding: 3rem 1.5rem;
+      max-width: 600px;
+    }
+    .pending-box {
+      background: rgba(255,215,0,0.04);
+      border: 1px solid rgba(255,215,0,0.2);
+      border-radius: 2px; padding: 2rem;
+      text-align: center;
+    }
+    .pending-title {
+      font-family: 'VT323', monospace;
+      font-size: 2.5rem; color: #FFD700; margin-bottom: 0.75rem;
+    }
+    .pending-body {
+      font-size: 0.95rem; color: rgba(255,255,255,0.55); line-height: 1.7;
+    }
+
+    /* ── Responsive ── */
+    @media(max-width:480px){
+      .page { padding: 0 1rem 6rem; }
+      .stats-ribbon { grid-template-columns: 1fr 1fr; }
+      .earnings-cards { grid-template-columns: 1fr; }
+      .utm-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Orbs -->
+  <div class="orb orb-green"></div>
+  <div class="orb orb-magenta"></div>
+  <div class="orb orb-purple"></div>
+
+  <!-- Boot -->
+  <div id="boot-screen">
+    <div id="boot-log"></div>
+  </div>
+
+  <!-- Nav -->
+  <nav class="nav">
+    <a href="/" class="nav-logo">SHIFT<span>GLITCH</span></a>
+    <div class="nav-links">
+      <a href="/app" class="nav-link">Dashboard</a>
+      <a href="/affiliates" class="nav-link">Program</a>
+      <a href="/affiliate-portal" class="nav-link active">Portal</a>
+      <a href="/pricing" class="nav-link">Pricing</a>
+    </div>
+  </nav>
+
+  <!-- Surge banner -->
+  <div id="surge-banner" style="display:none"></div>
+
+  <!-- Gate: shown while checking session / if not authed / not an affiliate -->
+  <div id="portal-gate">
+    <div class="gate-spinner" id="gate-spinner"></div>
+    <p class="gate-label" id="gate-label">AUTHENTICATING</p>
+    <h1 class="gate-title" id="gate-title">CONNECTING</h1>
+    <p class="gate-body" id="gate-body">Handshaking with the mainframe...</p>
+    <div id="gate-actions" style="display:none;gap:0.75rem;flex-wrap:wrap;justify-content:center"></div>
+  </div>
+
+  <!-- Main portal (hidden until auth confirmed + active affiliate) -->
+  <div id="portal-main" style="display:none">
+    <div class="page">
+
+      <!-- ── SECTION: Status ──────────────────────────── -->
+      <section class="portal-section" id="status-section">
+        <p class="section-label">OPERATIVE STATUS</p>
+        <h2 class="section-title" id="status-title">LOADING...</h2>
+
+        <div class="status-grid">
+          <div id="tier-badge" class="tier-badge recruit">
+            <div class="tier-badge-label">Current Tier</div>
+            <div class="tier-badge-name" id="tier-name">RECRUIT</div>
+            <div class="tier-badge-rate" id="tier-rate">15%</div>
+            <div class="tier-badge-note">commission</div>
+          </div>
+          <div class="status-right">
+            <div class="stats-ribbon">
+              <div class="stat-chip">
+                <div class="stat-chip-label">Sales</div>
+                <div class="stat-chip-value" id="stat-sales">0</div>
+              </div>
+              <div class="stat-chip">
+                <div class="stat-chip-label">Clicks</div>
+                <div class="stat-chip-value" id="stat-clicks">0</div>
+              </div>
+              <div class="stat-chip">
+                <div class="stat-chip-label">Conversion</div>
+                <div class="stat-chip-value" id="stat-cvr">N/A</div>
+              </div>
+              <div class="stat-chip">
+                <div class="stat-chip-label">Recruits</div>
+                <div class="stat-chip-value" id="stat-recruits">0</div>
+              </div>
+            </div>
+            <div class="tier-progress-wrap" id="tier-progress-wrap">
+              <div class="tier-progress-label" id="tier-progress-label">0 / 5 sales to OPERATIVE</div>
+              <div class="tier-progress-track">
+                <div class="tier-progress-fill" id="tier-progress-fill" style="width:0%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="section-divider"></div>
+
+      <!-- ── SECTION: Earnings ──────────────────────────── -->
+      <section class="portal-section" id="earnings-section">
+        <p class="section-label">EARNINGS</p>
+        <h2 class="section-title">COMMISSION LEDGER</h2>
+
+        <div class="earnings-cards">
+          <div class="earn-card pending">
+            <div class="earn-card-label">Pending</div>
+            <div class="earn-card-amount" id="earn-pending">R0.00</div>
+            <div class="earn-card-note">holds 14 days after sale</div>
+          </div>
+          <div class="earn-card payable">
+            <div class="earn-card-label">Payable</div>
+            <div class="earn-card-amount" id="earn-payable">R0.00</div>
+            <div class="earn-card-note">ready for payout</div>
+          </div>
+          <div class="earn-card paid">
+            <div class="earn-card-label">Total Paid</div>
+            <div class="earn-card-amount" id="earn-paid">R0.00</div>
+            <div class="earn-card-note">lifetime earnings paid out</div>
+          </div>
+        </div>
+
+        <div class="chart-wrap">
+          <div class="chart-title">MONTHLY COMMISSION — LAST 6 MONTHS</div>
+          <canvas id="commissions-chart"></canvas>
+          <p style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:rgba(255,255,255,0.18);margin-top:0.75rem" id="chart-empty-msg" style="display:none">No commission data yet — start sharing your link to generate sales.</p>
+        </div>
+      </section>
+
+      <div class="section-divider"></div>
+
+      <!-- ── SECTION: Links & Codes ──────────────────────────── -->
+      <section class="portal-section" id="links-section">
+        <p class="section-label">YOUR LINKS</p>
+        <h2 class="section-title">REFERRAL ARSENAL</h2>
+
+        <div class="links-grid">
+          <div class="link-row">
+            <span class="link-row-label">Referral Link</span>
+            <span class="link-row-value" id="link-referral">—</span>
+            <button class="copy-btn" onclick="copyVal('link-referral', this)">Copy</button>
+          </div>
+          <div class="link-row">
+            <span class="link-row-label">Recruit Link</span>
+            <span class="link-row-value" id="link-recruit">—</span>
+            <button class="copy-btn" onclick="copyVal('link-recruit', this)">Copy</button>
+          </div>
+          <div class="link-row">
+            <span class="link-row-label">Affiliate Code</span>
+            <span class="link-row-value" id="link-code">—</span>
+            <button class="copy-btn" onclick="copyVal('link-code', this)">Copy</button>
+          </div>
+        </div>
+
+        <div id="promo-row" style="margin-top:1rem;display:none">
+          <div class="promo-chip">
+            <span class="promo-chip-label">Promo Code</span>
+            <span class="promo-chip-code" id="promo-code-val">—</span>
+            <button class="copy-btn" onclick="copyVal('promo-code-val', this)">Copy</button>
+          </div>
+          <p style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:rgba(255,255,255,0.2);margin-top:0.5rem;letter-spacing:0.06em">Give this code to buyers — they get 10% off and you still earn full commission.</p>
+        </div>
+      </section>
+
+      <div class="section-divider"></div>
+
+      <!-- ── SECTION: Recruiter Card ──────────────────────────── -->
+      <section class="portal-section" id="recruiter-section">
+        <p class="section-label">RECRUITER CARD</p>
+        <h2 class="section-title">YOUR OPERATIVE CARD</h2>
+        <p style="font-size:0.9rem;color:rgba(255,255,255,0.4);line-height:1.7;margin-bottom:1.5rem;max-width:540px">Share this card to recruit other affiliates to your network. Every operative you recruit becomes part of your crew — and you unlock Ghost tier faster.</p>
+
+        <div id="recruiter-card-wrap">
+          <div class="recruiter-card" id="recruiter-card">
+            <div class="rc-brand">SHIFT<span>GLITCH</span></div>
+            <div class="rc-tagline">// JACKED INTO THE MAINFRAME</div>
+            <div class="rc-divider"></div>
+            <div class="rc-invite">OPERATIVE INVITE FROM</div>
+            <div class="rc-name" id="rc-name">—</div>
+            <div class="rc-url" id="rc-url">—</div>
+            <div class="rc-divider2"></div>
+            <div class="rc-recruits"><span id="rc-recruit-count">0</span> OPERATIVES IN MY NETWORK</div>
+            <a class="rc-cta" id="rc-cta-link" href="#">JOIN THE NETWORK →</a>
+          </div>
+        </div>
+        <button class="card-copy-btn" onclick="copyRecruiterLink()">Copy Recruit Link</button>
+      </section>
+
+      <div class="section-divider"></div>
+
+      <!-- ── SECTION: UTM Link Builder ──────────────────────────── -->
+      <section class="portal-section" id="utm-section">
+        <p class="section-label">UTM BUILDER</p>
+        <h2 class="section-title">LINK FORGE</h2>
+        <p style="font-size:0.9rem;color:rgba(255,255,255,0.4);line-height:1.7;max-width:540px">Tag your referral links with UTM parameters so you can track which platforms and campaigns convert best in your analytics.</p>
+
+        <div class="utm-grid">
+          <div class="utm-field">
+            <label class="utm-label">Source</label>
+            <input class="utm-input" id="utm-source" placeholder="e.g. tiktok" oninput="buildUtm()">
+          </div>
+          <div class="utm-field">
+            <label class="utm-label">Medium</label>
+            <input class="utm-input" id="utm-medium" placeholder="e.g. bio_link" oninput="buildUtm()">
+          </div>
+          <div class="utm-field">
+            <label class="utm-label">Campaign</label>
+            <input class="utm-input" id="utm-campaign" placeholder="e.g. may_drop" oninput="buildUtm()">
+          </div>
+          <div class="utm-field">
+            <label class="utm-label">Content (optional)</label>
+            <input class="utm-input" id="utm-content" placeholder="e.g. video_1" oninput="buildUtm()">
+          </div>
+        </div>
+
+        <div class="utm-output-wrap" id="utm-output-wrap">
+          <span class="utm-output-url" id="utm-output-url">— fill fields above to generate —</span>
+          <button class="copy-btn" id="utm-copy-btn" onclick="copyUtm(this)" style="display:none">Copy</button>
+        </div>
+      </section>
+
+      <div class="section-divider"></div>
+
+      <!-- ── SECTION: Marketing Kit ──────────────────────────── -->
+      <section class="portal-section" id="marketing-section">
+        <p class="section-label">MARKETING KIT</p>
+        <h2 class="section-title">CONTENT ARSENAL</h2>
+
+        <div class="kit-tabs">
+          <button class="kit-tab active" onclick="switchTab('captions', this)">Captions</button>
+          <button class="kit-tab" onclick="switchTab('scripts', this)">Video Scripts</button>
+          <button class="kit-tab" onclick="switchTab('brand', this)">Brand Assets</button>
+        </div>
+
+        <!-- CAPTIONS PANEL -->
+        <div class="kit-panel active" id="panel-captions">
+
+          <div class="platform-block">
+            <div class="platform-name">TikTok</div>
+            <div class="caption-card">
+              <div class="caption-text">POV: you stopped re-reading your notes and started actually learning 🧠⚡ ShiftGlitch uses spaced repetition + active recall — the same methods top operatives use. Free to jack in 👇 [link in bio]</div>
+              <button class="caption-copy" onclick="copyCaption(this)">Copy</button>
+            </div>
+            <div class="caption-card">
+              <div class="caption-text">The study app that feels like a game but hits different 💀 Ranked up from NPC to Glitch Tech in 3 weeks. No cap. ShiftGlitch — free. Link in bio.</div>
+              <button class="caption-copy" onclick="copyCaption(this)">Copy</button>
+            </div>
+            <div class="caption-card">
+              <div class="caption-text">Why are you still highlighting when science says it doesn't work? 😭 Spaced repetition, blurting method, active recall — ShiftGlitch has all of it. For free. Tap in.</div>
+              <button class="caption-copy" onclick="copyCaption(this)">Copy</button>
+            </div>
+          </div>
+
+          <div class="platform-block">
+            <div class="platform-name">Instagram</div>
+            <div class="caption-card">
+              <div class="caption-text">Your brain is a system. Systems can be hacked. 🔌 ShiftGlitch is a cognitive platform built on actual neuroscience — spaced repetition, active recall, Pomodoro timing. Not another quiz app. A full study OS. Free to use. Link in bio.</div>
+              <button class="caption-copy" onclick="copyCaption(this)">Copy</button>
+            </div>
+            <div class="caption-card">
+              <div class="caption-text">Studying harder isn't the exploit. Studying smarter is. ⚡ I've been using @shiftglitch for my revision and the difference is real. Flashcards that actually stick. Sessions that build streaks. Ranks that mean something. Go check it — free. 🔗 bio link</div>
+              <button class="caption-copy" onclick="copyCaption(this)">Copy</button>
+            </div>
+            <div class="caption-card">
+              <div class="caption-text">If you're cramming the night before, you're playing on hard mode. ShiftGlitch helps you space your revision so the material actually stays in your long-term memory. The science is solid. The platform is free. 🔗 in bio.</div>
+              <button class="caption-copy" onclick="copyCaption(this)">Copy</button>
+            </div>
+          </div>
+
+          <div class="platform-block">
+            <div class="platform-name">Twitter / X</div>
+            <div class="caption-card">
+              <div class="caption-text">Most students study wrong. Not lazy — just wrong method. ShiftGlitch fixes that. Free cognitive platform: spaced repetition, active recall, focus timer. No fluff. shiftglitch.replit.app</div>
+              <button class="caption-copy" onclick="copyCaption(this)">Copy</button>
+            </div>
+            <div class="caption-card">
+              <div class="caption-text">The gap between students who retain info and students who forget everything isn't IQ. It's technique. ShiftGlitch gives you the technique. Free. 🔗 shiftglitch.replit.app</div>
+              <button class="caption-copy" onclick="copyCaption(this)">Copy</button>
+            </div>
+            <div class="caption-card">
+              <div class="caption-text">Nobody told us how to actually study. ShiftGlitch did. Ranked-up cognitive system, free tools, real neuroscience. Check it: shiftglitch.replit.app</div>
+              <button class="caption-copy" onclick="copyCaption(this)">Copy</button>
+            </div>
+          </div>
+
+          <div class="platform-block">
+            <div class="platform-name">LinkedIn</div>
+            <div class="caption-card">
+              <div class="caption-text">I've been exploring a platform called ShiftGlitch — a study OS built on evidence-based learning science (spaced repetition, active recall, Pomodoro). What caught my attention: it gamifies the process without dumbing it down. Free to use. Sharing in case it's useful for anyone studying, or building skills independently. shiftglitch.replit.app</div>
+              <button class="caption-copy" onclick="copyCaption(this)">Copy</button>
+            </div>
+            <div class="caption-card">
+              <div class="caption-text">Most productivity tools are built for task completion. ShiftGlitch is built for knowledge retention — a different, more valuable problem. It implements the Leitner System, active recall, and Pomodoro timing in a single cohesive platform. Worth a look if you care about learning that sticks. (Free tier available.) shiftglitch.replit.app</div>
+              <button class="caption-copy" onclick="copyCaption(this)">Copy</button>
+            </div>
+          </div>
+
+          <div class="platform-block">
+            <div class="platform-name">WhatsApp / Study Groups</div>
+            <div class="caption-card">
+              <div class="caption-text">Guys check this out — ShiftGlitch is basically a full study system that uses actual science (spaced repetition, active recall, blurting method). It's free and it has a ranking system so it feels like a game. Helped me a lot with revision. Link: shiftglitch.replit.app</div>
+              <button class="caption-copy" onclick="copyCaption(this)">Copy</button>
+            </div>
+            <div class="caption-card">
+              <div class="caption-text">If anyone needs a proper study tool before exams — ShiftGlitch. Not a gimmick. Uses spaced repetition (the method that actually makes things stick). Free. shiftglitch.replit.app</div>
+              <button class="caption-copy" onclick="copyCaption(this)">Copy</button>
+            </div>
+            <div class="caption-card">
+              <div class="caption-text">Dropping this here because it's genuinely useful. ShiftGlitch: free study platform built on cognitive science. Flashcards, focus timer, active recall tools. Has a rank system too which makes it actually fun to use. shiftglitch.replit.app</div>
+              <button class="caption-copy" onclick="copyCaption(this)">Copy</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- VIDEO SCRIPTS PANEL -->
+        <div class="kit-panel" id="panel-scripts">
+
+          <div class="script-card" id="script-1">
+            <div class="script-header" onclick="toggleScript('script-1')">
+              <span class="script-title">Script 01 — "The Study Hack Nobody Taught You"</span>
+              <span class="script-toggle">▸</span>
+            </div>
+            <div class="script-body">
+              <div class="script-beat">
+                <div class="script-beat-label">HOOK (0–3 sec)</div>
+                <div class="script-beat-text">You've been studying wrong your whole life. And nobody told you.</div>
+              </div>
+              <div class="script-beat">
+                <div class="script-beat-label">PROBLEM (4–15 sec)</div>
+                <div class="script-beat-text">Re-reading notes. Highlighting. Passive revision. Cognitive science calls this <strong>"illusion of competence"</strong> — you feel like you know it because it looks familiar. But familiarity isn't memory. The material disappears before the assessment.</div>
+              </div>
+              <div class="script-beat">
+                <div class="script-beat-label">REVEAL (16–35 sec)</div>
+                <div class="script-beat-text">The method that actually works is called <strong>spaced repetition</strong>. You review material at increasing intervals — just before you'd forget it. Your brain encodes it deeper each time. I've been using ShiftGlitch — it has the whole system built in. Flashcards that schedule themselves, an active recall tool, a Pomodoro timer. It's free.</div>
+              </div>
+              <div class="script-beat">
+                <div class="script-beat-label">CTA (36–45 sec)</div>
+                <div class="script-beat-text">Link in bio. It's called ShiftGlitch. Free to use, no catch. Stop re-reading. Start encoding.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="script-card" id="script-2">
+            <div class="script-header" onclick="toggleScript('script-2')">
+              <span class="script-title">Script 02 — "Why High-Effort Students Still Fail"</span>
+              <span class="script-toggle">▸</span>
+            </div>
+            <div class="script-body">
+              <div class="script-beat">
+                <div class="script-beat-label">HOOK (0–3 sec)</div>
+                <div class="script-beat-text">Studying 4 hours a day and still blanking in assessments? It's not your fault. It's your method.</div>
+              </div>
+              <div class="script-beat">
+                <div class="script-beat-label">PROBLEM (4–15 sec)</div>
+                <div class="script-beat-text">Most operatives put in the hours — they just put them into the wrong activities. Copying notes, watching revision videos, re-reading textbooks. These feel productive but barely move the needle on <strong>long-term retention</strong>.</div>
+              </div>
+              <div class="script-beat">
+                <div class="script-beat-label">REVEAL (16–35 sec)</div>
+                <div class="script-beat-text">The science is clear: <strong>active recall and spaced repetition</strong> are the highest-ROI study techniques by a wide margin. ShiftGlitch puts them in one platform — free. You don't need to build a system from scratch. It's already done. Rank up from NPC to System Admin as you learn.</div>
+              </div>
+              <div class="script-beat">
+                <div class="script-beat-label">CTA (36–45 sec)</div>
+                <div class="script-beat-text">ShiftGlitch. Link in bio. Free. Stop working hard at the wrong things.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="script-card" id="script-3">
+            <div class="script-header" onclick="toggleScript('script-3')">
+              <span class="script-title">Script 03 — "I Earn Commission Sharing a Free Study Tool"</span>
+              <span class="script-toggle">▸</span>
+            </div>
+            <div class="script-body">
+              <div class="script-beat">
+                <div class="script-beat-label">HOOK (0–3 sec)</div>
+                <div class="script-beat-text">I get paid to share a study app that's free. Let me explain.</div>
+              </div>
+              <div class="script-beat">
+                <div class="script-beat-label">PROBLEM (4–15 sec)</div>
+                <div class="script-beat-text">Most affiliate programmes make you push overpriced stuff to your audience. This one is different — the core product is free. So there's zero resistance when I share it. Students actually thank me for the link.</div>
+              </div>
+              <div class="script-beat">
+                <div class="script-beat-label">REVEAL (16–35 sec)</div>
+                <div class="script-beat-text">ShiftGlitch has a free tier and optional Pro upgrades. When someone I refer goes Pro, I earn <strong>15–25% commission</strong> — depending on my tier. The commissions stack. It's not a get-rich thing, but it's real passive income from content I was making anyway. And they have a full affiliate portal with tracking, promo codes, a leaderboard.</div>
+              </div>
+              <div class="script-beat">
+                <div class="script-beat-label">CTA (36–45 sec)</div>
+                <div class="script-beat-text">If you make content around studying, productivity, or student life — apply at shiftglitch.replit.app/affiliates. Takes 2 minutes. They review within 48 hours.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- BRAND ASSETS PANEL -->
+        <div class="kit-panel" id="panel-brand">
+
+          <div class="brand-section">
+            <div class="brand-section-title">Colour Palette</div>
+            <div class="color-swatches">
+              <div class="swatch">
+                <div class="swatch-box" style="background:#39FF14" onclick="copyHex('#39FF14', this)" title="Copy hex"></div>
+                <span class="swatch-hex">#39FF14</span>
+              </div>
+              <div class="swatch">
+                <div class="swatch-box" style="background:#FF00FF" onclick="copyHex('#FF00FF', this)" title="Copy hex"></div>
+                <span class="swatch-hex">#FF00FF</span>
+              </div>
+              <div class="swatch">
+                <div class="swatch-box" style="background:#8A2BE2" onclick="copyHex('#8A2BE2', this)" title="Copy hex"></div>
+                <span class="swatch-hex">#8A2BE2</span>
+              </div>
+              <div class="swatch">
+                <div class="swatch-box" style="background:#050505;border-color:rgba(255,255,255,0.2)" onclick="copyHex('#050505', this)" title="Copy hex"></div>
+                <span class="swatch-hex">#050505</span>
+              </div>
+              <div class="swatch">
+                <div class="swatch-box" style="background:#ffffff;border-color:rgba(255,255,255,0.15)" onclick="copyHex('#ffffff', this)" title="Copy hex"></div>
+                <span class="swatch-hex">#FFFFFF</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="brand-section">
+            <div class="brand-section-title">Typography</div>
+            <div class="font-list">
+              <div class="font-row">
+                <span class="font-sample" style="font-family:'VT323',monospace">SHIFTGLITCH</span>
+                <span class="font-name">VT323</span>
+                <span class="font-use">Headings &amp; wordmarks</span>
+              </div>
+              <div class="font-row">
+                <span class="font-sample" style="font-family:'Share Tech Mono',monospace">jack-in//execute</span>
+                <span class="font-name">Share Tech Mono</span>
+                <span class="font-use">Labels &amp; terminal UI</span>
+              </div>
+              <div class="font-row">
+                <span class="font-sample" style="font-family:'Space Grotesk',sans-serif">Cognitive exploit</span>
+                <span class="font-name">Space Grotesk</span>
+                <span class="font-use">Body copy</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="brand-section">
+            <div class="brand-section-title">Brand Assets</div>
+            <div class="brand-download-row">
+              <a href="/assets/shiftglitch-logo-only.png" download class="brand-dl-btn">Logo PNG</a>
+              <a href="/og-image.png" download class="brand-dl-btn">OG Banner</a>
+            </div>
+            <p style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:rgba(255,255,255,0.2);margin-top:0.75rem">Use assets only to promote ShiftGlitch. Do not alter the logo or use it in misleading contexts.</p>
+          </div>
+
+          <div class="brand-section">
+            <div class="brand-section-title">Voice Guidelines</div>
+            <div class="voice-grid">
+              <div class="voice-rule"><span>✓</span> Cyberpunk tone — dark, sharp, technical. Not corporate.</div>
+              <div class="voice-rule"><span>✓</span> Say "operative", "netrunner", "jack in", "exploit" — not "student" or "teacher".</div>
+              <div class="voice-rule"><span>✓</span> The Corp = institutions, systems that hold you back. ShiftGlitch = the exploit.</div>
+              <div class="voice-rule"><span>✓</span> Lead with the free tier. The Pro upgrade is the upsell — never bait-and-switch.</div>
+              <div class="voice-rule"><span>✓</span> Be real about what it is — a study OS. No fake transformation stories.</div>
+              <div class="voice-rule" style="color:rgba(255,100,100,0.6)"><span style="color:#ff4444">✗</span> No spam, no misleading claims, no buying fake engagement.</div>
+              <div class="voice-rule" style="color:rgba(255,100,100,0.6)"><span style="color:#ff4444">✗</span> Don't guarantee results — frame it as a method, not a miracle.</div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </div><!-- /.page -->
+  </div><!-- /#portal-main -->
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script>
+    // ── Boot animation ─────────────────────────────────────────────────────────
+    const bootLines = [
+      { text: '> SHIFTGLITCH AFFILIATE OS v2.4.1', cls: 'ok' },
+      { text: '> Initialising session handshake...', cls: 'dim' },
+      { text: '> Loading operative credentials...', cls: 'dim' },
+      { text: '> Connecting to commission ledger...', cls: 'dim' },
+      { text: '> Portal ready.', cls: 'ok' },
+    ];
+    const bootLog = document.getElementById('boot-log');
+    let bootDelay = 0;
+    bootLines.forEach(line => {
+      const el = document.createElement('div');
+      el.className = 'boot-line ' + line.cls;
+      el.textContent = line.text;
+      el.style.animationDelay = bootDelay + 'ms';
+      bootLog.appendChild(el);
+      bootDelay += 90;
+    });
+    setTimeout(() => {
+      const bs = document.getElementById('boot-screen');
+      bs.classList.add('fade-out');
+      setTimeout(() => bs.remove(), 600);
+    }, bootDelay + 400);
+
+    // ── Helpers ────────────────────────────────────────────────────────────────
+    function showGate(label, title, body, actions) {
+      document.getElementById('gate-spinner').style.display = 'none';
+      document.getElementById('gate-label').textContent = label;
+      document.getElementById('gate-title').textContent = title;
+      document.getElementById('gate-body').textContent = body;
+      const actEl = document.getElementById('gate-actions');
+      actEl.innerHTML = '';
+      if (actions && actions.length) {
+        actEl.style.display = 'flex';
+        actions.forEach(a => {
+          const btn = document.createElement('a');
+          btn.href = a.href;
+          btn.textContent = a.label;
+          btn.className = 'gate-btn' + (a.magenta ? ' magenta' : '');
+          actEl.appendChild(btn);
+        });
+      }
+    }
+
+    function copyVal(elId, btn) {
+      const text = document.getElementById(elId).textContent.trim();
+      navigator.clipboard.writeText(text).then(() => {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1800);
+      });
+    }
+
+    function copyCaption(btn) {
+      const text = btn.previousElementSibling.textContent.trim();
+      navigator.clipboard.writeText(text).then(() => {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = orig; }, 1800);
+      });
+    }
+
+    function copyHex(hex, box) {
+      navigator.clipboard.writeText(hex).then(() => {
+        const orig = box.title;
+        box.title = 'Copied!';
+        box.style.outline = '2px solid var(--green)';
+        setTimeout(() => { box.title = orig; box.style.outline = ''; }, 1400);
+      });
+    }
+
+    let _recruitUrl = '';
+    function copyRecruiterLink() {
+      if (!_recruitUrl) return;
+      navigator.clipboard.writeText(_recruitUrl).then(() => {
+        const btn = event.currentTarget;
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = orig; }, 1800);
+      });
+    }
+
+    function switchTab(panelId, btn) {
+      document.querySelectorAll('.kit-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.kit-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('panel-' + panelId).classList.add('active');
+    }
+
+    function toggleScript(id) {
+      document.getElementById(id).classList.toggle('open');
+    }
+
+    // ── UTM builder ────────────────────────────────────────────────────────────
+    let _baseReferralUrl = '';
+    function buildUtm() {
+      const source   = document.getElementById('utm-source').value.trim();
+      const medium   = document.getElementById('utm-medium').value.trim();
+      const campaign = document.getElementById('utm-campaign').value.trim();
+      const content  = document.getElementById('utm-content').value.trim();
+      const outUrl   = document.getElementById('utm-output-url');
+      const copyBtn  = document.getElementById('utm-copy-btn');
+
+      if (!_baseReferralUrl || !source) {
+        outUrl.textContent = '— fill at least Source to generate —';
+        copyBtn.style.display = 'none';
+        return;
+      }
+      const url = new URL(_baseReferralUrl);
+      if (source)   url.searchParams.set('utm_source', source);
+      if (medium)   url.searchParams.set('utm_medium', medium);
+      if (campaign) url.searchParams.set('utm_campaign', campaign);
+      if (content)  url.searchParams.set('utm_content', content);
+      outUrl.textContent = url.toString();
+      copyBtn.style.display = '';
+    }
+
+    function copyUtm(btn) {
+      const url = document.getElementById('utm-output-url').textContent;
+      navigator.clipboard.writeText(url).then(() => {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1800);
+      });
+    }
+
+    // ── Tier helpers ───────────────────────────────────────────────────────────
+    const TIER_RATES = { recruit: 15, operative: 20, ghost: 25 };
+    const TIER_COLORS = { recruit: '#888', operative: '#39FF14', ghost: '#FF00FF' };
+
+    function applyTier(tier) {
+      const badge = document.getElementById('tier-badge');
+      badge.className = 'tier-badge ' + tier;
+      document.getElementById('tier-name').textContent = tier.toUpperCase();
+      document.getElementById('tier-rate').textContent = TIER_RATES[tier] + '%';
+    }
+
+    function applyTierProgress(salesCount, tier, nextTierAt) {
+      const wrap = document.getElementById('tier-progress-wrap');
+      const fill = document.getElementById('tier-progress-fill');
+      const label = document.getElementById('tier-progress-label');
+
+      if (!nextTierAt) {
+        label.textContent = 'MAX TIER — GHOST OPERATIVE';
+        fill.style.width = '100%';
+        fill.style.background = 'var(--magenta)';
+        return;
+      }
+      const prevTierAt = tier === 'recruit' ? 0 : 5;
+      const range = nextTierAt - prevTierAt;
+      const progress = Math.max(0, salesCount - prevTierAt);
+      const pct = Math.min(100, (progress / range) * 100);
+      fill.style.width = pct + '%';
+      const nextName = nextTierAt === 5 ? 'OPERATIVE' : 'GHOST';
+      label.textContent = salesCount + ' / ' + nextTierAt + ' sales to ' + nextName;
+    }
+
+    // ── Chart ──────────────────────────────────────────────────────────────────
+    let chartInstance = null;
+    function renderChart(months) {
+      const ctx = document.getElementById('commissions-chart').getContext('2d');
+      const emptyMsg = document.getElementById('chart-empty-msg');
+      if (!months || months.length === 0) {
+        emptyMsg.style.display = 'block';
+        return;
+      }
+      emptyMsg.style.display = 'none';
+      if (chartInstance) chartInstance.destroy();
+      chartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: months.map(m => m.month),
+          datasets: [{
+            label: 'Commission (R)',
+            data: months.map(m => m.total),
+            backgroundColor: 'rgba(57,255,20,0.18)',
+            borderColor: 'rgba(57,255,20,0.7)',
+            borderWidth: 1,
+            borderRadius: 2,
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: ctx => 'R' + ctx.parsed.y.toFixed(2)
+              }
+            }
+          },
+          scales: {
+            x: {
+              ticks: { color: 'rgba(255,255,255,0.4)', font: { family: 'Share Tech Mono', size: 10 } },
+              grid: { color: 'rgba(255,255,255,0.04)' }
+            },
+            y: {
+              ticks: {
+                color: 'rgba(255,255,255,0.4)',
+                font: { family: 'Share Tech Mono', size: 10 },
+                callback: v => 'R' + v
+              },
+              grid: { color: 'rgba(255,255,255,0.04)' },
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    }
+
+    // ── Surge banner ───────────────────────────────────────────────────────────
+    async function loadSurge() {
+      try {
+        const r = await fetch('/api/affiliate/surge');
+        const surge = await r.json();
+        if (surge && surge.ends_at) {
+          const banner = document.getElementById('surge-banner');
+          const endsAt = new Date(surge.ends_at);
+          banner.textContent = surge.message
+            ? `⚡ SURGE ACTIVE: ${surge.message} — ${surge.bonus_multiplier}× commission until ${endsAt.toLocaleDateString()}`
+            : `⚡ SURGE EVENT ACTIVE — ${surge.bonus_multiplier}× commission until ${endsAt.toLocaleDateString()}`;
+          banner.style.display = 'block';
+        }
+      } catch (_) {}
+    }
+
+    // ── Main init ──────────────────────────────────────────────────────────────
+    async function init() {
+      loadSurge();
+
+      // 1. Check session
+      let me;
+      try {
+        const r = await fetch('/api/me');
+        if (!r.ok) throw new Error('not_authed');
+        me = await r.json();
+      } catch (_) {
+        showGate(
+          'ACCESS DENIED',
+          'NOT JACKED IN',
+          'You need to sign in to access the affiliate portal.',
+          [{ href: '/api/login', label: 'Jack In' }]
+        );
+        return;
+      }
+
+      // 2. Check affiliate record
+      let aff;
+      try {
+        const r = await fetch('/api/affiliate/me', { headers: { 'Accept': 'application/json' } });
+        if (r.status === 404) {
+          showGate(
+            'NO OPERATIVE RECORD',
+            'NOT REGISTERED',
+            'You haven't applied to the affiliate programme yet. Apply on the programme page.',
+            [{ href: '/affiliates', label: 'Apply Now' }, { href: '/app', label: 'Back to Dashboard', magenta: true }]
+          );
+          return;
+        }
+        if (!r.ok) throw new Error('api_err');
+        aff = await r.json();
+      } catch (_) {
+        showGate(
+          'SYSTEM ERROR',
+          'MAINFRAME DOWN',
+          'Could not load your affiliate data. Try again in a moment.',
+          [{ href: '/affiliate-portal', label: 'Retry' }]
+        );
+        return;
+      }
+
+      // 3. Handle pending / suspended
+      if (aff.status === 'pending') {
+        document.getElementById('portal-gate').innerHTML = `
+          <div id="pending-overlay">
+            <div class="pending-box">
+              <p class="gate-label">APPLICATION STATUS</p>
+              <div class="pending-title">APPLICATION PENDING</div>
+              <p class="pending-body">Your application is in the queue. We review manually within 48 hours. You'll get an email when you're approved. Sit tight, operative.</p>
+            </div>
+          </div>
+        `;
+        return;
+      }
+      if (aff.status === 'suspended') {
+        showGate(
+          'ACCOUNT STATUS',
+          'SUSPENDED',
+          'Your affiliate account has been suspended. Contact support if you believe this is an error.',
+          [{ href: 'mailto:admin@shiftglitch.com', label: 'Contact Support' }]
+        );
+        return;
+      }
+
+      // 4. Show portal
+      document.getElementById('portal-gate').style.display = 'none';
+      document.getElementById('portal-main').style.display = 'block';
+
+      // Populate status
+      const displayName = aff.displayName || me.firstName || 'OPERATIVE';
+      document.getElementById('status-title').textContent = 'WELCOME BACK, ' + displayName.toUpperCase();
+      applyTier(aff.tier || 'recruit');
+      applyTierProgress(aff.salesCount || 0, aff.tier || 'recruit', aff.nextTierAt);
+
+      document.getElementById('stat-sales').textContent = aff.salesCount || 0;
+      document.getElementById('stat-clicks').textContent = aff.clickCount || 0;
+      document.getElementById('stat-cvr').textContent = aff.conversionRate || 'N/A';
+      document.getElementById('stat-recruits').textContent = aff.recruitCount || 0;
+
+      // Earnings
+      const fmt = v => 'R' + parseFloat(v || 0).toFixed(2);
+      document.getElementById('earn-pending').textContent = fmt(aff.commissions?.pending);
+      document.getElementById('earn-payable').textContent = fmt(aff.commissions?.payable);
+      document.getElementById('earn-paid').textContent    = fmt(aff.commissions?.paid);
+
+      // Links
+      _baseReferralUrl = aff.referralUrl || '';
+      _recruitUrl = aff.recruitUrl || '';
+      document.getElementById('link-referral').textContent = aff.referralUrl || '—';
+      document.getElementById('link-recruit').textContent  = aff.recruitUrl || '—';
+      document.getElementById('link-code').textContent     = aff.code || '—';
+
+      if (aff.promoCode) {
+        document.getElementById('promo-row').style.display = 'block';
+        document.getElementById('promo-code-val').textContent = aff.promoCode;
+      }
+
+      // Recruiter card
+      document.getElementById('rc-name').textContent = (aff.displayName || displayName).toUpperCase();
+      document.getElementById('rc-url').textContent  = aff.recruitUrl || '—';
+      document.getElementById('rc-recruit-count').textContent = aff.recruitCount || 0;
+      const rcCta = document.getElementById('rc-cta-link');
+      rcCta.href = aff.recruitUrl || '#';
+      rcCta.textContent = 'JOIN THE NETWORK →';
+
+      // UTM init
+      buildUtm();
+
+      // Load chart
+      try {
+        const r = await fetch('/api/affiliate/monthly-commissions', { headers: { 'Accept': 'application/json' } });
+        if (r.ok) {
+          const months = await r.json();
+          renderChart(months);
+        }
+      } catch (_) {}
+    }
+
+    init();
+  </script>
+</body>
+</html>
