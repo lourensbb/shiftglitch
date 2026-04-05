@@ -27,10 +27,11 @@ const {
 
 const SITE_URL = process.env.SITE_URL || 'https://shiftglitch.replit.app';
 
-// Primary: ADMIN_USER_ID env var. Secondary: hardcoded owner Replit userId.
-// To use the fallback without the env var, replace the empty string below with the
-// account's Replit user ID (visible in /api/me as "id" when logged in as the owner).
-const HARDCODED_OWNER_ID = process.env.HARDCODED_ADMIN_ID || '';
+// Primary: ADMIN_USER_ID env var.
+// Secondary: hardcoded owner ID — replace the empty string with the owner's Replit user ID
+// (visible in the response body of /api/me as "id" when the owner is logged in).
+// When both are absent the admin panel is disabled (fail-closed).
+const HARDCODED_OWNER_ID = '';          // <-- set this to enable admin without the env var
 const EFFECTIVE_ADMIN_ID = process.env.ADMIN_USER_ID || HARDCODED_OWNER_ID || null;
 
 if (!EFFECTIVE_ADMIN_ID) {
@@ -314,14 +315,15 @@ router.get('/affiliate-card/:code', async (req, res) => {
       return res.status(404).send('Not found');
     }
 
-    const [stats, recruitCount] = await Promise.all([
+    const [affiliateStats, recruitCount] = await Promise.all([
       getAffiliateStats(affiliate.id),
       getAffiliateRecruitCount(affiliate.id),
     ]);
 
-    const alias   = (affiliate.display_name || 'OPERATIVE').toUpperCase().slice(0, 22);
-    const tier    = (affiliate.tier || 'recruit').toUpperCase();
-    const sales   = affiliate.sales_count || 0;
+    const alias    = (affiliate.display_name || 'OPERATIVE').toUpperCase().slice(0, 22);
+    const tier     = (affiliate.tier || 'recruit').toUpperCase();
+    const sales    = affiliate.sales_count || 0;
+    const clicks   = affiliateStats.clickCount || 0;
     const recruits = recruitCount || 0;
     const refUrl  = `${SITE_URL}/?ref=${code}`;
 
@@ -364,8 +366,7 @@ router.get('/affiliate-card/:code', async (req, res) => {
   <text x="${32 + 30 + tier.length * 8 + 12}" y="${72 + 12 + nameFontSize + 26}" font-family="'Courier New', Courier, monospace" font-size="10" letter-spacing="1" fill="rgba(255,255,255,0.3)">${commRate} COMMISSION</text>
 
   <!-- Stats row -->
-  <text x="32" y="220" font-family="'Courier New', Courier, monospace" font-size="11" letter-spacing="2" fill="rgba(255,255,255,0.25)">${sales} SALES</text>
-  <text x="150" y="220" font-family="'Courier New', Courier, monospace" font-size="11" letter-spacing="2" fill="rgba(255,255,255,0.25)">${recruits} OPERATIVES RECRUITED</text>
+  <text x="32" y="220" font-family="'Courier New', Courier, monospace" font-size="11" letter-spacing="2" fill="rgba(255,255,255,0.25)">${sales} SALES · ${clicks} CLICKS · ${recruits} RECRUITED</text>
 
   <!-- Divider -->
   <line x1="32" y1="232" x2="568" y2="232" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>

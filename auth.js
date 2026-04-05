@@ -523,9 +523,10 @@ function setupAuthRoutes(app) {
       const user = await getUser(req.session.userId);
       if (!user) return res.status(401).json({ error: 'User not found' });
       const profile = req.session.userProfile || {};
-      // Determine effective admin ID using same cascade as affiliates-api.js:
-      // env ADMIN_USER_ID → env HARDCODED_ADMIN_ID → empty (no admin configured).
-      const effectiveAdminId = process.env.ADMIN_USER_ID || process.env.HARDCODED_ADMIN_ID || '';
+      // Same cascade as affiliates-api.js: ADMIN_USER_ID env → HARDCODED_OWNER_ID literal → empty.
+      // HARDCODED_OWNER_ID: replace '' with owner's Replit user ID if env var is not used.
+      const HARDCODED_OWNER_ID_ME = '';   // mirrors HARDCODED_OWNER_ID in affiliates-api.js
+      const effectiveAdminId = process.env.ADMIN_USER_ID || HARDCODED_OWNER_ID_ME || '';
       res.json({
         id: user.id,
         email: user.email,

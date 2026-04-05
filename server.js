@@ -369,8 +369,9 @@ app.get('/affiliate-portal', (req, res) => {
 // Page URL: /admin-panel/affiliates (different path from API endpoint /admin/affiliates).
 // Uses the same EFFECTIVE_ADMIN_ID as affiliates-api.js for consistent access control.
 // Fails closed: if no admin ID is configured, denies access rather than permitting it.
-// Uses same cascade as affiliates-api.js: ADMIN_USER_ID → HARDCODED_ADMIN_ID → null
-const ADMIN_PAGE_ID = process.env.ADMIN_USER_ID || process.env.HARDCODED_ADMIN_ID || '';
+// Same cascade as affiliates-api.js: ADMIN_USER_ID env → HARDCODED_OWNER_ID literal → fail.
+const _HARDCODED_OWNER_ID_PAGE = '';    // mirrors HARDCODED_OWNER_ID in affiliates-api.js
+const ADMIN_PAGE_ID = process.env.ADMIN_USER_ID || _HARDCODED_OWNER_ID_PAGE || '';
 if (!ADMIN_PAGE_ID) {
   console.warn('[server] WARNING: ADMIN_USER_ID env var not set — admin panel at /admin-panel/affiliates will deny all access');
 }
