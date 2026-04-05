@@ -118,6 +118,10 @@
       min-height: 80vh;
       display: flex; align-items: center; justify-content: center;
     }
+    #not-registered-screen {
+      position: relative; z-index: 10; display: none;
+      padding: 4rem 1.5rem; text-align: center;
+    }
     .loading-spinner {
       width: 40px; height: 40px; border-radius: 50%;
       border: 2px solid rgba(57,255,20,0.2);
@@ -392,6 +396,16 @@
     </div>
   </div>
 
+  <!-- Not registered state -->
+  <div id="not-registered-screen">
+    <div class="pending-box" style="border-color:rgba(57,255,20,0.2);background:rgba(57,255,20,0.03)">
+      <p class="pending-label" style="color:rgba(57,255,20,0.5)">No Operative Record</p>
+      <div class="pending-title" style="color:var(--green)">NOT REGISTERED</div>
+      <p class="pending-body">You haven't applied to the affiliate programme yet. Apply on the programme page to get your code, commission tier, and referral link.</p>
+      <a href="/affiliates" style="display:inline-block;margin-top:1.25rem;font-family:'Share Tech Mono',monospace;font-size:0.75rem;letter-spacing:0.12em;text-transform:uppercase;color:#000;background:var(--green);padding:0.6rem 1.25rem;border-radius:2px;text-decoration:none">Apply to Programme</a>
+    </div>
+  </div>
+
   <!-- Portal main -->
   <div id="portal-main">
     <div class="page">
@@ -574,7 +588,7 @@
               </div>
               <div class="script-beat">
                 <div class="script-beat-label">PROBLEM (3–8 sec)</div>
-                <div class="script-beat-text">Re-reading notes. Passive revision. Cognitive science calls this <strong>"illusion of competence"</strong> — familiarity isn't memory. The data vanishes before the assessment.</div>
+                <div class="script-beat-text">Re-reading intel packets. Passive re-runs. Cognitive science calls this <strong>"illusion of competence"</strong> — familiarity isn't encoding. The data vanishes before the op.</div>
               </div>
               <div class="script-beat">
                 <div class="script-beat-label">REVEAL (8–20 sec)</div>
@@ -582,7 +596,7 @@
               </div>
               <div class="script-beat">
                 <div class="script-beat-label">CTA (20–30 sec)</div>
-                <div class="script-beat-text">Link in bio. ShiftGlitch. Free. Stop passive revision. Start encoding.</div>
+                <div class="script-beat-text">Link in bio. ShiftGlitch. Free. Stop passive re-runs. Start encoding.</div>
               </div>
             </div>
           </div>
@@ -595,11 +609,11 @@
             <div class="script-body">
               <div class="script-beat">
                 <div class="script-beat-label">HOOK (0–3 sec)</div>
-                <div class="script-beat-text">Grinding 4 hours a day and still blanking in assessments? It's not your processing power. It's your method.</div>
+                <div class="script-beat-text">Grinding 4 hours a day and still blanking on the op? It's not your processing capacity. It's your method.</div>
               </div>
               <div class="script-beat">
                 <div class="script-beat-label">PROBLEM (3–8 sec)</div>
-                <div class="script-beat-text">Most operatives put in the hours — they just push them into the wrong activities. Copying notes, passive re-reads, revision videos. These feel productive but barely move your <strong>long-term encoding rate</strong>.</div>
+                <div class="script-beat-text">Most operatives put in the hours — they just push them into the wrong exploits. Passive re-reads, copying intel, re-watching walkthroughs. These feel productive but barely move your <strong>long-term encoding rate</strong>.</div>
               </div>
               <div class="script-beat">
                 <div class="script-beat-label">REVEAL (8–20 sec)</div>
@@ -665,6 +679,7 @@
               <a href="/og-image.png" download class="brand-dl-btn">OG Banner</a>
             </div>
             <p style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:rgba(255,255,255,0.2);margin-top:0.75rem">Use assets only to promote ShiftGlitch. Do not alter the logo or use it in misleading contexts.</p>
+            <p style="font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:rgba(57,255,20,0.3);margin-top:0.5rem;letter-spacing:0.05em">Need additional logo formats or asset variations? Contact: <a href="mailto:admin@shiftglitch.com" style="color:var(--green);text-decoration:none">admin@shiftglitch.com</a></p>
           </div>
           <div class="brand-section">
             <div class="brand-section-title">Voice Guidelines</div>
@@ -713,12 +728,13 @@
 
     // ── Helpers ───────────────────────────────────────────────────────────────
     function showSection(id) {
-      ['loading-screen','pending-screen','suspended-screen','portal-main'].forEach(s => {
-        document.getElementById(s).style.display = (s === id) ? (id === 'portal-main' ? 'block' : 'flex') : 'none';
+      ['loading-screen','pending-screen','suspended-screen','not-registered-screen','portal-main'].forEach(s => {
+        const el = document.getElementById(s);
+        if (!el) return;
+        el.style.display = 'none';
       });
-      if (id === 'pending-screen' || id === 'suspended-screen') {
-        document.getElementById(id).style.display = 'block';
-      }
+      const target = document.getElementById(id);
+      if (target) target.style.display = (id === 'portal-main') ? 'block' : 'block';
     }
 
     function copyVal(elId, btn) {
@@ -770,48 +786,56 @@
       document.getElementById(id).classList.toggle('open');
     }
 
-    // ── Captions (built dynamically with ref link) ────────────────────────────
+    // ── Captions (per-platform accordion, dynamic ref link) ──────────────────
     function buildCaptions(refUrl) {
-      const R = `<span class="ref-link">${refUrl}</span>`;
-
       const platforms = [
         {
+          id: 'cap-twitter',
           name: 'X / Twitter',
           captions: [
-            `The cognitive exploit that actually encodes information long-term: spaced repetition. Re-reading does almost nothing. ShiftGlitch has the full system — free. Jack in: ${refUrl}`,
-            `Most operatives fail not from lack of effort but wrong method. Passive revision is the low-ROI exploit. Active recall + spaced repetition is the cheat code. ShiftGlitch, free: ${refUrl}`,
-            `Your brain is a system. Systems have exploits. ShiftGlitch is a cognitive OS built on that premise — spaced repetition, active recall, Pomodoro timing. Free to run: ${refUrl}`,
+            { text: `The cognitive exploit that actually encodes information long-term: spaced repetition. Passive re-reading encodes almost nothing. ShiftGlitch has the full system — free. Jack in: ${refUrl}`, tags: '#ShiftGlitch #CognitiveOS #SpacedRepetition #ActiveRecall' },
+            { text: `Most operatives fail not from lack of processing power — from running the wrong exploit. Passive re-reads are low-ROI. Active recall + spaced repetition is the actual cheat code. ShiftGlitch, free: ${refUrl}`, tags: '#ShiftGlitch #Netrunner #CognitiveSystems #LearningOS' },
+            { text: `Your brain is a system. Systems have exploits. ShiftGlitch is a cognitive OS built on that premise — spaced repetition, active recall, Pomodoro timing. Free to run: ${refUrl}`, tags: '#ShiftGlitch #CognitiveExploit #Netrunner #MainframeMindset' },
+            { text: `The gap between operatives who retain intel and those who blank isn't raw IQ. It's method. ShiftGlitch gives you the method. Free: ${refUrl}`, tags: '#ShiftGlitch #CognitiveOS #ActiveRecall #SpacedRepetition' },
           ]
         },
         {
+          id: 'cap-linkedin',
           name: 'LinkedIn',
           captions: [
-            `Knowledge retention is a skill most people never intentionally develop. ShiftGlitch is a cognitive platform built on spaced repetition, active recall, and deliberate practice — not passive re-reading. It's free to use and the methodology is grounded in peer-reviewed cognitive science. Worth a look for anyone serious about learning that sticks. ${refUrl}`,
-            `I've been using ShiftGlitch — a cognitive OS built for operatives who want real retention, not just the feeling of productivity. It implements the Leitner System, active recall, and Pomodoro timing in one platform. Free tier available. The Pro upgrade is optional but the free tools are genuinely useful. ${refUrl}`,
+            { text: `Knowledge retention is a capability most people never intentionally develop. ShiftGlitch is a cognitive platform built on spaced repetition, active recall, and deliberate encoding — not passive re-reads. Free to use, methodology grounded in peer-reviewed cognitive science. Worth a look for anyone serious about retention that actually holds. ${refUrl}`, tags: '#ShiftGlitch #CognitiveSystems #SpacedRepetition #ActiveRecall #LearningScience' },
+            { text: `I've been running ShiftGlitch — a cognitive OS designed for operatives who want actual retention, not just the illusion of productivity. It implements the Leitner System, active recall, and Pomodoro timing in one platform. Free tier available. Pro upgrade optional but the core tools deliver real value. ${refUrl}`, tags: '#ShiftGlitch #LearningOS #CognitiveSystems #SpacedRepetition #Productivity' },
+            { text: `Most productivity tools solve task completion. ShiftGlitch solves knowledge encoding — a different, higher-value problem. It implements spaced repetition, active recall, and Pomodoro science in a single cohesive platform with a ranked progression system. Free tier does most of what you need. ${refUrl}`, tags: '#ShiftGlitch #KnowledgeManagement #CognitiveOS #Netrunner #ActiveRecall' },
           ]
         },
         {
+          id: 'cap-facebook',
           name: 'Facebook',
           captions: [
-            `If you're still re-reading notes, this is worth knowing: that method has one of the lowest retention rates in cognitive science. ShiftGlitch is a free platform that actually implements what works — spaced repetition, active recall, blurting method. Give it a run: ${refUrl}`,
-            `Sharing this because it genuinely made a difference. ShiftGlitch is a free cognitive platform built on real learning science — not just flashcards, a full system with ranked progression, focus timing, and recall tools. Link here: ${refUrl}`,
-            `Not often I recommend apps but this one's built on actual neuroscience. ShiftGlitch — free cognitive OS, spaced repetition system, active recall, Pomodoro focus. No subscriptions required to get value from it. ${refUrl} — worth checking.`,
+            { text: `Dropping this for anyone who's been running the wrong exploit: re-reading intel has one of the lowest retention rates in cognitive science. ShiftGlitch implements what actually works — spaced repetition, active recall, blurting method. Free to run: ${refUrl}`, tags: '#ShiftGlitch #CognitiveOS #SpacedRepetition #ActiveRecall #FreeApp' },
+            { text: `Sharing this because it genuinely changed how I encode intel. ShiftGlitch is a free cognitive platform — not just flashcards, it's a full system with ranked progression, focus timing, and recall protocols. Link: ${refUrl}`, tags: '#ShiftGlitch #CognitiveSystems #ActiveRecall #FreeTools #LearningOS' },
+            { text: `Not often I recommend apps but this one's built on actual neuroscience. ShiftGlitch — free cognitive OS, spaced repetition system, active recall, Pomodoro timing. No subscription required to get real value. ${refUrl}`, tags: '#ShiftGlitch #FreeApp #CognitiveOS #SpacedRepetition #Netrunner' },
+            { text: `If you want to actually retain what you're encoding — not just feel like you are — ShiftGlitch is worth a run. Spaced repetition + active recall. Rank progression from NPC to System Admin. Fully free. ${refUrl}`, tags: '#ShiftGlitch #CognitiveExploit #LearningOS #ActiveRecall #FreeForever' },
           ]
         },
         {
+          id: 'cap-instagram',
           name: 'Instagram',
           captions: [
-            `Your brain is a system. Systems can be exploited. ⚡ ShiftGlitch is a cognitive OS built on spaced repetition + active recall — the real science of retention. Free to jack in. Link in bio. #ShiftGlitch #CognitiveOS #LearningSystems`,
-            `Grinding for hours and still blanking? It's not your capacity — it's your method. 🔌 ShiftGlitch: spaced repetition, active recall, focus timer. Free. Rank up from NPC to System Admin as you run sessions. 🔗 bio link. #Netrunner #ShiftGlitch #CognitiveSystems`,
-            `The best operatives don't grind harder — they run better exploits. ShiftGlitch gives you the full cognitive toolkit: Leitner flashcards, blurting method, Pomodoro timing. Free platform. Link in bio. ⚡ #ShiftGlitch #ActiveRecall #SpacedRepetition`,
+            { text: `Your brain is a system. Systems can be exploited. ⚡\n\nShiftGlitch is a cognitive OS built on spaced repetition + active recall — the real science of retention. Free to jack in. 🔗 link in bio.`, tags: '#ShiftGlitch #CognitiveOS #Netrunner #ActiveRecall #SpacedRepetition #LearningSystems #FreeApp' },
+            { text: `Grinding hard and still blanking? It's not your processing capacity — it's your exploit. 🔌\n\nShiftGlitch: spaced repetition, active recall, focus timer. Free. Rank up from NPC to System Admin as you run sessions. 🔗 bio link.`, tags: '#ShiftGlitch #Netrunner #CognitiveSystems #ActiveRecall #FocusTimer #SpacedRepetition #MainframeMindset' },
+            { text: `The best operatives don't grind harder — they run better exploits. ⚡\n\nShiftGlitch gives you the full cognitive toolkit: Leitner flashcards, blurting method, Pomodoro timing. Free platform. 🔗 link in bio.`, tags: '#ShiftGlitch #CognitiveExploit #ActiveRecall #SpacedRepetition #Pomodoro #FreeApp #Netrunner' },
+            { text: `POV: you stopped passive re-reads and started actually encoding 🧠⚡\n\nShiftGlitch uses spaced repetition + active recall — the same cognitive exploits top operatives run. Free to jack in. 🔗 link in bio.`, tags: '#ShiftGlitch #CognitiveOS #ActiveRecall #SpacedRepetition #Netrunner #LearningScience #FreeApp' },
           ]
         },
         {
+          id: 'cap-whatsapp',
           name: 'WhatsApp / Telegram',
           captions: [
-            `Dropping this if anyone needs it — ShiftGlitch is a free cognitive platform built on actual neuroscience (spaced repetition, active recall). Has a rank system too which makes it usable without feeling like a grind. Link: ${refUrl}`,
-            `If you need a proper revision system before assessments — ShiftGlitch. Not a gimmick. Uses spaced repetition (the method that actually encodes information long-term). Free. ${refUrl}`,
-            `This is genuinely useful: ShiftGlitch, free cognitive OS — flashcards with spaced repetition, active recall tools, focus timer. Has a ranking system. Free tier does most of what you need. ${refUrl}`,
+            { text: `Dropping this if anyone needs it — ShiftGlitch is a free cognitive platform built on real neuroscience (spaced repetition, active recall). Has a rank system too which makes sessions feel purposeful. Link: ${refUrl}`, tags: '' },
+            { text: `If you need a proper cognitive system before your next op — ShiftGlitch. Not a gimmick. Uses spaced repetition (the method that actually encodes long-term). Completely free. ${refUrl}`, tags: '' },
+            { text: `This is genuinely useful: ShiftGlitch, free cognitive OS — flashcards with spaced repetition, active recall tools, focus timer, ranking system. Free tier covers most of what you need. ${refUrl}`, tags: '' },
+            { text: `Been running ShiftGlitch for a few weeks — the spaced repetition system is actually good. Rank progression makes it feel less like grinding and more like levelling up. Free to use: ${refUrl}`, tags: '' },
           ]
         }
       ];
@@ -819,25 +843,41 @@
       const container = document.getElementById('captions-container');
       container.innerHTML = '';
       platforms.forEach(p => {
+        const accordId = p.id + '-body';
         const block = document.createElement('div');
-        block.className = 'platform-block';
-        const nameEl = document.createElement('div');
-        nameEl.className = 'platform-name';
-        nameEl.textContent = p.name;
-        block.appendChild(nameEl);
-        p.captions.forEach(text => {
+        block.className = 'script-card';
+        block.id = p.id;
+        block.innerHTML = `
+          <div class="script-header" onclick="toggleScript('${p.id}')">
+            <span class="script-title">${p.name} &mdash; ${p.captions.length} variants</span>
+            <span class="script-toggle">▸</span>
+          </div>
+          <div class="script-body" id="${accordId}"></div>
+        `;
+        const bodyEl = block.querySelector(`#${accordId}`);
+        p.captions.forEach((cap, i) => {
           const card = document.createElement('div');
           card.className = 'caption-card';
+          card.style.marginBottom = i < p.captions.length - 1 ? '0.6rem' : '0';
+          const display = cap.text + (cap.tags ? '\n\n' + cap.tags : '');
           const textEl = document.createElement('div');
           textEl.className = 'caption-text';
-          textEl.innerHTML = text.replace(refUrl, R);
+          textEl.style.whiteSpace = 'pre-wrap';
+          textEl.innerHTML = display.replace(refUrl, `<span class="ref-link">${refUrl}</span>`);
           const copyBtn = document.createElement('button');
           copyBtn.className = 'caption-copy';
           copyBtn.textContent = 'Copy';
-          copyBtn.onclick = function() { copyCaption(this); };
+          copyBtn.onclick = function() {
+            const rawText = cap.text + (cap.tags ? '\n\n' + cap.tags : '');
+            navigator.clipboard.writeText(rawText.trim()).then(() => {
+              const orig = copyBtn.textContent;
+              copyBtn.textContent = 'Copied!';
+              setTimeout(() => { copyBtn.textContent = orig; }, 1800);
+            });
+          };
           card.appendChild(textEl);
           card.appendChild(copyBtn);
-          block.appendChild(card);
+          bodyEl.appendChild(card);
         });
         container.appendChild(block);
       });
@@ -983,7 +1023,7 @@
           return;
         }
         if (r.status === 404) {
-          window.location.href = '/affiliates';
+          showSection('not-registered-screen');
           return;
         }
         if (!r.ok) throw new Error('api_err');
