@@ -10,7 +10,7 @@ const { scheduleAffiliateEmail, getDueAffiliateEmails, markAffiliateEmailSent, g
 const SITE_URL = process.env.SITE_URL || 'https://shiftglitch.replit.app';
 
 function getResendKey() {
-  return process.env.RESEND_SG_KEY || process.env.RESEND_API_KEY || null;
+  return process.env.RESEND_API_SG_KEY || process.env.RESEND_API_KEY || null;
 }
 
 // From address is always hardcoded for affiliate emails — never overridden by env vars

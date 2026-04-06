@@ -293,7 +293,7 @@ async function upsertUserFromProvider(id, email, firstName, lastName, profileIma
 }
 
 async function sendMagicLinkEmail(email, link, expiresAt) {
-  const key = process.env.RESEND_SG_KEY || process.env.RESEND_API_KEY;
+  const key = process.env.RESEND_API_SG_KEY || process.env.RESEND_API_KEY;
   if (!key) { console.warn('[email-auth] No Resend key — magic link:', link); return; }
   const fromAddress = process.env.RESEND_FROM_ADDRESS || 'ShiftGlitch <admin@shiftglitch.com>';
   await fetch('https://api.resend.com/emails', {
