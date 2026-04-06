@@ -157,6 +157,26 @@ function payfastSignature(data, passphrase = '') {
 const PAYFAST_SANDBOX = process.env.PAYFAST_SANDBOX === 'true';
 const PAYFAST_HOST = PAYFAST_SANDBOX ? 'sandbox.payfast.co.za' : 'www.payfast.co.za';
 
+// PayFast IP validation — rejects spoofed ITN calls not from PayFast's servers.
+// https://developers.payfast.co.za/docs#step_4_confirm_payment_with_payfast
+function ip2long(ip) {
+  return ip.split('.').reduce((acc, octet) => (acc << 8) + parseInt(octet, 10), 0) >>> 0;
+}
+
+const PAYFAST_VALID_IPS = [
+  { start: ip2long('197.97.145.144'), end: ip2long('197.97.145.159') }, // 197.97.145.144/28
+  { start: ip2long('197.97.145.160'), end: ip2long('197.97.145.175') }, // 197.97.145.160/28
+  { start: ip2long('41.74.179.192'),  end: ip2long('41.74.179.223')  }, // 41.74.179.192/27
+];
+
+function isValidPayfastIp(ip) {
+  if (PAYFAST_SANDBOX) return true; // skip IP check in sandbox mode
+  try {
+    const ipLong = ip2long(ip);
+    return PAYFAST_VALID_IPS.some(r => ipLong >= r.start && ipLong <= r.end);
+  } catch { return false; }
+}
+
 const PAYFAST_PACKS = {
   '1m':      { amount: '99.00',  days: 30,  label: 'Netrunner Pro 1 Month'              },
   '3m':      { amount: '249.00', days: 90,  label: 'Netrunner Pro 3 Months'             },
@@ -168,6 +188,9 @@ const PAYFAST_PACKS = {
 };
 
 const app = express();
+
+// Trust Replit's reverse proxy so req.ip reflects the real client IP (used for PayFast IP validation).
+app.set('trust proxy', true);
 
 app.use(helmet({
   contentSecurityPolicy: false,
@@ -187,7 +210,16 @@ app.post('/api/payfast-itn', express.urlencoded({ extended: false }), async (req
 
   try {
     const data = req.body;
-    console.log('[payfast-itn] Received:', JSON.stringify(data));
+
+    // Step 0: Validate source IP against PayFast's known IP ranges.
+    // req.ip is the real client IP (trust proxy is enabled above).
+    const sourceIp = req.ip || req.headers['x-forwarded-for']?.split(',')[0]?.trim() || '';
+    if (!isValidPayfastIp(sourceIp)) {
+      console.warn(`[payfast-itn] Rejected — invalid source IP: ${sourceIp}`);
+      return;
+    }
+
+    console.log('[payfast-itn] Received from', sourceIp, ':', JSON.stringify(data));
 
     // Step 1: Verify signature
     const { signature, ...pfData } = data;
