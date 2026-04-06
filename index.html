@@ -428,6 +428,155 @@
 
     <main id="app-container" class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10 pb-20 sm:pb-24"></main>
 
+    <!-- ── MARTY FINCH CHAT WIDGET ──────────────────────── -->
+    <div id="marty-widget" style="position:fixed;bottom:1.5rem;left:1.5rem;z-index:900;display:flex;flex-direction:column;align-items:flex-start;">
+        <!-- Chat panel (hidden by default) -->
+        <div id="marty-panel" style="display:none;width:min(340px,calc(100vw - 2rem));background:#0a0a0a;border:1.5px solid #39FF14;border-radius:4px;box-shadow:0 0 32px rgba(57,255,20,0.2),0 8px 32px rgba(0,0,0,0.8);margin-bottom:0.6rem;overflow:hidden;font-family:'Space Grotesk',sans-serif;">
+            <!-- Header -->
+            <div style="background:#111;border-bottom:1px solid #39FF14;padding:0.65rem 1rem;display:flex;align-items:center;gap:0.7rem;">
+                <img id="marty-header-img" src="/public/marty/marty1.png" alt="Marty Finch" style="width:38px;height:38px;border-radius:50%;border:2px solid #39FF14;object-fit:cover;">
+                <div>
+                    <div style="color:#39FF14;font-family:'Share Tech Mono',monospace;font-size:0.8rem;font-weight:bold;letter-spacing:0.1em;">MARTY FINCH</div>
+                    <div style="color:#555;font-size:0.68rem;letter-spacing:0.05em;">Architect · ShiftGlitch</div>
+                </div>
+                <div style="margin-left:auto;display:flex;gap:0.4rem;align-items:center;">
+                    <span id="marty-status-dot" style="width:8px;height:8px;background:#39FF14;border-radius:50%;box-shadow:0 0 6px #39FF14;display:inline-block;"></span>
+                    <button onclick="window.martyWidget.close()" style="background:none;border:none;color:#555;cursor:pointer;font-size:1.1rem;line-height:1;padding:0.2rem;">✕</button>
+                </div>
+            </div>
+            <!-- Messages -->
+            <div id="marty-messages" style="height:280px;overflow-y:auto;padding:0.9rem;display:flex;flex-direction:column;gap:0.7rem;scrollbar-width:thin;scrollbar-color:#39FF14 #111;"></div>
+            <!-- Input area -->
+            <div style="border-top:1px solid #222;padding:0.65rem;display:flex;gap:0.5rem;background:#0d0d0d;">
+                <input id="marty-input" type="text" maxlength="300" placeholder="Ask Marty anything..." autocomplete="off"
+                    style="flex:1;background:#111;border:1px solid #333;color:#e0e0e0;padding:0.5rem 0.7rem;font-family:'Space Grotesk',sans-serif;font-size:0.82rem;outline:none;border-radius:2px;"
+                    onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();window.martyWidget.send();}">
+                <button onclick="window.martyWidget.send()" style="background:#39FF14;color:#000;border:none;padding:0.5rem 0.9rem;font-family:'Share Tech Mono',monospace;font-size:0.75rem;font-weight:bold;cursor:pointer;border-radius:2px;letter-spacing:0.05em;white-space:nowrap;">SEND</button>
+            </div>
+        </div>
+        <!-- Avatar trigger button -->
+        <button id="marty-avatar-btn" onclick="window.martyWidget.toggle()" title="Chat with Marty Finch"
+            style="background:none;border:none;padding:0;cursor:pointer;position:relative;">
+            <img id="marty-avatar-img" src="/public/marty/marty2.png" alt="Marty Finch"
+                style="width:62px;height:62px;border-radius:50%;border:2.5px solid #39FF14;object-fit:cover;box-shadow:0 0 18px rgba(57,255,20,0.45),0 4px 16px rgba(0,0,0,0.7);transition:box-shadow 0.2s;">
+            <span style="position:absolute;bottom:2px;right:2px;background:#39FF14;color:#000;font-family:'Share Tech Mono',monospace;font-size:0.48rem;font-weight:bold;padding:1px 4px;border-radius:2px;letter-spacing:0.06em;">MARTY</span>
+        </button>
+    </div>
+
+    <script>
+    window.martyWidget = (() => {
+        const imgs = ['/public/marty/marty1.png', '/public/marty/marty2.png', '/public/marty/marty3.png'];
+        let history = [];
+        let busy = false;
+        let open = false;
+
+        const greetings = [
+            "Hey, operative. Marty Finch — I built this place. What do you need?",
+            "Signal acquired. I'm Marty. Ask me anything about the platform or how to run better exploits.",
+            "You jacked in. I'm Marty Finch, the one who designed all of this. What's the glitch?"
+        ];
+
+        function randomImg() { return imgs[Math.floor(Math.random() * imgs.length)]; }
+
+        function el(id) { return document.getElementById(id); }
+
+        function addMessage(role, text) {
+            const msgs = el('marty-messages');
+            const isMarty = role === 'marty';
+            const div = document.createElement('div');
+            div.style.cssText = `display:flex;gap:0.5rem;align-items:flex-start;${isMarty ? '' : 'flex-direction:row-reverse;'}`;
+            const imgSrc = isMarty ? randomImg() : null;
+            div.innerHTML = isMarty
+                ? `<img src="${imgSrc}" style="width:26px;height:26px;border-radius:50%;border:1px solid #39FF14;object-fit:cover;flex-shrink:0;margin-top:2px;">
+                   <div style="background:#111;border:1px solid #1a1a1a;border-radius:3px;padding:0.5rem 0.65rem;color:#d4d4d4;font-size:0.8rem;line-height:1.5;max-width:85%;white-space:pre-wrap;">${escHtml(text)}</div>`
+                : `<div style="background:#0e2a0e;border:1px solid #1e3a1e;border-radius:3px;padding:0.5rem 0.65rem;color:#a0e0a0;font-size:0.8rem;line-height:1.5;max-width:85%;white-space:pre-wrap;">${escHtml(text)}</div>`;
+            msgs.appendChild(div);
+            msgs.scrollTop = msgs.scrollHeight;
+            history.push({ role: isMarty ? 'model' : 'user', text });
+        }
+
+        function addTyping() {
+            const msgs = el('marty-messages');
+            const div = document.createElement('div');
+            div.id = 'marty-typing';
+            div.style.cssText = 'display:flex;gap:0.5rem;align-items:center;';
+            div.innerHTML = `<img src="${randomImg()}" style="width:26px;height:26px;border-radius:50%;border:1px solid #39FF14;object-fit:cover;flex-shrink:0;">
+                <div style="background:#111;border:1px solid #1a1a1a;border-radius:3px;padding:0.5rem 0.8rem;">
+                    <span style="color:#39FF14;font-family:'Share Tech Mono',monospace;font-size:0.75rem;letter-spacing:0.1em;animation:martyblink 1s ease-in-out infinite;">processing...</span>
+                </div>`;
+            msgs.appendChild(div);
+            msgs.scrollTop = msgs.scrollHeight;
+        }
+
+        function removeTyping() { const t = el('marty-typing'); if (t) t.remove(); }
+
+        function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+        function toggle() {
+            open ? close() : openPanel();
+        }
+
+        function openPanel() {
+            open = true;
+            el('marty-panel').style.display = 'block';
+            el('marty-avatar-btn').style.boxShadow = '0 0 0 2px #39FF14';
+            if (history.length === 0) {
+                setTimeout(() => addMessage('marty', greetings[Math.floor(Math.random() * greetings.length)]), 220);
+            }
+            setTimeout(() => el('marty-input').focus(), 300);
+        }
+
+        function close() {
+            open = false;
+            el('marty-panel').style.display = 'none';
+            el('marty-avatar-btn').style.boxShadow = '';
+        }
+
+        async function send() {
+            if (busy) return;
+            const input = el('marty-input');
+            const msg = input.value.trim();
+            if (!msg) return;
+            input.value = '';
+            addMessage('user', msg);
+            busy = true;
+            el('marty-status-dot').style.background = '#ffaa00';
+            addTyping();
+            try {
+                const r = await fetch('/api/marty-chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: msg, history: history.slice(0, -1) })
+                });
+                const data = await r.json();
+                removeTyping();
+                if (r.ok) {
+                    addMessage('marty', data.reply);
+                    el('marty-header-img').src = randomImg();
+                } else {
+                    addMessage('marty', data.error || 'Signal interference. Try again.');
+                }
+            } catch(e) {
+                removeTyping();
+                addMessage('marty', 'Connection dropped. Check your uplink.');
+            } finally {
+                busy = false;
+                el('marty-status-dot').style.background = '#39FF14';
+            }
+        }
+
+        return { toggle, open: openPanel, close, send };
+    })();
+    </script>
+    <style>
+    @keyframes martyblink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    #marty-messages::-webkit-scrollbar { width:4px; }
+    #marty-messages::-webkit-scrollbar-track { background:#111; }
+    #marty-messages::-webkit-scrollbar-thumb { background:#39FF14;border-radius:2px; }
+    #marty-avatar-btn:hover img { box-shadow:0 0 28px rgba(57,255,20,0.7),0 4px 20px rgba(0,0,0,0.8); }
+    #marty-input:focus { border-color:#39FF14 !important;box-shadow:0 0 0 1px #39FF14; }
+    </style>
+
     <!-- ── HELP BUTTON ──────────────────────────────────── -->
     <button onclick="app.openHelp()" id="help-fab" title="Help — what does everything mean?"
         style="position:fixed;bottom:1.5rem;right:1.5rem;z-index:900;background:#FF3333;color:#fff;font-family:'Share Tech Mono',monospace;font-size:0.95rem;font-weight:bold;letter-spacing:0.12em;text-transform:uppercase;padding:0.7rem 1.3rem;border:none;cursor:pointer;box-shadow:0 0 24px rgba(255,51,51,0.55),0 4px 16px rgba(0,0,0,0.5);animation:helpPulse 2.5s ease-in-out infinite;">
