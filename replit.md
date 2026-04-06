@@ -190,7 +190,7 @@ Promotion is evidence-based. `checkPromotion()` runs after every activity. `roll
 - **Learning Governor (Pomodoro):** 25-min focus timer, knowledge domain tagging, governor blocking after 4 consecutive same-domain sessions, "What I Learned?" modal on completion. Sessions counted as `pomodorosCompleted` rank evidence.
 - **Flashcard Decks (Data Shards):** Leitner 5-box spaced repetition. `cardsAdvanced` rank evidence on box promotion. Not-Yet button with YET Growth Shield reframe.
 - **Blurting Method (BrainDump):** 4-phase active recall. Each completed session = `blurtsCompleted` evidence.
-- **MCQ Diagnostics (Boss Fights):** 100 questions / 5 missions covering learning science. Each submission = `diagnosticsCompleted` evidence.
+- **MCQ Diagnostics (Boss Fights):** 200 questions / 10 missions. Missions 1–5 cover learning science; Missions 6–10 cover Wild Science, World Oddities, Physics & Earth, History of Tech & AI, Language & Idioms (Q206–Q305). Each submission = `diagnosticsCompleted` evidence.
 - **Babel Fish Metaphor Lab:** Feynman technique — plain-language explanation + optional doodle.
 - **Eisenhower Matrix:** Task prioritisation with reflection prompts.
 - **Dopamine Recalibrator:** Stealth Mode + Entry Rocket anti-procrastination tools.

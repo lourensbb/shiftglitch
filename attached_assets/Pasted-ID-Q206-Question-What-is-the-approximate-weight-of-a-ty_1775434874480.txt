@@ -1,0 +1,1399 @@
+ID: Q206
+Question: What is the approximate weight of a typical cloud?
+A: 10,000 tonnes
+B: 100,000 tonnes
+C: A million tonnes
+D: A billion tonnes
+Answer: C
+Explanation: A typical cloud has a volume of around 1 cubic kilometre, which equates to a weight of about a million tonnes.
+Difficulty: 2
+Category: Science
+Subcategory: Earth Science
+Tags: clouds, weather, weight
+Cognitive Skill: Recall
+
+ID: Q207
+Question: Which animal is 30 times more likely to get hit by lightning than a human?
+A: Elephant
+B: Giraffe
+C: Rhinoceros
+D: Kangaroo
+Answer: B
+Explanation: Due to their height and population size, giraffes have a fatality rate from lightning strikes 30 times higher than humans.
+Difficulty: 2
+Category: Science
+Subcategory: Biology
+Tags: giraffes, lightning, animals
+Cognitive Skill: Recall
+
+ID: Q208
+Question: Why do identical twins have different fingerprints?
+A: They have different DNA
+B: They are formed at different times
+C: Environmental factors in the womb affect finger growth
+D: Fingerprints are determined by diet after birth
+Answer: C
+Explanation: Environmental factors during development, like umbilical cord length and womb position, uniquely shape each twin's fingerprints.
+Difficulty: 3
+Category: Science
+Subcategory: Biology
+Tags: twins, fingerprints, genetics
+Cognitive Skill: Understand
+
+ID: Q209
+Question: How long did a day last on Earth 600 million years ago?
+A: 12 hours
+B: 21 hours
+C: 24 hours
+D: 30 hours
+Answer: B
+Explanation: Earth's rotation is slowing down, meaning a day was just 21 hours long 600 million years ago.
+Difficulty: 3
+Category: Science
+Subcategory: Space
+Tags: Earth, time, rotation
+Cognitive Skill: Recall
+
+ID: Q210
+Question: Which part of the human body has no proven biological purpose?
+A: Eyebrows
+B: Earlobes
+C: Pinky toes
+D: Uvula
+Answer: B
+Explanation: While rich in nerve endings and useful for social bonding, many scientists argue earlobes have no true biological purpose.
+Difficulty: 2
+Category: Science
+Subcategory: Human Anatomy
+Tags: human body, earlobes, biology
+Cognitive Skill: Recall
+
+ID: Q211
+Question: What is the process called where your brain constantly "eats" its own smaller cells to preserve grey matter?
+A: Phagocytosis
+B: Mitosis
+C: Osmosis
+D: Photosynthesis
+Answer: A
+Explanation: Phagocytosis is a harmless process where cells envelop and consume smaller molecules to clean the system.
+Difficulty: 3
+Category: Science
+Subcategory: Human Anatomy
+Tags: brain, cells, phagocytosis
+Cognitive Skill: Recall
+
+ID: Q212
+Question: What is the scientific name for fossilised dinosaur poo?
+A: Amber
+B: Coprolite
+C: Pumice
+D: Steatite
+Answer: B
+Explanation: Coprolite is fossilised dung, which helps scientists understand what dinosaurs like the T. rex ate.
+Difficulty: 2
+Category: Science
+Subcategory: Paleontology
+Tags: dinosaurs, fossils, coprolite
+Cognitive Skill: Recall
+
+ID: Q213
+Question: What shape is the planet Mars?
+A: A perfect sphere
+B: A flat disc
+C: A rugby ball
+D: A pyramid
+Answer: C
+Explanation: Unlike other rocky planets, Mars is shaped like a rugby ball with different sizes along all three of its axes.
+Difficulty: 2
+Category: Science
+Subcategory: Space
+Tags: Mars, planets, solar system
+Cognitive Skill: Recall
+
+ID: Q214
+Question: Why are "zero-calorie" foods a myth?
+A: All foods absorb calories from the air
+B: Even low-calorie foods contain more energy than the body needs to process them
+C: Calories multiply when chewed
+D: Water is the only zero-calorie food
+Answer: B
+Explanation: Foods like celery and watercress still contain more energy than it takes for the human body to digest them.
+Difficulty: 3
+Category: Science
+Subcategory: Biology
+Tags: food, calories, nutrition
+Cognitive Skill: Understand
+
+ID: Q215
+Question: What did astronomers name the average colour of the Universe?
+A: Galactic Grey
+B: Cosmic Latte
+C: Starlight White
+D: Nebula Beige
+Answer: B
+Explanation: A 2002 study found that light from galaxies averages into a beige colour, which was named 'Cosmic latte'.
+Difficulty: 1
+Category: Science
+Subcategory: Space
+Tags: universe, colour, astronomy
+Cognitive Skill: Recall
+
+ID: Q216
+Question: Why do smaller animals like lizards experience time more slowly than humans?
+A: Their hearts beat faster
+B: They live shorter lives
+C: Their brains process incoming information more quickly
+D: They sleep more often
+Answer: C
+Explanation: The perception of time depends on brain processing speed, making the world seem to move slower for smaller animals.
+Difficulty: 3
+Category: Science
+Subcategory: Biology
+Tags: animals, time, brain
+Cognitive Skill: Understand
+
+ID: Q217
+Question: According to most scientists, why is water itself not considered "wet"?
+A: Wetness is a liquid's ability to maintain contact with a solid surface
+B: Water constantly evaporates
+C: Wetness only applies to solids touching other solids
+D: Water has no physical texture
+Answer: A
+Explanation: Because wetness is defined by how a liquid interacts with a solid surface, water makes other objects wet but isn't wet itself.
+Difficulty: 4
+Category: Science
+Subcategory: Physics
+Tags: water, physics, wetness
+Cognitive Skill: Analyse
+
+ID: Q218
+Question: Where are the worst places to stroke a cat if you want to bond with it?
+A: Under the chin and cheeks
+B: The back of the neck
+C: The belly and the base of the tail
+D: Behind the ears
+Answer: C
+Explanation: Touching a cat's belly or the base of its tail is more likely to annoy them than create a bond.
+Difficulty: 1
+Category: Science
+Subcategory: Biology
+Tags: cats, animals, pets
+Cognitive Skill: Recall
+
+ID: Q219
+Question: How long did "Mike the chicken" live after having his head cut off in the 1940s?
+A: 18 minutes
+B: 18 hours
+C: 18 days
+D: 18 months
+Answer: D
+Explanation: Mike survived for 18 months because his jugular vein and most of his brainstem were left intact.
+Difficulty: 2
+Category: History
+Subcategory: Weird History
+Tags: chicken, survival, biology
+Cognitive Skill: Recall
+
+ID: Q220
+Question: If you stacked all the world's bacteria on top of each other, how far would they stretch?
+A: To the Moon
+B: To the Sun
+C: Across the Milky Way
+D: 10 billion light-years
+Answer: D
+Explanation: Earth's microbes could wrap around the Milky Way over 20,000 times, stretching 10 billion light-years.
+Difficulty: 3
+Category: Science
+Subcategory: Biology
+Tags: bacteria, distance, space
+Cognitive Skill: Recall
+
+ID: Q221
+Question: What negative health effect can wearing a tight necktie cause?
+A: Reduced blood flow to the brain by 7.5 percent
+B: Increased heart rate by 15 percent
+C: Decreased lung capacity
+D: Spinal compression
+Answer: A
+Explanation: A 2018 study found that tight neckties restrict brain blood flow, causing dizziness, nausea, and headaches.
+Difficulty: 2
+Category: Science
+Subcategory: Human Anatomy
+Tags: clothing, health, brain
+Cognitive Skill: Recall
+
+ID: Q222
+Question: What is "Hippopotomonstrosesquippedaliophobia"?
+A: The fear of hippopotamuses
+B: The fear of long words
+C: The fear of small spaces
+D: The fear of spelling mistakes
+Answer: B
+Explanation: The 36-letter word was coined to describe an unreasonable fear of long words.
+Difficulty: 2
+Category: Language
+Subcategory: Vocabulary
+Tags: phobias, words, linguistics
+Cognitive Skill: Recall
+
+ID: Q223
+Question: How old was the oldest recorded dog, an Australian cattle dog named Bluey?
+A: 20.5 years
+B: 25.5 years
+C: 29.5 years
+D: 34.5 years
+Answer: C
+Explanation: Bluey survived to the incredibly ripe old age of 29.5 years.
+Difficulty: 2
+Category: Science
+Subcategory: Biology
+Tags: dogs, pets, age
+Cognitive Skill: Recall
+
+ID: Q224
+Question: Why can't humans hear the sound the Sun makes?
+A: Sound cannot travel through the vacuum of space
+B: The wavelengths of the pressure waves are in hundreds of miles
+C: The sound is blocked by Earth's atmosphere
+D: The Sun's sound is at a frequency too high for human ears
+Answer: B
+Explanation: The Sun makes sound via pressure waves, but their massive wavelengths put them far beyond the range of human hearing.
+Difficulty: 3
+Category: Science
+Subcategory: Space
+Tags: Sun, sound, astronomy
+Cognitive Skill: Understand
+
+ID: Q225
+Question: Which mountain is actually taller than Mount Everest when measured from its true base?
+A: Mount Kilimanjaro
+B: K2
+C: Mauna Kea
+D: Mount Fuji
+Answer: C
+Explanation: Hawaii's twin volcanoes Mauna Kea and Mauna Loa measure 10.2km from their underwater base, beating Everest's 8.8km.
+Difficulty: 3
+Category: Geography
+Subcategory: Physical Geography
+Tags: mountains, Everest, Earth
+Cognitive Skill: Recall
+
+ID: Q226
+Question: What is the "boundary wall" of our Solar System called?
+A: The Oort Cloud
+B: The Kuiper Belt
+C: The Heliopause
+D: The Heliosphere
+Answer: C
+Explanation: The heliopause is the region where solar wind isn't hot enough to push back interstellar particles, forming a wall.
+Difficulty: 4
+Category: Science
+Subcategory: Space
+Tags: solar system, space, heliopause
+Cognitive Skill: Recall
+
+ID: Q227
+Question: Why do scientists say octopuses don't have tentacles?
+A: They are officially called "arms" because they have suckers down their entire length
+B: Tentacles must contain bones, which octopuses lack
+C: Tentacles are only found on jellyfish
+D: Octopus limbs do not regenerate like true tentacles
+Answer: A
+Explanation: In cephalopods, a limb is only a "tentacle" if it has suckers just at the end. Octopuses have suckers along their entire arms.
+Difficulty: 3
+Category: Science
+Subcategory: Biology
+Tags: octopus, ocean, animals
+Cognitive Skill: Understand
+
+ID: Q228
+Question: Why is the widely used Mercator map projection wildly inaccurate?
+A: It places the South Pole at the top
+B: It makes landmasses near the poles look far larger than they are
+C: It completely leaves out Antarctica
+D: It shrinks the size of the oceans
+Answer: B
+Explanation: The Mercator projection distorts sizes, making Greenland appear 14 times larger than it actually is.
+Difficulty: 2
+Category: Geography
+Subcategory: Physical Geography
+Tags: maps, Mercator, geography
+Cognitive Skill: Understand
+
+ID: Q229
+Question: What part of the Apollo Moon landing missions did NASA genuinely fake?
+A: Neil Armstrong's first steps
+B: The blast-off from the lunar surface
+C: The astronaut quarantine protocol upon returning
+D: The planting of the American flag
+Answer: C
+Explanation: While the landing was real, the quarantine protocol when the astronauts arrived back on Earth was largely a theatrical show.
+Difficulty: 4
+Category: History
+Subcategory: Space History
+Tags: NASA, Moon, Apollo
+Cognitive Skill: Recall
+
+ID: Q230
+Question: What does a comet reportedly smell like?
+A: Fresh rain and pine
+B: Rotten eggs, urine, and burning matches
+C: Vanilla and cinnamon
+D: Burnt plastic and ozone
+Answer: B
+Explanation: Traces of hydrogen sulphide and ammonia give comets a pungent scent resembling rotten eggs and urine.
+Difficulty: 2
+Category: Science
+Subcategory: Space
+Tags: comets, smell, astronomy
+Cognitive Skill: Recall
+
+ID: Q231
+Question: What original medical purpose were chainsaws invented for in the late 18th Century?
+A: Amputating infected limbs
+B: Removing diseased teeth
+C: Aiding and speeding up childbirth procedures
+D: Cracking open the ribcage
+Answer: C
+Explanation: Chainsaws were developed in Scotland to widen pubic cartilage and remove disease-laden bone during childbirth.
+Difficulty: 4
+Category: History
+Subcategory: Medical History
+Tags: medicine, chainsaw, history
+Cognitive Skill: Recall
+
+ID: Q232
+Question: How do ants breathe since they don't have lungs?
+A: Through their skin
+B: Through their antennae
+C: Through tiny openings called spiracles
+D: They don't need oxygen
+Answer: C
+Explanation: Ants breathe through nine or ten tiny openings called spiracles located on their bodies.
+Difficulty: 2
+Category: Science
+Subcategory: Biology
+Tags: ants, insects, breathing
+Cognitive Skill: Recall
+
+ID: Q233
+Question: The myth that you lose most of your body heat through your head is false. What is the actual truth?
+A: You lose most of your heat through your feet
+B: Covering any part of the body prevents heat loss equally
+C: Heat is only lost through breathing
+D: The hands lose heat the fastest
+Answer: B
+Explanation: While the face and head are sensitive to temperature changes, covering any exposed body part prevents heat loss in the same way.
+Difficulty: 2
+Category: Science
+Subcategory: Human Anatomy
+Tags: body heat, myths, biology
+Cognitive Skill: Understand
+
+ID: Q234
+Question: According to a review of 55 years of matches, football teams wearing which colour kit consistently play better?
+A: Blue
+B: White
+C: Black
+D: Red
+Answer: D
+Explanation: Teams wearing red kits played better in home matches, likely because the colour affects perception and feelings.
+Difficulty: 2
+Category: Sports
+Subcategory: Football
+Tags: football, colours, psychology
+Cognitive Skill: Recall
+
+ID: Q235
+Question: How does painting one blade of a wind turbine black affect birds?
+A: It attracts more birds to nest there
+B: It reduces bird deaths by 70 percent
+C: It completely stops birds from flying near it
+D: It has no effect on birds at all
+Answer: B
+Explanation: Painting a single turbine blade black significantly increases its visibility, saving thousands of birds each year.
+Difficulty: 2
+Category: Science
+Subcategory: Environment
+Tags: wind turbines, birds, conservation
+Cognitive Skill: Recall
+
+ID: Q236
+Question: Where are a snail's teeth located?
+A: On its shell
+B: In its throat
+C: On its file-like tongue
+D: Along its underbelly
+Answer: C
+Explanation: Snails have between 1,000 and 12,000 tiny teeth spread all over their file-like tongues.
+Difficulty: 3
+Category: Science
+Subcategory: Biology
+Tags: snails, teeth, animals
+Cognitive Skill: Recall
+
+ID: Q237
+Question: What is the decibel level of the quietest place on Earth (Microsoft's anechoic chamber)?
+A: 0 decibels
+B: -5.5 decibels
+C: -20.6 decibels
+D: 10 decibels
+Answer: C
+Explanation: Microsoft's anechoic chamber in Washington blocks out so much vibration that the sound level drops to minus 20.6 decibels.
+Difficulty: 4
+Category: Science
+Subcategory: Physics
+Tags: sound, decibels, quiet
+Cognitive Skill: Recall
+
+ID: Q238
+Question: What is the maximum power a horse can actually produce?
+A: Exactly 1 horsepower
+B: Around 5 horsepower
+C: Around 24 horsepower
+D: Around 50 horsepower
+Answer: C
+Explanation: A 1993 study showed that a horse can produce up to 18,000W of power, which equates to roughly 24 horsepower.
+Difficulty: 3
+Category: Science
+Subcategory: Physics
+Tags: horses, power, measurement
+Cognitive Skill: Recall
+
+ID: Q239
+Question: Why are bananas slightly radioactive?
+A: They absorb radiation from the sun
+B: They contain the natural isotope potassium-40
+C: They are grown in uranium-rich soil
+D: The peel traps radon gas
+Answer: B
+Explanation: Bananas are rich in potassium, which includes the naturally radioactive isotope potassium-40.
+Difficulty: 2
+Category: Science
+Subcategory: Chemistry
+Tags: bananas, radiation, food
+Cognitive Skill: Recall
+
+ID: Q240
+Question: According to the World Happiness Report, which country has been the happiest on Earth for six years in a row?
+A: Denmark
+B: Sweden
+C: Finland
+D: Norway
+Answer: C
+Explanation: Finland consistently ranks as the happiest country, featuring a high concentration of saunas and Santa Claus lore.
+Difficulty: 1
+Category: Geography
+Subcategory: World
+Tags: Finland, happiness, countries
+Cognitive Skill: Recall
+
+ID: Q241
+Question: Why do hippos perform a "slow-motion gallop" on riverbeds instead of swimming?
+A: Their legs are too short to paddle
+B: They are afraid of deep water
+C: Their bones are so big and dense that they are barely buoyant
+D: Swimming requires too much energy
+Answer: C
+Explanation: Hippos cannot swim; their dense bones cause them to sink, allowing them to walk along the bottom of the water.
+Difficulty: 2
+Category: Science
+Subcategory: Biology
+Tags: hippos, swimming, animals
+Cognitive Skill: Understand
+
+ID: Q242
+Question: Why does a yo-yo still work in the microgravity of the International Space Station?
+A: It generates its own artificial gravity
+B: The string acts as a vacuum seal
+C: It relies on the laws of conservation of angular momentum
+D: Astronauts use magnetic strings
+Answer: C
+Explanation: As long as the string is kept taut, the conservation of angular momentum allows a yo-yo to perform tricks in space.
+Difficulty: 4
+Category: Science
+Subcategory: Physics
+Tags: yo-yo, space, physics
+Cognitive Skill: Understand
+
+ID: Q243
+Question: Which of the following non-plant organisms can photosynthesise?
+A: Sea slugs and pea aphids
+B: Starfish and sea urchins
+C: Honeybees and ants
+D: Earthworms and beetles
+Answer: A
+Explanation: Certain animals, like sea slugs and pea aphids, contain chlorophyll and can turn sunlight into energy.
+Difficulty: 4
+Category: Science
+Subcategory: Biology
+Tags: photosynthesis, animals, biology
+Cognitive Skill: Recall
+
+ID: Q244
+Question: What causes the physical sensation of an itch on human skin?
+A: Dead skin cells shedding
+B: Hair follicles growing
+C: Bacteria releasing a chemical that activates nerve proteins
+D: Friction from clothing
+Answer: C
+Explanation: Bacteria like Staphylococcus aureus release chemicals that trigger nerve signals, which the brain interprets as an itch.
+Difficulty: 3
+Category: Science
+Subcategory: Human Anatomy
+Tags: itching, bacteria, skin
+Cognitive Skill: Recall
+
+ID: Q245
+Question: What colour is a polar bear's skin underneath its white fur?
+A: White
+B: Pink
+C: Jet-black
+D: Blue
+Answer: C
+Explanation: Despite their snowy appearance, polar bears have jet-black skin to help absorb heat from the sun.
+Difficulty: 1
+Category: Science
+Subcategory: Biology
+Tags: polar bears, animals, biology
+Cognitive Skill: Recall
+
+ID: Q246
+Question: From a biological classification standpoint, what makes up a starfish's entire body?
+A: Arms
+B: A stomach
+C: A head
+D: A foot
+Answer: C
+Explanation: Echinoderms, like starfish and sea urchins, are technically classed as having bodies that are entirely heads.
+Difficulty: 3
+Category: Science
+Subcategory: Biology
+Tags: starfish, marine life, biology
+Cognitive Skill: Recall
+
+ID: Q247
+Question: How fast does the Earth's orbit travel with respect to the Sun's centre every day?
+A: 100,000 km
+B: 1 million km
+C: 2.5 million km
+D: 19 million km
+Answer: C
+Explanation: The Earth travels around 2.5 million kilometres a day around the Sun, and 19 million km relative to the Milky Way's centre.
+Difficulty: 4
+Category: Science
+Subcategory: Space
+Tags: Earth, orbit, space
+Cognitive Skill: Recall
+
+ID: Q248
+Question: Which of the following is a true statement about the cells in the human body?
+A: 90% of them are bacteria
+B: 56% of them are bacteria
+C: Humans have no bacterial cells
+D: Bacteria make up 50% of human body weight
+Answer: B
+Explanation: A 2016 study found the average human is about 56% bacteria by cell count, though bacteria weigh very little.
+Difficulty: 3
+Category: Science
+Subcategory: Human Anatomy
+Tags: bacteria, cells, human body
+Cognitive Skill: Recall
+
+ID: Q249
+Question: Why are there roughly three male ginger cats to every one female ginger cat?
+A: Male cats are more aggressive
+B: The ginger gene is found on the X chromosome
+C: Female cats cannot grow ginger fur
+D: The ginger gene is linked to testosterone
+Answer: B
+Explanation: Because the gene is on the X chromosome, a female needs two copies to be ginger, while a male only needs one.
+Difficulty: 3
+Category: Science
+Subcategory: Biology
+Tags: cats, genetics, animals
+Cognitive Skill: Understand
+
+ID: Q250
+Question: The "Bermuda Triangle" gained a legendary status for disappearances. What is the scientific truth about it?
+A: It has a magnetic anomaly that sinks ships
+B: Alien abductions frequently occur there
+C: It is no more hazardous than any other busy ocean route
+D: Rogue waves are 100 times more common there
+Answer: C
+Explanation: Despite the myths, the number of incidents in the Bermuda Triangle is not significantly higher than in other parts of the ocean.
+Difficulty: 2
+Category: Geography
+Subcategory: World
+Tags: Bermuda Triangle, myths, ocean
+Cognitive Skill: Recall
+
+ID: Q251
+Question: What bizarre reproductive act do male deep-sea anglerfish perform?
+A: They lay eggs inside the female's mouth
+B: They fuse into the female's body and dissolve
+C: They change their gender after mating
+D: They glow brightly to distract predators while mating
+Answer: B
+Explanation: A tiny male anglerfish bites onto a larger female and gradually dissolves into her body, acting as a living sperm sack.
+Difficulty: 3
+Category: Science
+Subcategory: Biology
+Tags: anglerfish, reproduction, deep sea
+Cognitive Skill: Recall
+
+ID: Q252
+Question: What is "Auto-brewery syndrome"?
+A: A condition where sweat smells like beer
+B: A rare condition where gut bacteria and yeast break down carbohydrates into ethanol
+C: A psychological desire to constantly brew alcohol
+D: An allergic reaction to hops
+Answer: B
+Explanation: This rare syndrome causes the body to brew its own alcohol when gut microbes ferment carbohydrates into ethanol.
+Difficulty: 3
+Category: Science
+Subcategory: Human Anatomy
+Tags: biology, alcohol, digestion
+Cognitive Skill: Recall
+
+ID: Q253
+Question: Which physiological response proves that being bored is actually a "high arousal state"?
+A: Your heart rate increases
+B: Your blood pressure drops
+C: Your body temperature plummets
+D: Your pupils dilate
+Answer: A
+Explanation: When you are bored, your heart rate actually increases, marking it as a state of high physiological arousal.
+Difficulty: 3
+Category: Science
+Subcategory: Psychology
+Tags: boredom, heart rate, body
+Cognitive Skill: Recall
+
+ID: Q254
+Question: Why does a platypus "sweat" milk?
+A: It uses milk to cool down
+B: It has no teats
+C: Its milk is mostly water
+D: It lives entirely underwater
+Answer: B
+Explanation: Since platypuses lack teats, they secrete milk through pores in their skin, which makes it look like they are sweating.
+Difficulty: 2
+Category: Science
+Subcategory: Biology
+Tags: platypus, mammals, animals
+Cognitive Skill: Recall
+
+ID: Q255
+Question: How many standard plastic LEGO bricks can be stacked before the bottom brick fails under compression?
+A: 10,000
+B: 50,000
+C: 100,000
+D: 375,000
+Answer: D
+Explanation: An ordinary LEGO brick can support the weight of 375,000 other bricks, enough to build a 3.5km high tower.
+Difficulty: 4
+Category: Science
+Subcategory: Physics
+Tags: LEGO, compression, physics
+Cognitive Skill: Recall
+
+ID: Q256
+Question: Why might you dislike the sound of your own voice when you hear it played back on a recording?
+A: Microphones distort the pitch
+B: The bones in your head make your voice sound deeper to yourself
+C: You speak faster than you think you do
+D: Recordings remove all vocal inflection
+Answer: B
+Explanation: The bones in our skulls conduct lower frequencies well, making our voices sound deeper to us than they do to others.
+Difficulty: 2
+Category: Science
+Subcategory: Human Anatomy
+Tags: voice, sound, human body
+Cognitive Skill: Understand
+
+ID: Q257
+Question: What is a rainbow on the planet Venus called?
+A: A halo
+B: A spectrum
+C: A glory
+D: A corona
+Answer: C
+Explanation: Appearing as concentric rings, a "glory" on Venus is caused by light wave interference rather than refraction.
+Difficulty: 3
+Category: Science
+Subcategory: Space
+Tags: Venus, rainbows, space
+Cognitive Skill: Recall
+
+ID: Q258
+Question: How many reflections can two mirrors facing each other actually produce before fading into invisibility?
+A: Exactly 10
+B: A few hundred
+C: Ten thousand
+D: Infinite
+Answer: B
+Explanation: Because mirrors absorb a fraction of light energy with every bounce, they can only produce a few hundred reflections.
+Difficulty: 3
+Category: Science
+Subcategory: Physics
+Tags: mirrors, light, physics
+Cognitive Skill: Recall
+
+ID: Q259
+Question: Why do football players spit so much during a game?
+A: To assert dominance on the field
+B: Exercise increases protein in saliva, making it thicker and harder to swallow
+C: To clear out grass and dirt from their mouths
+D: Because they drink too much water
+Answer: B
+Explanation: A protein called MUC5B increases during exercise, thickening saliva to prevent the mouth from drying out.
+Difficulty: 3
+Category: Sports
+Subcategory: Football
+Tags: football, exercise, saliva
+Cognitive Skill: Understand
+
+ID: Q260
+Question: If the Earth doubled in size, what immediate problem would large animals and trees face?
+A: The atmosphere would ignite
+B: Surface gravity would double, causing trees to fall and animals to break legs
+C: The oceans would instantly freeze
+D: The planet would spin out of orbit
+Answer: B
+Explanation: A doubled Earth size means doubled surface gravity, making it impossible for trees to stand or large animals to run safely.
+Difficulty: 2
+Category: Science
+Subcategory: Physics
+Tags: Earth, gravity, physics
+Cognitive Skill: Understand
+
+ID: Q261
+Question: On average, which planet is actually closest to Earth?
+A: Venus
+B: Mars
+C: Mercury
+D: Jupiter
+Answer: C
+Explanation: While Venus comes closest at its closest point, Mercury is on average the closest planet to Earth due to orbital mechanics.
+Difficulty: 4
+Category: Science
+Subcategory: Space
+Tags: planets, solar system, Mercury
+Cognitive Skill: Recall
+
+ID: Q262
+Question: What gives a flamingo its pink colour?
+A: Genetics passed down from their parents
+B: A diet of brine shrimp and blue-green algae
+C: Sunburn from tropical environments
+D: Rolling in pink clay
+Answer: B
+Explanation: Flamingoes are born grey/white and only turn pink after consuming pigments found in their shrimp and algae diet.
+Difficulty: 1
+Category: Science
+Subcategory: Biology
+Tags: flamingoes, birds, diet
+Cognitive Skill: Recall
+
+ID: Q263
+Question: In a group of 23 people, what is the statistical probability that two people will share the same birthday?
+A: 10 percent
+B: 25 percent
+C: 50.7 percent
+D: 99 percent
+Answer: C
+Explanation: Due to probability mathematics, there is just over a 50% chance of a shared birthday in any group of 23 people.
+Difficulty: 4
+Category: Mathematics
+Subcategory: Logic
+Tags: probability, birthdays, maths
+Cognitive Skill: Analyse
+
+ID: Q264
+Question: Why is the "sea level" on Earth not actually perfectly level everywhere?
+A: Tides pull all water to the North Pole
+B: The Earth's spin makes water bulge outward at the equator
+C: Wind pushes the ocean entirely to one side
+D: Salt makes some water sink lower
+Answer: B
+Explanation: The centrifugal force generated by Earth's spin creates a bulge at the equator, putting sea level further from the Earth's centre there.
+Difficulty: 3
+Category: Geography
+Subcategory: Physical Geography
+Tags: oceans, Earth, gravity
+Cognitive Skill: Understand
+
+ID: Q265
+Question: When looking at the night sky with the naked eye, you are seeing stars as they were up to how many years ago?
+A: 100 years
+B: 4,000 years
+C: 1 million years
+D: 1 billion years
+Answer: B
+Explanation: Without a telescope, visible stars lie within about 4,000 light-years, meaning you see their light from up to 4,000 years ago.
+Difficulty: 3
+Category: Science
+Subcategory: Space
+Tags: stars, light, astronomy
+Cognitive Skill: Recall
+
+ID: Q266
+Question: According to the fossil record, which came first: plants or seeds?
+A: Seeds
+B: Plants
+C: They evolved at exactly the same time
+D: Neither; both were created by fungi
+Answer: B
+Explanation: Early plants resembled moss and reproduced using spores; multicellular seeds didn't evolve for another 150 million years.
+Difficulty: 2
+Category: Science
+Subcategory: Biology
+Tags: plants, evolution, history
+Cognitive Skill: Recall
+
+ID: Q267
+Question: What is the absolute maximum number of times you can fold a standard piece of A4 paper in half?
+A: 5
+B: 8
+C: 12
+D: 20
+Answer: B
+Explanation: Because the thickness doubles with each fold, A4 paper rapidly becomes too thick and small to fold more than 8 times.
+Difficulty: 2
+Category: Science
+Subcategory: Physics
+Tags: paper, folding, limits
+Cognitive Skill: Recall
+
+ID: Q268
+Question: About how much of the brain's daily energy requirement goes towards maintaining automatic processes like muscle control?
+A: 1-2%
+B: 5%
+C: Around 20% (400-500 calories)
+D: 80%
+Answer: C
+Explanation: The brain burns 400-500 calories a day—about a fifth of total energy—mostly for automatic sensory and motor processing.
+Difficulty: 3
+Category: Science
+Subcategory: Human Anatomy
+Tags: brain, calories, energy
+Cognitive Skill: Recall
+
+ID: Q269
+Question: What tech idiom describes doing something quickly and effortlessly using technology?
+A: Pushing the envelope
+B: Pull the plug
+C: At the click of a button
+D: Blowing a fuse
+Answer: C
+Explanation: "At the click of a button" highlights the convenience and speed brought by technology to our daily lives.
+Difficulty: 1
+Category: Language
+Subcategory: Tech Idioms
+Tags: idioms, speed, convenience
+Cognitive Skill: Understand
+
+ID: Q270
+Question: If an IT department is described as running like a "well-oiled machine", what does that mean?
+A: It requires constant maintenance
+B: It functions smoothly and efficiently
+C: It relies entirely on old hardware
+D: It frequently breaks down
+Answer: B
+Explanation: A "well-oiled machine" describes something that runs perfectly, smoothly, and efficiently.
+Difficulty: 1
+Category: Language
+Subcategory: Tech Idioms
+Tags: efficiency, idioms, tech
+Cognitive Skill: Understand
+
+ID: Q271
+Question: What does it mean to "pull the plug" on a tech project?
+A: To launch it to the public
+B: To charge its batteries
+C: To stop it because it is no longer viable
+D: To connect it to a faster network
+Answer: C
+Explanation: This idiom means discontinuing something, often used for failed projects or outdated technology.
+Difficulty: 1
+Category: Language
+Subcategory: Tech Idioms
+Tags: failure, project, idiom
+Cognitive Skill: Understand
+
+ID: Q272
+Question: If a new smartphone comes with lots of "bells and whistles," what does it have?
+A: Audio alerts for every app
+B: Extra, flashy features that aren't strictly necessary
+C: A highly durable protective case
+D: Only the most basic, essential functions
+Answer: B
+Explanation: "Bells and whistles" refers to non-essential, appealing extras added to a product.
+Difficulty: 2
+Category: Language
+Subcategory: Tech Idioms
+Tags: technology, features, idioms
+Cognitive Skill: Understand
+
+ID: Q273
+Question: In the digital world, what does the pun "byte the bullet" mean?
+A: Shooting a computer
+B: Deleting an entire hard drive
+C: Accepting and dealing with a difficult or frustrating tech situation
+D: Eating computer chips
+Answer: C
+Explanation: A play on "bite the bullet," it means reluctantly accepting a tough tech fix, like debugging late at night.
+Difficulty: 2
+Category: Language
+Subcategory: Tech Idioms
+Tags: puns, tech, idioms
+Cognitive Skill: Apply
+
+ID: Q274
+Question: If someone "firewalls" a former employee, what are they doing metaphorically?
+A: Giving them a warm recommendation
+B: Blocking them or restricting their access and communication
+C: Setting their desk on fire
+D: Promoting them to an IT security position
+Answer: B
+Explanation: Just like a digital firewall blocks bad traffic, "firewalling someone" means cutting off communication or access.
+Difficulty: 2
+Category: Language
+Subcategory: Tech Idioms
+Tags: security, blocking, idiom
+Cognitive Skill: Understand
+
+ID: Q275
+Question: The AI ethical principle of "Fairness & Justice" aims to prevent what?
+A: High prices for AI software
+B: Discrimination or bias against individuals or groups
+C: Hackers stealing data
+D: AI systems consuming too much electricity
+Answer: B
+Explanation: The principle of justice and fairness states that AI must not result in biases or discrimination.
+Difficulty: 2
+Category: Technology
+Subcategory: AI Ethics
+Tags: fairness, ethics, AI
+Cognitive Skill: Understand
+
+ID: Q276
+Question: What does the AI ethical principle of "Nonmaleficence" strictly require?
+A: That AI must always be open-source
+B: That AI systems should do no harm to humans
+C: That AI must generate a financial profit
+D: That AI models must have 100 billion parameters
+Answer: B
+Explanation: Nonmaleficence is the moral obligation to avoid imposing risks of harm and ensuring systems are safe.
+Difficulty: 3
+Category: Technology
+Subcategory: AI Ethics
+Tags: safety, nonmaleficence, ethics
+Cognitive Skill: Recall
+
+ID: Q277
+Question: When applying ethical theories to AI, what does "Consequentialist ethics" focus on?
+A: The agent's internal moral character
+B: Strict adherence to traditional laws and duties
+C: Assessing the morality of an action solely based on its outcome or result
+D: Random decision-making
+Answer: C
+Explanation: Consequentialism judges whether an action is morally right based on if its consequences are beneficial.
+Difficulty: 3
+Category: Technology
+Subcategory: AI Ethics
+Tags: ethics, consequences, AI
+Cognitive Skill: Understand
+
+ID: Q278
+Question: In 1912, Leonardo Torres Quevedo built "El Ajedrecista," which was the world's first what?
+A: Nuclear reactor
+B: Autonomous chess-playing machine
+C: Steam-powered automobile
+D: Programmable loom
+Answer: B
+Explanation: Unlike earlier hoaxes, El Ajedrecista was a true integrated automation that could play a chess endgame without human guidance.
+Difficulty: 3
+Category: History
+Subcategory: Robotics History
+Tags: chess, robots, history
+Cognitive Skill: Recall
+
+ID: Q279
+Question: From which language does the word "robot" originate?
+A: Greek
+B: Latin
+C: Czech
+D: German
+Answer: C
+Explanation: The term was coined in the 1920 play R.U.R. and comes from the Czech word 'robota', meaning forced labor.
+Difficulty: 2
+Category: History
+Subcategory: Robotics History
+Tags: robots, literature, language
+Cognitive Skill: Recall
+
+ID: Q280
+Question: Who formulated the "Three Laws of Robotics" in 1941 and 1942?
+A: Alan Turing
+B: George Devol
+C: Isaac Asimov
+D: Karel Čapek
+Answer: C
+Explanation: Isaac Asimov created the Three Laws of Robotics for his science fiction stories, coining the word "robotics" in the process.
+Difficulty: 1
+Category: History
+Subcategory: Robotics History
+Tags: Asimov, sci-fi, robots
+Cognitive Skill: Recall
+
+ID: Q281
+Question: What was "Unimate," invented by George Devol in 1950?
+A: The first automated vacuum cleaner
+B: The first digitally operated and programmable industrial robot
+C: A chess-playing supercomputer
+D: A mechanical bird
+Answer: B
+Explanation: Unimate was sold to General Motors in 1960 and became the foundation of the modern robotics assembly line industry.
+Difficulty: 2
+Category: History
+Subcategory: Robotics History
+Tags: industry, robots, history
+Cognitive Skill: Recall
+
+ID: Q282
+Question: In 2017, the robot "Sophia" made history by becoming the first robot to receive what?
+A: A driver's license
+B: A bank account
+C: Citizenship from Saudi Arabia
+D: A Nobel Prize
+Answer: C
+Explanation: Saudi Arabia granted Sophia citizenship, sparking debate over whether shutting her down would be considered murder.
+Difficulty: 2
+Category: History
+Subcategory: Modern History
+Tags: Sophia, citizenship, robots
+Cognitive Skill: Recall
+
+ID: Q283
+Question: Why is "Edge Computing" chosen over "Cloud Computing" for autonomous vehicles?
+A: It offers unlimited storage capacity
+B: It processes data locally, reducing latency to single-digit milliseconds
+C: It connects directly to satellites
+D: It relies entirely on human operators
+Answer: B
+Explanation: Edge computing handles processing on nearby nodes or the device itself to ensure real-time, low-latency reactions.
+Difficulty: 2
+Category: Technology
+Subcategory: Computing Models
+Tags: Edge, cloud, latency
+Cognitive Skill: Understand
+
+ID: Q284
+Question: What is a major advantage of Cloud Computing?
+A: It guarantees zero latency
+B: It works without an internet connection
+C: It provides near-infinite scalability and centralized control
+D: It keeps all data completely isolated from the web
+Answer: C
+Explanation: Cloud computing uses remote data centers, allowing users to effortlessly scale infrastructure and computing power up or down.
+Difficulty: 2
+Category: Technology
+Subcategory: Computing Models
+Tags: cloud, scalability, infrastructure
+Cognitive Skill: Understand
+
+ID: Q285
+Question: In Large Language Models, what does the "Transformer" architecture's attention mechanism do?
+A: It permanently stores all internet data
+B: It "pays attention" to the most important parts of a text, even if words are far apart
+C: It filters out bad words
+D: It powers the computer screen
+Answer: B
+Explanation: The attention mechanism lets models focus on relevant context across long sequences, like listening to one speaker at a noisy party.
+Difficulty: 3
+Category: Technology
+Subcategory: AI Basics
+Tags: AI, Transformers, attention
+Cognitive Skill: Understand
+
+ID: Q286
+Question: What is a "Convolutional Neural Network" (CNN) best optimized for?
+A: Translating languages
+B: Predicting the stock market
+C: Image recognition and scanning photos
+D: Writing poetry
+Answer: C
+Explanation: CNNs scan images area by area with a small "window", making them ideal for photo recognition and Instagram filters.
+Difficulty: 3
+Category: Technology
+Subcategory: AI Basics
+Tags: AI, vision, CNN
+Cognitive Skill: Recall
+
+ID: Q287
+Question: Recurrent Neural Networks (RNNs) are best suited for what kind of data?
+A: Static images
+B: Data where order matters, like text or speech
+C: 3D video game rendering
+D: Deleting files
+Answer: B
+Explanation: RNNs have a "memory" of what came before, making them ideal for sequences like text translation and music.
+Difficulty: 3
+Category: Technology
+Subcategory: AI Basics
+Tags: AI, sequences, RNN
+Cognitive Skill: Recall
+
+ID: Q288
+Question: In the "Split Brain Experiment" thought exercise, what concept is challenged when a person's brain is split into two different bodies?
+A: The existence of gravity
+B: The Brain Theory of personal identity
+C: The speed of light
+D: Evolution
+Answer: B
+Explanation: If your brain is split and put into two bodies that both think they are you, the Brain Theory (wherever your brain goes, you go) breaks down.
+Difficulty: 4
+Category: Mathematics
+Subcategory: Logic
+Tags: philosophy, identity, brain
+Cognitive Skill: Analyse
+
+ID: Q289
+Question: According to the "Body Theory" of identity, what makes you "you"?
+A: Your memories
+B: Your physical flesh and bone
+C: Your social media profiles
+D: Your clothing
+Answer: B
+Explanation: The Body Theory posits that your physical body is the core of your identity, regardless of what happens to your memories or personality.
+Difficulty: 2
+Category: Mathematics
+Subcategory: Logic
+Tags: identity, philosophy, body
+Cognitive Skill: Understand
+
+ID: Q290
+Question: The idiom "spill the beans" comes from which ancient practice?
+A: Dropping food in medieval markets
+B: Using coloured beans to vote in Ancient Greece
+C: Aztec cooking rituals
+D: Roman planting seasons
+Answer: B
+Explanation: Ancient Greeks voted using white and black beans; spilling them would prematurely reveal the secret outcome.
+Difficulty: 3
+Category: Language
+Subcategory: Idioms
+Tags: Greece, secrets, history
+Cognitive Skill: Recall
+
+ID: Q291
+Question: What does it mean if something happens "once in a blue moon"?
+A: It happens every night
+B: It happens very rarely
+C: It happens during an eclipse
+D: It happens when it rains
+Answer: B
+Explanation: A "blue moon" is the rare occurrence of a 13th full moon in a year, making the phrase a metaphor for rare events.
+Difficulty: 1
+Category: Language
+Subcategory: Idioms
+Tags: time, moon, phrases
+Cognitive Skill: Understand
+
+ID: Q292
+Question: When looking for a romantic partner, what does a "red flag" refer to?
+A: A sign of true love
+B: A warning signal about their true, potentially negative nature
+C: A mutual interest in sports
+D: A wealthy background
+Answer: B
+Explanation: Red flags have historically been used to indicate danger; in relationships, they signify concerning behavior.
+Difficulty: 1
+Category: Language
+Subcategory: Idioms
+Tags: relationships, warning, idioms
+Cognitive Skill: Understand
+
+ID: Q293
+Question: The phrase "hands down" (meaning undoubtedly) originated from which sport?
+A: Boxing
+B: Football
+C: Horse racing
+D: Tennis
+Answer: C
+Explanation: In 19th-century horse racing, a jockey winning by a large distance could relax and drop his reins, riding with "hands down".
+Difficulty: 2
+Category: Language
+Subcategory: Idioms
+Tags: sports, racing, winning
+Cognitive Skill: Recall
+
+ID: Q294
+Question: Why do theater performers say "break a leg" instead of "good luck"?
+A: To encourage dancing
+B: Because saying "good luck" is actually considered bad luck
+C: To remind actors to stretch
+D: Because stages used to be slippery
+Answer: B
+Explanation: Saying "good luck" before a performance is a long-standing theatrical superstition thought to bring bad luck.
+Difficulty: 1
+Category: Language
+Subcategory: Idioms
+Tags: theater, luck, idioms
+Cognitive Skill: Recall
+
+ID: Q295
+Question: Which idiom originated from 1800s sailing ships clearing paths in frozen oceans?
+A: Bite the bullet
+B: Break the ice
+C: Spill the beans
+D: Under the weather
+Answer: B
+Explanation: Special boats "broke the ice" to ensure safe passage; now it means relieving tension at a first social meeting.
+Difficulty: 1
+Category: Language
+Subcategory: Idioms
+Tags: socializing, ice, idioms
+Cognitive Skill: Understand
+
+ID: Q296
+Question: What does the idiom "under the weather" mean?
+A: Caught in a rainstorm
+B: Feeling ill or unwell
+C: Being very wealthy
+D: Looking for an umbrella
+Answer: B
+Explanation: Sick sailors would go below deck (literally under the weather) to recover from storms and seasickness.
+Difficulty: 1
+Category: Language
+Subcategory: Idioms
+Tags: health, weather, sailors
+Cognitive Skill: Understand
+
+ID: Q297
+Question: Where does the idiom "beat around the bush" come from?
+A: Gardening techniques
+B: Hunting birds
+C: Playing drums
+D: Building houses
+Answer: B
+Explanation: In old bird hunting, beating bushes drove birds out for shooting; beating *around* the bush was unhelpful and indirect.
+Difficulty: 2
+Category: Language
+Subcategory: Idioms
+Tags: communication, birds, history
+Cognitive Skill: Recall
+
+ID: Q298
+Question: If you are "close but no cigar", what has happened?
+A: You successfully quit smoking
+B: You almost achieved something, but ultimately failed
+C: You won the grand prize
+D: You refused a gift
+Answer: B
+Explanation: In the 1800s, cigars were common prizes for adult carnival games; almost winning meant getting "no cigar".
+Difficulty: 2
+Category: Language
+Subcategory: Idioms
+Tags: failure, games, idioms
+Cognitive Skill: Understand
+
+ID: Q299
+Question: Where did the term "riding shotgun" originate?
+A: The Wild West stagecoaches
+B: World War II bombers
+C: 1950s police cars
+D: Bank robbery getaway cars
+Answer: A
+Explanation: In the Wild West, a guard armed with a shotgun would ride next to the stagecoach driver for protection.
+Difficulty: 2
+Category: Language
+Subcategory: Idioms
+Tags: cars, history, weapons
+Cognitive Skill: Recall
+
+ID: Q300
+Question: The term "AI Hallucination" refers to what phenomenon?
+A: When a computer screen flickers
+B: When an AI model confidently states false or non-existent facts
+C: When a robot dreams during standby mode
+D: When a user misunderstands an AI's output
+Answer: B
+Explanation: Because LLMs predict likely next words rather than "knowing" facts, they can confidently generate completely plausible sounding lies.
+Difficulty: 2
+Category: Technology
+Subcategory: AI Basics
+Tags: AI errors, truth, LLMs
+Cognitive Skill: Understand
+
+ID: Q301
+Question: What does "Pushing the envelope" mean in a technology context?
+A: Mailing physical letters instead of email
+B: Going beyond the usual limits or boundaries in innovation
+C: Deleting old files
+D: Closing down a business
+Answer: B
+Explanation: This phrase is commonly used to describe cutting-edge breakthroughs or trying something completely new.
+Difficulty: 2
+Category: Language
+Subcategory: Tech Idioms
+Tags: innovation, idioms, boundaries
+Cognitive Skill: Understand
+
+ID: Q302
+Question: In 2025, how did Cloudflare respond to AI bots scraping the web for free?
+A: They shut down the internet
+B: They introduced a "Pay-Per-Crawl" system
+C: They gave bots unlimited free access
+D: They sued every AI company
+Answer: B
+Explanation: Cloudflare implemented HTTP 402 to charge bots and models for access, shifting the web to a consent-based economic system.
+Difficulty: 3
+Category: Technology
+Subcategory: Internet
+Tags: scraping, economics, AI bots
+Cognitive Skill: Recall
+
+ID: Q303
+Question: The "Dead Internet Theory" suggests what disturbing trend?
+A: All servers will soon run out of electricity
+B: The majority of online content and engagement is synthetic and generated by AI bots
+C: No one uses social media anymore
+D: Fiber optic cables are decaying
+Answer: B
+Explanation: This theory posits that the internet is becoming a closed loop where bots outnumber humans, generating slop and fake engagement.
+Difficulty: 3
+Category: Technology
+Subcategory: Internet
+Tags: bots, synthetic, culture
+Cognitive Skill: Understand
+
+ID: Q304
+Question: Why do "AI Content Detectors" often fail?
+A: They cannot read English
+B: Generative models self-correct to slip past them, leading to an endless arms race
+C: They are too expensive to run
+D: They instantly delete all files
+Answer: B
+Explanation: As AI improves, detectors struggle to keep up, often falsely flagging real human writers and failing to catch advanced AI text.
+Difficulty: 3
+Category: Technology
+Subcategory: AI Basics
+Tags: detection, arms race, AI
+Cognitive Skill: Analyse
+
+ID: Q305
+Question: How does the "Teletransporter" thought experiment challenge the Data Theory of identity?
+A: It proves teleportation is physically impossible
+B: It shows that copying your exact data to a new location feels like dying if your original body is destroyed
+C: It shows that humans don't have enough data to copy
+D: It proves data is too heavy to transmit
+Answer: B
+Explanation: If teleporting destroys your original cells to make a perfect data replica elsewhere, it feels like murder, suggesting you are more than just "data".
+Difficulty: 4
+Category: Mathematics
+Subcategory: Logic
+Tags: philosophy, teleportation, identity
+Cognitive Skill: Analyse
