@@ -1246,6 +1246,7 @@ async function sendProUpgradeEmail(email, gamertag, daysAdded) {
   } catch (err) { console.error('[pro-email] Error:', err.message); }
 }
 
-app.listen(5000, '0.0.0.0', () => {
-  console.log('Server running on port 5000');
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running on port ${PORT}`);
 });
