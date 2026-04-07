@@ -204,6 +204,131 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', ts: Date.now() });
 });
 
+// ── PayPal IPN ──────────────────────────────────────────────────────────────
+const PAYPAL_MERCHANT_EMAIL = 'lourensbreytenbach@gmail.com';
+const PAYPAL_SANDBOX = process.env.PAYPAL_SANDBOX === 'true';
+const PAYPAL_IPN_VERIFY_URL = PAYPAL_SANDBOX
+  ? 'https://ipnpb.sandbox.paypal.com/cgi-bin/webscr'
+  : 'https://ipnpb.paypal.com/cgi-bin/webscr';
+
+// Pack amounts in USD (approximate equivalents of ZAR prices)
+const PAYPAL_PACKS = {
+  '1m':  { amountUSD: '5.50',  days: 30,  label: 'Netrunner Pro 1 Month'   },
+  '3m':  { amountUSD: '13.75', days: 90,  label: 'Netrunner Pro 3 Months'  },
+  '12m': { amountUSD: '44.00', days: 365, label: 'Netrunner Pro 12 Months' },
+};
+
+app.post('/api/paypal-ipn', express.urlencoded({ extended: false }), async (req, res) => {
+  res.status(200).end();
+  try {
+    const rawBody = new URLSearchParams(req.body).toString();
+    // Step 1: Send back to PayPal to verify authenticity
+    const verifyRes = await fetch(PAYPAL_IPN_VERIFY_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'User-Agent': 'ShiftGlitch-IPN/1.0' },
+      body: 'cmd=_notify-validate&' + rawBody
+    });
+    const verifyText = await verifyRes.text();
+    if (verifyText !== 'VERIFIED') {
+      console.warn('[paypal-ipn] Not verified — ignoring. PayPal returned:', verifyText);
+      return;
+    }
+
+    const data = req.body;
+    console.log('[paypal-ipn] Verified IPN:', JSON.stringify(data));
+
+    // Step 2: Check payment status
+    if (data.payment_status !== 'Completed') {
+      console.log('[paypal-ipn] Non-Completed status, ignoring:', data.payment_status);
+      return;
+    }
+
+    // Step 3: Validate receiver email
+    if ((data.receiver_email || '').toLowerCase() !== PAYPAL_MERCHANT_EMAIL.toLowerCase()) {
+      console.warn('[paypal-ipn] Wrong receiver email:', data.receiver_email);
+      return;
+    }
+
+    // Step 4: Validate currency
+    if (data.mc_currency !== 'USD') {
+      console.warn('[paypal-ipn] Unexpected currency:', data.mc_currency);
+      return;
+    }
+
+    // Step 5: Identify user from custom field (set at checkout as userId)
+    const userId = (data.custom || '').trim();
+    if (!userId) {
+      console.warn('[paypal-ipn] No custom field (userId) — cannot identify user');
+      return;
+    }
+
+    // Step 6: Match pack by amount paid
+    const paidAmount = parseFloat(data.mc_gross || '0');
+    const matchedPack = Object.values(PAYPAL_PACKS).find(p => Math.abs(parseFloat(p.amountUSD) - paidAmount) < 0.50);
+    if (!matchedPack) {
+      console.warn(`[paypal-ipn] Unrecognised amount $${paidAmount} — no matching pack`);
+      return;
+    }
+
+    // Step 7: Check item name
+    const itemName = data.item_name || '';
+    if (!itemName.toLowerCase().includes('netrunner pro')) {
+      console.warn(`[paypal-ipn] Unexpected item_name: "${itemName}" — ignoring`);
+      return;
+    }
+
+    // Step 8: Upgrade the user
+    const txnId = data.txn_id || String(Date.now());
+    const expiresAt = new Date(Date.now() + matchedPack.days * 24 * 60 * 60 * 1000);
+    await updateMembershipTier(userId, 'pro', `paypal_${txnId}`, expiresAt);
+    console.log(`[paypal-ipn] User ${userId} upgraded to pro for ${matchedPack.days} days ($${paidAmount}) via PayPal — expires ${expiresAt.toISOString().slice(0,10)}`);
+
+    try {
+      const upgradedUser = await getUser(userId);
+      if (upgradedUser && upgradedUser.email) {
+        sendProUpgradeEmail(upgradedUser.email, upgradedUser.gamertag || upgradedUser.username || 'Operative', matchedPack.days).catch(() => {});
+      }
+    } catch (e) { console.warn('[paypal-ipn] Could not send pro upgrade email:', e.message); }
+
+  } catch (err) {
+    console.error('[paypal-ipn] Error:', err.message);
+  }
+});
+
+app.post('/api/paypal-checkout', requireAuth, checkoutLimiter, async (req, res) => {
+  const { pack: rawPack } = req.body;
+  const BASE_PACKS = ['1m', '3m', '12m'];
+  if (!rawPack || !BASE_PACKS.includes(rawPack)) {
+    return res.status(400).json({ error: 'Pack must be "1m", "3m", or "12m".' });
+  }
+  const selected = PAYPAL_PACKS[rawPack];
+  const userId = req.session.userId;
+  const baseUrl = getBaseUrl(req);
+
+  // Build a PayPal standard payment URL
+  const params = new URLSearchParams({
+    cmd: '_xclick',
+    business: PAYPAL_MERCHANT_EMAIL,
+    item_name: selected.label,
+    amount: selected.amountUSD,
+    currency_code: 'USD',
+    custom: String(userId),
+    no_shipping: '1',
+    no_note: '1',
+    return: `${baseUrl}/pricing?success=1&provider=paypal&pack=${rawPack}`,
+    cancel_return: `${baseUrl}/pricing?cancelled=1`,
+    notify_url: `${baseUrl}/api/paypal-ipn`,
+  });
+
+  const paypalBase = PAYPAL_SANDBOX
+    ? 'https://www.sandbox.paypal.com/cgi-bin/webscr'
+    : 'https://www.paypal.com/cgi-bin/webscr';
+
+  console.log(`[paypal] Checkout for user ${userId}, pack ${rawPack} ($${selected.amountUSD})`);
+  res.json({ url: `${paypalBase}?${params.toString()}` });
+});
+
+// ── PayFast ITN ──────────────────────────────────────────────────────────────
 app.post('/api/payfast-itn', express.urlencoded({ extended: false }), async (req, res) => {
   // Guide: send 200 immediately — PayFast will retry if it doesn't get one fast enough
   res.status(200).end();
