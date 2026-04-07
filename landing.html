@@ -1,1117 +1,541 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('consent', 'default', {
-        analytics_storage: 'denied',
-        ad_storage: 'denied',
-        ad_user_data: 'denied',
-        ad_personalization: 'denied',
-        wait_for_update: 500
-      });
-    </script>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-P6VQGP7B1D"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-P6VQGP7B1D');
-    </script>
-    <script src="/consent.js" defer></script>
-    <script>
-      (function captureUTMs() {
-        const p = new URLSearchParams(window.location.search);
-        const keys = ['utm_source','utm_medium','utm_campaign','utm_term','utm_content'];
-        const vals = {};
-        keys.forEach(k => { const v = p.get(k); if (v) vals[k] = v; });
-        if (Object.keys(vals).length) sessionStorage.setItem('sg_utms', JSON.stringify(vals));
-      })();
-    </script>
-    <title>ShiftGlitch — The Study OS for Students | Spaced Repetition, Active Recall & Pomodoro</title>
-    <meta name="description" content="ShiftGlitch is the cyberpunk study platform built on real learning science. Spaced repetition, active recall, Pomodoro timing — the tools that actually make studying work. Free to use.">
-    <meta name="keywords" content="study app for students, spaced repetition app, active recall flashcards, Pomodoro timer app, AI study assistant, free revision tools, cyberpunk study platform">
-    <meta name="author" content="Lourens Breytenbach">
-    <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://shiftglitch.replit.app/">
-    <link rel="icon" href="/public/brand/favicon.png" type="image/png">
-
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://shiftglitch.replit.app/">
-    <meta property="og:title" content="ShiftGlitch — The Study OS for Students">
-    <meta property="og:description" content="Not a quiz game. Not a homework tracker. A full study operating system built on the same learning science used by top students worldwide. Free to use.">
-    <meta property="og:image" content="https://shiftglitch.replit.app/public/brand/og-image.jpg">
-    <meta property="og:site_name" content="ShiftGlitch">
-    <meta property="og:locale" content="en_US">
-
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="ShiftGlitch — The Study OS for Students">
-    <meta name="twitter:description" content="Evidence-based study tools that actually work. Spaced repetition, active recall, Pomodoro — built on real learning science. Free.">
-    <meta name="twitter:image" content="https://shiftglitch.replit.app/public/brand/og-image.jpg">
-
-    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebApplication",
-      "name": "ShiftGlitch",
-      "url": "https://shiftglitch.replit.app",
-      "applicationCategory": "EducationApplication",
-      "operatingSystem": "Any",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD"
-      },
-      "description": "ShiftGlitch is a cyberpunk study operating system for high school and college students. It implements evidence-based learning techniques — spaced repetition, active recall, Pomodoro timing — in a single platform designed to replace passive re-reading with methods that actually work.",
-      "audience": {
-        "@type": "EducationalAudience",
-        "educationalRole": "student"
-      }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ShiftGlitch — The Study App Built on the Evidence. Not the Vibe.</title>
+  <meta name="description" content="Spaced repetition. Active recall. Deliberate practice. The methods cognitive science has proven actually work. Not passive rereading. Not highlighting. Not lies.">
+  <meta name="keywords" content="study app for students, spaced repetition app, active recall flashcards, Pomodoro timer app, AI study assistant, free revision tools, cyberpunk study platform">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://shiftglitch.replit.app">
+  <link rel="icon" href="/public/brand/favicon.png" type="image/png">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://shiftglitch.replit.app">
+  <meta property="og:title" content="ShiftGlitch — The Study App Built on the Evidence. Not the Vibe.">
+  <meta property="og:description" content="Spaced repetition. Active recall. Deliberate practice. The methods that cognitive science has actually proven work.">
+  <meta property="og:image" content="https://shiftglitch.replit.app/public/brand/og-image.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://shiftglitch.replit.app/public/brand/og-image.jpg">
+  <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: #000; color: #fff; font-family: 'Space Grotesk', sans-serif; }
+    .font-display { font-family: 'VT323', monospace; }
+    .font-mono-sg { font-family: 'Share Tech Mono', monospace; }
+    .scanlines {
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px);
+      pointer-events: none;
     }
-    </script>
-
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      "mainEntity": [
-        {
-          "@type": "Question",
-          "name": "What is ShiftGlitch?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "ShiftGlitch is a study operating system for high school and college students. It combines spaced repetition flashcards, active recall tools, a Pomodoro focus timer, and AI study planning in one cyberpunk-themed platform. Every tool is grounded in peer-reviewed learning science."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Is ShiftGlitch free?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Yes. ShiftGlitch core tools are completely free — spaced repetition flashcards, Pomodoro timer, blurting method, and MCQ diagnostics. Pro features including AI study planning and Squad Mode are available on paid plans."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "What study methods does ShiftGlitch use?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "ShiftGlitch is built on spaced repetition (Leitner System), active recall (the testing effect), the Blurting Method, and Pomodoro timing. These are the most evidence-backed study techniques in cognitive science research."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Does ShiftGlitch work for GCSE and A-Level students?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Yes. ShiftGlitch works for GCSE, A-Level, AP, IB, and any high school or college exam system. The tools work for any subject and the AI study planner can be customised to your specific exam subjects and timetable."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Can teachers use ShiftGlitch?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Yes. ShiftGlitch includes a Teacher Dashboard at /teacher that lets educators view student progress, track study habits, and export class reports — no student account needed to view the dashboard."
-          }
-        }
-      ]
+    .glow-green  { text-shadow: 0 0 20px rgba(57,255,20,0.5), 0 0 40px rgba(57,255,20,0.2); }
+    .glow-magenta{ text-shadow: 0 0 20px rgba(255,0,255,0.5), 0 0 40px rgba(255,0,255,0.2); }
+    .glow-purple { text-shadow: 0 0 20px rgba(138,43,226,0.5); }
+    .terminal-border { border: 1px solid rgba(57,255,20,0.3); }
+    .sector-label { font-family:'Share Tech Mono',monospace; font-size:0.7rem; letter-spacing:0.15em; color:rgba(57,255,20,0.6); text-transform:uppercase; }
+    nav.site-nav { position:fixed; top:0; left:0; right:0; z-index:100; transition:background 0.3s, border-color 0.3s; }
+    nav.site-nav.scrolled { background:rgba(0,0,0,0.95); border-bottom:1px solid rgba(57,255,20,0.25); backdrop-filter:blur(8px); }
+    .hero-grid {
+      background-image: linear-gradient(rgba(57,255,20,0.07) 1px,transparent 1px), linear-gradient(90deg,rgba(57,255,20,0.07) 1px,transparent 1px);
+      background-size: 80px 80px;
     }
-    </script>
-
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      "name": "ShiftGlitch",
-      "url": "https://shiftglitch.replit.app",
-      "description": "ShiftGlitch — The study operating system for students. Evidence-based study tools built on spaced repetition, active recall, and Pomodoro science."
-    }
-    </script>
-
-    <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-        :root {
-            --green: #39FF14;
-            --magenta: #FF00FF;
-            --purple: #8A2BE2;
-            --bg: #050505;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        html, body {
-            width: 100%;
-            background: var(--bg);
-            color: #fff;
-            overflow-x: hidden;
-            font-family: 'Space Grotesk', sans-serif;
-        }
-
-        /* ── Orbs ─────────────────────────────────────────── */
-        .orb {
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(120px);
-            pointer-events: none;
-            z-index: 0;
-            opacity: 0.18;
-        }
-        .orb-green {
-            width: 55vw; height: 55vw;
-            background: var(--green);
-            top: -15vw; left: -12vw;
-            animation: driftGreen 22s ease-in-out infinite alternate;
-        }
-        .orb-magenta {
-            width: 50vw; height: 50vw;
-            background: var(--magenta);
-            bottom: -12vw; right: -10vw;
-            animation: driftMagenta 28s ease-in-out infinite alternate;
-        }
-        .orb-purple {
-            width: 40vw; height: 40vw;
-            background: var(--purple);
-            top: 40%; left: 50%;
-            transform: translate(-50%, -50%);
-            animation: driftPurple 34s ease-in-out infinite alternate;
-            opacity: 0.12;
-        }
-
-        @keyframes driftGreen {
-            0%   { transform: translate(0, 0); }
-            50%  { transform: translate(8vw, 6vw); }
-            100% { transform: translate(2vw, 14vw); }
-        }
-        @keyframes driftMagenta {
-            0%   { transform: translate(0, 0); }
-            50%  { transform: translate(-10vw, -8vw); }
-            100% { transform: translate(-4vw, -16vw); }
-        }
-        @keyframes driftPurple {
-            0%   { transform: translate(-50%, -50%); }
-            50%  { transform: translate(-58%, -42%); }
-            100% { transform: translate(-44%, -60%); }
-        }
-
-        /* ── Scanline overlay ─────────────────────────────── */
-        body::after {
-            content: '';
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            z-index: 1;
-            background: repeating-linear-gradient(
-                0deg,
-                transparent,
-                transparent 2px,
-                rgba(0,0,0,0.07) 2px,
-                rgba(0,0,0,0.07) 4px
-            );
-        }
-
-        /* ── Boot screen ──────────────────────────────────── */
-        #boot-screen {
-            position: fixed;
-            inset: 0;
-            z-index: 100;
-            background: #000;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            padding: 2rem 1.5rem;
-            font-family: 'Share Tech Mono', monospace;
-            font-size: clamp(11px, 2vw, 13px);
-            color: var(--green);
-            overflow: hidden;
-            transition: opacity 0.6s ease;
-        }
-        #boot-screen.fade-out {
-            opacity: 0;
-            pointer-events: none;
-        }
-        #boot-log {
-            display: flex;
-            flex-direction: column;
-            gap: 3px;
-        }
-        .boot-line {
-            opacity: 0;
-            animation: bootFadeIn 0.08s forwards;
-            white-space: pre;
-        }
-        @keyframes bootFadeIn { to { opacity: 1; } }
-        .boot-line.dim  { color: rgba(57,255,20,0.35); }
-        .boot-line.warn { color: #FFD700; }
-        .boot-line.err  { color: var(--magenta); }
-        .boot-line.ok   { color: var(--green); }
-
-        /* ── Hero section ─────────────────────────────────── */
-        #hero {
-            position: relative;
-            z-index: 10;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem 1.25rem;
-            text-align: center;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.8s ease, transform 0.8s ease;
-        }
-        #hero.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* ── Glitch wordmark ──────────────────────────────── */
-        .wordmark-wrap { position: relative; margin-bottom: 1.5rem; }
-        .wordmark {
-            font-family: 'VT323', monospace;
-            font-size: clamp(2.625rem, 12vw, 6.75rem);
-            letter-spacing: 0.04em;
-            color: #fff;
-            text-transform: uppercase;
-            line-height: 1;
-            position: relative;
-            display: inline-block;
-            animation: glitchIdle 6s infinite;
-        }
-        .wordmark::before, .wordmark::after {
-            content: 'SHIFTGLITCH';
-            position: absolute; inset: 0;
-            font-family: 'VT323', monospace;
-            font-size: inherit;
-            letter-spacing: inherit;
-            line-height: inherit;
-            text-transform: uppercase;
-        }
-        .wordmark::before {
-            color: var(--magenta);
-            animation: glitchBefore 6s infinite;
-            clip-path: polygon(0 30%, 100% 30%, 100% 50%, 0 50%);
-        }
-        .wordmark::after {
-            color: var(--green);
-            animation: glitchAfter 6s infinite;
-            clip-path: polygon(0 60%, 100% 60%, 100% 75%, 0 75%);
-        }
-        @keyframes glitchIdle {
-            0%, 90%, 100% { transform: translate(0); text-shadow: none; }
-            91%  { transform: translate(-2px, 1px); text-shadow: 2px 0 var(--magenta), -2px 0 var(--green); }
-            92%  { transform: translate(2px, -1px); text-shadow: -2px 0 var(--magenta), 2px 0 var(--green); }
-            93%  { transform: translate(0, 2px); text-shadow: 0 0 8px var(--green); }
-            94%  { transform: translate(-1px, -2px); text-shadow: 1px 0 var(--magenta); }
-            95%  { transform: translate(0); text-shadow: none; }
-            96%  { transform: translate(3px, 1px); text-shadow: -3px 0 var(--magenta), 3px 0 var(--green); }
-            97%  { transform: translate(-3px, -1px); }
-            98%  { transform: translate(0); text-shadow: 0 0 20px rgba(57,255,20,0.3); }
-        }
-        @keyframes glitchBefore {
-            0%, 90%, 100% { opacity: 0; transform: translate(0); }
-            91% { opacity: 0.7; transform: translate(-3px, 0); }
-            93% { opacity: 0.4; transform: translate(3px, 1px); }
-            95% { opacity: 0; }
-            96% { opacity: 0.6; transform: translate(-2px, -1px); }
-            98% { opacity: 0; }
-        }
-        @keyframes glitchAfter {
-            0%, 90%, 100% { opacity: 0; transform: translate(0); }
-            92% { opacity: 0.5; transform: translate(3px, 0); }
-            94% { opacity: 0.3; transform: translate(-3px, 2px); }
-            95% { opacity: 0; }
-            97% { opacity: 0.5; transform: translate(2px, -1px); }
-            98% { opacity: 0; }
-        }
-
-        .main-slogan {
-            font-family: 'Share Tech Mono', monospace;
-            font-size: clamp(1.1rem, 4vw, 1.65rem);
-            color: var(--green);
-            letter-spacing: 0.04em;
-            margin-bottom: 1.5rem;
-            text-shadow: 0 0 24px rgba(57,255,20,0.4);
-        }
-        .secondary-slogan-wrap {
-            height: 1.8em;
-            overflow: hidden;
-            margin-bottom: 0.5rem;
-            position: relative;
-        }
-        .secondary-slogan {
-            font-family: 'Share Tech Mono', monospace;
-            font-size: clamp(1rem, 3vw, 1.1rem);
-            color: rgba(57,255,20,0.6);
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            position: absolute; width: 100%; left: 0;
-            opacity: 0;
-            transition: opacity 0.5s ease, transform 0.5s ease;
-            transform: translateY(12px);
-        }
-        .secondary-slogan.active { opacity: 1; transform: translateY(0); }
-
-        .cta-wrap { width: 100%; max-width: 420px; }
-        .cta-btn {
-            display: block; width: 100%;
-            padding: 1.1rem 2rem;
-            font-family: 'Share Tech Mono', monospace;
-            font-size: clamp(0.9rem, 3vw, 1.1rem);
-            font-weight: bold; letter-spacing: 0.18em; text-transform: uppercase;
-            text-decoration: none; color: var(--magenta);
-            background: transparent;
-            border: 2px solid var(--magenta);
-            cursor: pointer; position: relative; overflow: hidden;
-            transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
-            box-shadow: 0 0 18px rgba(255,0,255,0.2), inset 0 0 18px rgba(255,0,255,0.04);
-            animation: ctaPulse 3s ease-in-out infinite;
-        }
-        .cta-btn:hover {
-            background: rgba(255,0,255,0.1); color: #fff;
-            box-shadow: 0 0 40px rgba(255,0,255,0.5), inset 0 0 20px rgba(255,0,255,0.08);
-            animation: none;
-        }
-        @keyframes ctaPulse {
-            0%, 100% { box-shadow: 0 0 18px rgba(255,0,255,0.2), inset 0 0 18px rgba(255,0,255,0.04); }
-            50% { box-shadow: 0 0 32px rgba(255,0,255,0.38), inset 0 0 24px rgba(255,0,255,0.07); }
-        }
-
-        .scroll-hint {
-            margin-top: 3rem;
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 0.95rem;
-            color: rgba(57,255,20,0.45);
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            animation: scrollBlink 2s ease-in-out infinite;
-        }
-        @keyframes scrollBlink {
-            0%, 100% { opacity: 0.4; }
-            50% { opacity: 1; }
-        }
-
-        /* ── Section shared styles ────────────────────────── */
-        .section {
-            position: relative;
-            z-index: 10;
-            padding: 5rem 1.25rem;
-            max-width: 1100px;
-            margin: 0 auto;
-        }
-        .section-label {
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 1rem;
-            color: var(--green);
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            margin-bottom: 1rem;
-            opacity: 0.8;
-        }
-        .section-title {
-            font-family: 'VT323', monospace;
-            font-size: clamp(2.2rem, 7vw, 4rem);
-            color: #fff;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            line-height: 1.05;
-            margin-bottom: 1.5rem;
-        }
-        .section-body {
-            font-size: clamp(1rem, 3vw, 1.15rem);
-            color: #bbb;
-            line-height: 1.85;
-            max-width: 680px;
-        }
-        .divider {
-            width: 100%;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(57,255,20,0.15), transparent);
-            margin: 0 auto;
-        }
-
-        /* ── What Is Section ──────────────────────────────── */
-        #what-is {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4rem;
-            align-items: center;
-        }
-        @media (max-width: 700px) {
-            #what-is { grid-template-columns: 1fr; gap: 2rem; }
-        }
-
-        /* ── Mobile 360px pass ────────────────────────────── */
-        @media (max-width: 400px) {
-            .section { padding: 4rem 1rem; }
-            .section-label { font-size: 0.95rem; letter-spacing: 0.1em; }
-            .tools-grid { grid-template-columns: 1fr; }
-            .tool-card { padding: 1.5rem 1.25rem; }
-            .stat-box { padding: 1.5rem 1.25rem; }
-            .scroll-hint { font-size: 0.95rem; }
-            .rank-name { font-size: 0.95rem; }
-        }
-        .not-list {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-            margin-top: 2rem;
-        }
-        .not-list li {
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 1rem;
-            letter-spacing: 0.06em;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-        .not-list .no {
-            color: rgba(255,0,255,0.5);
-        }
-        .not-list .yes {
-            color: rgba(57,255,20,0.8);
-        }
-        .stat-box {
-            border: 1px solid rgba(57,255,20,0.15);
-            padding: 2rem;
-            background: rgba(57,255,20,0.02);
-            position: relative;
-        }
-        .stat-box::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--green), transparent);
-        }
-        .stat-number {
-            font-family: 'VT323', monospace;
-            font-size: 4rem;
-            color: var(--green);
-            text-shadow: 0 0 30px rgba(57,255,20,0.3);
-            line-height: 1;
-            margin-bottom: 0.5rem;
-        }
-        .stat-label {
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 0.95rem;
-            color: rgba(57,255,20,0.75);
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            line-height: 1.6;
-        }
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-
-        /* ── Tools Section ────────────────────────────────── */
-        .tools-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.25rem;
-            margin-top: 3rem;
-        }
-        .tool-card {
-            border: 1px solid rgba(255,255,255,0.06);
-            padding: 1.75rem;
-            background: rgba(255,255,255,0.015);
-            position: relative;
-            transition: border-color 0.2s ease, background 0.2s ease;
-        }
-        .tool-card:hover {
-            border-color: rgba(57,255,20,0.2);
-            background: rgba(57,255,20,0.025);
-        }
-        .tool-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0;
-            width: 2px; height: 100%;
-            background: var(--green);
-            opacity: 0;
-            transition: opacity 0.2s ease;
-        }
-        .tool-card:hover::before { opacity: 0.4; }
-        .tool-tag {
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 0.95rem;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-            color: var(--green);
-            opacity: 0.8;
-            margin-bottom: 0.75rem;
-        }
-        .tool-name {
-            font-family: 'VT323', monospace;
-            font-size: 1.65rem;
-            color: #fff;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 0.75rem;
-        }
-        .tool-desc {
-            font-size: 1rem;
-            color: #aaa;
-            line-height: 1.75;
-        }
-        .tool-science {
-            margin-top: 1rem;
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 0.95rem;
-            color: rgba(255,0,255,0.7);
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-        }
-
-        /* ── Science Section ──────────────────────────────── */
-        #science {
-            text-align: center;
-        }
-        #science .section-body {
-            margin: 0 auto 3rem;
-        }
-        .curve-bar-wrap {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        .curve-label {
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 0.95rem;
-            color: rgba(255,255,255,0.7);
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            text-align: left;
-            margin-bottom: 0.35rem;
-        }
-        .curve-bar {
-            height: 3px;
-            border-radius: 2px;
-            position: relative;
-        }
-        .curve-bar.passive { background: linear-gradient(90deg, #FF3333 60%, transparent 100%); width: 95%; }
-        .curve-bar.active  { background: linear-gradient(90deg, var(--green) 90%, transparent 100%); width: 90%; }
-        .curve-bar-row {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-        .curve-bar-row span {
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 0.95rem;
-            white-space: nowrap;
-        }
-        .curve-bar-row.passive span { color: #FF3333; }
-        .curve-bar-row.active  span { color: var(--green); }
-
-        /* ── Ranks Section ────────────────────────────────── */
-        #ranks {
-            text-align: center;
-        }
-        .ranks-row {
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            gap: 0;
-            margin-top: 3rem;
-            flex-wrap: wrap;
-        }
-        .rank-step {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.5rem;
-            min-width: 110px;
-            flex: 1;
-            max-width: 180px;
-            padding: 1.5rem 0.5rem;
-            position: relative;
-        }
-        .rank-step::after {
-            content: '→';
-            position: absolute;
-            right: -12px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-family: 'Share Tech Mono', monospace;
-            color: rgba(255,255,255,0.12);
-            font-size: 1.2rem;
-        }
-        .rank-step:last-child::after { display: none; }
-        .rank-icon {
-            font-family: 'VT323', monospace;
-            font-size: 2.5rem;
-            line-height: 1;
-        }
-        .rank-name {
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 0.82rem;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-        }
-        .rank-step:nth-child(1) .rank-icon { color: #444; }
-        .rank-step:nth-child(2) .rank-icon { color: #3a7a3a; }
-        .rank-step:nth-child(3) .rank-icon { color: var(--purple); }
-        .rank-step:nth-child(4) .rank-icon { color: var(--green); text-shadow: 0 0 20px rgba(57,255,20,0.5); }
-        .rank-step:nth-child(5) .rank-icon { color: var(--magenta); text-shadow: 0 0 20px rgba(255,0,255,0.5); }
-        .rank-step:nth-child(1) .rank-name { color: #444; }
-        .rank-step:nth-child(2) .rank-name { color: #3a7a3a; }
-        .rank-step:nth-child(3) .rank-name { color: var(--purple); }
-        .rank-step:nth-child(4) .rank-name { color: var(--green); }
-        .rank-step:nth-child(5) .rank-name { color: var(--magenta); }
-
-        /* ── Schools Section ──────────────────────────────── */
-        #schools {
-            border: 1px solid rgba(138,43,226,0.2);
-            background: rgba(138,43,226,0.03);
-            position: relative;
-        }
-        #schools::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, var(--purple), transparent);
-        }
-        #schools .section-title { color: var(--purple); }
-        .school-btn {
-            display: inline-block;
-            margin-top: 2rem;
-            padding: 1rem 2.5rem;
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 0.85rem;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            text-decoration: none;
-            color: var(--purple);
-            border: 1px solid var(--purple);
-            transition: background 0.2s ease, box-shadow 0.2s ease;
-        }
-        .school-btn:hover {
-            background: rgba(138,43,226,0.1);
-            box-shadow: 0 0 30px rgba(138,43,226,0.3);
-        }
-
-        /* ── Final CTA Section ────────────────────────────── */
-        #final-cta {
-            text-align: center;
-            padding-bottom: 8rem;
-        }
-        .final-cta-btn {
-            display: inline-block;
-            margin-top: 2rem;
-            padding: 1.25rem 3.5rem;
-            font-family: 'Share Tech Mono', monospace;
-            font-size: clamp(0.9rem, 3vw, 1.1rem);
-            font-weight: bold; letter-spacing: 0.18em; text-transform: uppercase;
-            text-decoration: none;
-            color: #000;
-            background: var(--green);
-            border: 2px solid var(--green);
-            transition: box-shadow 0.2s ease, transform 0.1s ease;
-            box-shadow: 0 0 40px rgba(57,255,20,0.4);
-        }
-        .final-cta-btn:hover {
-            box-shadow: 0 0 70px rgba(57,255,20,0.65);
-            transform: translateY(-2px);
-        }
-        .cta-sub-links {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin-top: 1.5rem;
-            flex-wrap: wrap;
-        }
-        .cta-sub-link {
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 0.8rem;
-            color: rgba(255,255,255,0.35);
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            text-decoration: none;
-            transition: color 0.2s ease;
-        }
-        .cta-sub-link:hover { color: rgba(255,255,255,0.6); }
-    </style>
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+    .cursor { animation:blink 1s step-end infinite; display:inline-block; width:8px; height:16px; background:#39FF14; vertical-align:middle; margin-left:2px; }
+    .tool-card  { border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.02); transition:background 0.2s; }
+    .tool-card:hover { background:rgba(255,255,255,0.04); }
+    .rank-card  { border:1px solid rgba(255,255,255,0.08); border-top-width:2px; background:rgba(255,255,255,0.02); transition:background 0.2s; }
+    .rank-card:hover { background:rgba(255,255,255,0.04); }
+    .ev-track   { flex:1; height:3px; background:rgba(255,255,255,0.1); }
+    .ev-fill    { height:100%; }
+    .plan-card-promo { border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.02); }
+    .plan-card-promo.featured { border-color:#39FF14; background:rgba(57,255,20,0.04); }
+    .cta-primary { display:inline-block; padding:0.85rem 2.5rem; background:#39FF14; color:#000; font-family:'Share Tech Mono',monospace; font-size:0.85rem; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; text-decoration:none; transition:all 0.2s; cursor:pointer; }
+    .cta-primary:hover { background:#fff; box-shadow:0 0 30px rgba(57,255,20,0.4); }
+    .cta-outline { display:inline-block; padding:0.85rem 2.5rem; border:1px solid #39FF14; color:#39FF14; font-family:'Share Tech Mono',monospace; font-size:0.85rem; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; text-decoration:none; transition:all 0.2s; }
+    .cta-outline:hover { background:#39FF14; color:#000; }
+    .waitlist-input { width:100%; padding:0.85rem 1.25rem; background:rgba(255,255,255,0.04); border:1px solid rgba(57,255,20,0.3); color:#fff; font-family:'Share Tech Mono',monospace; font-size:0.85rem; outline:none; transition:border-color 0.2s; }
+    .waitlist-input:focus { border-color:#39FF14; }
+    .waitlist-input::placeholder { color:rgba(255,255,255,0.3); }
+    #toast { position:fixed; bottom:2rem; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.95); border:1px solid #39FF14; color:#39FF14; font-family:'Share Tech Mono',monospace; font-size:0.8rem; padding:0.75rem 1.5rem; z-index:9999; opacity:0; transition:opacity 0.3s; letter-spacing:0.05em; white-space:nowrap; }
+    #toast.show { opacity:1; }
+    #mobile-nav { display:none; }
+    #mobile-nav.open { display:block; }
+    @media(max-width:767px) { .hero-headline,.section-headline { font-size:3rem !important; } }
+  </style>
 </head>
 <body>
 
-    <div class="orb orb-green"></div>
-    <div class="orb orb-magenta"></div>
-    <div class="orb orb-purple"></div>
-
-    <!-- Boot screen -->
-    <div id="boot-screen">
-        <div id="boot-log"></div>
+<!-- NAV -->
+<nav class="site-nav" id="main-nav">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
+    <a href="/"><img src="/public/brand/logo.jpg" alt="ShiftGlitch" class="h-10 w-auto"></a>
+    <div class="hidden md:flex items-center gap-8">
+      <a href="#the-problem" class="font-mono-sg text-xs tracking-widest text-white/60 hover:text-[#39FF14] transition-colors uppercase">The Problem</a>
+      <a href="#features"    class="font-mono-sg text-xs tracking-widest text-white/60 hover:text-[#39FF14] transition-colors uppercase">Tools</a>
+      <a href="#ranks"       class="font-mono-sg text-xs tracking-widest text-white/60 hover:text-[#39FF14] transition-colors uppercase">Ranks</a>
+      <a href="#pricing"     class="font-mono-sg text-xs tracking-widest text-white/60 hover:text-[#39FF14] transition-colors uppercase">Pricing</a>
     </div>
-
-    <!-- ── HERO ──────────────────────────────────────────── -->
-    <section id="hero" aria-label="ShiftGlitch hero">
-        <!-- Cyberpunk mainframe scene -->
-        <img
-            src="/public/brand/hero-main.jpg"
-            alt="ShiftGlitch Mainframe — cyberpunk setup with neon green monitor"
-            style="display:block;width:100%;max-width:560px;margin:1.5rem auto 0;border-radius:6px;border:1px solid rgba(57,255,20,0.18);box-shadow:0 0 60px rgba(57,255,20,0.1),0 0 120px rgba(255,0,255,0.05);"
-        >
-        <div class="secondary-slogan-wrap" aria-live="polite" style="margin-top:1.25rem;">
-            <span class="secondary-slogan active" id="ss-0">AFK farming your GPA.</span>
-            <span class="secondary-slogan" id="ss-1">NPC → System Admin. Your speedrun.</span>
-            <span class="secondary-slogan" id="ss-2">The exploit the school board doesn't want you to find.</span>
-            <span class="secondary-slogan" id="ss-3">Zero psychic damage. Infinite aura.</span>
-        </div>
-        <p style="font-family:'Space Grotesk',sans-serif;font-size:clamp(1rem,2.5vw,1.2rem);color:rgba(255,255,255,0.75);max-width:560px;margin:0.75rem auto 0;line-height:1.7;text-align:center;">
-            ShiftGlitch teaches you <strong style="color:#39FF14;">how to actually learn</strong> — using the methods that work. 
-            Flashcards, focus timers, active recall, knowledge diagnostics. 
-            Jack in, run the exploits, rank up. <strong style="color:#FF00FF;">Free to use.</strong>
-        </p>
-        <div class="cta-wrap" style="margin-top:2rem;">
-            <a href="/login" class="cta-btn">JACK IN — It's Free</a>
-        </div>
-        <p style="margin-top:1rem;font-family:'Share Tech Mono',monospace;font-size:0.9rem;color:rgba(57,255,20,0.5);">
-            ↓ scroll down to see what's inside ↓
-        </p>
-    </section>
-
-    <div class="divider"></div>
-
-    <!-- ── WHAT IS SHIFTGLITCH ─────────────────────────── -->
-    <div class="section" id="what-is" aria-label="What is ShiftGlitch">
-        <div>
-            <p class="section-label">// system.identify</p>
-            <h2 class="section-title">Not a quiz game.<br>A study OS.</h2>
-            <p class="section-body">
-                Every study app on your phone is a slot machine with a loading bar.
-                Points for opening it. Streaks for not quitting. XP for doing literally anything.
-                None of it is revision. None of it makes you remember anything.
-            </p>
-            <p class="section-body" style="margin-top:1rem;">
-                ShiftGlitch is different. Every tool inside it is built around one question:
-                <em style="color:rgba(57,255,20,0.7);">what does the science say actually works?</em>
-                That question has been answered. The answer is spaced repetition, active recall, and deliberate practice.
-                We built the tools around the answers.
-            </p>
-            <ul class="not-list" aria-label="What ShiftGlitch is and isn't">
-                <li><span class="no">✕</span> Not a gamified points machine</li>
-                <li><span class="no">✕</span> Not a passive note-reading tool</li>
-                <li><span class="no">✕</span> Not another flashcard clone with ads</li>
-                <li><span class="yes">✓</span> A full study operating system</li>
-                <li><span class="yes">✓</span> Built on peer-reviewed learning science</li>
-                <li><span class="yes">✓</span> Designed for high school and college students</li>
-            </ul>
-        </div>
-        <div class="stats-grid" aria-label="Learning science stats">
-            <div class="stat-box">
-                <div class="stat-number">70%</div>
-                <div class="stat-label">of new information is forgotten within 24 hours without active review — Ebbinghaus, 1885</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-number">50%</div>
-                <div class="stat-label">more retained after one week by students using active recall vs. re-reading — Roediger &amp; Karpicke, 2006</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-number">5×</div>
-                <div class="stat-label">more durable memories formed through spaced repetition vs. massed study sessions</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-number">Free</div>
-                <div class="stat-label">core tools. No credit card. No ads. No catch. Just revision that works.</div>
-            </div>
-        </div>
+    <div class="flex items-center gap-3">
+      <a href="/login" class="cta-outline hidden md:inline-block" style="padding:0.5rem 1.25rem;font-size:0.75rem;">Enter the Mainframe</a>
+      <button class="md:hidden text-white/60 p-2" onclick="document.getElementById('mobile-nav').classList.toggle('open')" aria-label="Menu">
+        <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
     </div>
+  </div>
+  <div id="mobile-nav" class="bg-black border-t border-[#39FF14]/20 px-4 py-4 space-y-3">
+    <a href="#the-problem" class="block font-mono-sg text-xs tracking-widest text-white/60 uppercase py-2" onclick="document.getElementById('mobile-nav').classList.remove('open')">The Problem</a>
+    <a href="#features"    class="block font-mono-sg text-xs tracking-widest text-white/60 uppercase py-2" onclick="document.getElementById('mobile-nav').classList.remove('open')">Tools</a>
+    <a href="#ranks"       class="block font-mono-sg text-xs tracking-widest text-white/60 uppercase py-2" onclick="document.getElementById('mobile-nav').classList.remove('open')">Ranks</a>
+    <a href="#pricing"     class="block font-mono-sg text-xs tracking-widest text-white/60 uppercase py-2" onclick="document.getElementById('mobile-nav').classList.remove('open')">Pricing</a>
+    <a href="/login" class="cta-primary block text-center mt-2">Enter the Mainframe</a>
+  </div>
+</nav>
 
-    <div class="divider"></div>
-
-    <!-- ── TOOLS ───────────────────────────────────────── -->
-    <div class="section" aria-label="ShiftGlitch study tools">
-        <p class="section-label">// modules.list</p>
-        <h2 class="section-title">The Tools</h2>
-        <p class="section-body">
-            Six study modules. Each one grounded in a different branch of cognitive science.
-            Each one designed to make your revision actually stick.
-        </p>
-        <div class="tools-grid" role="list">
-            <article class="tool-card" role="listitem">
-                <div class="tool-tag">// module_01</div>
-                <div class="tool-name">Leitner Flashcards</div>
-                <p class="tool-desc">
-                    Spaced repetition done properly. Cards are sorted into five orbital boxes based on how well you know them.
-                    The system decides what to review and when — focusing your time where it actually matters.
-                </p>
-                <div class="tool-science">Science: spacing effect · Leitner System · Ebbinghaus forgetting curve</div>
-            </article>
-            <article class="tool-card" role="listitem">
-                <div class="tool-tag">// module_02</div>
-                <div class="tool-name">Focus Governor</div>
-                <p class="tool-desc">
-                    A Pomodoro timer with an enforcement layer. Choose your session length, choose your intensity level,
-                    and commit to deep work. The Governor prevents shallow repetition by tracking what you actually do.
-                </p>
-                <div class="tool-science">Science: Pomodoro Technique · deliberate practice · attention research</div>
-            </article>
-            <article class="tool-card" role="listitem">
-                <div class="tool-tag">// module_03</div>
-                <div class="tool-name">Blurting Engine</div>
-                <p class="tool-desc">
-                    Write down everything you know about a topic from memory. No notes. No prompts. Pure retrieval.
-                    Then compare your blurt against your notes and see exactly where your gaps are.
-                </p>
-                <div class="tool-science">Science: testing effect · retrieval practice · metacognition</div>
-            </article>
-            <article class="tool-card" role="listitem">
-                <div class="tool-tag">// module_04</div>
-                <div class="tool-name">Diagnostic MCQ</div>
-                <p class="tool-desc">
-                    Knowledge gap detection. Multiple-choice questions that identify exactly what you think you know
-                    versus what you actually know. Brutal. Honest. Necessary.
-                </p>
-                <div class="tool-science">Science: diagnostic assessment · confidence calibration</div>
-            </article>
-            <article class="tool-card" role="listitem">
-                <div class="tool-tag">// module_05 · pro</div>
-                <div class="tool-name">Mission Architect</div>
-                <p class="tool-desc">
-                    AI-powered study planning. Tell the system your subjects, your exam dates, and your weak areas.
-                    It generates a structured revision schedule built on the same principles as the rest of the platform.
-                </p>
-                <div class="tool-science">Powered by Google Gemini · Pro feature</div>
-            </article>
-            <article class="tool-card" role="listitem">
-                <div class="tool-tag">// module_06</div>
-                <div class="tool-name">Progress Intel</div>
-                <p class="tool-desc">
-                    Your study habits tracked and visualised. Streaks, focus scores, cards mastered, blurts completed.
-                    A real record of whether you are doing the right things — not just the easy ones.
-                </p>
-                <div class="tool-science">Science: habit formation · progress monitoring · motivation research</div>
-            </article>
-        </div>
+<!-- HERO -->
+<section class="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-black">
+  <div class="absolute inset-0 z-0">
+    <img src="/public/brand/hero-main.jpg" alt="" class="w-full h-full object-cover opacity-20">
+    <div class="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/90"></div>
+  </div>
+  <div class="absolute inset-0 z-10 scanlines opacity-25 pointer-events-none"></div>
+  <div class="absolute inset-0 z-10 hero-grid pointer-events-none"></div>
+  <div class="relative z-20 max-w-5xl mx-auto px-4 sm:px-6 text-center pt-28 pb-16">
+    <div class="terminal-border bg-black/80 p-4 mb-10 text-left max-w-xl mx-auto">
+      <div id="boot-lines"></div>
+      <span class="cursor" id="boot-cursor"></span>
     </div>
-
-    <div class="divider"></div>
-
-    <!-- ── SCIENCE ─────────────────────────────────────── -->
-    <div class="section" id="science" aria-label="The science behind ShiftGlitch">
-        <p class="section-label">// research.base</p>
-        <h2 class="section-title">Built on the evidence,<br>not the vibe.</h2>
-        <p class="section-body">
-            Passive re-reading feels productive. That is the problem. Familiarity is not the same as memory.
-            The research on this is unambiguous — students who reread their notes consistently underperform
-            students who test themselves, even when the rereaders spend more time studying.
-        </p>
-        <p class="section-body" style="margin-top:1rem;">
-            ShiftGlitch implements the techniques that the evidence actually supports.
-            Below is what happens to a memory over time — with and without active review.
-        </p>
-        <div class="curve-bar-wrap" aria-label="Forgetting curve comparison" style="margin-top:2.5rem;">
-            <div class="curve-label">Memory retention after one week:</div>
-            <div class="curve-bar-row passive">
-                <div class="curve-bar passive" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
-                <span>Passive re-reading: ~20%</span>
-            </div>
-            <div class="curve-bar-row active">
-                <div class="curve-bar active" role="progressbar" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"></div>
-                <span>Active recall (ShiftGlitch): ~70%</span>
-            </div>
-        </div>
+    <div class="flex justify-center mb-10">
+      <img src="/public/brand/logo-tagline.jpg" alt="ShiftGlitch — Grades and Aura Fall Up" class="w-full max-w-xl">
     </div>
-
-    <div class="divider"></div>
-
-    <!-- ── RANKS ───────────────────────────────────────── -->
-    <div class="section" id="ranks" aria-label="ShiftGlitch rank progression system">
-        <p class="section-label">// rank.progression — your escape route</p>
-        <h2 class="section-title">The Mainframe has<br>five security levels.</h2>
-        <p class="section-body" style="margin:0 auto;">
-            You enter the Mainframe as an <strong style="color:#fff;">NPC</strong> — the system controls you. 
-            Exams stress you out. Deadlines sneak up. You don't know how to study properly.
-            <br><br>
-            Your mission is to earn clearance by <strong style="color:#39FF14;">actually studying</strong> — 
-            focus sessions, flashcards, recall practice, diagnostics. 
-            Each rank is proven by what you've done, not by time in the app.
-            When you reach <strong style="color:#FF00FF;">System Admin</strong>, the Mainframe can't hold you. 
-            You know how to learn anything. That's the goal.
-        </p>
-        <div class="ranks-row" role="list" aria-label="Rank levels">
-            <div class="rank-step" role="listitem">
-                <div class="rank-icon" aria-hidden="true">◈</div>
-                <div class="rank-name">NPC</div>
-            </div>
-            <div class="rank-step" role="listitem">
-                <div class="rank-icon" aria-hidden="true">◉</div>
-                <div class="rank-name">Script<br>Kiddie</div>
-            </div>
-            <div class="rank-step" role="listitem">
-                <div class="rank-icon" aria-hidden="true">⬡</div>
-                <div class="rank-name">Glitch<br>Tech</div>
-            </div>
-            <div class="rank-step" role="listitem">
-                <div class="rank-icon" aria-hidden="true">◬</div>
-                <div class="rank-name">Netrunner</div>
-            </div>
-            <div class="rank-step" role="listitem">
-                <div class="rank-icon" aria-hidden="true">✦</div>
-                <div class="rank-name">System<br>Admin</div>
-            </div>
-        </div>
+    <h1 class="font-display text-6xl sm:text-7xl lg:text-8xl text-white mb-4 leading-tight hero-headline">
+      THE STUDY APP BUILT ON THE
+      <span class="text-[#39FF14] glow-green block">EVIDENCE.</span>
+      <span class="text-white/30 text-3xl sm:text-4xl lg:text-5xl">NOT THE VIBE.</span>
+    </h1>
+    <p class="text-lg sm:text-xl text-white/70 max-w-2xl mx-auto mb-10 leading-relaxed">
+      Spaced repetition. Active recall. Deliberate practice.
+      <span class="text-[#39FF14]"> The methods that cognitive science has proven actually work.</span>
+      No passive rereading. No highlighting. No lies.
+    </p>
+    <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+      <a href="/login" class="cta-primary">Jack In — It's Free</a>
+      <a href="#the-problem" class="cta-outline">See the Evidence</a>
     </div>
+    <p class="font-mono-sg text-xs text-white/30 mt-8 tracking-widest">NO CREDIT CARD &nbsp;·&nbsp; NO TRIAL TIMER &nbsp;·&nbsp; NO BULLSHIT</p>
+  </div>
+</section>
 
-    <div class="divider"></div>
-
-    <!-- ── SCHOOLS ─────────────────────────────────────── -->
-    <div class="section" id="schools" aria-label="ShiftGlitch for schools">
-        <p class="section-label">// enterprise.access</p>
-        <h2 class="section-title">For schools.<br>For teachers.</h2>
-        <p class="section-body">
-            ShiftGlitch includes a Teacher Dashboard — a separate interface that lets educators view student study data,
-            track revision habits, and identify students who are at risk before exams arrive.
-            No student account required to access the dashboard. No setup. No delay.
-        </p>
-        <p class="section-body" style="margin-top:1rem;">
-            School licenses cover your entire institution. One payment, every student, full access.
-            Pricing information and institutional invoicing available on the pricing page.
-        </p>
-        <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:2rem;">
-            <a href="/teacher" class="school-btn">View Teacher Dashboard</a>
-            <a href="/pricing" class="school-btn" style="color:rgba(138,43,226,0.6);border-color:rgba(138,43,226,0.4);">School Pricing →</a>
+<!-- PROBLEM -->
+<section id="the-problem" class="py-24 sm:py-32 bg-black relative overflow-hidden">
+  <div class="absolute left-0 top-0 bottom-0 w-1 bg-[#FF00FF]"></div>
+  <div class="max-w-6xl mx-auto px-4 sm:px-6">
+    <div class="sector-label mb-4">// SYSTEM ALERT — MEMORY DEGRADATION DETECTED</div>
+    <div class="grid lg:grid-cols-2 gap-16 items-start">
+      <div>
+        <h2 class="font-display text-5xl sm:text-6xl section-headline text-white mb-6 leading-tight">
+          YOU'VE BEEN
+          <span class="text-[#FF00FF] glow-magenta block">STUDYING WRONG</span>
+          YOUR ENTIRE LIFE.
+        </h2>
+        <p class="text-white/70 leading-relaxed mb-6">Every year, millions of students sit down to study and do exactly the same thing: open their notes, read them through, close them again. Highlight in fluorescent colours. Reread the same pages the night before an exam.</p>
+        <p class="text-white/70 leading-relaxed mb-6">It does not work. The research on this is not ambiguous.</p>
+        <div class="terminal-border p-4 bg-[#39FF14]/5">
+          <p class="font-mono-sg text-sm text-[#39FF14] leading-relaxed">&gt; Hermann Ebbinghaus, 1885: humans forget roughly 70% of new information within 24 hours without active reinforcement. 140 years of cognitive science has refined that finding — but never overturned it.</p>
         </div>
+      </div>
+      <div class="space-y-6">
+        <div class="border border-white/10 p-6 bg-white/[0.02]">
+          <div class="font-display text-5xl mb-1 text-[#FF00FF]">70%</div>
+          <div class="font-mono-sg text-xs tracking-widest text-[#FF00FF] mb-3">FORGOTTEN IN 24 HOURS</div>
+          <p class="text-white/60 text-sm leading-relaxed">Without active reinforcement, most new memories are gone within a day. This is the Forgetting Curve — and rereading does nothing to stop it.</p>
+        </div>
+        <div class="border border-white/10 p-6 bg-white/[0.02]">
+          <div class="font-display text-5xl mb-1 text-[#39FF14]">50%</div>
+          <div class="font-mono-sg text-xs tracking-widest text-[#39FF14] mb-3">MORE RETAINED WITH TESTING</div>
+          <p class="text-white/60 text-sm leading-relaxed">Roediger &amp; Karpicke (2006): students who tested themselves retained 50% more after one week than those who reread. Testing is not assessment. It is the most powerful learning method known.</p>
+        </div>
+        <div class="border border-white/10 p-6 bg-white/[0.02]">
+          <div class="font-display text-5xl mb-1 text-[#8A2BE2]">10×</div>
+          <div class="font-mono-sg text-xs tracking-widest text-[#8A2BE2] mb-3">MORE EFFECTIVE WITH SPACING</div>
+          <p class="text-white/60 text-sm leading-relaxed">Distributed practice over days and weeks produces dramatically stronger retention than cramming. The timing of study matters as much as the amount.</p>
+        </div>
+      </div>
     </div>
+  </div>
+</section>
 
-    <div class="divider"></div>
-
-    <!-- ── PARENT SECTION ───────────────────────────────── -->
-    <div class="section" style="border:1px solid rgba(138,43,226,0.25);background:rgba(138,43,226,0.04);" aria-label="For parents">
-        <p class="section-label" style="color:rgba(138,43,226,0.8);">// parent.briefing</p>
-        <h2 class="section-title" style="color:#8A2BE2;">For parents:<br>what is my child doing?</h2>
-        <p class="section-body">
-            ShiftGlitch is a <strong style="color:#fff;">study skills platform</strong> — not a game, not social media. 
-            It teaches your child the techniques that academic research proves lead to better exam results: 
-            spaced repetition, active recall, and focused practice.
-        </p>
-        <p class="section-body" style="margin-top:1rem;">
-            The cyberpunk theme makes studying feel engaging rather than like punishment. 
-            The rank system rewards <strong style="color:#fff;">real study habits</strong> — 
-            sessions completed, cards mastered, knowledge tested — not time spent scrolling.
-        </p>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-top:2rem;">
-            <div style="background:#0a0a0a;border:1px solid rgba(138,43,226,0.3);padding:1.25rem;">
-                <div style="color:#8A2BE2;font-family:'Share Tech Mono',monospace;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.5rem;">What they learn</div>
-                <p style="color:#ccc;font-size:0.95rem;line-height:1.6;">How to retain information using spaced repetition — the same method used by medical students worldwide.</p>
-            </div>
-            <div style="background:#0a0a0a;border:1px solid rgba(138,43,226,0.3);padding:1.25rem;">
-                <div style="color:#8A2BE2;font-family:'Share Tech Mono',monospace;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.5rem;">What they do</div>
-                <p style="color:#ccc;font-size:0.95rem;line-height:1.6;">Timed focus sessions, flashcard review, active recall writing, and knowledge gap tests — all tracked.</p>
-            </div>
-            <div style="background:#0a0a0a;border:1px solid rgba(138,43,226,0.3);padding:1.25rem;">
-                <div style="color:#8A2BE2;font-family:'Share Tech Mono',monospace;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.5rem;">What it costs</div>
-                <p style="color:#ccc;font-size:0.95rem;line-height:1.6;">Core tools are <strong style="color:#39FF14;">completely free</strong>. Pro features start at R99/month — less than one private tutoring session.</p>
-            </div>
-        </div>
-        <div style="text-align:center;margin-top:2rem;">
-            <a href="/pricing" style="font-family:'Share Tech Mono',monospace;font-size:0.9rem;color:#8A2BE2;border:1px solid rgba(138,43,226,0.4);padding:0.75rem 2rem;text-decoration:none;display:inline-block;letter-spacing:0.12em;text-transform:uppercase;">View Pricing →</a>
-        </div>
+<!-- FEATURES -->
+<section id="features" class="py-24 sm:py-32 bg-black relative overflow-hidden">
+  <div class="absolute right-0 top-0 bottom-0 w-1 bg-[#39FF14]"></div>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6">
+    <div class="sector-label mb-4">// COGNITIVE EXPLOIT MODULES — LOADED</div>
+    <div class="mb-16">
+      <h2 class="font-display text-5xl sm:text-6xl section-headline text-white mb-4 leading-tight">
+        EIGHT TOOLS.
+        <span class="text-[#39FF14] glow-green"> ALL GROUNDED IN</span>
+        <span class="block">PEER-REVIEWED SCIENCE.</span>
+      </h2>
+      <p class="text-white/60 max-w-2xl font-mono-sg text-sm">Every tool is a structured implementation of a known learning method. Students are not just given a timer. They are given a framework.</p>
     </div>
-
-    <div class="divider"></div>
-
-    <!-- ── FINAL CTA ────────────────────────────────────── -->
-    <div class="section" id="final-cta" aria-label="Join ShiftGlitch">
-        <p class="section-label">// jack.in — free to start</p>
-        <h2 class="section-title">Ready to escape<br>the Mainframe?</h2>
-        <p class="section-body" style="margin:0 auto 0.5rem;">
-            Create a free account. No credit card required. 
-            Access all core study tools immediately — flashcards, focus timer, active recall, diagnostics. 
-            Start as an NPC. Work toward System Admin.
-        </p>
-        <a href="/login" class="final-cta-btn">JACK IN — It's Free</a>
-        <div class="cta-sub-links">
-            <a href="/more-info" class="cta-sub-link">How it works →</a>
-            <a href="/pricing" class="cta-sub-link">Pro features &amp; pricing →</a>
-            <a href="/teacher" class="cta-sub-link">I'm a teacher / school →</a>
-        </div>
+    <div class="grid md:grid-cols-2 xl:grid-cols-4 gap-4">
+      <div class="tool-card p-5">
+        <div class="flex items-start justify-between mb-3"><span class="font-display text-3xl text-[#39FF14]">01</span><span class="font-mono-sg text-xs px-2 py-0.5 border border-[#39FF14] text-[#39FF14]">FREE</span></div>
+        <div class="font-mono-sg text-xs tracking-widest mb-1 text-[#39FF14]">POMODORO ENGINE</div>
+        <div class="font-display text-xl text-white mb-3">Learning Governor</div>
+        <div class="font-mono-sg text-xs text-white/30 mb-3 pb-3 border-b border-white/10">SCIENCE: Pomodoro Technique + Deliberate Practice</div>
+        <p class="text-white/60 text-xs leading-relaxed">25-minute focused sessions. Subject tagging. Phone-lock nudge. After 4 consecutive same-domain sessions the Governor blocks you and forces a breakdown. Every session earns rank evidence.</p>
+      </div>
+      <div class="tool-card p-5">
+        <div class="flex items-start justify-between mb-3"><span class="font-display text-3xl text-[#39FF14]">02</span><span class="font-mono-sg text-xs px-2 py-0.5 border border-[#39FF14] text-[#39FF14]">FREE</span></div>
+        <div class="font-mono-sg text-xs tracking-widest mb-1 text-[#39FF14]">DATA SHARDS — LEITNER SYSTEM</div>
+        <div class="font-display text-xl text-white mb-3">Flashcard Decks</div>
+        <div class="font-mono-sg text-xs text-white/30 mb-3 pb-3 border-b border-white/10">SCIENCE: Spaced Repetition — Leitner 5-Box Method</div>
+        <p class="text-white/60 text-xs leading-relaxed">A full implementation of the Leitner System — cards sorted into 5 boxes by retention level. Visual orbit indicators show memory stability. Cards that advance count as rank evidence.</p>
+      </div>
+      <div class="tool-card p-5">
+        <div class="flex items-start justify-between mb-3"><span class="font-display text-3xl text-[#FF00FF]">03</span><span class="font-mono-sg text-xs px-2 py-0.5 border border-[#FF00FF] text-[#FF00FF]">FREE</span></div>
+        <div class="font-mono-sg text-xs tracking-widest mb-1 text-[#FF00FF]">BRAINDUMP PROTOCOL</div>
+        <div class="font-display text-xl text-white mb-3">Blurting Method</div>
+        <div class="font-mono-sg text-xs text-white/30 mb-3 pb-3 border-b border-white/10">SCIENCE: Active Recall — Testing Effect (Roediger &amp; Karpicke, 2006)</div>
+        <p class="text-white/60 text-xs leading-relaxed">4-phase guided active recall. Write everything from memory. Read your notes. Write again. Compare. Confront exactly what you do and don't know. The most honest study method available.</p>
+      </div>
+      <div class="tool-card p-5">
+        <div class="flex items-start justify-between mb-3"><span class="font-display text-3xl text-[#FF00FF]">04</span><span class="font-mono-sg text-xs px-2 py-0.5 border border-[#FF00FF] text-[#FF00FF]">FREE</span></div>
+        <div class="font-mono-sg text-xs tracking-widest mb-1 text-[#FF00FF]">MCQ DIAGNOSTIC MISSIONS</div>
+        <div class="font-display text-xl text-white mb-3">Boss Fights</div>
+        <div class="font-mono-sg text-xs text-white/30 mb-3 pb-3 border-b border-white/10">SCIENCE: Retrieval Practice — Forced Recall Under Pressure</div>
+        <p class="text-white/60 text-xs leading-relaxed">100-question MCQ knowledge assessment across 5 missions. Every question tied to real learning science. Surfaces knowledge gaps directly. Each submission counts as rank evidence.</p>
+      </div>
+      <div class="tool-card p-5">
+        <div class="flex items-start justify-between mb-3"><span class="font-display text-3xl text-[#8A2BE2]">05</span><span class="font-mono-sg text-xs px-2 py-0.5 border border-[#8A2BE2] text-[#8A2BE2]">FREE</span></div>
+        <div class="font-mono-sg text-xs tracking-widest mb-1 text-[#8A2BE2]">FEYNMAN TECHNIQUE MODULE</div>
+        <div class="font-display text-xl text-white mb-3">Babel Fish Lab</div>
+        <div class="font-mono-sg text-xs text-white/30 mb-3 pb-3 border-b border-white/10">SCIENCE: Feynman Technique — Explanation as Understanding Test</div>
+        <p class="text-white/60 text-xs leading-relaxed">If you cannot explain it simply, you do not understand it. Write a plain-language explanation as if teaching a 10-year-old. Add a rough sketch. The explanation reveals the gaps.</p>
+      </div>
+      <div class="tool-card p-5">
+        <div class="flex items-start justify-between mb-3"><span class="font-display text-3xl text-[#8A2BE2]">06</span><span class="font-mono-sg text-xs px-2 py-0.5 border border-[#8A2BE2] text-[#8A2BE2]">FREE</span></div>
+        <div class="font-mono-sg text-xs tracking-widest mb-1 text-[#8A2BE2]">REPEATABLE DOMAIN CLEARANCE</div>
+        <div class="font-display text-xl text-white mb-3">Escape Runs</div>
+        <div class="font-mono-sg text-xs text-white/30 mb-3 pb-3 border-b border-white/10">SCIENCE: Spaced Practice + Interleaving + Metacognition</div>
+        <p class="text-white/60 text-xs leading-relaxed">Name a knowledge domain. Run 6 ordered cognitive exploits in sequence. Achieve Domain Clearance. Reset and run again. The repeat mechanic is the point — second run is always deeper.</p>
+      </div>
+      <div class="tool-card p-5">
+        <div class="flex items-start justify-between mb-3"><span class="font-display text-3xl text-[#FF8800]">07</span><span class="font-mono-sg text-xs px-2 py-0.5 border border-[#FF8800] text-[#FF8800]">FREE</span></div>
+        <div class="font-mono-sg text-xs tracking-widest mb-1 text-[#FF8800]">DYNAMIC EVENT ENGINE</div>
+        <div class="font-display text-xl text-white mb-3">System INTERRUPT</div>
+        <div class="font-mono-sg text-xs text-white/30 mb-3 pb-3 border-b border-white/10">SCIENCE: Spaced Alerts — Forgetting Curve Enforcement</div>
+        <p class="text-white/60 text-xs leading-relaxed">The Mainframe fights back. Full-screen dramatic events fire when decks decay, when you go inactive, when you earn a rank promotion. The app feels alive. The Mainframe feels hostile.</p>
+      </div>
+      <div class="tool-card p-5">
+        <div class="flex items-start justify-between mb-3"><span class="font-display text-3xl text-[#FF8800]">08</span><span class="font-mono-sg text-xs px-2 py-0.5 border border-[#FF8800] text-[#FF8800]">FREE</span></div>
+        <div class="font-mono-sg text-xs tracking-widest mb-1 text-[#FF8800]">ADVERSARIAL CHARACTER SYSTEM</div>
+        <div class="font-display text-xl text-white mb-3">The Warden</div>
+        <div class="font-mono-sg text-xs text-white/30 mb-3 pb-3 border-b border-white/10">SCIENCE: Operant Conditioning + Narrative Engagement</div>
+        <p class="text-white/60 text-xs leading-relaxed">47 messages. Three modes: observer, guide, adversary. Appears unpredictably. Snakes and Ladders progression — streaks earn bonuses, inactivity earns penalties. Non-linear. Unpredictable. Real.</p>
+      </div>
     </div>
+    <div class="mt-8 text-center">
+      <p class="font-mono-sg text-xs text-white/30 tracking-widest">+ 10 COGNITIVE EXPLOIT MODULES · LEADERBOARD · SQUAD MODE · AI MISSION ARCHITECT · TEACHER DASHBOARD</p>
+    </div>
+  </div>
+</section>
 
-    <script>
-        const BOOT_LINES = [
-            { t: 'dim',  txt: 'BIOS v4.2.1 — ShiftGlitch Systems' },
-            { t: 'dim',  txt: '>>> Initialising memory banks...' },
-            { t: 'ok',   txt: '[  OK  ] RAM check passed — 16384MB clean' },
-            { t: 'dim',  txt: '>>> Loading kernel modules...' },
-            { t: 'ok',   txt: '[  OK  ] exploit_core.ko loaded' },
-            { t: 'ok',   txt: '[  OK  ] focus_governor.ko loaded' },
-            { t: 'warn', txt: '[ WARN ] Social media firewall detected — bypassing...' },
-            { t: 'ok',   txt: '[  OK  ] Firewall bypassed — connection spoofed' },
-            { t: 'dim',  txt: '>>> Authenticating neural interface...' },
-            { t: 'ok',   txt: '[  OK  ] Biometrics accepted — user identity: ANONYMOUS' },
-            { t: 'dim',  txt: '>>> Mounting study partitions...' },
-            { t: 'ok',   txt: '[  OK  ] /dev/braindump mounted (rw)' },
-            { t: 'ok',   txt: '[  OK  ] /dev/flashcards mounted (rw)' },
-            { t: 'warn', txt: '[ WARN ] Procrastination daemon detected — terminating PID 1337...' },
-            { t: 'ok',   txt: '[  OK  ] PID 1337 killed. Focus mode: ACTIVE' },
-            { t: 'dim',  txt: '>>> Launching ShiftGlitch OS...' },
-            { t: 'ok',   txt: '[  OK  ] All systems nominal. Ready to exploit.' },
-            { t: 'ok',   txt: 'SHIFTGLITCH BOOT COMPLETE ▋' },
-        ];
-        const INTERVALS = [0, 80, 120, 180, 220, 280, 330, 430, 530, 600, 660, 720, 760, 820, 950, 1050, 1160, 1350];
+<!-- RANKS -->
+<section id="ranks" class="py-24 sm:py-32 bg-black relative overflow-hidden">
+  <div class="absolute left-0 top-0 bottom-0 w-1 bg-[#8A2BE2]"></div>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6">
+    <div class="sector-label mb-4">// RANK PROGRESSION MATRIX — EVIDENCE-BASED ONLY</div>
+    <div class="mb-16">
+      <h2 class="font-display text-5xl sm:text-6xl section-headline text-white mb-4 leading-tight">
+        FIVE RANKS.
+        <span class="text-[#8A2BE2] glow-purple block">EARNED BY BEHAVIOUR.</span>
+        NOT BY PURCHASES.
+      </h2>
+      <p class="text-white/60 font-mono-sg text-sm max-w-2xl">Progression is permanent and irreversible. It cannot be bought, skipped, or hacked. Every threshold must be met simultaneously. There are no shortcuts — except the legitimate ones.</p>
+    </div>
+    <div class="grid md:grid-cols-5 gap-4">
+      <!-- NPC -->
+      <div class="rank-card p-5 flex flex-col" style="border-top-color:#fff;">
+        <div class="font-display text-3xl mb-2 text-white">◈</div>
+        <div class="font-mono-sg text-xs tracking-widest mb-1 text-white">TIER 00</div>
+        <div class="font-display text-2xl text-white mb-1">NPC</div>
+        <div class="font-mono-sg text-xs text-white/40 italic mb-3">The system controls you.</div>
+        <p class="text-white/60 text-xs leading-relaxed mb-4 flex-1">Starting rank. No evidence required. This is where everyone begins — being moved by systems they don't understand.</p>
+        <div class="border-t border-white/10 pt-4"><p class="font-mono-sg text-xs text-white/30">No evidence required. This is where everyone begins.</p></div>
+      </div>
+      <!-- Script Kiddie -->
+      <div class="rank-card p-5 flex flex-col" style="border-top-color:#39FF14;">
+        <div class="font-display text-3xl mb-2 text-[#39FF14]">◉</div>
+        <div class="font-mono-sg text-xs tracking-widest mb-1 text-[#39FF14]">TIER 01</div>
+        <div class="font-display text-2xl text-white mb-1">Script Kiddie</div>
+        <div class="font-mono-sg text-xs text-white/40 italic mb-3">You've learned some tricks.</div>
+        <p class="text-white/60 text-xs leading-relaxed mb-4 flex-1">You've started using the tools. Consistency is forming. The Mainframe acknowledges your presence.</p>
+        <div class="space-y-2 border-t border-white/10 pt-4">
+          <div class="flex items-center gap-2 text-xs"><span class="font-mono-sg text-white/40 w-20 shrink-0">Pomodoros</span><div class="ev-track"><div class="ev-fill" style="width:10%;background:#39FF14;"></div></div><span class="font-mono-sg text-white/40 w-5 text-right">15</span></div>
+          <div class="flex items-center gap-2 text-xs"><span class="font-mono-sg text-white/40 w-20 shrink-0">Blurts</span><div class="ev-track"><div class="ev-fill" style="width:10%;background:#39FF14;"></div></div><span class="font-mono-sg text-white/40 w-5 text-right">10</span></div>
+          <div class="flex items-center gap-2 text-xs"><span class="font-mono-sg text-white/40 w-20 shrink-0">Cards</span><div class="ev-track"><div class="ev-fill" style="width:10%;background:#39FF14;"></div></div><span class="font-mono-sg text-white/40 w-5 text-right">50</span></div>
+          <div class="flex items-center gap-2 text-xs"><span class="font-mono-sg text-white/40 w-20 shrink-0">Days</span><div class="ev-track"><div class="ev-fill" style="width:9%;background:#39FF14;"></div></div><span class="font-mono-sg text-white/40 w-5 text-right">7</span></div>
+          <div class="flex items-center gap-2 text-xs"><span class="font-mono-sg text-white/40 w-20 shrink-0">Boss Fights</span><div class="ev-track"><div class="ev-fill" style="width:10%;background:#39FF14;"></div></div><span class="font-mono-sg text-white/40 w-5 text-right">2</span></div>
+        </div>
+      </div>
+      <!-- Glitch Tech -->
+      <div class="rank-card p-5 flex flex-col" style="border-top-color:#8A2BE2;">
+        <div class="font-display text-3xl mb-2 text-[#8A2BE2]">⬡</div>
+        <div class="font-mono-sg text-xs tracking-widest mb-1 text-[#8A2BE2]">TIER 02</div>
+        <div class="font-display text-2xl text-white mb-1">Glitch Tech</div>
+        <div class="font-mono-sg text-xs text-white/40 italic mb-3">You understand how it works.</div>
+        <p class="text-white/60 text-xs leading-relaxed mb-4 flex-1">Evidence of sustained practice. No longer just using the tools — you understand what they do and why.</p>
+        <div class="space-y-2 border-t border-white/10 pt-4">
+          <div class="flex items-center gap-2 text-xs"><span class="font-mono-sg text-white/40 w-20 shrink-0">Pomodoros</span><div class="ev-track"><div class="ev-fill" style="width:27%;background:#8A2BE2;"></div></div><span class="font-mono-sg text-white/40 w-5 text-right">40</span></div>
+          <div class="flex items-center gap-2 text-xs"><span class="font-mono-sg text-white/40 w-20 shrink-0">Blurts</span><div class="ev-track"><div class="ev-fill" style="width:25%;background:#8A2BE2;"></div></div><span class="font-mono-sg text-white/40 w-5 text-right">25</span></div>
+          <div class="flex items-center gap-2 text-xs"><span class="font-mono-sg text-white/40 w-20 shrink-0">Cards</span><div class="ev-track"><div class="ev-fill" style="width:24%;background:#8A2BE2;"></div></div><span class="font-mono-sg text-white/40 w-5 text-right">120</span></div>
+          <div class="flex items-center gap-2 text-xs"><span class="font-mono-sg text-white/40 w-20 shrink-0">Days</span><div class="ev-track"><div class="ev-fill" style="width:27%;background:#8A2BE2;"></div></div><span class="font-mono-sg text-white/40 w-5 text-right">20</span></div>
+          <div class="flex items-center gap-2 text-xs"><span class="font-mono-sg text-white/40 w-20 shrink-0">Boss Fights</span><div class="ev-track"><div class="ev-fill" style="width:25%;background:#8A2BE2;"></div></div><span class="font-mono-sg text-white/40 w-5 text-right">5</span></div>
+        </div>
+      </div>
+      <!-- Netrunner -->
+      <div class="rank-card p-5 flex flex-col" style="border-top-color:#FF8800;">
+        <div class="font-display text-3xl mb-2 text-[#FF8800]">◬</div>
+        <div class="font-mono-sg text-xs tracking-widest mb-1 text-[#FF8800]">TIER 03</div>
+        <div class="font-display text-2xl text-white mb-1">Netrunner</div>
+        <div class="font-mono-sg text-xs text-white/40 italic mb-3">Deep inside the system.</div>
+        <p class="text-white/60 text-xs leading-relaxed mb-4 flex-1">Significant demonstrated behaviour. Real mastery is taking shape — not claimed, proven.</p>
+        <div class="space-y-2 border-t border-white/10 pt-4">
+          <div class="flex items-center gap-2 text-xs"><span class="font-mono-sg text-white/40 w-20 shrink-0">Pomodoros</span><div class="ev-track"><div class="ev-fill" style="width:53%;background:#FF8800;"></div></div><span class="font-mono-sg text-white/40 w-5 text-right">80</span></div>
+          <div class="flex items-center gap-2 text-xs"><span class="font-mono-sg text-white/40 w-20 shrink-0">Blurts</span><div class="ev-track"><div class="ev-fill" style="width:50%;background:#FF8800;"></div></div><span class="font-mono-sg text-white/40 w-5 text-right">50</span></div>
+          <div class="flex items-center gap-2 text-xs"><span class="font-mono-sg text-white/40 w-20 shrink-0">Cards</span><div class="ev-track"><div class="ev-fill" style="width:50%;background:#FF8800;"></div></div><span class="font-mono-sg text-white/40 w-5 text-right">250</span></div>
+          <div class="flex items-center gap-2 text-xs"><span class="font-mono-sg text-white/40 w-20 shrink-0">Days</span><div class="ev-track"><div class="ev-fill" style="width:53%;background:#FF8800;"></div></div><span class="font-mono-sg text-white/40 w-5 text-right">40</span></div>
+          <div class="flex items-center gap-2 text-xs"><span class="font-mono-sg text-white/40 w-20 shrink-0">Boss Fights</span><div class="ev-track"><div class="ev-fill" style="width:50%;background:#FF8800;"></div></div><span class="font-mono-sg text-white/40 w-5 text-right">10</span></div>
+        </div>
+      </div>
+      <!-- System Admin -->
+      <div class="rank-card p-5 flex flex-col" style="border-top-color:#FF00FF;">
+        <div class="font-display text-3xl mb-2 text-[#FF00FF]">✦</div>
+        <div class="font-mono-sg text-xs tracking-widest mb-1 text-[#FF00FF]">TIER 04</div>
+        <div class="font-display text-2xl text-white mb-1">System Admin</div>
+        <div class="font-mono-sg text-xs text-white/40 italic mb-3">You own the Mainframe.</div>
+        <p class="text-white/60 text-xs leading-relaxed mb-4 flex-1">The highest rank. Sustained, documented evidence across weeks and months. Permanent. Irreversible. Impossible to fake.</p>
+        <div class="space-y-2 border-t border-white/10 pt-4">
+          <div class="flex items-center gap-2 text-xs"><span class="font-mono-sg text-white/40 w-20 shrink-0">Pomodoros</span><div class="ev-track"><div class="ev-fill" style="width:100%;background:#FF00FF;"></div></div><span class="font-mono-sg text-white/40 w-5 text-right">150</span></div>
+          <div class="flex items-center gap-2 text-xs"><span class="font-mono-sg text-white/40 w-20 shrink-0">Blurts</span><div class="ev-track"><div class="ev-fill" style="width:100%;background:#FF00FF;"></div></div><span class="font-mono-sg text-white/40 w-5 text-right">100</span></div>
+          <div class="flex items-center gap-2 text-xs"><span class="font-mono-sg text-white/40 w-20 shrink-0">Cards</span><div class="ev-track"><div class="ev-fill" style="width:100%;background:#FF00FF;"></div></div><span class="font-mono-sg text-white/40 w-5 text-right">500</span></div>
+          <div class="flex items-center gap-2 text-xs"><span class="font-mono-sg text-white/40 w-20 shrink-0">Days</span><div class="ev-track"><div class="ev-fill" style="width:100%;background:#FF00FF;"></div></div><span class="font-mono-sg text-white/40 w-5 text-right">75</span></div>
+          <div class="flex items-center gap-2 text-xs"><span class="font-mono-sg text-white/40 w-20 shrink-0">Boss Fights</span><div class="ev-track"><div class="ev-fill" style="width:100%;background:#FF00FF;"></div></div><span class="font-mono-sg text-white/40 w-5 text-right">20</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="mt-10 grid sm:grid-cols-3 gap-4">
+      <div class="border border-white/10 p-4 bg-white/[0.02]">
+        <div class="font-mono-sg text-xs tracking-widest mb-2 text-[#39FF14]">CONSISTENCY LADDER BONUS</div>
+        <p class="text-white/60 text-xs leading-relaxed">7-day streak → 10% threshold reduction on all rank requirements.</p>
+      </div>
+      <div class="border border-white/10 p-4 bg-white/[0.02]">
+        <div class="font-mono-sg text-xs tracking-widest mb-2 text-[#FF00FF]">CLEARANCE STRIP PENALTY</div>
+        <p class="text-white/60 text-xs leading-relaxed">10+ day inactivity → rank promotion blocked until activity resumes.</p>
+      </div>
+      <div class="border border-white/10 p-4 bg-white/[0.02]">
+        <div class="font-mono-sg text-xs tracking-widest mb-2 text-[#FF8800]">PERFORMANCE SHORTCUT</div>
+        <p class="text-white/60 text-xs leading-relaxed">BrainDump 200+ words + Boss Fight 90%+ + Speed Run 5/5 → immediate clearance boost.</p>
+      </div>
+    </div>
+  </div>
+</section>
 
-        const logEl   = document.getElementById('boot-log');
-        const bootEl  = document.getElementById('boot-screen');
-        const heroEl  = document.getElementById('hero');
+<!-- PRICING -->
+<section id="pricing" class="py-24 sm:py-32 bg-[#030303] relative overflow-hidden">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6">
+    <div class="sector-label mb-4">// ACCESS TIER SELECTION</div>
+    <div class="mb-16 text-center">
+      <h2 class="font-display text-5xl sm:text-6xl section-headline text-white mb-4 leading-tight">
+        FREE IS GENUINELY FREE.
+        <span class="text-[#39FF14] glow-green block">PRO IS WORTH IT.</span>
+      </h2>
+      <p class="text-white/60 font-mono-sg text-sm max-w-xl mx-auto">Progression is earned, not purchased. No rank can be bought. Monetisation never affects learning outcomes.</p>
+      <div class="mt-4 inline-block bg-[#FF00FF]/10 border border-[#FF00FF]/30 px-4 py-2">
+        <span class="font-mono-sg text-xs text-[#FF00FF] tracking-widest">PAYFAST ZAR + PAYPAL USD PAYMENTS</span>
+      </div>
+    </div>
+    <div class="grid md:grid-cols-3 gap-6">
+      <!-- Free -->
+      <div class="plan-card-promo border p-6 flex flex-col">
+        <div class="font-mono-sg text-xs tracking-widest text-white/40 mb-1">NPC TIER</div>
+        <div class="font-display text-4xl text-white mb-1">FREE</div>
+        <div class="font-display text-5xl text-white mb-4">R0 <span class="text-2xl text-white/40">forever</span></div>
+        <ul class="space-y-2 flex-1 mb-6">
+          <li class="font-mono-sg text-xs text-white/60">✓ Unlimited flashcard decks</li>
+          <li class="font-mono-sg text-xs text-white/60">✓ Full Learning Governor (Pomodoro)</li>
+          <li class="font-mono-sg text-xs text-white/60">✓ Blurting Method — BrainDump sessions</li>
+          <li class="font-mono-sg text-xs text-white/60">✓ MCQ Diagnostic Boss Fights</li>
+          <li class="font-mono-sg text-xs text-white/60">✓ Babel Fish Metaphor Lab</li>
+          <li class="font-mono-sg text-xs text-white/60">✓ Full 5-rank progression system</li>
+          <li class="font-mono-sg text-xs text-white/60">✓ System INTERRUPT + The Warden</li>
+          <li class="font-mono-sg text-xs text-white/60">✓ Memory Palace + Mind Map + Chunking</li>
+          <li class="font-mono-sg text-xs text-white/60">✓ Global leaderboard</li>
+        </ul>
+        <a href="/login" class="block text-center py-3 border font-mono-sg text-sm tracking-widest transition-colors" style="border-color:rgba(255,255,255,0.3);color:rgba(255,255,255,0.7);" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'">Start Free — No Card Required</a>
+        <p class="font-mono-sg text-xs text-white/30 text-center mt-3">The free tier is genuinely useful. Always.</p>
+      </div>
+      <!-- Pro -->
+      <div class="plan-card-promo featured border p-6 flex flex-col relative">
+        <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#39FF14] text-black font-mono-sg text-xs px-3 py-1 tracking-widest whitespace-nowrap">MOST POPULAR</div>
+        <div class="font-mono-sg text-xs tracking-widest text-[#39FF14] mb-1">PRO TIER</div>
+        <div class="font-display text-4xl text-white mb-1">NETRUNNER PRO</div>
+        <div class="font-display text-5xl text-[#39FF14] mb-1">R99 <span class="text-2xl text-white/40">/month</span></div>
+        <div class="font-mono-sg text-xs text-white/30 mb-6">R799/year &nbsp;·&nbsp; ≈ R26/week</div>
+        <ul class="space-y-2 flex-1 mb-6">
+          <li class="font-mono-sg text-xs text-white/60">✓ Everything in Free</li>
+          <li class="font-mono-sg text-xs text-[#39FF14]">✓ AI Mission Architect (study plan generator)</li>
+          <li class="font-mono-sg text-xs text-[#39FF14]">✓ Squad Mode — co-op groups up to 4</li>
+          <li class="font-mono-sg text-xs text-white/60">✓ Advanced Cognitive Exploit Modules</li>
+          <li class="font-mono-sg text-xs text-white/60">✓ Mistake Vault + Teach It + Dual Coding</li>
+          <li class="font-mono-sg text-xs text-white/60">✓ The Interleave + Concept Mapper</li>
+          <li class="font-mono-sg text-xs text-white/60">✓ Operative Status Board — full analytics</li>
+        </ul>
+        <a href="/pricing" class="cta-primary block text-center">Go Pro — R99/month</a>
+      </div>
+      <!-- School -->
+      <div class="plan-card-promo border p-6 flex flex-col" style="border-color:rgba(138,43,226,0.4);">
+        <div class="font-mono-sg text-xs tracking-widest text-[#8A2BE2] mb-1">INSTITUTION TIER</div>
+        <div class="font-display text-4xl text-white mb-1">SCHOOL LICENSE</div>
+        <div class="font-display text-5xl text-[#8A2BE2] mb-4">R499 <span class="text-2xl text-white/40">/year</span></div>
+        <ul class="space-y-2 flex-1 mb-6">
+          <li class="font-mono-sg text-xs text-white/60">✓ Pro access for all enrolled students</li>
+          <li class="font-mono-sg text-xs text-[#8A2BE2]">✓ Teacher Dashboard — class analytics</li>
+          <li class="font-mono-sg text-xs text-[#8A2BE2]">✓ At-risk students flagged automatically</li>
+          <li class="font-mono-sg text-xs text-white/60">✓ Printable individual progress reports</li>
+          <li class="font-mono-sg text-xs text-white/60">✓ JSON export — one file per student</li>
+          <li class="font-mono-sg text-xs text-white/60">✓ Dedicated support channel</li>
+          <li class="font-mono-sg text-xs text-white/60">✓ Formal invoice for finance department</li>
+        </ul>
+        <a href="mailto:admin@shiftglitch.com?subject=School%20License%20Enquiry" class="block text-center py-3 border font-mono-sg text-sm tracking-widest transition-colors" style="border-color:rgba(138,43,226,0.5);color:#8A2BE2;" onmouseover="this.style.background='rgba(138,43,226,0.1)'" onmouseout="this.style.background='transparent'">Get School Access →</a>
+        <p class="font-mono-sg text-xs text-white/30 text-center mt-3">Heads of department can often approve this without committee.</p>
+      </div>
+    </div>
+  </div>
+</section>
 
-        let maxDelay = 0;
-        BOOT_LINES.forEach((line, i) => {
-            const delay = INTERVALS[i] || (i * 90);
-            maxDelay = Math.max(maxDelay, delay);
-            setTimeout(() => {
-                const el = document.createElement('div');
-                el.className = 'boot-line ' + line.t;
-                el.textContent = line.txt;
-                el.style.animationDelay = '0ms';
-                logEl.appendChild(el);
-                logEl.scrollTop = logEl.scrollHeight;
-            }, delay);
-        });
+<!-- WAITLIST / CTA -->
+<section id="waitlist" class="py-24 sm:py-32 bg-black relative overflow-hidden">
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 text-center">
+    <div class="sector-label mb-4">// MAINFRAME ENTRY PROTOCOL</div>
+    <h2 class="font-display text-5xl sm:text-6xl section-headline text-white mb-4 leading-tight">
+      READY TO
+      <span class="text-[#39FF14] glow-green block">JACK IN?</span>
+    </h2>
+    <p class="text-white/60 font-mono-sg text-sm max-w-xl mx-auto mb-10">The app is live. Create your account and start earning rank immediately. Or join the waitlist for early access intel.</p>
+    <div class="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+      <a href="/login" class="cta-primary">Create Account — Free</a>
+      <a href="/pricing" class="cta-outline">View All Plans</a>
+    </div>
+    <div class="terminal-border bg-black/60 p-6 max-w-xl mx-auto">
+      <div class="font-mono-sg text-xs text-[#39FF14] tracking-widest mb-4">// JOIN THE WAITLIST — GET EARLY INTEL</div>
+      <form id="waitlist-form" class="space-y-3">
+        <input type="text"  id="wl-name"  placeholder="Operative handle (your name)"  class="waitlist-input" required>
+        <input type="email" id="wl-email" placeholder="Comms channel (email)"          class="waitlist-input" required>
+        <button type="submit" class="cta-primary w-full" id="wl-submit">Transmit Intel Request</button>
+      </form>
+      <p id="wl-msg" class="font-mono-sg text-xs text-[#39FF14] mt-3 hidden"></p>
+    </div>
+  </div>
+</section>
 
-        setTimeout(() => {
-            bootEl.classList.add('fade-out');
-            setTimeout(() => {
-                bootEl.style.display = 'none';
-                heroEl.classList.add('visible');
-                startSloganRotation();
-            }, 620);
-        }, maxDelay + 700);
+<!-- FOOTER -->
+<footer class="bg-black border-t border-white/10 py-12">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6">
+    <div class="grid sm:grid-cols-3 gap-10 mb-10">
+      <div>
+        <img src="/public/brand/logo.jpg" alt="ShiftGlitch" class="h-10 w-auto mb-3">
+        <p class="font-mono-sg text-xs text-white/30 leading-relaxed">The study OS built on cognitive science. Not vibes.</p>
+      </div>
+      <div>
+        <div class="font-mono-sg text-xs text-[#39FF14] tracking-widest mb-3">// QUICK LINKS</div>
+        <ul class="space-y-2">
+          <li><a href="#the-problem" class="font-mono-sg text-xs text-white/40 hover:text-[#39FF14] transition-colors">The Problem</a></li>
+          <li><a href="#features"    class="font-mono-sg text-xs text-white/40 hover:text-[#39FF14] transition-colors">Tools</a></li>
+          <li><a href="#ranks"       class="font-mono-sg text-xs text-white/40 hover:text-[#39FF14] transition-colors">Ranks</a></li>
+          <li><a href="/pricing"     class="font-mono-sg text-xs text-white/40 hover:text-[#39FF14] transition-colors">Pricing</a></li>
+          <li><a href="/login"       class="font-mono-sg text-xs text-white/40 hover:text-[#39FF14] transition-colors">Enter the Mainframe</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="font-mono-sg text-xs text-[#39FF14] tracking-widest mb-3">// SYSTEM ARCHITECTURE</div>
+        <ul class="space-y-2">
+          <li class="font-mono-sg text-xs text-white/30">Spaced Repetition — Leitner System</li>
+          <li class="font-mono-sg text-xs text-white/30">Active Recall — Testing Effect</li>
+          <li class="font-mono-sg text-xs text-white/30">Pomodoro — Deliberate Practice</li>
+          <li class="font-mono-sg text-xs text-white/30">Feynman — Explanation as Understanding</li>
+          <li class="font-mono-sg text-xs text-white/30">Metacognition — Reflective Learning</li>
+        </ul>
+      </div>
+    </div>
+    <div class="border-t border-white/10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <p class="font-mono-sg text-xs text-white/30">© 2026 ShiftGlitch. All rights reserved. A product by Lourens Breytenbach.</p>
+      <a href="mailto:admin@shiftglitch.com" class="font-mono-sg text-xs text-white/30 hover:text-[#39FF14] transition-colors">admin@shiftglitch.com</a>
+    </div>
+    <div class="mt-4 text-center">
+      <p class="font-mono-sg text-xs text-white/10 tracking-widest">SHIFTGLITCH OS v18.0 — MAINFRAME SECURE — ALL EVIDENCE REAL — NO VIBE</p>
+    </div>
+  </div>
+</footer>
 
-        function startSloganRotation() {
-            const slogans = document.querySelectorAll('.secondary-slogan');
-            let current = 0;
-            setInterval(() => {
-                slogans[current].classList.remove('active');
-                current = (current + 1) % slogans.length;
-                slogans[current].classList.add('active');
-            }, 2800);
-        }
-    </script>
-    <footer style="text-align:center;padding:2rem 1rem 3rem;font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:rgba(57,255,20,0.2);border-top:1px solid rgba(57,255,20,0.06);margin-top:2rem;">
-      <a href="/privacy" style="color:rgba(57,255,20,0.35);text-decoration:none;margin:0 0.6rem;">Privacy Policy</a>
-      ·
-      <a href="/terms" style="color:rgba(57,255,20,0.35);text-decoration:none;margin:0 0.6rem;">Terms of Service</a>
-      ·
-      <a href="mailto:admin@shiftglitch.com" style="color:rgba(57,255,20,0.35);text-decoration:none;margin:0 0.6rem;">admin@shiftglitch.com</a>
-      <br><span style="margin-top:0.5rem;display:block;">© 2026 Lourens Breytenbach. All rights reserved.</span>
-    </footer>
+<div id="toast"></div>
+
+<script>
+  // Nav scroll
+  const nav = document.getElementById('main-nav');
+  window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 40), { passive: true });
+
+  // Boot terminal
+  const BOOT = [
+    '> SHIFTGLITCH OS v18.0 — INITIALISING...',
+    '> Neural pathway integrity: OPTIMAL',
+    '> Spaced repetition engine: LOADED',
+    '> Active recall protocols: ARMED',
+    '> Forgetting curve: NEUTRALISED',
+    '> Mainframe access: GRANTED',
+    '> Welcome, Operative.',
+  ];
+  const bootEl = document.getElementById('boot-lines');
+  const cur    = document.getElementById('boot-cursor');
+  let bi = 0;
+  const bootInt = setInterval(() => {
+    if (bi < BOOT.length) {
+      const p = document.createElement('p');
+      p.className = 'font-mono-sg text-xs text-[#39FF14] leading-relaxed';
+      p.textContent = BOOT[bi++];
+      bootEl.appendChild(p);
+    } else { clearInterval(bootInt); cur.style.display = 'none'; }
+  }, 340);
+
+  // Toast
+  function showToast(msg, dur = 5000) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), dur);
+  }
+
+  // Waitlist
+  document.getElementById('waitlist-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const name  = document.getElementById('wl-name').value.trim();
+    const email = document.getElementById('wl-email').value.trim();
+    const btn   = document.getElementById('wl-submit');
+    const msg   = document.getElementById('wl-msg');
+    btn.disabled = true; btn.textContent = 'Transmitting...';
+    try {
+      const res = await fetch('/api/waitlist', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ name, email }) });
+      if (res.ok || res.status === 409) {
+        msg.textContent = '> Transmission received. Intel incoming.';
+        msg.classList.remove('hidden');
+        document.getElementById('waitlist-form').reset();
+        showToast('// transmission received — check your comms channel');
+      } else {
+        showToast('// transmission failed — try again');
+        btn.disabled = false; btn.textContent = 'Transmit Intel Request';
+      }
+    } catch { showToast('// network error — try again'); btn.disabled = false; btn.textContent = 'Transmit Intel Request'; }
+  });
+</script>
 </body>
 </html>
