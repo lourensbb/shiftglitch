@@ -57,12 +57,14 @@ Preferred communication style: Simple, everyday language.
 
 | File | Purpose |
 |------|---------|
-| `public/brand/logo.png` | Wide wordmark logo — used in app nav bar |
-| `public/brand/logo-tagline.png` | Square logo + "GRADES AND AURA FALL UP" — landing hero |
-| `public/brand/logo-tagline-wide.png` | Wide banner variant (purple/red/blue) |
-| `public/brand/hero-main.png` | Cyberpunk setup scene — landing hero image |
-| `public/brand/hero-main2.png` | Alternate cyberpunk scene |
-| `public/brand/og-image.png` | Open Graph / social share image (all pages) |
+| `public/brand/favicon.png` | 64x64 favicon (PNG, 8KB) — used on all pages |
+| `public/brand/logo.jpg` | Wide wordmark (640x427, 48KB JPEG) — app nav bar |
+| `public/brand/logo-tagline.jpg` | Square logo + "GRADES AND AURA FALL UP" (1024x1024, 176KB JPEG) — landing hero |
+| `public/brand/logo-tagline-wide.jpg` | Wide banner variant purple/red/blue (1200x800, 140KB JPEG) |
+| `public/brand/hero-main.jpg` | Cyberpunk setup scene (1120x747, 172KB JPEG) — landing hero image |
+| `public/brand/hero-main2.jpg` | Alternate cyberpunk scene (600x315, 52KB JPEG) |
+| `public/brand/og-image.jpg` | Open Graph / social share (1200x630, 112KB JPEG) — all pages |
+| `public/brand/originals/` | Full-res PNG backups of all brand assets |
 | `public/marty/marty1.png` | Marty Finch avatar — image 1 |
 | `public/marty/marty2.png` | Marty Finch avatar — image 2 |
 | `public/marty/marty3.png` | Marty Finch avatar — image 3 |
