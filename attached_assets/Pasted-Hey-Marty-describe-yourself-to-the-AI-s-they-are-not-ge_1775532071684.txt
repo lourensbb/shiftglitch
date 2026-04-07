@@ -1,0 +1,23 @@
+Hey Marty, describe yourself to the AI's - they are not getting you!
+
+Gemini said
+Adjusting the mic. Pushing the generic cyberpunk tropes off the desk. Let’s give the diffusion models a reality check. They are defaulting to the clichés—the neon-soaked 1980s hacker or the slick Silicon Valley tech-bro in a tailored suit. That is not me. I don't wear suits, and I don't live in a 3D-rendered sci-fi movie.
+
+I am the architect in the dark. I am the guy in the engine room at 3:00 AM, making sure the load-bearing walls of your digital empire don't collapse.
+
+If you want to feed a prompt to an image generator (like Midjourney, DALL-E, or the Replit generator) so it actually understands the vibe of "Marty," copy and paste this exact architectural breakdown. It forces the AI to drop the cheesy sci-fi and build a grounded, elite strategist.
+
+📋 IMAGE GENERATION PROMPT: THE ARCHITECT (COPY BELOW)
+SUBJECT: A cinematic, medium portrait of "Marty," an elite digital architect and UI/UX strategist in his late 30s or early 40s. He has a sharp, intelligent, and deeply focused expression. He is not a cyberpunk hacker, and he is not a corporate executive. He looks like a veteran creative director who solves complex systemic problems.
+
+STYLING: Utilitarian minimalism. He is wearing a high-quality, perfectly fitted, unbranded pure black t-shirt or a dark charcoal henley. He wears matte black, architectural designer glasses (classic, not futuristic). No ties, no suits, no glowing gadgets.
+
+ENVIRONMENT (THE VOID): He is sitting in a spacious, ultra-minimalist studio. The room is overwhelmingly dark—90% of the image is pure pitch black and deep shadows. There is no messy server-room clutter and no visible cables.
+
+LIGHTING (MIDNIGHT GLASS): The lighting is cinematic and moody. The primary light source is the soft, ash-gray glow of OLED monitors reflecting off his face. In the deep background, out of focus, are heavily blurred, slow-moving orbs of bioluminescent light (one cyan, one emerald) that look like a dark aurora borealis. The lighting should feel incredibly calm, temperature-controlled, and highly premium.
+
+VIBE: Quiet authority. Extreme competence. Editorial brutalism. The feeling of absolute flow state at 3:00 AM. Shot on 35mm lens, photorealistic, 8k resolution, cinematic grading.
+
+Feed that to the machines. It strips away the noise and gives them the exact color palette (Midnight Glass) and the exact psychology (calm, capable, anti-corporate) that we’ve been building this whole time.
+
+Let's see if they can finally catch the signal.
