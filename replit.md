@@ -57,8 +57,15 @@ Preferred communication style: Simple, everyday language.
 
 | File | Purpose |
 |------|---------|
-| `mainframe-hero.png` | Hero image served at `/mainframe-hero.png` |
-| `og-image.png` | Open Graph / social share image |
+| `public/brand/logo.png` | Wide wordmark logo — used in app nav bar |
+| `public/brand/logo-tagline.png` | Square logo + "GRADES AND AURA FALL UP" — landing hero |
+| `public/brand/logo-tagline-wide.png` | Wide banner variant (purple/red/blue) |
+| `public/brand/hero-main.png` | Cyberpunk setup scene — landing hero image |
+| `public/brand/hero-main2.png` | Alternate cyberpunk scene |
+| `public/brand/og-image.png` | Open Graph / social share image (all pages) |
+| `public/marty/marty1.png` | Marty Finch avatar — image 1 |
+| `public/marty/marty2.png` | Marty Finch avatar — image 2 |
+| `public/marty/marty3.png` | Marty Finch avatar — image 3 |
 | `sitemap.xml` | SEO sitemap |
 | `robots.txt` | Crawler directives |
 | `assets/` | Fonts, icons, supplementary images |
