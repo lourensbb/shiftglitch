@@ -439,8 +439,9 @@ Response length: 2-4 sentences normally. Go longer only when a genuine deep-dive
 const MARTY_SESSION_COUNTS = new Map(); // simple in-memory rate limit
 
 app.post('/api/marty-chat', async (req, res) => {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) return res.status(503).json({ error: 'Marty is offline — API key not configured.' });
+  const openaiKey = process.env.OPENAI_API_KEY;
+  const geminiKey = process.env.GEMINI_API_KEY;
+  if (!openaiKey && !geminiKey) return res.status(503).json({ error: 'Marty is offline — no AI key configured.' });
 
   // Simple rate limit: 30 messages per IP per 10-min window
   const ip = req.ip || 'unknown';
@@ -459,28 +460,56 @@ app.post('/api/marty-chat', async (req, res) => {
   }
   if (message.length > 1000) return res.status(400).json({ error: 'Message too long.' });
 
-  // Build conversation for Gemini: history (max last 10 turns) + new message
-  const turns = history.slice(-10).map(h => ({
-    role: h.role,
-    parts: [{ text: h.text }]
-  }));
-  turns.push({ role: 'user', parts: [{ text: message.trim() }] });
+  // ── Try OpenAI first (GPT-4o-mini — fast, cheap, strong) ─────────────────
+  if (openaiKey) {
+    try {
+      const messages = [{ role: 'system', content: MARTY_SYSTEM_PROMPT }];
+      history.slice(-10).forEach(h => {
+        messages.push({ role: h.role === 'model' ? 'assistant' : 'user', content: h.text });
+      });
+      messages.push({ role: 'user', content: message.trim() });
 
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${openaiKey}` },
+        body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages,
+          max_tokens: 350,
+          temperature: 0.85
+        })
+      });
+      const data = await response.json();
+      if (response.ok) {
+        const text = data.choices?.[0]?.message?.content || "...signal lost. Try again.";
+        return res.json({ reply: text, engine: 'openai' });
+      }
+      console.warn('[marty] OpenAI error, falling back to Gemini:', data.error?.message);
+    } catch (err) {
+      console.warn('[marty] OpenAI request failed, falling back to Gemini:', err.message);
+    }
+  }
+
+  // ── Fallback: Gemini ───────────────────────────────────────────────────────
+  if (!geminiKey) return res.status(503).json({ error: 'Marty is offline — backup signal also down.' });
   try {
+    const turns = history.slice(-10).map(h => ({ role: h.role, parts: [{ text: h.text }] }));
+    turns.push({ role: 'user', parts: [{ text: message.trim() }] });
+
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiKey}`;
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents: turns,
         systemInstruction: { parts: [{ text: MARTY_SYSTEM_PROMPT }] },
-        generationConfig: { maxOutputTokens: 300, temperature: 0.85 }
+        generationConfig: { maxOutputTokens: 350, temperature: 0.85 }
       })
     });
     const data = await response.json();
     if (!response.ok) return res.status(response.status).json({ error: data.error?.message || 'AI error' });
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "...signal lost. Try again.";
-    res.json({ reply: text });
+    res.json({ reply: text, engine: 'gemini' });
   } catch (err) {
     res.status(500).json({ error: 'Failed to reach Marty. Check your connection.' });
   }
