@@ -431,27 +431,27 @@
     <!-- ── MARTY FINCH CHAT WIDGET ──────────────────────── -->
     <div id="marty-widget" style="position:fixed;bottom:1.5rem;left:1.5rem;z-index:900;display:flex;flex-direction:column;align-items:flex-start;">
         <!-- Chat panel (hidden by default) -->
-        <div id="marty-panel" style="display:none;width:min(340px,calc(100vw - 2rem));background:#0a0a0a;border:1.5px solid #39FF14;border-radius:4px;box-shadow:0 0 32px rgba(57,255,20,0.2),0 8px 32px rgba(0,0,0,0.8);margin-bottom:0.6rem;overflow:hidden;font-family:'Space Grotesk',sans-serif;">
+        <div id="marty-panel" style="display:none;width:min(360px,calc(100vw - 2rem));background:rgba(20,20,20,0.45);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border:1px solid rgba(57,255,20,0.22);border-radius:10px;box-shadow:0 0 40px rgba(57,255,20,0.1),0 16px 48px rgba(0,0,0,0.85);margin-bottom:0.75rem;overflow:hidden;font-family:'Space Grotesk',sans-serif;">
             <!-- Header -->
-            <div style="background:#111;border-bottom:1px solid #39FF14;padding:0.65rem 1rem;display:flex;align-items:center;gap:0.7rem;">
-                <img id="marty-header-img" src="/public/marty/marty1.png" alt="Marty Finch" style="width:38px;height:38px;border-radius:50%;border:2px solid #39FF14;object-fit:cover;">
+            <div style="background:rgba(15,15,15,0.7);border-bottom:1px solid rgba(57,255,20,0.15);padding:0.7rem 1rem;display:flex;align-items:center;gap:0.75rem;">
+                <img id="marty-header-img" src="/public/marty/marty1.png" alt="Marty Finch" style="width:40px;height:40px;border-radius:50%;border:1.5px solid rgba(57,255,20,0.6);object-fit:cover;box-shadow:0 0 10px rgba(57,255,20,0.25);">
                 <div>
-                    <div style="color:#39FF14;font-family:'Share Tech Mono',monospace;font-size:0.8rem;font-weight:bold;letter-spacing:0.1em;">MARTY FINCH</div>
-                    <div style="color:#555;font-size:0.68rem;letter-spacing:0.05em;">Architect · ShiftGlitch</div>
+                    <div style="color:#39FF14;font-family:'Share Tech Mono',monospace;font-size:0.78rem;font-weight:bold;letter-spacing:0.12em;">MARTY FINCH</div>
+                    <div style="color:#4a4a52;font-size:0.67rem;letter-spacing:0.06em;margin-top:1px;">Architect · ShiftGlitch</div>
                 </div>
-                <div style="margin-left:auto;display:flex;gap:0.4rem;align-items:center;">
-                    <span id="marty-status-dot" style="width:8px;height:8px;background:#39FF14;border-radius:50%;box-shadow:0 0 6px #39FF14;display:inline-block;"></span>
-                    <button onclick="window.martyWidget.close()" style="background:none;border:none;color:#555;cursor:pointer;font-size:1.1rem;line-height:1;padding:0.2rem;">✕</button>
+                <div style="margin-left:auto;display:flex;gap:0.5rem;align-items:center;">
+                    <span id="marty-status-dot" style="width:7px;height:7px;background:#39FF14;border-radius:50%;box-shadow:0 0 8px #39FF14;display:inline-block;"></span>
+                    <button onclick="window.martyWidget.close()" style="background:none;border:none;color:#444;cursor:pointer;font-size:1rem;line-height:1;padding:0.25rem 0.3rem;border-radius:4px;transition:color 0.2s;" onmouseover="this.style.color='#E4E4E7'" onmouseout="this.style.color='#444'">✕</button>
                 </div>
             </div>
             <!-- Messages -->
-            <div id="marty-messages" style="height:280px;overflow-y:auto;padding:0.9rem;display:flex;flex-direction:column;gap:0.7rem;scrollbar-width:thin;scrollbar-color:#39FF14 #111;"></div>
+            <div id="marty-messages" style="height:300px;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:0.8rem;scrollbar-width:thin;scrollbar-color:rgba(57,255,20,0.3) transparent;"></div>
             <!-- Input area -->
-            <div style="border-top:1px solid #222;padding:0.65rem;display:flex;gap:0.5rem;background:#0d0d0d;">
-                <input id="marty-input" type="text" maxlength="300" placeholder="Ask Marty anything..." autocomplete="off"
-                    style="flex:1;background:#111;border:1px solid #333;color:#e0e0e0;padding:0.5rem 0.7rem;font-family:'Space Grotesk',sans-serif;font-size:0.82rem;outline:none;border-radius:2px;"
+            <div style="border-top:1px solid rgba(255,255,255,0.06);padding:0.7rem;display:flex;gap:0.5rem;background:rgba(10,10,10,0.5);">
+                <input id="marty-input" type="text" maxlength="300" placeholder="Jack in — ask Marty anything..." autocomplete="off"
+                    style="flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:#E4E4E7;padding:0.55rem 0.75rem;font-family:'Space Grotesk',sans-serif;font-size:0.82rem;outline:none;border-radius:6px;"
                     onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();window.martyWidget.send();}">
-                <button onclick="window.martyWidget.send()" style="background:#39FF14;color:#000;border:none;padding:0.5rem 0.9rem;font-family:'Share Tech Mono',monospace;font-size:0.75rem;font-weight:bold;cursor:pointer;border-radius:2px;letter-spacing:0.05em;white-space:nowrap;">SEND</button>
+                <button onclick="window.martyWidget.send()" style="background:#39FF14;color:#000;border:none;padding:0.55rem 1rem;font-family:'Share Tech Mono',monospace;font-size:0.72rem;font-weight:bold;cursor:pointer;border-radius:6px;letter-spacing:0.05em;white-space:nowrap;">SEND</button>
             </div>
         </div>
         <!-- Avatar trigger button -->
@@ -471,9 +471,10 @@
         let open = false;
 
         const greetings = [
-            "Hey, operative. Marty Finch — I built this place. What do you need?",
-            "Signal acquired. I'm Marty. Ask me anything about the platform or how to run better exploits.",
-            "You jacked in. I'm Marty Finch, the one who designed all of this. What's the glitch?"
+            "You jacked in. I'm Marty — I built this place. What are we solving tonight?",
+            "Signal acquired. Late-night session? Good. That's when the real work happens. What do you need?",
+            "Marty Finch. I designed everything you're looking at. Tell me what you're up against.",
+            "You made it. Most operatives never get this far. What's blocking your run?"
         ];
 
         function randomImg() { return imgs[Math.floor(Math.random() * imgs.length)]; }
@@ -487,9 +488,9 @@
             div.style.cssText = `display:flex;gap:0.5rem;align-items:flex-start;${isMarty ? '' : 'flex-direction:row-reverse;'}`;
             const imgSrc = isMarty ? randomImg() : null;
             div.innerHTML = isMarty
-                ? `<img src="${imgSrc}" style="width:26px;height:26px;border-radius:50%;border:1px solid #39FF14;object-fit:cover;flex-shrink:0;margin-top:2px;">
-                   <div style="background:#111;border:1px solid #1a1a1a;border-radius:3px;padding:0.5rem 0.65rem;color:#d4d4d4;font-size:0.8rem;line-height:1.5;max-width:85%;white-space:pre-wrap;">${escHtml(text)}</div>`
-                : `<div style="background:#0e2a0e;border:1px solid #1e3a1e;border-radius:3px;padding:0.5rem 0.65rem;color:#a0e0a0;font-size:0.8rem;line-height:1.5;max-width:85%;white-space:pre-wrap;">${escHtml(text)}</div>`;
+                ? `<img src="${imgSrc}" style="width:28px;height:28px;border-radius:50%;border:1px solid rgba(57,255,20,0.5);object-fit:cover;flex-shrink:0;margin-top:3px;box-shadow:0 0 8px rgba(57,255,20,0.15);">
+                   <div style="background:rgba(10,30,15,0.55);border:1px solid rgba(16,185,129,0.28);border-radius:8px;border-top-left-radius:2px;padding:0.6rem 0.75rem;color:#E4E4E7;font-size:0.82rem;line-height:1.6;max-width:86%;white-space:pre-wrap;box-shadow:0 0 12px rgba(16,185,129,0.07);">${escHtml(text)}</div>`
+                : `<div style="background:rgba(0,30,40,0.55);border:1px solid rgba(0,210,230,0.25);border-radius:8px;border-top-right-radius:2px;padding:0.6rem 0.75rem;color:#c8f0f4;font-size:0.82rem;line-height:1.6;max-width:86%;white-space:pre-wrap;box-shadow:0 0 12px rgba(0,210,230,0.07);">${escHtml(text)}</div>`;
             msgs.appendChild(div);
             msgs.scrollTop = msgs.scrollHeight;
             history.push({ role: isMarty ? 'model' : 'user', text });
@@ -500,9 +501,9 @@
             const div = document.createElement('div');
             div.id = 'marty-typing';
             div.style.cssText = 'display:flex;gap:0.5rem;align-items:center;';
-            div.innerHTML = `<img src="${randomImg()}" style="width:26px;height:26px;border-radius:50%;border:1px solid #39FF14;object-fit:cover;flex-shrink:0;">
-                <div style="background:#111;border:1px solid #1a1a1a;border-radius:3px;padding:0.5rem 0.8rem;">
-                    <span style="color:#39FF14;font-family:'Share Tech Mono',monospace;font-size:0.75rem;letter-spacing:0.1em;animation:martyblink 1s ease-in-out infinite;">processing...</span>
+            div.innerHTML = `<img src="${randomImg()}" style="width:28px;height:28px;border-radius:50%;border:1px solid rgba(57,255,20,0.5);object-fit:cover;flex-shrink:0;box-shadow:0 0 8px rgba(57,255,20,0.15);">
+                <div style="background:rgba(10,30,15,0.55);border:1px solid rgba(16,185,129,0.28);border-radius:8px;border-top-left-radius:2px;padding:0.55rem 0.85rem;">
+                    <span style="color:#39FF14;font-family:'Share Tech Mono',monospace;font-size:0.72rem;letter-spacing:0.12em;animation:martyblink 1.2s ease-in-out infinite;">transmitting...</span>
                 </div>`;
             msgs.appendChild(div);
             msgs.scrollTop = msgs.scrollHeight;
@@ -569,12 +570,13 @@
     })();
     </script>
     <style>
-    @keyframes martyblink { 0%,100%{opacity:1} 50%{opacity:0.3} }
-    #marty-messages::-webkit-scrollbar { width:4px; }
-    #marty-messages::-webkit-scrollbar-track { background:#111; }
-    #marty-messages::-webkit-scrollbar-thumb { background:#39FF14;border-radius:2px; }
-    #marty-avatar-btn:hover img { box-shadow:0 0 28px rgba(57,255,20,0.7),0 4px 20px rgba(0,0,0,0.8); }
-    #marty-input:focus { border-color:#39FF14 !important;box-shadow:0 0 0 1px #39FF14; }
+    @keyframes martyblink { 0%,100%{opacity:1} 50%{opacity:0.25} }
+    #marty-messages::-webkit-scrollbar { width:3px; }
+    #marty-messages::-webkit-scrollbar-track { background:transparent; }
+    #marty-messages::-webkit-scrollbar-thumb { background:rgba(57,255,20,0.25);border-radius:4px; }
+    #marty-avatar-btn:hover img { box-shadow:0 0 30px rgba(57,255,20,0.65),0 6px 24px rgba(0,0,0,0.8) !important; }
+    #marty-input:focus { border-color:rgba(0,210,230,0.45) !important;box-shadow:0 0 0 2px rgba(0,210,230,0.12) !important; }
+    #marty-panel { transition: opacity 0.18s ease, transform 0.18s ease; }
     </style>
 
     <!-- ── HELP BUTTON ──────────────────────────────────── -->
