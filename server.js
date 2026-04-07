@@ -439,9 +439,10 @@ Response length: 2-4 sentences normally. Go longer only when a genuine deep-dive
 const MARTY_SESSION_COUNTS = new Map(); // simple in-memory rate limit
 
 app.post('/api/marty-chat', async (req, res) => {
-  const openaiKey = process.env.OPENAI_API_KEY;
-  const geminiKey = process.env.GEMINI_API_KEY;
-  if (!openaiKey && !geminiKey) return res.status(503).json({ error: 'Marty is offline — no AI key configured.' });
+  const openaiKey   = process.env.OPENAI_API_KEY;
+  const claudeKey   = process.env.ANTHROPIC_API_KEY;
+  const geminiKey   = process.env.GEMINI_API_KEY;
+  if (!openaiKey && !claudeKey && !geminiKey) return res.status(503).json({ error: 'Marty is offline — no AI key configured.' });
 
   // Simple rate limit: 30 messages per IP per 10-min window
   const ip = req.ip || 'unknown';
@@ -484,13 +485,47 @@ app.post('/api/marty-chat', async (req, res) => {
         const text = data.choices?.[0]?.message?.content || "...signal lost. Try again.";
         return res.json({ reply: text, engine: 'openai' });
       }
-      console.warn('[marty] OpenAI error, falling back to Gemini:', data.error?.message);
+      console.warn('[marty] OpenAI error, trying Claude:', data.error?.message);
     } catch (err) {
-      console.warn('[marty] OpenAI request failed, falling back to Gemini:', err.message);
+      console.warn('[marty] OpenAI request failed, trying Claude:', err.message);
     }
   }
 
-  // ── Fallback: Gemini ───────────────────────────────────────────────────────
+  // ── Fallback 1: Claude (claude-3-5-haiku — fast, expressive) ──────────────
+  if (claudeKey) {
+    try {
+      const claudeMessages = [];
+      history.slice(-10).forEach(h => {
+        claudeMessages.push({ role: h.role === 'model' ? 'assistant' : 'user', content: h.text });
+      });
+      claudeMessages.push({ role: 'user', content: message.trim() });
+
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': claudeKey,
+          'anthropic-version': '2023-06-01'
+        },
+        body: JSON.stringify({
+          model: 'claude-3-5-haiku-20241022',
+          max_tokens: 350,
+          system: MARTY_SYSTEM_PROMPT,
+          messages: claudeMessages
+        })
+      });
+      const data = await response.json();
+      if (response.ok) {
+        const text = data.content?.[0]?.text || "...signal lost. Try again.";
+        return res.json({ reply: text, engine: 'claude' });
+      }
+      console.warn('[marty] Claude error, falling back to Gemini:', data.error?.message);
+    } catch (err) {
+      console.warn('[marty] Claude request failed, falling back to Gemini:', err.message);
+    }
+  }
+
+  // ── Fallback 2: Gemini ─────────────────────────────────────────────────────
   if (!geminiKey) return res.status(503).json({ error: 'Marty is offline — backup signal also down.' });
   try {
     const turns = history.slice(-10).map(h => ({ role: h.role, parts: [{ text: h.text }] }));
